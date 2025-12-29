@@ -4,13 +4,15 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './modules/user/user.module';
 import { TeacherModule } from './modules/teacher/teacher.module';
 import { ConfigModule } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
+import { ClassModule } from './modules/class/class.module';
+import { CourseModule } from './modules/course/course.module';
 
 
 @Module({
   imports: [
     AuthModule, UserModule, PrismaModule, 
-    TeacherModule, ConfigModule.forRoot({isGlobal:true})
+    TeacherModule, ConfigModule.forRoot({isGlobal:true}),
+    ClassModule, CourseModule
   ]
 })
 export class AppModule {}

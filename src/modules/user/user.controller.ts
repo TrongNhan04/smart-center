@@ -1,10 +1,10 @@
 import { Controller, Get, UseGuards, Req } from '@nestjs/common';
 import { UserService } from './user.service';
-import { AuthGuard } from '@nestjs/passport';
 import {Request} from 'express'
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
+type RequestWithUser = Request & { user: { userId: number; role?: string } };
 
 @Controller('user')
 export class UserController {
@@ -12,8 +12,8 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard,RolesGuard)
   @Roles('ADMIN','TEACHER')
-  @Get('detail')
-  detail(@Req() request: any){
-    return this.userService.Profile(request)
+  @Get('me')
+  GetProfile(@Req() request: RequestWithUser){
+    return this.userService.Profile(request.user.userId)
   }
 }

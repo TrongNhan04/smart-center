@@ -89,7 +89,7 @@ model HocVien {
 // ============ 4. KHOAHOC ============//
 enum TrangThaiKH {
   DRAFT
-  AcTIVE
+  ACTIVE
   INACTIVE
 }
 
@@ -99,7 +99,7 @@ model KhoaHoc {
 
   TenKhoaHoc String
   TrinhDo    String
-  ThoiGian   Int //tổng thời gian khóa học tháng
+  ThoiGian   Int //tổng thời gian khóa học (tháng)
   TongSoBuoi Int
   HocPhi     Decimal     @db.Decimal(10, 2)
   TrangThai  TrangThaiKH @default(DRAFT) //mặc định là DRAFT

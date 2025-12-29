@@ -9,13 +9,13 @@ export class UserService {
     private prismaService: PrismaService
   ){}
 
-  async Profile(req){
-    const id = req.user.userId
+  async Profile(userId: number){
     const userDB = await this.prismaService.user.findUnique({
-      where:{ID: id},
+      where:{ID: userId},
       select:{
         ID: true,
         Email: true,
+        DienThoai: true,
         VaiTro: true,
         PhaiDoiMK: true
       }

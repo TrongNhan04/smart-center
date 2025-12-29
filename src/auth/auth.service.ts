@@ -30,28 +30,29 @@ export class AuthService {
                 msg: `Số điện thoại ${registerDTO.phone} hoặc ${registerDTO.email} đã được sử dụng`
             }, HttpStatus.BAD_REQUEST)
         }
-        else {
-            // 2 băm mật khẩu là só điện thoại
-            const passwordHash = bcrypt.hashSync(registerDTO.phone, 10)
 
-            // 3 lưu user vào DB
-            const user = await this.prismaService.user.create({
-                data: {
-                    Email: registerDTO.email,
-                    DienThoai: registerDTO.phone,
-                    MatKhauHash: passwordHash,
-                    VaiTro: registerDTO.role
-                },
-                // hiện ra những trường nào
-                select: {
-                    ID: true,
-                    Email: true,
-                    DienThoai: true,
-                    VaiTro: true
-                }
-            })
-            //   return await this.signJWT(user.ID, user.Email)
-        }
+        // 2 băm mật khẩu là số điện thoại
+        const passwordHash = await bcrypt.hash(registerDTO.phone, 10)
+
+        // 3 lưu user vào DB
+        const user = await this.prismaService.user.create({
+            data: {
+                Email: registerDTO.email,
+                DienThoai: registerDTO.phone,
+                MatKhauHash: passwordHash,
+                VaiTro: registerDTO.role
+            },
+            // hiện ra những trường nào
+            select: {
+                ID: true,
+                Email: true,
+                DienThoai: true,
+                VaiTro: true
+            }
+        })
+        return {msg: "Successful"}
+        //   return await this.signJWT(user.ID, user.Email)
+
     }
 
     // Xác thực
@@ -116,7 +117,7 @@ export class AuthService {
     async ChangePassword(userID: number, oldpw: string, newpw: string) {
         const userDB = await this.prismaService.user.findUnique({
             where: { ID: userID },
-            select:{
+            select: {
                 ID: true,
                 MatKhauHash: true
             }
@@ -128,9 +129,9 @@ export class AuthService {
         if (!pw)
             throw new UnauthorizedException("Incorrect password!")
 
-        if (oldpw===newpw)
+        if (oldpw === newpw)
             throw new BadRequestException("Password doesn't change!")
-        
+
         const hashPW = await bcrypt.hash(newpw, 10)
 
         await this.prismaService.user.update({
@@ -140,7 +141,7 @@ export class AuthService {
                 PhaiDoiMK: false
             }
         })
-        return {ok:true}
+        return { mgs: "Password has changed!" }
     }
 
 }

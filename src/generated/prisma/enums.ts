@@ -36,7 +36,7 @@ export type TrangThaiHV = (typeof TrangThaiHV)[keyof typeof TrangThaiHV]
 
 export const TrangThaiKH = {
   DRAFT: 'DRAFT',
-  AcTIVE: 'AcTIVE',
+  ACTIVE: 'ACTIVE',
   INACTIVE: 'INACTIVE'
 } as const
 

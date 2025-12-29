@@ -1,7 +1,6 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsNumber, IsPhoneNumber, IsString } from "class-validator"
 import { Vaitro } from "src/generated/prisma/enums"
 
-
 export class RegisterDTO{
     @IsEmail()
     @IsNotEmpty()
