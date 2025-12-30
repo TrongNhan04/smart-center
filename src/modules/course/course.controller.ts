@@ -3,7 +3,7 @@ import { CourseService } from "./course.service";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guard/roles.guard";
 import { Roles } from "src/auth/decorators/roles.decorator";
-import { CoursesDTO, CreateCourseDTO, UpdateCourseDTO } from "./dto/course.dto";
+import { CoursesDTO, CreateCourseDTO, UpdateCourseDTO } from "./course.dto";
 
 @Controller('admin/courses')
 export class CourseController {
@@ -16,7 +16,7 @@ export class CourseController {
     @Roles('ADMIN')
     @Post()
     async CreateCourse(@Body() courseDTO: CreateCourseDTO) {
-        return this.courseService.CreateCourse(courseDTO)
+        return await this.courseService.CreateCourse(courseDTO)
     }
 
     // lấy danh sách khóa học
@@ -24,7 +24,7 @@ export class CourseController {
     @Roles('ADMIN')
     @Get()
     async GetCourses(@Query() query: CoursesDTO) {
-        return this.courseService.GetCourses(query)
+        return await this.courseService.GetCourses(query)
     }
 
     // lấy chi tiết khóa học
@@ -32,7 +32,7 @@ export class CourseController {
     @Roles('ADMIN')
     @Get(':id')
     async GetCourseById(@Param('id') id: number) {
-        return this.courseService.GetCourseById(+id) // ép kiểu id sang number
+        return await this.courseService.GetCourseById(+id) // ép kiểu id sang number
     }
 
     //sửa khóa học
@@ -41,6 +41,14 @@ export class CourseController {
     @Patch(':id')
     async UpdateCourseById(@Param('id') id: number,
         @Body() updateCourse: UpdateCourseDTO) {
-        return this.courseService.UpdateCourseById(+id, updateCourse)
+        return await this.courseService.UpdateCourseById(+id, updateCourse)
+    }
+
+    // xóa mềm khóa học
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADMIN')
+    @Patch(':id/inactive')
+    async DeleteCourseById(@Param('id') id: number){
+        return await this.courseService.DeleteCouresByID(+id)
     }
 }

@@ -12,7 +12,7 @@ import { CourseModule } from './modules/course/course.module';
   imports: [
     AuthModule, UserModule, PrismaModule, 
     TeacherModule, ConfigModule.forRoot({isGlobal:true}),
-    ClassModule, CourseModule
+    CourseModule, ClassModule
   ]
 })
 export class AppModule {}
