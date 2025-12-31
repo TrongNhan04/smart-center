@@ -3,7 +3,7 @@ import { CourseService } from "./course.service";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guard/roles.guard";
 import { Roles } from "src/auth/decorators/roles.decorator";
-import { CoursesDTO, CreateCourseDTO, UpdateCourseDTO } from "./course.dto";
+import { CourseQueryDTO, CourseUpdateDTO, CreateCourseDTO } from "./course.dto";
 
 @Controller('admin/courses')
 export class CourseController {
@@ -19,15 +19,15 @@ export class CourseController {
         return await this.courseService.CreateCourse(courseDTO)
     }
 
-    // lấy danh sách khóa học
+    // lấy danh sách khóa học hiện có hoặc theo query
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Get()
-    async GetCourses(@Query() query: CoursesDTO) {
+    async GetCourses(@Query() query: CourseQueryDTO) {
         return await this.courseService.GetCourses(query)
     }
 
-    // lấy chi tiết khóa học
+    // lấy chi tiết 1 khóa học
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Get(':id')
@@ -35,20 +35,28 @@ export class CourseController {
         return await this.courseService.GetCourseById(+id) // ép kiểu id sang number
     }
 
-    //sửa khóa học
+    //sửa khóa học + xóa mềm khóa học
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Patch(':id')
     async UpdateCourseById(@Param('id') id: number,
-        @Body() updateCourse: UpdateCourseDTO) {
+        @Body() updateCourse: CourseUpdateDTO) {
         return await this.courseService.UpdateCourseById(+id, updateCourse)
     }
 
     // xóa mềm khóa học
+    // @UseGuards(JwtAuthGuard, RolesGuard)
+    // @Roles('ADMIN')
+    // @Patch(':id/inactive')
+    // async DeleteCourseById(@Param('id') id: number){
+    //     return await this.courseService.DeleteCouresByID(+id)
+    // }
+
+    // lấy danh sách lớp thuộc khóa học 
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
-    @Patch(':id/inactive')
-    async DeleteCourseById(@Param('id') id: number){
-        return await this.courseService.DeleteCouresByID(+id)
+    @Get(':id/classes')
+    async GetClassesByCourseId(@Param('id') courseId: number) {
+            return this.courseService.GetClassesByCourseId(+courseId)
     }
 }

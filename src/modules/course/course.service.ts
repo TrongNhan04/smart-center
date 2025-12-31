@@ -1,6 +1,6 @@
 import { BadRequestException, ConflictException, Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
-import { CoursesDTO, CreateCourseDTO, UpdateCourseDTO } from "./course.dto";
+import { CourseQueryDTO, CreateCourseDTO, CourseUpdateDTO } from "./course.dto";
 import { Prisma } from "src/generated/prisma/client";
 import { constants } from "buffer";
 
@@ -43,7 +43,7 @@ export class CourseService {
         return newCourse
     }
 
-    async GetCourses(query: CoursesDTO) {
+    async GetCourses(query: CourseQueryDTO) {
         // tạo điều kiện where
         const where: Prisma.KhoaHocWhereInput = {};
         const q = query.q?.trim()
@@ -81,7 +81,7 @@ export class CourseService {
         return courseDB
     }
 
-    async UpdateCourseById(id: number, courseUpdate: UpdateCourseDTO) {
+    async UpdateCourseById(id: number, courseUpdate: CourseUpdateDTO) {
         // update theo trạng thái
         const courseDB = await this.prismaService.khoaHoc.findUnique({
             where: { ID: id }
@@ -93,7 +93,7 @@ export class CourseService {
         const data: Prisma.KhoaHocUpdateInput = {}
 
         // data update cho DRAFT
-        if(courseDB.TrangThai === 'DRAFT'){
+        if (courseDB.TrangThai === 'DRAFT') {
             data.TenKhoaHoc = courseUpdate.name,
             data.TrinhDo = courseUpdate.level,
             data.TongSoBuoi = courseUpdate.totalSession,
@@ -104,34 +104,41 @@ export class CourseService {
         }
 
         //data update cho ACTIVE
-        if(courseDB.TrangThai === 'ACTIVE'){
+        if (courseDB.TrangThai === 'ACTIVE') {
             data.TenKhoaHoc = courseUpdate.name,
             data.MoTa = courseUpdate.description
-            if(courseUpdate.status === 'INACTIVE')
+            if (courseUpdate.status === 'INACTIVE')
                 data.TrangThai = courseUpdate.status
-            else throw new BadRequestException('ACTIVE allows to INACTIVE')
         }
-        
+
         //data update cho INACTIVE
-        if(courseDB.TrangThai === 'INACTIVE'){
-            if(courseUpdate.status === 'ACTIVE')
-                data.TrangThai = 'ACTIVE'
-            else
-                throw new BadRequestException('INACTIVE allows to ACTIVE')
-        }
-            
+        if (courseDB.TrangThai === 'INACTIVE' && courseUpdate.status === 'ACTIVE')
+            data.TrangThai = courseUpdate.status
+
+
         return this.prismaService.khoaHoc.update({
-            where:{ID:id},
+            where: { ID: id },
             data,
-            omit: {CreatedAt:true, UpdatedAt: true}
+            omit: { CreatedAt: true, UpdatedAt: true }
         })
     }
 
-    async DeleteCouresByID(id: number){
-        return await this.prismaService.khoaHoc.update({
-            where: {ID: id},
-            data: {TrangThai: 'INACTIVE'},
-            omit:{CreatedAt:true, UpdatedAt: true}
+    // async DeleteCouresByID(id: number){
+    //     return await this.prismaService.khoaHoc.update({
+    //         where: {ID: id},
+    //         data: {TrangThai: 'INACTIVE'},
+    //         omit:{CreatedAt:true, UpdatedAt: true}
+    //     })
+    // }
+
+    async GetClassesByCourseId(courseId: number) {
+        return await this.prismaService.lopHoc.findMany({
+            where: { KhoaHocID: courseId },
+            omit: {
+                ID: true,
+                CreatedAt: true,
+                updatedAt: true
+            }
         })
     }
 }

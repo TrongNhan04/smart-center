@@ -158,7 +158,6 @@ model BuoiHoc {
 
   BuoiSo     Int
   ChuDe      String?
-  PhongHoc   String?
   BatDauLuc  DateTime
   KetThucLuc DateTime
   MoTa       String?

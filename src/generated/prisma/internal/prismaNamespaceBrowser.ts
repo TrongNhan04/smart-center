@@ -169,7 +169,6 @@ export const BuoiHocScalarFieldEnum = {
   LopHocID: 'LopHocID',
   BuoiSo: 'BuoiSo',
   ChuDe: 'ChuDe',
-  PhongHoc: 'PhongHoc',
   BatDauLuc: 'BatDauLuc',
   KetThucLuc: 'KetThucLuc',
   MoTa: 'MoTa',
