@@ -4,12 +4,13 @@ import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guard/roles.guard";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { ClassQueryDTO, ClassUpdateDTO, CreateClassDTO } from "./class.dto";
+import { CreateSessionDTO, SessionStatusDTO } from "../session/session.dto";
 
 @Controller('admin/classes')
 export class ClassController {
     constructor(private classService: ClassService) { }
 
-    //thêm lớp
+    // thêm lớp
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Post()
@@ -25,7 +26,7 @@ export class ClassController {
         return await this.classService.GetClasses(query)
     }
 
-    // lấy chi tiết lớp
+    // lấy chi tiết lớp - phần trên 
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Get(':id')
@@ -33,20 +34,46 @@ export class ClassController {
         return await this.classService.GetClassById(+classId)
     }
 
-    //cập nhật lớp theo trạng thái
+    // cập nhật lớp theo trạng thái
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Patch(':id')
     async UpdateClassById(@Param('id') classId: number,
         @Body() body: ClassUpdateDTO) {
-            return await this.classService.UpdateClassById(+classId, body)
+        return await this.classService.UpdateClassById(+classId, body)
     }
 
-    //lấy danh sách buổi học của lớp
+    // xóa mềm lớp học
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADMIN')
+    @Patch(':id/closed')
+    async DeleteClassByID(@Param('id') classId: number) {
+        return await this.classService.DeleteClassByID(+classId)
+    }
+
+    //  lấy danh sách buổi học của lớp - phần dưới
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Get(':id/sessions')
-    async GetSessionsByClassId(@Param('id') classId: number){
-        return await this.classService.GetSessionsByClassId(+classId)
+    async GetSessionsByClassId(@Param('id') classId: number,
+        @Query() query: SessionStatusDTO) {
+        return await this.classService.GetSessionsByClassId(+classId, query)
+    }
+
+    // tạo buổi học tự động
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADMIN')
+    @Post(':id/sessions/auto')
+    async AutoGenerateSession(@Param('id') classId: number) {
+        return await this.classService.AutoGenerateSession(+classId)
+    }
+
+    //tạo buổi học thủ công
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADMIN')
+    @Post(':id/sessions/manual')
+    async ManualGenerateSession(@Param('id') classId: number,
+        @Body() body: CreateSessionDTO) {
+            return await this.classService.ManualGenerateSession(+classId, body)
     }
 }

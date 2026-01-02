@@ -1,6 +1,7 @@
 import { ArrayNotEmpty, ArrayUnique, IsArray, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, MaxLength, Min } from "class-validator";
 import { TrangThaiLH } from "src/generated/prisma/enums";
 
+
 export class CreateClassDTO {
     @IsNotEmpty()
     @IsString()
@@ -40,13 +41,13 @@ export class CreateClassDTO {
     @IsNotEmpty()
     @IsString()
     @Matches(/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
-        { message: 'Time must be in valid 24-hour format (HH:MM, e.g., 14:30)', })
+        { message: 'Time must be in valid 24-hour format (HH:MM, e.g., 18:03)', })
     startTime: string
 
     @IsNotEmpty()
     @IsString()
     @Matches(/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
-        { message: 'Time must be in valid 24-hour format (HH:MM, e.g., 14:30)', })
+        { message: 'Time must be in valid 24-hour format (HH:MM, e.g., 18:03)', })
     endTime: string
 
     @IsNotEmpty()
@@ -56,6 +57,7 @@ export class CreateClassDTO {
 
 export class ClassQueryDTO{
     @IsOptional()
+    @IsEnum(TrangThaiLH)
     status?: TrangThaiLH
 
     @IsOptional()
@@ -63,6 +65,11 @@ export class ClassQueryDTO{
 }
 
 export class ClassUpdateDTO{
+    @IsOptional()
+    @IsInt()
+    @Min(1)
+    teacherId: number
+
     @IsString()
     @MaxLength(150)
     name?: string
@@ -104,3 +111,4 @@ export class ClassUpdateDTO{
     @IsEnum(TrangThaiLH)
     status?: TrangThaiLH
 }
+

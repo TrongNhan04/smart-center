@@ -2,12 +2,13 @@ import { BadRequestException, ConflictException, Injectable } from "@nestjs/comm
 import { PrismaService } from "src/prisma/prisma.service";
 import { ClassQueryDTO, ClassUpdateDTO, CreateClassDTO } from "./class.dto";
 import { Prisma } from "src/generated/prisma/client";
+import { CreateSessionDTO, SessionStatusDTO } from "../session/session.dto";
 
 @Injectable()
 export class ClassService {
     constructor(
         private prismaService: PrismaService
-    ) { }
+    ) {}
 
     //kiểm tra trùng mã lớp 
     async ClassValidator(code: string) {
@@ -44,8 +45,8 @@ export class ClassService {
     async FromDateToDayValidator(fromDate: string, toDate: string) {
         const fd = new Date(fromDate)
         const td = new Date(toDate)
-        if (fd >= td)
-            throw new ConflictException('From date should less than today')
+        if (td <= fd)
+            throw new ConflictException('To date must greater than from date')
     }
 
     // kiểm tra thời gian bắt đầu, kết thúc và sĩ số
@@ -64,13 +65,24 @@ export class ClassService {
         if (classSize < 0)
             throw new ConflictException('Class size must greater than 0')
     }
-    async CreateClass(classDTO: CreateClassDTO) {
 
+    // kiểm tra lớp tồn tại theo id
+    async ClassIDValidator(classId: number) {
+        const classDB = await this.prismaService.lopHoc.findUnique({
+            where: { ID: classId },
+        })
+        if (!classDB) throw new BadRequestException('Class is not existed')
+        return classDB
+    }
+
+    // thêm lớp mới
+    async CreateClass(classDTO: CreateClassDTO) {
         await this.ClassValidator(classDTO.code)
         await this.CourseValidator(classDTO.courseId)
         await this.TeacherValidator(classDTO.teacherId)
         await this.Timetable_SizeValidator(classDTO.startTime, classDTO.endTime, classDTO.classSize)
         await this.FromDateToDayValidator(classDTO.fromDate, classDTO.toDate)
+
         await this.prismaService.$transaction([
             this.prismaService.lopHoc.create({
                 data: {
@@ -88,7 +100,10 @@ export class ClassService {
                 }
             }),
             this.prismaService.khoaHoc.update({
-                where: { ID: classDTO.courseId },
+                where: {
+                    ID: classDTO.courseId,
+                    TrangThai: 'DRAFT',
+                },
                 data: {
                     TrangThai: 'ACTIVE'
                 }
@@ -97,11 +112,12 @@ export class ClassService {
         return { mgs: "succesfull" }
     }
 
+    // lấy danh sách lớp mặc đinh hoặc query
     async GetClasses(query: ClassQueryDTO) {
         // tạo điều kiện where
         const where: Prisma.LopHocWhereInput = {}
         const q = query?.q?.trim()
-        
+
         if (query.status)// nếu trạng thái có thì where theo
             where.TrangThai = query.status
         else // không thì có 1 trong các trạng thái
@@ -124,6 +140,7 @@ export class ClassService {
         })
     }
 
+    // lấy chi tiết lớp - phần trên
     async GetClassById(classId: number) {
         return await this.prismaService.lopHoc.findUnique({
             where: { ID: classId },
@@ -135,33 +152,40 @@ export class ClassService {
         })
     }
 
+    // cập nhật lớp theo trạng thái
     async UpdateClassById(classId: number, up: ClassUpdateDTO) {
         await this.Timetable_SizeValidator(up.startTime, up.endTime, up.classSize)
         await this.FromDateToDayValidator(up.fromDate, up.toDate)
+        await this.TeacherValidator(up.teacherId)
+        const classDB = await this.ClassIDValidator(classId)
 
         const data: Prisma.LopHocUpdateInput = {}
-        const classDB = await this.prismaService.lopHoc.findUnique({
-            where: { ID: classId }
+        // đếm buổi học của lớp
+        const countSession = await this.prismaService.buoiHoc.count({
+            where: { LopHocID: classId }
         })
-        if (!classDB) throw new ConflictException('Class is not existed')
-
         if (classDB.TrangThai === 'OPEN') {
             data.TenLop = up.name
             data.MoTa = up.description
-            data.TuNgay = up.fromDate
-            data.DenNgay = up.toDate
-            data.LichHoc = up.timeTable
-            data.GioBatDau = up.startTime
-            data.GioKetThuc = up.endTime
-            data.SiSo = up.classSize
             data.TrangThai = up.status
+            data.SiSo = up.classSize
+            data.giaovien = { connect: { ID: up.teacherId } }
+            // nếu không có buổi học thì cho sửa thêm
+            if (countSession == 0) {
+                data.TuNgay = up.fromDate
+                data.DenNgay = up.toDate
+                data.LichHoc = up.timeTable
+                data.GioBatDau = up.startTime
+                data.GioKetThuc = up.endTime
+            }
         }
 
         if (classDB.TrangThai === 'RUNNING') {
+            data.giaovien = { connect: { ID: up.teacherId } }
             data.TenLop = up.name
             data.MoTa = up.description
             if (up.status === 'CLOSED')
-                data.TrangThai = up.status
+                data.TrangThai = 'CLOSED'
         }
         return await this.prismaService.lopHoc.update({
             where: { ID: classId },
@@ -173,22 +197,202 @@ export class ClassService {
         })
     }
 
-    async GetSessionsByClassId(classId: number) {
-        const classDB = await this.prismaService.lopHoc.findUnique({
-            where: { ID: classId },
-        })
+    // xóa mềm lớp học, hủy ghi danh và các buổi học chưa diễn ra
+    async DeleteClassByID(classId: number) {
+        // nếu hủy lớp OPEN hoặc RUNNING thì hủy ghi danh: STOPPED 
+        // và hủy các buổi học SCHEDULED -> CANCELLED 
+        const classDB = await this.ClassIDValidator(classId)
+        if (classDB.TrangThai !== 'CLOSED') {
+            await this.prismaService.$transaction([
+                this.prismaService.lopHoc.update({
+                    where: { ID: classId },
+                    data: { TrangThai: 'CLOSED' }
+                }),
+                this.prismaService.ghiDanh.updateMany({
+                    where: {
+                        LopHocID: classId,
+                        TrangThai: { in: ['ACTIVE', 'PENDING'] }
+                    },
+                    data: { TrangThai: 'STOPPED' }
+                }),
+                this.prismaService.buoiHoc.updateMany({
+                    where: {
+                        LopHocID: classId,
+                        TrangThai: 'SCHEDULED'
+                    },
+                    data: { TrangThai: 'CANCELED' }
+                })
+            ])
+        }
+        return { meg: "Closed or already closed" }
+    }
 
-        if (!classDB) throw new BadRequestException('Class is not existed')
+    // lấy danh sách buổi học theo lớp - phần dưới
+    async GetSessionsByClassId(classId: number, query: SessionStatusDTO) {
+        const classDB = await this.ClassIDValidator(classId)
         if (classDB.TrangThai === 'CLOSED')
             throw new BadRequestException(`Class ${classDB.TenLop} is closed`)
 
+        const where: Prisma.BuoiHocWhereInput = {}
+        where.LopHocID = classId
+        if (query.status)
+            where.TrangThai = query.status
+        else
+            where.TrangThai = { in: ['SCHEDULED', 'COMPLETED'] }
         return await this.prismaService.buoiHoc.findMany({
-            where: {LopHocID: classId},
-            omit:{
+            where,
+            omit: {
                 ID: true,
                 CreatedAt: true,
                 updatedAt: true
             }
+        })
+    }
+
+    //format giờ và phút
+    parseHHmm(time: string) {
+        const [h, m] = time.split(':').map(Number);
+        return { h, m };
+    }
+
+    // ghép ngày và giờ
+    combineDateAndTime(dateOnly: Date, hhmm: string) {
+        const { h, m } = this.parseHHmm(hhmm);
+        const d = new Date(dateOnly);
+        d.setHours(h, m, 0, 0);
+        return d;
+    }
+
+    // tự động tạo buổi học
+    async AutoGenerateSession(classId: number) {
+        const classDB = await this.prismaService.lopHoc.findUnique({
+            where: { ID: classId },
+            select: {
+                ID: true,
+                TuNgay: true,
+                DenNgay: true,
+                LichHoc: true,      // 0..6 theo getDay()
+                GioBatDau: true,    // "08:30"
+                GioKetThuc: true,   // "10:30"
+                TrangThai: true,
+                khoahoc: { select: { TongSoBuoi: true, ThoiGian: true } },
+            },
+        });
+
+        if (!classDB) throw new ConflictException('Class not found');
+        if (!classDB.khoahoc) throw new ConflictException('Course data is null');
+
+        const totalSessions = classDB.khoahoc.TongSoBuoi;
+        const durationMonths = classDB.khoahoc.ThoiGian;
+
+        // số buổi mỗi tháng
+        const perChunk = Math.ceil(totalSessions / durationMonths);
+        // số buổi đã có trong dánh sách buổi học 
+        const currentCount = await this.prismaService.buoiHoc.count({
+            where: { LopHocID: classId }
+        });
+        if (currentCount >= totalSessions + 4)
+            return { mes: 'No sessions to generate (already full)' };
+        //số buổi cần sinh = min của số buổi mỗi tháng và số buổi còn lại
+        const need = Math.min(perChunk, totalSessions - currentCount);
+
+        // xác định ngày của buổi cuối trong danh sách buổi học
+        const last = await this.prismaService.buoiHoc.findFirst({
+            where: { LopHocID: classId },
+            orderBy: { BatDauLuc: 'desc' },
+            select: { BatDauLuc: true },
+        });
+        // xác định ngày bắt đầu dò để buổi học học đúng lịch học
+        let xday = last ? last.BatDauLuc : classDB.TuNgay //gán giá trị cho xday
+        if (last) xday.setDate(xday.getDate() + 1)//dò từ ngày tiếp theo buổi cuối
+
+        const endDate = classDB.DenNgay
+        if (xday > endDate) return { mes: 'No sessions to generate (out of date range)' };
+
+        // Mảng danh sách buổi học để đưa cho createMany()
+        const data: Prisma.BuoiHocCreateManyInput[] = [];
+        let buoiSo = currentCount + 1;
+
+        while (xday <= endDate && data.length < need) {
+            const dow = xday.getDay(); // 0..6
+            if (classDB.LichHoc.includes(dow)) {
+                const startAt = this.combineDateAndTime(xday, classDB.GioBatDau);
+                const endAt = this.combineDateAndTime(xday, classDB.GioKetThuc);
+
+                data.push({
+                    LopHocID: classId,
+                    BuoiSo: buoiSo++,
+                    BatDauLuc: startAt,
+                    KetThucLuc: endAt,
+                });
+            }
+            xday.setDate(xday.getDate() + 1);
+        }
+
+        if (data.length === 0) return { mes: 'No sessions matched timetable in range' };
+
+        await this.prismaService.buoiHoc.createMany({
+            data,
+            skipDuplicates: true,
+        });
+
+        return { mes: 'successful', created: data.length };
+    }
+
+    // tạo buổi học thủ công 
+    async ManualGenerateSession(classId: number, body: CreateSessionDTO) {
+        const classDB = await this.ClassIDValidator(classId)
+        if (classDB.TrangThai === 'CLOSED')
+            throw new ConflictException('Class already closed')
+
+        await this.Timetable_SizeValidator(body.startAt, body.endAt, 1)
+
+        const xdate = new Date(body.date)
+        if (xdate >= classDB.DenNgay || xdate < classDB.TuNgay)
+            throw new ConflictException(`New session must from ${classDB.TuNgay} to ${classDB.DenNgay}`)
+
+        const nos = await this.prismaService.buoiHoc.count({ where: { LopHocID: classId } })
+
+        if (!classDB.LichHoc.includes(xdate.getDay()))
+            throw new ConflictException(`New session must on the timetable`)
+
+        const startAt = this.combineDateAndTime(xdate, body.startAt)
+        const endAt = this.combineDateAndTime(xdate, body.endAt)
+
+        return await this.prismaService.$transaction(async (tx) => {
+            // kiểm tra trùng buổi hoặc đè buổi trong cùng lớp
+            const duplicate = await tx.buoiHoc.findFirst({
+                where: {
+                    LopHocID: classId,
+                    BatDauLuc: { lt: endAt },
+                    KetThucLuc: { gt: startAt }
+                },
+                select: { ID: true }
+            })
+            if (duplicate) throw new ConflictException('Duplicate session')
+            
+            // BuoiSo = max + 1 
+            const max = await tx.buoiHoc.findFirst({
+                where: { LopHocID: classId },
+                orderBy: { BuoiSo: 'desc' },
+                select: { BuoiSo: true }
+            })
+            const nextSs = Math.max(max?.BuoiSo ?? 0, 1) + 1
+
+            return await tx.buoiHoc.create({
+                data:{
+                    LopHocID: classId,
+                    ChuDe: body.topic,
+                    MoTa: body.description,
+                    BatDauLuc: startAt,
+                    KetThucLuc: endAt,
+                    BuoiSo: nextSs
+                },
+                omit:{
+                    CreatedAt:true,
+                    updatedAt:true
+                }
+            })
         })
     }
 }

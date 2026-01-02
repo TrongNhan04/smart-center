@@ -123,13 +123,13 @@ export class CourseService {
         })
     }
 
-    // async DeleteCouresByID(id: number){
-    //     return await this.prismaService.khoaHoc.update({
-    //         where: {ID: id},
-    //         data: {TrangThai: 'INACTIVE'},
-    //         omit:{CreatedAt:true, UpdatedAt: true}
-    //     })
-    // }
+    async DeleteCouresByID(id: number){
+        return await this.prismaService.khoaHoc.update({
+            where: {ID: id},
+            data: {TrangThai: 'INACTIVE'},
+            omit:{CreatedAt:true, UpdatedAt: true}
+        })
+    }
 
     async GetClassesByCourseId(courseId: number) {
         return await this.prismaService.lopHoc.findMany({

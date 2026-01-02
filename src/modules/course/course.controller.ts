@@ -35,7 +35,7 @@ export class CourseController {
         return await this.courseService.GetCourseById(+id) // ép kiểu id sang number
     }
 
-    //sửa khóa học + xóa mềm khóa học
+    //sửa khóa học theo trạng thái
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Patch(':id')
@@ -45,12 +45,12 @@ export class CourseController {
     }
 
     // xóa mềm khóa học
-    // @UseGuards(JwtAuthGuard, RolesGuard)
-    // @Roles('ADMIN')
-    // @Patch(':id/inactive')
-    // async DeleteCourseById(@Param('id') id: number){
-    //     return await this.courseService.DeleteCouresByID(+id)
-    // }
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADMIN')
+    @Patch(':id/inactive')
+    async DeleteCourseById(@Param('id') id: number){
+        return await this.courseService.DeleteCouresByID(+id)
+    }
 
     // lấy danh sách lớp thuộc khóa học 
     @UseGuards(JwtAuthGuard, RolesGuard)

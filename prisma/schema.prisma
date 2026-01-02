@@ -149,7 +149,7 @@ model LopHoc {
 enum TrangThaiBH {
   SCHEDULED
   COMPLETED
-  CANCELED
+  CANCELLED
 }
 
 model BuoiHoc {
@@ -158,7 +158,7 @@ model BuoiHoc {
 
   BuoiSo     Int
   ChuDe      String?
-  BatDauLuc  DateTime
+  BatDauLuc  DateTime 
   KetThucLuc DateTime
   MoTa       String?
   TrangThai  TrangThaiBH @default(SCHEDULED) //mặc định là SCHEDULE
@@ -169,7 +169,8 @@ model BuoiHoc {
   ketqua_buoihoc KetQua_BuoiHoc? //buổi học có kết quả buổi học
 
   //Quan hệ
-  @@unique([LopHocID, BatDauLuc]) //một lớp học không có hai buổi học cùng thời gian bắt đầu
+  @@unique([LopHocID, BatDauLuc]) 
+  //một lớp học không có hai buổi học cùng ngày + giờ bắt đầu
 }
 
 // ============ 7. KETQUA_BUOIHOC ============//
@@ -180,7 +181,6 @@ enum TrangThai_KQBH {
 
 model KetQua_BuoiHoc {
   ID           Int            @id @default(autoincrement())
-  //BuoiHocID, GiaoVienID, NhanXetChung, TrangThai
   BuoiHocID    Int            @unique
   GiaoVienID   Int
   NhanXetChung String

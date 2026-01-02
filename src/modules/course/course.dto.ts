@@ -1,4 +1,4 @@
-import { IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength } from "class-validator"
+import { IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, Min } from "class-validator"
 import { TrangThaiKH } from "src/generated/prisma/enums"
 
 export class CreateCourseDTO{
@@ -17,6 +17,7 @@ export class CreateCourseDTO{
 
     @IsNotEmpty()
     @IsNumber()
+    @Min(1)
     duration: number
 
     @IsNotEmpty()
@@ -50,6 +51,7 @@ export class CourseUpdateDTO{
 
     @IsOptional()
     @IsNumber()
+    @Min(1)
     duration: number
 
     @IsOptional()

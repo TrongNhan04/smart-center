@@ -6,13 +6,14 @@ import { TeacherModule } from './modules/teacher/teacher.module';
 import { ConfigModule } from '@nestjs/config';
 import { ClassModule } from './modules/class/class.module';
 import { CourseModule } from './modules/course/course.module';
+import { SessionModule } from './modules/session/session.module';
 
 
 @Module({
   imports: [
     AuthModule, UserModule, PrismaModule, 
     TeacherModule, ConfigModule.forRoot({isGlobal:true}),
-    CourseModule, ClassModule
+    CourseModule, ClassModule, SessionModule
   ]
 })
 export class AppModule {}
