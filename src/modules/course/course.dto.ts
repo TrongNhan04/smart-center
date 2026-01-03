@@ -34,8 +34,8 @@ export class CourseQueryDTO{
     @IsOptional()
     status?: TrangThaiKH
 
-    @IsString()
     @IsOptional()
+    @IsString()
     q?:string //câu truy vấn
 }
 
@@ -43,28 +43,28 @@ export class CourseUpdateDTO{
     @IsOptional()
     @IsString()
     @MaxLength(150)
-    name: string
+    name?: string
 
     @IsOptional()
     @IsString()
-    level: string
+    level?: string
 
     @IsOptional()
     @IsNumber()
     @Min(1)
-    duration: number
+    duration?: number
 
     @IsOptional()
     @IsNumber()
-    totalSession: number
+    totalSession?: number
 
     @IsOptional()
     @IsNumber()
-    courseFee: number
+    courseFee?: number
 
     @IsOptional()
     @IsString()
-    description: string
+    description?: string
 
     @IsOptional()
     @IsEnum(TrangThaiKH)

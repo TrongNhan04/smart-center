@@ -1343,6 +1343,7 @@ export const LopHocScalarFieldEnum = {
   GioBatDau: 'GioBatDau',
   GioKetThuc: 'GioKetThuc',
   SiSo: 'SiSo',
+  PhongHoc: 'PhongHoc',
   TrangThai: 'TrangThai',
   CreatedAt: 'CreatedAt',
   updatedAt: 'updatedAt'
@@ -1359,6 +1360,7 @@ export const BuoiHocScalarFieldEnum = {
   BatDauLuc: 'BatDauLuc',
   KetThucLuc: 'KetThucLuc',
   MoTa: 'MoTa',
+  PhongHoc: 'PhongHoc',
   TrangThai: 'TrangThai',
   CreatedAt: 'CreatedAt',
   updatedAt: 'updatedAt'
@@ -1386,6 +1388,7 @@ export const KetQua_ChiTietScalarFieldEnum = {
   GhiDanhID: 'GhiDanhID',
   NhanXetRieng: 'NhanXetRieng',
   DiemDanh: 'DiemDanh',
+  Diem: 'Diem',
   CreatedAt: 'CreatedAt',
   UpdatedAt: 'UpdatedAt'
 } as const

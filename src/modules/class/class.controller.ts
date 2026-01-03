@@ -5,6 +5,7 @@ import { RolesGuard } from "src/auth/guard/roles.guard";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { ClassQueryDTO, ClassUpdateDTO, CreateClassDTO } from "./class.dto";
 import { CreateSessionDTO, SessionStatusDTO } from "../session/session.dto";
+import { MustChangePWGuard } from "src/auth/guard/must-change-pw.guard";
 
 @Controller('admin/classes')
 export class ClassController {
@@ -19,8 +20,8 @@ export class ClassController {
     }
 
     // lấy danh sách lớp hiện có hoặc theo điều kiện - query
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles('ADMIN')
+    @UseGuards(JwtAuthGuard, MustChangePWGuard,RolesGuard)
+    @Roles('ADMIN','TEACHER')
     @Get()
     async GetClasses(@Query() query: ClassQueryDTO) {
         return await this.classService.GetClasses(query)

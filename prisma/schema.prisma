@@ -6,7 +6,7 @@
 
 generator client {
   provider     = "prisma-client"
-  output   = "../src/generated/prisma"
+  output       = "../src/generated/prisma"
   moduleFormat = "cjs"
 }
 
@@ -134,6 +134,7 @@ model LopHoc {
   GioBatDau  String //"18:00"
   GioKetThuc String //"20:00"
   SiSo       Int
+  PhongHoc   String?
   TrangThai  TrangThaiLH @default(OPEN) //mặc định là OPEN
   CreatedAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
@@ -158,19 +159,20 @@ model BuoiHoc {
 
   BuoiSo     Int
   ChuDe      String?
-  BatDauLuc  DateTime 
+  BatDauLuc  DateTime
   KetThucLuc DateTime
   MoTa       String?
+  PhongHoc   String?
   TrangThai  TrangThaiBH @default(SCHEDULED) //mặc định là SCHEDULE
 
   CreatedAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   lophoc         LopHoc          @relation(fields: [LopHocID], references: [ID]) //buổi học thuộc về lớp học
   ketqua_buoihoc KetQua_BuoiHoc? //buổi học có kết quả buổi học
+  //một lớp học không có hai buổi học cùng ngày + giờ bắt đầu
 
   //Quan hệ
-  @@unique([LopHocID, BatDauLuc]) 
-  //một lớp học không có hai buổi học cùng ngày + giờ bắt đầu
+  @@unique([LopHocID, BatDauLuc])
 }
 
 // ============ 7. KETQUA_BUOIHOC ============//
@@ -197,19 +199,20 @@ model KetQua_BuoiHoc {
 
 // ============ 8. KETQUA_CHITIET ============//
 model KetQua_ChiTiet {
-  ID           Int     @id @default(autoincrement())
-  KetQuaID     Int
-  GhiDanhID    Int
-  NhanXetRieng String?
-  DiemDanh     Boolean @default(false) //mặc định là có mặt
-
+  ID             Int            @id @default(autoincrement())
+  KetQuaID       Int
+  GhiDanhID      Int
+  NhanXetRieng   String?
+  DiemDanh       Boolean        @default(false) //mặc định là có mặt
+  Diem           Decimal        @db.Decimal(4, 2)
+  
   CreatedAt      DateTime       @default(now())
   UpdatedAt      DateTime       @updatedAt
-  
-  //Quan hệ
-  @@unique([KetQuaID, GhiDanhID]) //một kết quả buổi học chỉ có một chi tiết cho mỗi ghi danh 
   ketqua_buoihoc KetQua_BuoiHoc @relation(fields: [KetQuaID], references: [ID])
   ghidanh        GhiDanh        @relation(fields: [GhiDanhID], references: [ID])
+
+  //Quan hệ
+  @@unique([KetQuaID, GhiDanhID]) //một kết quả buổi học chỉ có một chi tiết cho mỗi ghi danh 
 }
 
 // ============ 9. GHIDANH ============//

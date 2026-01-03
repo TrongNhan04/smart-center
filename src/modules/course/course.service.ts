@@ -6,10 +6,9 @@ import { constants } from "buffer";
 
 @Injectable()
 export class CourseService {
-    constructor(
-        private prismaService: PrismaService
-    ) { }
+    constructor(private prismaService: PrismaService) { }
 
+    // kiểm tra trùng mã khóa học
     async ValidateCourse(courseCode: string) {
         const courseDB = await this.prismaService.khoaHoc.findUnique({
             where: { MaKhoaHoc: courseCode }
@@ -18,6 +17,7 @@ export class CourseService {
             throw new ConflictException('Course code is existed!')
     }
 
+    // tạo khóa học
     async CreateCourse(courseDTO: CreateCourseDTO) {
         // kiểm tra trùng mã khóa học
         await this.ValidateCourse(courseDTO.code)
@@ -43,6 +43,7 @@ export class CourseService {
         return newCourse
     }
 
+    // lấy danh sách khóa học
     async GetCourses(query: CourseQueryDTO) {
         // tạo điều kiện where
         const where: Prisma.KhoaHocWhereInput = {};
@@ -70,6 +71,7 @@ export class CourseService {
         return courses
     }
 
+    // lấy chi tiết 1 khóa học
     async GetCourseById(id: number) {
         const courseDB = await this.prismaService.khoaHoc.findUnique({
             where: { ID: id },
@@ -81,6 +83,7 @@ export class CourseService {
         return courseDB
     }
 
+    // cập nhật khóa học theo trạng thái
     async UpdateCourseById(id: number, courseUpdate: CourseUpdateDTO) {
         // update theo trạng thái
         const courseDB = await this.prismaService.khoaHoc.findUnique({
@@ -123,6 +126,7 @@ export class CourseService {
         })
     }
 
+    // xóa mềm khóa học
     async DeleteCouresByID(id: number){
         return await this.prismaService.khoaHoc.update({
             where: {ID: id},
@@ -131,6 +135,7 @@ export class CourseService {
         })
     }
 
+    // lấy danh sách lớp học của khóa học
     async GetClassesByCourseId(courseId: number) {
         return await this.prismaService.lopHoc.findMany({
             where: { KhoaHocID: courseId },

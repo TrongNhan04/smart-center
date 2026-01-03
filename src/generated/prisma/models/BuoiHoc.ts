@@ -46,6 +46,7 @@ export type BuoiHocMinAggregateOutputType = {
   BatDauLuc: Date | null
   KetThucLuc: Date | null
   MoTa: string | null
+  PhongHoc: string | null
   TrangThai: $Enums.TrangThaiBH | null
   CreatedAt: Date | null
   updatedAt: Date | null
@@ -59,6 +60,7 @@ export type BuoiHocMaxAggregateOutputType = {
   BatDauLuc: Date | null
   KetThucLuc: Date | null
   MoTa: string | null
+  PhongHoc: string | null
   TrangThai: $Enums.TrangThaiBH | null
   CreatedAt: Date | null
   updatedAt: Date | null
@@ -72,6 +74,7 @@ export type BuoiHocCountAggregateOutputType = {
   BatDauLuc: number
   KetThucLuc: number
   MoTa: number
+  PhongHoc: number
   TrangThai: number
   CreatedAt: number
   updatedAt: number
@@ -99,6 +102,7 @@ export type BuoiHocMinAggregateInputType = {
   BatDauLuc?: true
   KetThucLuc?: true
   MoTa?: true
+  PhongHoc?: true
   TrangThai?: true
   CreatedAt?: true
   updatedAt?: true
@@ -112,6 +116,7 @@ export type BuoiHocMaxAggregateInputType = {
   BatDauLuc?: true
   KetThucLuc?: true
   MoTa?: true
+  PhongHoc?: true
   TrangThai?: true
   CreatedAt?: true
   updatedAt?: true
@@ -125,6 +130,7 @@ export type BuoiHocCountAggregateInputType = {
   BatDauLuc?: true
   KetThucLuc?: true
   MoTa?: true
+  PhongHoc?: true
   TrangThai?: true
   CreatedAt?: true
   updatedAt?: true
@@ -225,6 +231,7 @@ export type BuoiHocGroupByOutputType = {
   BatDauLuc: Date
   KetThucLuc: Date
   MoTa: string | null
+  PhongHoc: string | null
   TrangThai: $Enums.TrangThaiBH
   CreatedAt: Date
   updatedAt: Date
@@ -261,6 +268,7 @@ export type BuoiHocWhereInput = {
   BatDauLuc?: Prisma.DateTimeFilter<"BuoiHoc"> | Date | string
   KetThucLuc?: Prisma.DateTimeFilter<"BuoiHoc"> | Date | string
   MoTa?: Prisma.StringNullableFilter<"BuoiHoc"> | string | null
+  PhongHoc?: Prisma.StringNullableFilter<"BuoiHoc"> | string | null
   TrangThai?: Prisma.EnumTrangThaiBHFilter<"BuoiHoc"> | $Enums.TrangThaiBH
   CreatedAt?: Prisma.DateTimeFilter<"BuoiHoc"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"BuoiHoc"> | Date | string
@@ -276,6 +284,7 @@ export type BuoiHocOrderByWithRelationInput = {
   BatDauLuc?: Prisma.SortOrder
   KetThucLuc?: Prisma.SortOrder
   MoTa?: Prisma.SortOrderInput | Prisma.SortOrder
+  PhongHoc?: Prisma.SortOrderInput | Prisma.SortOrder
   TrangThai?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -295,6 +304,7 @@ export type BuoiHocWhereUniqueInput = Prisma.AtLeast<{
   BatDauLuc?: Prisma.DateTimeFilter<"BuoiHoc"> | Date | string
   KetThucLuc?: Prisma.DateTimeFilter<"BuoiHoc"> | Date | string
   MoTa?: Prisma.StringNullableFilter<"BuoiHoc"> | string | null
+  PhongHoc?: Prisma.StringNullableFilter<"BuoiHoc"> | string | null
   TrangThai?: Prisma.EnumTrangThaiBHFilter<"BuoiHoc"> | $Enums.TrangThaiBH
   CreatedAt?: Prisma.DateTimeFilter<"BuoiHoc"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"BuoiHoc"> | Date | string
@@ -310,6 +320,7 @@ export type BuoiHocOrderByWithAggregationInput = {
   BatDauLuc?: Prisma.SortOrder
   KetThucLuc?: Prisma.SortOrder
   MoTa?: Prisma.SortOrderInput | Prisma.SortOrder
+  PhongHoc?: Prisma.SortOrderInput | Prisma.SortOrder
   TrangThai?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -331,6 +342,7 @@ export type BuoiHocScalarWhereWithAggregatesInput = {
   BatDauLuc?: Prisma.DateTimeWithAggregatesFilter<"BuoiHoc"> | Date | string
   KetThucLuc?: Prisma.DateTimeWithAggregatesFilter<"BuoiHoc"> | Date | string
   MoTa?: Prisma.StringNullableWithAggregatesFilter<"BuoiHoc"> | string | null
+  PhongHoc?: Prisma.StringNullableWithAggregatesFilter<"BuoiHoc"> | string | null
   TrangThai?: Prisma.EnumTrangThaiBHWithAggregatesFilter<"BuoiHoc"> | $Enums.TrangThaiBH
   CreatedAt?: Prisma.DateTimeWithAggregatesFilter<"BuoiHoc"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"BuoiHoc"> | Date | string
@@ -342,6 +354,7 @@ export type BuoiHocCreateInput = {
   BatDauLuc: Date | string
   KetThucLuc: Date | string
   MoTa?: string | null
+  PhongHoc?: string | null
   TrangThai?: $Enums.TrangThaiBH
   CreatedAt?: Date | string
   updatedAt?: Date | string
@@ -357,6 +370,7 @@ export type BuoiHocUncheckedCreateInput = {
   BatDauLuc: Date | string
   KetThucLuc: Date | string
   MoTa?: string | null
+  PhongHoc?: string | null
   TrangThai?: $Enums.TrangThaiBH
   CreatedAt?: Date | string
   updatedAt?: Date | string
@@ -369,6 +383,7 @@ export type BuoiHocUpdateInput = {
   BatDauLuc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   KetThucLuc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   MoTa?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  PhongHoc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   TrangThai?: Prisma.EnumTrangThaiBHFieldUpdateOperationsInput | $Enums.TrangThaiBH
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -384,6 +399,7 @@ export type BuoiHocUncheckedUpdateInput = {
   BatDauLuc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   KetThucLuc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   MoTa?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  PhongHoc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   TrangThai?: Prisma.EnumTrangThaiBHFieldUpdateOperationsInput | $Enums.TrangThaiBH
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -398,6 +414,7 @@ export type BuoiHocCreateManyInput = {
   BatDauLuc: Date | string
   KetThucLuc: Date | string
   MoTa?: string | null
+  PhongHoc?: string | null
   TrangThai?: $Enums.TrangThaiBH
   CreatedAt?: Date | string
   updatedAt?: Date | string
@@ -409,6 +426,7 @@ export type BuoiHocUpdateManyMutationInput = {
   BatDauLuc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   KetThucLuc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   MoTa?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  PhongHoc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   TrangThai?: Prisma.EnumTrangThaiBHFieldUpdateOperationsInput | $Enums.TrangThaiBH
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -422,6 +440,7 @@ export type BuoiHocUncheckedUpdateManyInput = {
   BatDauLuc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   KetThucLuc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   MoTa?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  PhongHoc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   TrangThai?: Prisma.EnumTrangThaiBHFieldUpdateOperationsInput | $Enums.TrangThaiBH
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -450,6 +469,7 @@ export type BuoiHocCountOrderByAggregateInput = {
   BatDauLuc?: Prisma.SortOrder
   KetThucLuc?: Prisma.SortOrder
   MoTa?: Prisma.SortOrder
+  PhongHoc?: Prisma.SortOrder
   TrangThai?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -469,6 +489,7 @@ export type BuoiHocMaxOrderByAggregateInput = {
   BatDauLuc?: Prisma.SortOrder
   KetThucLuc?: Prisma.SortOrder
   MoTa?: Prisma.SortOrder
+  PhongHoc?: Prisma.SortOrder
   TrangThai?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -482,6 +503,7 @@ export type BuoiHocMinOrderByAggregateInput = {
   BatDauLuc?: Prisma.SortOrder
   KetThucLuc?: Prisma.SortOrder
   MoTa?: Prisma.SortOrder
+  PhongHoc?: Prisma.SortOrder
   TrangThai?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -564,6 +586,7 @@ export type BuoiHocCreateWithoutLophocInput = {
   BatDauLuc: Date | string
   KetThucLuc: Date | string
   MoTa?: string | null
+  PhongHoc?: string | null
   TrangThai?: $Enums.TrangThaiBH
   CreatedAt?: Date | string
   updatedAt?: Date | string
@@ -577,6 +600,7 @@ export type BuoiHocUncheckedCreateWithoutLophocInput = {
   BatDauLuc: Date | string
   KetThucLuc: Date | string
   MoTa?: string | null
+  PhongHoc?: string | null
   TrangThai?: $Enums.TrangThaiBH
   CreatedAt?: Date | string
   updatedAt?: Date | string
@@ -620,6 +644,7 @@ export type BuoiHocScalarWhereInput = {
   BatDauLuc?: Prisma.DateTimeFilter<"BuoiHoc"> | Date | string
   KetThucLuc?: Prisma.DateTimeFilter<"BuoiHoc"> | Date | string
   MoTa?: Prisma.StringNullableFilter<"BuoiHoc"> | string | null
+  PhongHoc?: Prisma.StringNullableFilter<"BuoiHoc"> | string | null
   TrangThai?: Prisma.EnumTrangThaiBHFilter<"BuoiHoc"> | $Enums.TrangThaiBH
   CreatedAt?: Prisma.DateTimeFilter<"BuoiHoc"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"BuoiHoc"> | Date | string
@@ -631,6 +656,7 @@ export type BuoiHocCreateWithoutKetqua_buoihocInput = {
   BatDauLuc: Date | string
   KetThucLuc: Date | string
   MoTa?: string | null
+  PhongHoc?: string | null
   TrangThai?: $Enums.TrangThaiBH
   CreatedAt?: Date | string
   updatedAt?: Date | string
@@ -645,6 +671,7 @@ export type BuoiHocUncheckedCreateWithoutKetqua_buoihocInput = {
   BatDauLuc: Date | string
   KetThucLuc: Date | string
   MoTa?: string | null
+  PhongHoc?: string | null
   TrangThai?: $Enums.TrangThaiBH
   CreatedAt?: Date | string
   updatedAt?: Date | string
@@ -672,6 +699,7 @@ export type BuoiHocUpdateWithoutKetqua_buoihocInput = {
   BatDauLuc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   KetThucLuc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   MoTa?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  PhongHoc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   TrangThai?: Prisma.EnumTrangThaiBHFieldUpdateOperationsInput | $Enums.TrangThaiBH
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -686,6 +714,7 @@ export type BuoiHocUncheckedUpdateWithoutKetqua_buoihocInput = {
   BatDauLuc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   KetThucLuc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   MoTa?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  PhongHoc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   TrangThai?: Prisma.EnumTrangThaiBHFieldUpdateOperationsInput | $Enums.TrangThaiBH
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -698,6 +727,7 @@ export type BuoiHocCreateManyLophocInput = {
   BatDauLuc: Date | string
   KetThucLuc: Date | string
   MoTa?: string | null
+  PhongHoc?: string | null
   TrangThai?: $Enums.TrangThaiBH
   CreatedAt?: Date | string
   updatedAt?: Date | string
@@ -709,6 +739,7 @@ export type BuoiHocUpdateWithoutLophocInput = {
   BatDauLuc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   KetThucLuc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   MoTa?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  PhongHoc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   TrangThai?: Prisma.EnumTrangThaiBHFieldUpdateOperationsInput | $Enums.TrangThaiBH
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -722,6 +753,7 @@ export type BuoiHocUncheckedUpdateWithoutLophocInput = {
   BatDauLuc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   KetThucLuc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   MoTa?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  PhongHoc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   TrangThai?: Prisma.EnumTrangThaiBHFieldUpdateOperationsInput | $Enums.TrangThaiBH
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -735,6 +767,7 @@ export type BuoiHocUncheckedUpdateManyWithoutLophocInput = {
   BatDauLuc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   KetThucLuc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   MoTa?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  PhongHoc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   TrangThai?: Prisma.EnumTrangThaiBHFieldUpdateOperationsInput | $Enums.TrangThaiBH
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -750,6 +783,7 @@ export type BuoiHocSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   BatDauLuc?: boolean
   KetThucLuc?: boolean
   MoTa?: boolean
+  PhongHoc?: boolean
   TrangThai?: boolean
   CreatedAt?: boolean
   updatedAt?: boolean
@@ -765,6 +799,7 @@ export type BuoiHocSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   BatDauLuc?: boolean
   KetThucLuc?: boolean
   MoTa?: boolean
+  PhongHoc?: boolean
   TrangThai?: boolean
   CreatedAt?: boolean
   updatedAt?: boolean
@@ -779,6 +814,7 @@ export type BuoiHocSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   BatDauLuc?: boolean
   KetThucLuc?: boolean
   MoTa?: boolean
+  PhongHoc?: boolean
   TrangThai?: boolean
   CreatedAt?: boolean
   updatedAt?: boolean
@@ -793,12 +829,13 @@ export type BuoiHocSelectScalar = {
   BatDauLuc?: boolean
   KetThucLuc?: boolean
   MoTa?: boolean
+  PhongHoc?: boolean
   TrangThai?: boolean
   CreatedAt?: boolean
   updatedAt?: boolean
 }
 
-export type BuoiHocOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"ID" | "LopHocID" | "BuoiSo" | "ChuDe" | "BatDauLuc" | "KetThucLuc" | "MoTa" | "TrangThai" | "CreatedAt" | "updatedAt", ExtArgs["result"]["buoiHoc"]>
+export type BuoiHocOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"ID" | "LopHocID" | "BuoiSo" | "ChuDe" | "BatDauLuc" | "KetThucLuc" | "MoTa" | "PhongHoc" | "TrangThai" | "CreatedAt" | "updatedAt", ExtArgs["result"]["buoiHoc"]>
 export type BuoiHocInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   lophoc?: boolean | Prisma.LopHocDefaultArgs<ExtArgs>
   ketqua_buoihoc?: boolean | Prisma.BuoiHoc$ketqua_buoihocArgs<ExtArgs>
@@ -824,6 +861,7 @@ export type $BuoiHocPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     BatDauLuc: Date
     KetThucLuc: Date
     MoTa: string | null
+    PhongHoc: string | null
     TrangThai: $Enums.TrangThaiBH
     CreatedAt: Date
     updatedAt: Date
@@ -1259,6 +1297,7 @@ export interface BuoiHocFieldRefs {
   readonly BatDauLuc: Prisma.FieldRef<"BuoiHoc", 'DateTime'>
   readonly KetThucLuc: Prisma.FieldRef<"BuoiHoc", 'DateTime'>
   readonly MoTa: Prisma.FieldRef<"BuoiHoc", 'String'>
+  readonly PhongHoc: Prisma.FieldRef<"BuoiHoc", 'String'>
   readonly TrangThai: Prisma.FieldRef<"BuoiHoc", 'TrangThaiBH'>
   readonly CreatedAt: Prisma.FieldRef<"BuoiHoc", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"BuoiHoc", 'DateTime'>

@@ -6,9 +6,7 @@ import { CreateSessionDTO, SessionStatusDTO } from "../session/session.dto";
 
 @Injectable()
 export class ClassService {
-    constructor(
-        private prismaService: PrismaService
-    ) {}
+    constructor(private prismaService: PrismaService) { }
 
     //kiểm tra trùng mã lớp 
     async ClassValidator(code: string) {
@@ -32,38 +30,44 @@ export class ClassService {
 
     //kiểm tra id giáo viên
     async TeacherValidator(teacherId: number) {
-        const teacherDB = await this.prismaService.giaoVien.findUnique({
-            where: { ID: teacherId }
-        })
-        if (teacherDB == null)
-            throw new ConflictException('This teacher is not found')
-        if (teacherDB.TrangThai === 'INACTIVE')
-            throw new ConflictException('Teacher is retire')
+        if (teacherId) {
+            const teacherDB = await this.prismaService.giaoVien.findUnique({
+                where: { ID: teacherId }
+            })
+            if (teacherDB == null)
+                throw new ConflictException('This teacher is not found')
+            if (teacherDB.TrangThai === 'INACTIVE')
+                throw new ConflictException('Teacher is retire')
+        }
     }
 
-    //kiểm tra ngày 
-    async FromDateToDayValidator(fromDate: string, toDate: string) {
-        const fd = new Date(fromDate)
-        const td = new Date(toDate)
-        if (td <= fd)
-            throw new ConflictException('To date must greater than from date')
+    //kiểm tra khoảng ngày 
+    async FromDateToDayValidator(fromDate?: string, toDate?: string) {
+        if (fromDate && toDate) {
+            const fd = new Date(fromDate)
+            const td = new Date(toDate)
+            if (td <= fd)
+                throw new ConflictException('To date must greater than from date')
+        }
     }
 
     // kiểm tra thời gian bắt đầu, kết thúc và sĩ số
-    async Timetable_SizeValidator(startTime: string, endTime: string, classSize: number) {
-        // tách giờ bởi dấu ":" và chuyển thành số 
-        const startTimeSplit = startTime.split(":").map(Number)
-        // tổng số phút = giờ * 60 + phút --> để so sánh
-        const startMinutes = startTimeSplit[0] * 60 + startTimeSplit[1]
+    async Timetable_SizeValidator(startTime?: string, endTime?: string, classSize?: number) {
+        if (startTime && endTime && classSize) {
+            // tách giờ bởi dấu ":" và chuyển thành số 
+            const startTimeSplit = startTime.split(":").map(Number)
+            // tổng số phút = giờ * 60 + phút --> để so sánh
+            const startMinutes = startTimeSplit[0] * 60 + startTimeSplit[1]
 
-        const endTimeSplit = endTime.split(":").map(Number)
-        const endMinutes = endTimeSplit[0] * 60 + endTimeSplit[1]
+            const endTimeSplit = endTime.split(":").map(Number)
+            const endMinutes = endTimeSplit[0] * 60 + endTimeSplit[1]
 
-        if (startMinutes >= endMinutes)
-            throw new ConflictException('End time must greater than start time')
+            if (startMinutes >= endMinutes)
+                throw new ConflictException('End time must greater than start time')
 
-        if (classSize < 0)
-            throw new ConflictException('Class size must greater than 0')
+            if (classSize < 0)
+                throw new ConflictException('Class size must greater than 0')
+        }
     }
 
     // kiểm tra lớp tồn tại theo id
@@ -156,7 +160,6 @@ export class ClassService {
     async UpdateClassById(classId: number, up: ClassUpdateDTO) {
         await this.Timetable_SizeValidator(up.startTime, up.endTime, up.classSize)
         await this.FromDateToDayValidator(up.fromDate, up.toDate)
-        await this.TeacherValidator(up.teacherId)
         const classDB = await this.ClassIDValidator(classId)
 
         const data: Prisma.LopHocUpdateInput = {}
@@ -164,12 +167,18 @@ export class ClassService {
         const countSession = await this.prismaService.buoiHoc.count({
             where: { LopHocID: classId }
         })
+
+        // đổi giáo viên
+        if (up.teacherId) {
+            await this.TeacherValidator(up.teacherId)
+            data.giaovien = { connect: { ID: up.teacherId } }
+        }
+
         if (classDB.TrangThai === 'OPEN') {
             data.TenLop = up.name
             data.MoTa = up.description
             data.TrangThai = up.status
             data.SiSo = up.classSize
-            data.giaovien = { connect: { ID: up.teacherId } }
             // nếu không có buổi học thì cho sửa thêm
             if (countSession == 0) {
                 data.TuNgay = up.fromDate
@@ -181,23 +190,35 @@ export class ClassService {
         }
 
         if (classDB.TrangThai === 'RUNNING') {
-            data.giaovien = { connect: { ID: up.teacherId } }
             data.TenLop = up.name
             data.MoTa = up.description
             if (up.status === 'CLOSED')
                 data.TrangThai = 'CLOSED'
         }
-        return await this.prismaService.lopHoc.update({
-            where: { ID: classId },
-            data,
-            omit: {
-                CreatedAt: true,
-                updatedAt: true
+
+        if (up.room)
+            data.PhongHoc = up.room
+
+        return await this.prismaService.$transaction(async (tx) => {
+            await this.prismaService.lopHoc.update({
+                where: { ID: classId },
+                data
+            })
+
+            if (up.room) {
+                await this.prismaService.buoiHoc.updateMany({
+                    where: {
+                        LopHocID: classId,
+                        TrangThai: 'SCHEDULED'
+                    },
+                    data: { PhongHoc: up.room }
+                })
             }
+            return { mgs: "Succesfull" }
         })
     }
 
-    // xóa mềm lớp học, hủy ghi danh và các buổi học chưa diễn ra
+    // xóa mềm lớp học, hủy ghi danh và hủy các buổi học chưa diễn ra
     async DeleteClassByID(classId: number) {
         // nếu hủy lớp OPEN hoặc RUNNING thì hủy ghi danh: STOPPED 
         // và hủy các buổi học SCHEDULED -> CANCELLED 
@@ -220,7 +241,7 @@ export class ClassService {
                         LopHocID: classId,
                         TrangThai: 'SCHEDULED'
                     },
-                    data: { TrangThai: 'CANCELED' }
+                    data: { TrangThai: 'CANCELLED' }
                 })
             ])
         }
@@ -263,7 +284,7 @@ export class ClassService {
         return d;
     }
 
-    // tự động tạo buổi học
+    // tạo buổi học tự động
     async AutoGenerateSession(classId: number) {
         const classDB = await this.prismaService.lopHoc.findUnique({
             where: { ID: classId },
@@ -351,8 +372,6 @@ export class ClassService {
         if (xdate >= classDB.DenNgay || xdate < classDB.TuNgay)
             throw new ConflictException(`New session must from ${classDB.TuNgay} to ${classDB.DenNgay}`)
 
-        const nos = await this.prismaService.buoiHoc.count({ where: { LopHocID: classId } })
-
         if (!classDB.LichHoc.includes(xdate.getDay()))
             throw new ConflictException(`New session must on the timetable`)
 
@@ -370,7 +389,7 @@ export class ClassService {
                 select: { ID: true }
             })
             if (duplicate) throw new ConflictException('Duplicate session')
-            
+
             // BuoiSo = max + 1 
             const max = await tx.buoiHoc.findFirst({
                 where: { LopHocID: classId },
@@ -380,7 +399,7 @@ export class ClassService {
             const nextSs = Math.max(max?.BuoiSo ?? 0, 1) + 1
 
             return await tx.buoiHoc.create({
-                data:{
+                data: {
                     LopHocID: classId,
                     ChuDe: body.topic,
                     MoTa: body.description,
@@ -388,9 +407,9 @@ export class ClassService {
                     KetThucLuc: endAt,
                     BuoiSo: nextSs
                 },
-                omit:{
-                    CreatedAt:true,
-                    updatedAt:true
+                omit: {
+                    CreatedAt: true,
+                    updatedAt: true
                 }
             })
         })

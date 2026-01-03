@@ -68,44 +68,59 @@ export class ClassUpdateDTO{
     @IsOptional()
     @IsInt()
     @Min(1)
-    teacherId: number
+    teacherId?: number
 
+    @IsOptional()// không gửi lên thì thôi, gửi thì phải theo validate
     @IsString()
     @MaxLength(150)
-    name?: string
+    name?: string // field có thể undefined để không báo lỗi khi code
 
+    @IsOptional()
+    @IsString()
     description?: string
 
+    @IsOptional()
+    @IsString()
+    room?: string
+
     //@IsNotEmpty() cho đổi nhưng không cho bỏ trống 
+    @IsOptional()
     @IsNotEmpty()
-    fromDate: string
+    @IsString()
+    fromDate?: string
 
+    @IsOptional()
     @IsNotEmpty()
-    toDate: string
+    @IsString()
+    toDate?: string
 
+    @IsOptional()
     @ArrayNotEmpty()
     @IsArray()
     @ArrayUnique()// mỗi phần tử là duy nhất
     @IsInt({ each: true })// mỗi phần tử là số nguyên
     @Min(0, { each: true })// mỗi phần tử nhỏ nhất là 0 - chủ nhật
     @Max(6, { each: true })// mỗi phần tử lơn nhất là 6 - thứ 7
-    timeTable: number[]
+    timeTable?: number[]
 
+    @IsOptional()
     @IsNotEmpty()
     @IsString()
     @Matches(/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
         { message: 'Time must be in valid 24-hour format (HH:MM, e.g., 14:30)', })
-    startTime: string
+    startTime?: string
 
+    @IsOptional()
     @IsNotEmpty()
     @IsString()
     @Matches(/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
         { message: 'Time must be in valid 24-hour format (HH:MM, e.g., 14:30)', })
-    endTime: string
+    endTime?: string
 
+    @IsOptional()
     @IsNotEmpty()
     @IsInt()
-    classSize: number
+    classSize?: number
 
     @IsOptional()
     @IsEnum(TrangThaiLH)

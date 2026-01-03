@@ -55,7 +55,7 @@ export type TrangThaiLH = (typeof TrangThaiLH)[keyof typeof TrangThaiLH]
 export const TrangThaiBH = {
   SCHEDULED: 'SCHEDULED',
   COMPLETED: 'COMPLETED',
-  CANCELED: 'CANCELED'
+  CANCELLED: 'CANCELLED'
 } as const
 
 export type TrangThaiBH = (typeof TrangThaiBH)[keyof typeof TrangThaiBH]

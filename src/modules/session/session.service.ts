@@ -36,7 +36,7 @@ export class SessionService {
             },
             data: {
                 MoTa: reason,
-                TrangThai: 'CANCELED'
+                TrangThai: 'CANCELLED'
             }
         })
 

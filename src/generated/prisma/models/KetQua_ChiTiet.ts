@@ -30,12 +30,14 @@ export type KetQua_ChiTietAvgAggregateOutputType = {
   ID: number | null
   KetQuaID: number | null
   GhiDanhID: number | null
+  Diem: runtime.Decimal | null
 }
 
 export type KetQua_ChiTietSumAggregateOutputType = {
   ID: number | null
   KetQuaID: number | null
   GhiDanhID: number | null
+  Diem: runtime.Decimal | null
 }
 
 export type KetQua_ChiTietMinAggregateOutputType = {
@@ -44,6 +46,7 @@ export type KetQua_ChiTietMinAggregateOutputType = {
   GhiDanhID: number | null
   NhanXetRieng: string | null
   DiemDanh: boolean | null
+  Diem: runtime.Decimal | null
   CreatedAt: Date | null
   UpdatedAt: Date | null
 }
@@ -54,6 +57,7 @@ export type KetQua_ChiTietMaxAggregateOutputType = {
   GhiDanhID: number | null
   NhanXetRieng: string | null
   DiemDanh: boolean | null
+  Diem: runtime.Decimal | null
   CreatedAt: Date | null
   UpdatedAt: Date | null
 }
@@ -64,6 +68,7 @@ export type KetQua_ChiTietCountAggregateOutputType = {
   GhiDanhID: number
   NhanXetRieng: number
   DiemDanh: number
+  Diem: number
   CreatedAt: number
   UpdatedAt: number
   _all: number
@@ -74,12 +79,14 @@ export type KetQua_ChiTietAvgAggregateInputType = {
   ID?: true
   KetQuaID?: true
   GhiDanhID?: true
+  Diem?: true
 }
 
 export type KetQua_ChiTietSumAggregateInputType = {
   ID?: true
   KetQuaID?: true
   GhiDanhID?: true
+  Diem?: true
 }
 
 export type KetQua_ChiTietMinAggregateInputType = {
@@ -88,6 +95,7 @@ export type KetQua_ChiTietMinAggregateInputType = {
   GhiDanhID?: true
   NhanXetRieng?: true
   DiemDanh?: true
+  Diem?: true
   CreatedAt?: true
   UpdatedAt?: true
 }
@@ -98,6 +106,7 @@ export type KetQua_ChiTietMaxAggregateInputType = {
   GhiDanhID?: true
   NhanXetRieng?: true
   DiemDanh?: true
+  Diem?: true
   CreatedAt?: true
   UpdatedAt?: true
 }
@@ -108,6 +117,7 @@ export type KetQua_ChiTietCountAggregateInputType = {
   GhiDanhID?: true
   NhanXetRieng?: true
   DiemDanh?: true
+  Diem?: true
   CreatedAt?: true
   UpdatedAt?: true
   _all?: true
@@ -205,6 +215,7 @@ export type KetQua_ChiTietGroupByOutputType = {
   GhiDanhID: number
   NhanXetRieng: string | null
   DiemDanh: boolean
+  Diem: runtime.Decimal
   CreatedAt: Date
   UpdatedAt: Date
   _count: KetQua_ChiTietCountAggregateOutputType | null
@@ -238,6 +249,7 @@ export type KetQua_ChiTietWhereInput = {
   GhiDanhID?: Prisma.IntFilter<"KetQua_ChiTiet"> | number
   NhanXetRieng?: Prisma.StringNullableFilter<"KetQua_ChiTiet"> | string | null
   DiemDanh?: Prisma.BoolFilter<"KetQua_ChiTiet"> | boolean
+  Diem?: Prisma.DecimalFilter<"KetQua_ChiTiet"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Prisma.DateTimeFilter<"KetQua_ChiTiet"> | Date | string
   UpdatedAt?: Prisma.DateTimeFilter<"KetQua_ChiTiet"> | Date | string
   ketqua_buoihoc?: Prisma.XOR<Prisma.KetQua_BuoiHocScalarRelationFilter, Prisma.KetQua_BuoiHocWhereInput>
@@ -250,6 +262,7 @@ export type KetQua_ChiTietOrderByWithRelationInput = {
   GhiDanhID?: Prisma.SortOrder
   NhanXetRieng?: Prisma.SortOrderInput | Prisma.SortOrder
   DiemDanh?: Prisma.SortOrder
+  Diem?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
   UpdatedAt?: Prisma.SortOrder
   ketqua_buoihoc?: Prisma.KetQua_BuoiHocOrderByWithRelationInput
@@ -266,6 +279,7 @@ export type KetQua_ChiTietWhereUniqueInput = Prisma.AtLeast<{
   GhiDanhID?: Prisma.IntFilter<"KetQua_ChiTiet"> | number
   NhanXetRieng?: Prisma.StringNullableFilter<"KetQua_ChiTiet"> | string | null
   DiemDanh?: Prisma.BoolFilter<"KetQua_ChiTiet"> | boolean
+  Diem?: Prisma.DecimalFilter<"KetQua_ChiTiet"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Prisma.DateTimeFilter<"KetQua_ChiTiet"> | Date | string
   UpdatedAt?: Prisma.DateTimeFilter<"KetQua_ChiTiet"> | Date | string
   ketqua_buoihoc?: Prisma.XOR<Prisma.KetQua_BuoiHocScalarRelationFilter, Prisma.KetQua_BuoiHocWhereInput>
@@ -278,6 +292,7 @@ export type KetQua_ChiTietOrderByWithAggregationInput = {
   GhiDanhID?: Prisma.SortOrder
   NhanXetRieng?: Prisma.SortOrderInput | Prisma.SortOrder
   DiemDanh?: Prisma.SortOrder
+  Diem?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
   UpdatedAt?: Prisma.SortOrder
   _count?: Prisma.KetQua_ChiTietCountOrderByAggregateInput
@@ -296,6 +311,7 @@ export type KetQua_ChiTietScalarWhereWithAggregatesInput = {
   GhiDanhID?: Prisma.IntWithAggregatesFilter<"KetQua_ChiTiet"> | number
   NhanXetRieng?: Prisma.StringNullableWithAggregatesFilter<"KetQua_ChiTiet"> | string | null
   DiemDanh?: Prisma.BoolWithAggregatesFilter<"KetQua_ChiTiet"> | boolean
+  Diem?: Prisma.DecimalWithAggregatesFilter<"KetQua_ChiTiet"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Prisma.DateTimeWithAggregatesFilter<"KetQua_ChiTiet"> | Date | string
   UpdatedAt?: Prisma.DateTimeWithAggregatesFilter<"KetQua_ChiTiet"> | Date | string
 }
@@ -303,6 +319,7 @@ export type KetQua_ChiTietScalarWhereWithAggregatesInput = {
 export type KetQua_ChiTietCreateInput = {
   NhanXetRieng?: string | null
   DiemDanh?: boolean
+  Diem: runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   ketqua_buoihoc: Prisma.KetQua_BuoiHocCreateNestedOneWithoutKetqua_chitietInput
@@ -315,6 +332,7 @@ export type KetQua_ChiTietUncheckedCreateInput = {
   GhiDanhID: number
   NhanXetRieng?: string | null
   DiemDanh?: boolean
+  Diem: runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
 }
@@ -322,6 +340,7 @@ export type KetQua_ChiTietUncheckedCreateInput = {
 export type KetQua_ChiTietUpdateInput = {
   NhanXetRieng?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   DiemDanh?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  Diem?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ketqua_buoihoc?: Prisma.KetQua_BuoiHocUpdateOneRequiredWithoutKetqua_chitietNestedInput
@@ -334,6 +353,7 @@ export type KetQua_ChiTietUncheckedUpdateInput = {
   GhiDanhID?: Prisma.IntFieldUpdateOperationsInput | number
   NhanXetRieng?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   DiemDanh?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  Diem?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -344,6 +364,7 @@ export type KetQua_ChiTietCreateManyInput = {
   GhiDanhID: number
   NhanXetRieng?: string | null
   DiemDanh?: boolean
+  Diem: runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
 }
@@ -351,6 +372,7 @@ export type KetQua_ChiTietCreateManyInput = {
 export type KetQua_ChiTietUpdateManyMutationInput = {
   NhanXetRieng?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   DiemDanh?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  Diem?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -361,6 +383,7 @@ export type KetQua_ChiTietUncheckedUpdateManyInput = {
   GhiDanhID?: Prisma.IntFieldUpdateOperationsInput | number
   NhanXetRieng?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   DiemDanh?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  Diem?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -386,6 +409,7 @@ export type KetQua_ChiTietCountOrderByAggregateInput = {
   GhiDanhID?: Prisma.SortOrder
   NhanXetRieng?: Prisma.SortOrder
   DiemDanh?: Prisma.SortOrder
+  Diem?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
   UpdatedAt?: Prisma.SortOrder
 }
@@ -394,6 +418,7 @@ export type KetQua_ChiTietAvgOrderByAggregateInput = {
   ID?: Prisma.SortOrder
   KetQuaID?: Prisma.SortOrder
   GhiDanhID?: Prisma.SortOrder
+  Diem?: Prisma.SortOrder
 }
 
 export type KetQua_ChiTietMaxOrderByAggregateInput = {
@@ -402,6 +427,7 @@ export type KetQua_ChiTietMaxOrderByAggregateInput = {
   GhiDanhID?: Prisma.SortOrder
   NhanXetRieng?: Prisma.SortOrder
   DiemDanh?: Prisma.SortOrder
+  Diem?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
   UpdatedAt?: Prisma.SortOrder
 }
@@ -412,6 +438,7 @@ export type KetQua_ChiTietMinOrderByAggregateInput = {
   GhiDanhID?: Prisma.SortOrder
   NhanXetRieng?: Prisma.SortOrder
   DiemDanh?: Prisma.SortOrder
+  Diem?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
   UpdatedAt?: Prisma.SortOrder
 }
@@ -420,6 +447,7 @@ export type KetQua_ChiTietSumOrderByAggregateInput = {
   ID?: Prisma.SortOrder
   KetQuaID?: Prisma.SortOrder
   GhiDanhID?: Prisma.SortOrder
+  Diem?: Prisma.SortOrder
 }
 
 export type KetQua_ChiTietCreateNestedManyWithoutKetqua_buoihocInput = {
@@ -509,6 +537,7 @@ export type KetQua_ChiTietUncheckedUpdateManyWithoutGhidanhNestedInput = {
 export type KetQua_ChiTietCreateWithoutKetqua_buoihocInput = {
   NhanXetRieng?: string | null
   DiemDanh?: boolean
+  Diem: runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   ghidanh: Prisma.GhiDanhCreateNestedOneWithoutKetqua_chitietInput
@@ -519,6 +548,7 @@ export type KetQua_ChiTietUncheckedCreateWithoutKetqua_buoihocInput = {
   GhiDanhID: number
   NhanXetRieng?: string | null
   DiemDanh?: boolean
+  Diem: runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
 }
@@ -558,6 +588,7 @@ export type KetQua_ChiTietScalarWhereInput = {
   GhiDanhID?: Prisma.IntFilter<"KetQua_ChiTiet"> | number
   NhanXetRieng?: Prisma.StringNullableFilter<"KetQua_ChiTiet"> | string | null
   DiemDanh?: Prisma.BoolFilter<"KetQua_ChiTiet"> | boolean
+  Diem?: Prisma.DecimalFilter<"KetQua_ChiTiet"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Prisma.DateTimeFilter<"KetQua_ChiTiet"> | Date | string
   UpdatedAt?: Prisma.DateTimeFilter<"KetQua_ChiTiet"> | Date | string
 }
@@ -565,6 +596,7 @@ export type KetQua_ChiTietScalarWhereInput = {
 export type KetQua_ChiTietCreateWithoutGhidanhInput = {
   NhanXetRieng?: string | null
   DiemDanh?: boolean
+  Diem: runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   ketqua_buoihoc: Prisma.KetQua_BuoiHocCreateNestedOneWithoutKetqua_chitietInput
@@ -575,6 +607,7 @@ export type KetQua_ChiTietUncheckedCreateWithoutGhidanhInput = {
   KetQuaID: number
   NhanXetRieng?: string | null
   DiemDanh?: boolean
+  Diem: runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
 }
@@ -610,6 +643,7 @@ export type KetQua_ChiTietCreateManyKetqua_buoihocInput = {
   GhiDanhID: number
   NhanXetRieng?: string | null
   DiemDanh?: boolean
+  Diem: runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
 }
@@ -617,6 +651,7 @@ export type KetQua_ChiTietCreateManyKetqua_buoihocInput = {
 export type KetQua_ChiTietUpdateWithoutKetqua_buoihocInput = {
   NhanXetRieng?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   DiemDanh?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  Diem?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ghidanh?: Prisma.GhiDanhUpdateOneRequiredWithoutKetqua_chitietNestedInput
@@ -627,6 +662,7 @@ export type KetQua_ChiTietUncheckedUpdateWithoutKetqua_buoihocInput = {
   GhiDanhID?: Prisma.IntFieldUpdateOperationsInput | number
   NhanXetRieng?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   DiemDanh?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  Diem?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -636,6 +672,7 @@ export type KetQua_ChiTietUncheckedUpdateManyWithoutKetqua_buoihocInput = {
   GhiDanhID?: Prisma.IntFieldUpdateOperationsInput | number
   NhanXetRieng?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   DiemDanh?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  Diem?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -645,6 +682,7 @@ export type KetQua_ChiTietCreateManyGhidanhInput = {
   KetQuaID: number
   NhanXetRieng?: string | null
   DiemDanh?: boolean
+  Diem: runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
 }
@@ -652,6 +690,7 @@ export type KetQua_ChiTietCreateManyGhidanhInput = {
 export type KetQua_ChiTietUpdateWithoutGhidanhInput = {
   NhanXetRieng?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   DiemDanh?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  Diem?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ketqua_buoihoc?: Prisma.KetQua_BuoiHocUpdateOneRequiredWithoutKetqua_chitietNestedInput
@@ -662,6 +701,7 @@ export type KetQua_ChiTietUncheckedUpdateWithoutGhidanhInput = {
   KetQuaID?: Prisma.IntFieldUpdateOperationsInput | number
   NhanXetRieng?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   DiemDanh?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  Diem?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -671,6 +711,7 @@ export type KetQua_ChiTietUncheckedUpdateManyWithoutGhidanhInput = {
   KetQuaID?: Prisma.IntFieldUpdateOperationsInput | number
   NhanXetRieng?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   DiemDanh?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  Diem?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -683,6 +724,7 @@ export type KetQua_ChiTietSelect<ExtArgs extends runtime.Types.Extensions.Intern
   GhiDanhID?: boolean
   NhanXetRieng?: boolean
   DiemDanh?: boolean
+  Diem?: boolean
   CreatedAt?: boolean
   UpdatedAt?: boolean
   ketqua_buoihoc?: boolean | Prisma.KetQua_BuoiHocDefaultArgs<ExtArgs>
@@ -695,6 +737,7 @@ export type KetQua_ChiTietSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   GhiDanhID?: boolean
   NhanXetRieng?: boolean
   DiemDanh?: boolean
+  Diem?: boolean
   CreatedAt?: boolean
   UpdatedAt?: boolean
   ketqua_buoihoc?: boolean | Prisma.KetQua_BuoiHocDefaultArgs<ExtArgs>
@@ -707,6 +750,7 @@ export type KetQua_ChiTietSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   GhiDanhID?: boolean
   NhanXetRieng?: boolean
   DiemDanh?: boolean
+  Diem?: boolean
   CreatedAt?: boolean
   UpdatedAt?: boolean
   ketqua_buoihoc?: boolean | Prisma.KetQua_BuoiHocDefaultArgs<ExtArgs>
@@ -719,11 +763,12 @@ export type KetQua_ChiTietSelectScalar = {
   GhiDanhID?: boolean
   NhanXetRieng?: boolean
   DiemDanh?: boolean
+  Diem?: boolean
   CreatedAt?: boolean
   UpdatedAt?: boolean
 }
 
-export type KetQua_ChiTietOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"ID" | "KetQuaID" | "GhiDanhID" | "NhanXetRieng" | "DiemDanh" | "CreatedAt" | "UpdatedAt", ExtArgs["result"]["ketQua_ChiTiet"]>
+export type KetQua_ChiTietOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"ID" | "KetQuaID" | "GhiDanhID" | "NhanXetRieng" | "DiemDanh" | "Diem" | "CreatedAt" | "UpdatedAt", ExtArgs["result"]["ketQua_ChiTiet"]>
 export type KetQua_ChiTietInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ketqua_buoihoc?: boolean | Prisma.KetQua_BuoiHocDefaultArgs<ExtArgs>
   ghidanh?: boolean | Prisma.GhiDanhDefaultArgs<ExtArgs>
@@ -749,6 +794,7 @@ export type $KetQua_ChiTietPayload<ExtArgs extends runtime.Types.Extensions.Inte
     GhiDanhID: number
     NhanXetRieng: string | null
     DiemDanh: boolean
+    Diem: runtime.Decimal
     CreatedAt: Date
     UpdatedAt: Date
   }, ExtArgs["result"]["ketQua_ChiTiet"]>
@@ -1181,6 +1227,7 @@ export interface KetQua_ChiTietFieldRefs {
   readonly GhiDanhID: Prisma.FieldRef<"KetQua_ChiTiet", 'Int'>
   readonly NhanXetRieng: Prisma.FieldRef<"KetQua_ChiTiet", 'String'>
   readonly DiemDanh: Prisma.FieldRef<"KetQua_ChiTiet", 'Boolean'>
+  readonly Diem: Prisma.FieldRef<"KetQua_ChiTiet", 'Decimal'>
   readonly CreatedAt: Prisma.FieldRef<"KetQua_ChiTiet", 'DateTime'>
   readonly UpdatedAt: Prisma.FieldRef<"KetQua_ChiTiet", 'DateTime'>
 }

@@ -1,4 +1,4 @@
-import { IsEmail, IsEnum, IsNotEmpty, IsNumber, IsPhoneNumber, IsString } from "class-validator"
+import { IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString } from "class-validator"
 import { Vaitro } from "src/generated/prisma/enums"
 
 export class RegisterDTO{
@@ -26,6 +26,9 @@ export class LoginDTO{
     @IsNotEmpty()
     @IsString()
     password: string
+
+    @IsOptional()
+    mustChangePW?: boolean
 }
 
 

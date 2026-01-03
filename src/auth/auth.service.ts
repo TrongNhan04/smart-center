@@ -51,8 +51,6 @@ export class AuthService {
             }
         })
         return {msg: "Successful"}
-        //   return await this.signJWT(user.ID, user.Email)
-
     }
 
     // Xác thực
@@ -82,36 +80,16 @@ export class AuthService {
         const userDB = await this.ValidateUser(loginDTO)
         const payload = {
             sub: userDB.id,
-            role: userDB.role
+            role: userDB.role,
+            mustChangePW: userDB.mustChangePassword
         }
 
-        const token = await this.jwtService.signAsync(payload, {
-            secret: this.configService.get('JWT_SECRET'),
-            expiresIn: '30m' //thời gian hiệu lực
-        })
+        const token = await this.jwtService.signAsync(payload)
         return {
             acccessToken: token,
             userDB
         }
     }
-
-    // async signJWT(userID: number, email: string, role: string):
-    //     Promise<{ accessToken: string }> {
-    //     const payload = {
-    //         sub: userID,
-    //         email,
-    //         role
-    //     }
-    //     // jwtstring có chữ ký từ payload và secret
-    //     const jwtString = await this.jwtService.signAsync(payload, {
-    //         secret: this.configService.get('JWT_SECRET'),
-    //         expiresIn: '30m' //thời gian hiệu lực
-    //     })
-
-    //     return {
-    //         accessToken: jwtString
-    //     }
-    // }
 
     //Đổi mật khẩu đăng nhập
     async ChangePassword(userID: number, oldpw: string, newpw: string) {
