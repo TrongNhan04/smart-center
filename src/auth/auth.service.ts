@@ -15,7 +15,7 @@ export class AuthService {
 
     // Đăng ký 
     async Register(registerDTO: RegisterDTO) {
-        // 1 kiểm tra trùng mail
+        // 1 kiểm tra trùng mail và số điện thoại
         const userDB = await this.prismaService.user.findFirst({
             where: {
                 OR: [
@@ -27,7 +27,7 @@ export class AuthService {
 
         if (userDB) {
             throw new HttpException({
-                msg: `Số điện thoại ${registerDTO.phone} hoặc ${registerDTO.email} đã được sử dụng`
+                msg: `${registerDTO.phone} or ${registerDTO.email} was used`
             }, HttpStatus.BAD_REQUEST)
         }
 

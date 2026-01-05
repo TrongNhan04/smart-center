@@ -201,7 +201,7 @@ export class ClassService {
 
         return await this.prismaService.$transaction(async (tx) => {
             await this.prismaService.lopHoc.update({
-                where: { ID: classId },
+                where: { ID: classId},
                 data
             })
 
@@ -384,7 +384,7 @@ export class ClassService {
                 where: {
                     LopHocID: classId,
                     BatDauLuc: { lt: endAt },
-                    KetThucLuc: { gt: startAt }
+                    KetThucLuc: { gt: startAt },
                 },
                 select: { ID: true }
             })

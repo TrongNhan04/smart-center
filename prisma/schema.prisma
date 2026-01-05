@@ -203,7 +203,7 @@ model KetQua_ChiTiet {
   KetQuaID       Int
   GhiDanhID      Int
   NhanXetRieng   String?
-  DiemDanh       Boolean        @default(false) //mặc định là có mặt
+  DiemDanh       Boolean        
   Diem           Decimal        @db.Decimal(4, 2)
   
   CreatedAt      DateTime       @default(now())
