@@ -318,7 +318,7 @@ export type KetQua_ChiTietScalarWhereWithAggregatesInput = {
 
 export type KetQua_ChiTietCreateInput = {
   NhanXetRieng?: string | null
-  DiemDanh?: boolean
+  DiemDanh: boolean
   Diem: runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
@@ -331,7 +331,7 @@ export type KetQua_ChiTietUncheckedCreateInput = {
   KetQuaID: number
   GhiDanhID: number
   NhanXetRieng?: string | null
-  DiemDanh?: boolean
+  DiemDanh: boolean
   Diem: runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
@@ -363,7 +363,7 @@ export type KetQua_ChiTietCreateManyInput = {
   KetQuaID: number
   GhiDanhID: number
   NhanXetRieng?: string | null
-  DiemDanh?: boolean
+  DiemDanh: boolean
   Diem: runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
@@ -536,7 +536,7 @@ export type KetQua_ChiTietUncheckedUpdateManyWithoutGhidanhNestedInput = {
 
 export type KetQua_ChiTietCreateWithoutKetqua_buoihocInput = {
   NhanXetRieng?: string | null
-  DiemDanh?: boolean
+  DiemDanh: boolean
   Diem: runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
@@ -547,7 +547,7 @@ export type KetQua_ChiTietUncheckedCreateWithoutKetqua_buoihocInput = {
   ID?: number
   GhiDanhID: number
   NhanXetRieng?: string | null
-  DiemDanh?: boolean
+  DiemDanh: boolean
   Diem: runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
@@ -595,7 +595,7 @@ export type KetQua_ChiTietScalarWhereInput = {
 
 export type KetQua_ChiTietCreateWithoutGhidanhInput = {
   NhanXetRieng?: string | null
-  DiemDanh?: boolean
+  DiemDanh: boolean
   Diem: runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
@@ -606,7 +606,7 @@ export type KetQua_ChiTietUncheckedCreateWithoutGhidanhInput = {
   ID?: number
   KetQuaID: number
   NhanXetRieng?: string | null
-  DiemDanh?: boolean
+  DiemDanh: boolean
   Diem: runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
@@ -642,7 +642,7 @@ export type KetQua_ChiTietCreateManyKetqua_buoihocInput = {
   ID?: number
   GhiDanhID: number
   NhanXetRieng?: string | null
-  DiemDanh?: boolean
+  DiemDanh: boolean
   Diem: runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
@@ -681,7 +681,7 @@ export type KetQua_ChiTietCreateManyGhidanhInput = {
   ID?: number
   KetQuaID: number
   NhanXetRieng?: string | null
-  DiemDanh?: boolean
+  DiemDanh: boolean
   Diem: runtime.Decimal | runtime.DecimalJsLike | number | string
   CreatedAt?: Date | string
   UpdatedAt?: Date | string

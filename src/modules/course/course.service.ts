@@ -2,7 +2,6 @@ import { BadRequestException, ConflictException, Injectable } from "@nestjs/comm
 import { PrismaService } from "src/prisma/prisma.service";
 import { CourseQueryDTO, CreateCourseDTO, CourseUpdateDTO } from "./course.dto";
 import { Prisma } from "src/generated/prisma/client";
-import { constants } from "buffer";
 
 @Injectable()
 export class CourseService {
@@ -50,8 +49,6 @@ export class CourseService {
         const q = query.q?.trim()
         if (query.status) // nếu có status thì where status
             where.TrangThai = query.status
-        else// nếu không có thì theo các trạng thái dưới
-            where.TrangThai = { in: ['ACTIVE', 'DRAFT'] }
         if (q) { // nếu có query thì where status, tên hoặc mã 
             where.OR = [
                 // mã khóa học chứa q và không phân biệt hoa thường
@@ -73,14 +70,13 @@ export class CourseService {
 
     // lấy chi tiết 1 khóa học
     async GetCourseById(id: number) {
-        const courseDB = await this.prismaService.khoaHoc.findUnique({
+        return await this.prismaService.khoaHoc.findUnique({
             where: { ID: id },
             omit: {
                 CreatedAt: true,
                 UpdatedAt: true
             }
         })
-        return courseDB
     }
 
     // cập nhật khóa học theo trạng thái

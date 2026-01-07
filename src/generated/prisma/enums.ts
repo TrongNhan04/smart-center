@@ -70,9 +70,8 @@ export type TrangThai_KQBH = (typeof TrangThai_KQBH)[keyof typeof TrangThai_KQBH
 
 
 export const TrangThai_GD = {
-  PENDING: 'PENDING',
   ACTIVE: 'ACTIVE',
-  STOPPED: 'STOPPED'
+  INACTIVE: 'INACTIVE'
 } as const
 
 export type TrangThai_GD = (typeof TrangThai_GD)[keyof typeof TrangThai_GD]

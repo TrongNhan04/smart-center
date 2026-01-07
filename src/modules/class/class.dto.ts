@@ -82,8 +82,7 @@ export class ClassUpdateDTO{
     @IsOptional()
     @IsString()
     room?: string
-
-    //@IsNotEmpty() cho đổi nhưng không cho bỏ trống 
+ 
     @IsOptional()
     @IsNotEmpty()
     @IsString()

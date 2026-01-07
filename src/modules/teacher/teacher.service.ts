@@ -76,8 +76,6 @@ export class TeacherService {
         const q = query.q?.trim()
         if (query.status)
             where.TrangThai = query.status
-        else
-            where.TrangThai = 'ACTIVE'
         if (q) {
             where.OR = [
                 { HoTen: { contains: q, mode: 'insensitive' } },
@@ -97,30 +95,50 @@ export class TeacherService {
         if (teacherDB) return teacherDB
     }
 
-    // lấy chi tiết 1 giáo viên - phần trên
+    // sửa thông tin 1 giáo viên
     async UpdateTeacherByID(teacherId: number, body: UpdateTeacherDTO) {
-        const teacherDB = await this.TeacherIdValidator(teacherId)
-        
+        await this.TeacherIdValidator(teacherId)
+
         const data: Prisma.GiaoVienUpdateInput = {}
         if (body.status === 'INACTIVE') {
-            const hasClass = await this.prismaService.lopHoc.findMany({
-                where: {
-                    GiaoVienID: teacherId,
-                    TrangThai: { in: ['OPEN', 'RUNNING'] }
-                },
-                select: { TenLop: true }
-            })
-            console.log(hasClass.keys())
-            if (hasClass.length>0)
-                throw new BadRequestException(`Teacher ${teacherDB.HoTen} is busy with another class. Please change the teacher.`)
-            data.TrangThai = body.status
+            await this.DelateTeacherByID(teacherId)
+            // data.TrangThai = body.status
         }
         data.HoTen = body.name
         data.ChuyenMon = body.major
         data.GhiChu = body.note
         return await this.prismaService.giaoVien.update({
-            where:{ID:teacherId},
-            data
+            where: { ID: teacherId },
+            data, omit:{CreatedAt: true, UpdatedAt:true}
         })
+    }
+
+    //xóa mềm giáo viên
+    async DelateTeacherByID(teacherId: number) {
+        const teacherDB = await this.TeacherIdValidator(teacherId)
+        const hasClass = await this.prismaService.lopHoc.findMany({
+            where: {
+                GiaoVienID: teacherId,
+                TrangThai: { in: ['OPEN', 'RUNNING'] }
+            },
+            select: { TenLop: true }
+        })
+        if (hasClass.length > 0)
+            throw new BadRequestException(`Teacher ${teacherDB.HoTen} is busy with another class. Please change the teacher.`)
+        return await this.prismaService.giaoVien.update({
+            where:{ID:teacherId}, data:{TrangThai:'INACTIVE'},
+            omit:{CreatedAt: true, UpdatedAt:true}
+        })
+    }
+
+    //lấy danh sách lớp giáo viên dạy - phần dưới
+    async GetClassesByTeacherID(teacherId: number){
+        await this.TeacherIdValidator(teacherId)
+        const classDB =  await this.prismaService.lopHoc.findMany({
+            where: {GiaoVienID: teacherId},
+            omit:{CreatedAt:true, updatedAt:true}
+        })
+        if(classDB.length==0) return {msg:"This teacher doesn't teach any classes."}
+        return classDB
     }
 }

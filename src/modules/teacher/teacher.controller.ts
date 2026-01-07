@@ -8,7 +8,7 @@ import { CreateTeacherDTO, QueryTeacherDTO, UpdateTeacherDTO } from './teacher.d
 
 @Controller('admin/teachers')
 export class TeacherController {
-  constructor(private readonly teacherService: TeacherService) { }
+  constructor(private teacherService: TeacherService) { }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
@@ -38,4 +38,18 @@ export class TeacherController {
     @Body() body: UpdateTeacherDTO) {
     return await this.teacherService.UpdateTeacherByID(+teacherId, body)
   }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Patch(':id/inactive')
+  async DelateTeacherByID(@Param('id') teacherId: number) {
+    return await this.teacherService.DelateTeacherByID(+teacherId)
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Get(':id/classes')
+  async GetClassesByTeacherID(@Param('id') teacherId: number) {
+    return await this.teacherService.GetClassesByTeacherID(+teacherId)
+  }  
 }

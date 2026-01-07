@@ -124,8 +124,6 @@ export class ClassService {
 
         if (query.status)// nếu trạng thái có thì where theo
             where.TrangThai = query.status
-        else // không thì có 1 trong các trạng thái
-            where.TrangThai = { in: ['OPEN', 'RUNNING'] }
         if (q) {// nếu có câu truy vấn như tìm tên lớp, mã lớp, tên giáo viên,..
             where.OR = [
                 // theo mã hoặc tên lớp
@@ -146,6 +144,7 @@ export class ClassService {
 
     // lấy chi tiết lớp - phần trên
     async GetClassById(classId: number) {
+        await this.ClassIDValidator(+classId)
         return await this.prismaService.lopHoc.findUnique({
             where: { ID: classId },
             omit: {
@@ -232,9 +231,9 @@ export class ClassService {
                 this.prismaService.ghiDanh.updateMany({
                     where: {
                         LopHocID: classId,
-                        TrangThai: { in: ['ACTIVE', 'PENDING'] }
+                        TrangThai: 'ACTIVE'
                     },
-                    data: { TrangThai: 'STOPPED' }
+                    data: { TrangThai: 'INACTIVE' }
                 }),
                 this.prismaService.buoiHoc.updateMany({
                     where: {

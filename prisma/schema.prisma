@@ -217,28 +217,28 @@ model KetQua_ChiTiet {
 
 // ============ 9. GHIDANH ============//
 enum TrangThai_GD {
-  PENDING
   ACTIVE
-  STOPPED
+  INACTIVE
 }
 
 model GhiDanh {
   ID Int @id @default(autoincrement())
-
   HocVienID      Int
   LopHocID       Int
+
   NgayGhiDanh    DateTime
   GhiChu         String?
-  TrangThai      TrangThai_GD     @default(PENDING) //mặc định là PENDING
+  TrangThai      TrangThai_GD     @default(ACTIVE)
+ 
   CreatedAt      DateTime         @default(now())
   UpdatedAt      DateTime         @updatedAt
+
+  //Quan hệ
+  @@unique([HocVienID, LopHocID]) //một học viên chỉ được ghi danh một lần vào một lớp học
   hocvien        HocVien          @relation(fields: [HocVienID], references: [ID])
   lophoc         LopHoc           @relation(fields: [LopHocID], references: [ID])
   ketqua_chitiet KetQua_ChiTiet[] //ghi danh có nhiều kết quả chi tiết
   hoadon         HoaDon? //1 ghi danh có 1 hóa đơn
-
-  //Quan hệ
-  @@unique([HocVienID, LopHocID]) //một học viên chỉ được ghi danh một lần vào một lớp học
 }
 
 // ============ 10. HOADON  ============//
