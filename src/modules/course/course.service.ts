@@ -138,7 +138,7 @@ export class CourseService {
             omit: {
                 ID: true,
                 CreatedAt: true,
-                updatedAt: true
+                UpdatedAt: true
             }
         })
     }

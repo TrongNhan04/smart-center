@@ -159,7 +159,7 @@ export const LopHocScalarFieldEnum = {
   PhongHoc: 'PhongHoc',
   TrangThai: 'TrangThai',
   CreatedAt: 'CreatedAt',
-  updatedAt: 'updatedAt'
+  UpdatedAt: 'UpdatedAt'
 } as const
 
 export type LopHocScalarFieldEnum = (typeof LopHocScalarFieldEnum)[keyof typeof LopHocScalarFieldEnum]
@@ -176,7 +176,7 @@ export const BuoiHocScalarFieldEnum = {
   PhongHoc: 'PhongHoc',
   TrangThai: 'TrangThai',
   CreatedAt: 'CreatedAt',
-  updatedAt: 'updatedAt'
+  UpdatedAt: 'UpdatedAt'
 } as const
 
 export type BuoiHocScalarFieldEnum = (typeof BuoiHocScalarFieldEnum)[keyof typeof BuoiHocScalarFieldEnum]

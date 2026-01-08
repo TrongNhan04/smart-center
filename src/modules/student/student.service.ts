@@ -31,6 +31,7 @@ export class StudentService {
             where: { Email: email }
         })
         if (userEmail) throw new ConflictException(`Email: ${email} was used`)
+        
         const userPhone = await this.prismaService.user.findUnique({
             where: { DienThoai: phone }
         })
@@ -54,7 +55,6 @@ export class StudentService {
         const code = body.code.trim()
         const classDB = await this.classService.GetClassById(body.classId)
         if (!classDB) throw new ConflictException('Class is not existed')
-        const courseDB = await this.courseService.GetCourseById(classDB?.KhoaHocID)
 
         const runLogic = async (client: Prisma.TransactionClient) => {
             const newStudent = await client.hocVien.create({
@@ -89,7 +89,7 @@ export class StudentService {
         await this.StudentCodeValidator(body.code)
         const userDB = await this.prismaService.user.findMany({
             where: {
-                OR: [{ Email: body.email, DienThoai: body.phone }]
+                OR: [{ Email: body.email}, { DienThoai: body.phone }]
             }
         })
 
@@ -106,7 +106,7 @@ export class StudentService {
                         VaiTro: 'PARENT'
                     }
                 })
-                await this.AddRecord_3Table(newUser.ID, body, tx)
+                return await this.AddRecord_3Table(newUser.ID, body, tx)
             })
         }
         else if(userDB.length == 1){// tìm được 1 user => user cũ
@@ -181,7 +181,7 @@ export class StudentService {
         return await this.prismaService.ghiDanh.findMany({
             where: { HocVienID: studentId },
             select: {
-                lophoc: { omit: { CreatedAt: true, updatedAt: true } }
+                lophoc: { omit: { CreatedAt: true, UpdatedAt: true } }
             }
         })
 

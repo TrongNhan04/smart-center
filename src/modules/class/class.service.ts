@@ -70,7 +70,7 @@ export class ClassService {
         }
     }
 
-    // kiểm tra lớp tồn tại theo id
+    // kiểm tra id lớp
     async ClassIDValidator(classId: number) {
         const classDB = await this.prismaService.lopHoc.findUnique({
             where: { ID: classId },
@@ -86,6 +86,8 @@ export class ClassService {
         await this.TeacherValidator(classDTO.teacherId)
         await this.Timetable_SizeValidator(classDTO.startTime, classDTO.endTime, classDTO.classSize)
         await this.FromDateToDayValidator(classDTO.fromDate, classDTO.toDate)
+        const toDate = new Date(classDTO.toDate)
+        toDate.setDate(toDate.getDate()+1)
 
         await this.prismaService.$transaction([
             this.prismaService.lopHoc.create({
@@ -95,7 +97,7 @@ export class ClassService {
                     KhoaHocID: classDTO.courseId,
                     GiaoVienID: classDTO.teacherId,
                     TuNgay: classDTO.fromDate,
-                    DenNgay: classDTO.toDate,
+                    DenNgay: toDate,
                     LichHoc: classDTO.timeTable,
                     GioBatDau: classDTO.startTime,
                     GioKetThuc: classDTO.endTime,
@@ -103,7 +105,7 @@ export class ClassService {
                     MoTa: classDTO.description
                 }
             }),
-            this.prismaService.khoaHoc.update({
+            this.prismaService.khoaHoc.updateMany({
                 where: {
                     ID: classDTO.courseId,
                     TrangThai: 'DRAFT',
@@ -137,7 +139,7 @@ export class ClassService {
             where,
             omit: {
                 CreatedAt: true,
-                updatedAt: true,
+                UpdatedAt: true,
             }
         })
     }
@@ -149,7 +151,7 @@ export class ClassService {
             where: { ID: classId },
             omit: {
                 ID: true,
-                updatedAt: true,
+                UpdatedAt: true,
                 CreatedAt: true
             }
         })
@@ -264,7 +266,7 @@ export class ClassService {
             omit: {
                 ID: true,
                 CreatedAt: true,
-                updatedAt: true
+                UpdatedAt: true
             }
         })
     }
@@ -311,9 +313,9 @@ export class ClassService {
         const currentCount = await this.prismaService.buoiHoc.count({
             where: { LopHocID: classId }
         });
-        if (currentCount >= totalSessions + 4)
+        if (currentCount >= totalSessions)
             return { mes: 'No sessions to generate (already full)' };
-        //số buổi cần sinh = min của số buổi mỗi tháng và số buổi còn lại
+        //số buổi cần sinh = MIN của số buổi mỗi tháng và số buổi còn lại
         const need = Math.min(perChunk, totalSessions - currentCount);
 
         // xác định ngày của buổi cuối trong danh sách buổi học
@@ -382,8 +384,8 @@ export class ClassService {
             const duplicate = await tx.buoiHoc.findFirst({
                 where: {
                     LopHocID: classId,
-                    BatDauLuc: { lt: endAt },
-                    KetThucLuc: { gt: startAt },
+                    BatDauLuc: { lt: endAt },//lớn hơn
+                    KetThucLuc: { gt: startAt },// nhỏ hơn
                 },
                 select: { ID: true }
             })
@@ -395,7 +397,7 @@ export class ClassService {
                 orderBy: { BuoiSo: 'desc' },
                 select: { BuoiSo: true }
             })
-            const nextSs = Math.max(max?.BuoiSo ?? 0, 1) + 1
+            const nextSs = (max?.BuoiSo ?? 0) + 1
 
             return await tx.buoiHoc.create({
                 data: {
@@ -408,7 +410,7 @@ export class ClassService {
                 },
                 omit: {
                     CreatedAt: true,
-                    updatedAt: true
+                    UpdatedAt: true
                 }
             })
         })

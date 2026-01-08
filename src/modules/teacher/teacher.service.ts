@@ -18,11 +18,25 @@ export class TeacherService {
 
     //kiểm tra trùng email và số điện thoại
     async UserValidator(email: string, phone: string) {
-        const userDB = await this.prismaService.user.findUnique({
-            where: { Email: email, DienThoai: phone }
+        // const userDB = await this.prismaService.user.findMany({
+        //     where: {
+        //         OR: [
+        //             { Email: email },
+        //             { DienThoai: phone }]
+        //     }
+        // })
+        //if (userDB?.Email == email) throw new ConflictException(`${email} was used`)
+        //if (userDB) throw new ConflictException(`${email} or ${phone} was used`)
+        const userEmail = await this.prismaService.user.findUnique({
+            where: { Email: email }
         })
-        if (userDB?.Email == email) throw new ConflictException(`${email} was used`)
-        if (userDB?.DienThoai == phone) throw new ConflictException(`${phone} was used`)
+        if (userEmail) throw new ConflictException(`Email: ${email} was used`)
+        
+        const userPhone = await this.prismaService.user.findUnique({
+            where: { DienThoai: phone }
+        })
+        if (userPhone) throw new ConflictException(`Phone number: ${phone} was used`)
+    
     }
 
     // kiểm tra giáo viên có tồn tại 
@@ -109,7 +123,7 @@ export class TeacherService {
         data.GhiChu = body.note
         return await this.prismaService.giaoVien.update({
             where: { ID: teacherId },
-            data, omit:{CreatedAt: true, UpdatedAt:true}
+            data, omit: { CreatedAt: true, UpdatedAt: true }
         })
     }
 
@@ -126,19 +140,19 @@ export class TeacherService {
         if (hasClass.length > 0)
             throw new BadRequestException(`Teacher ${teacherDB.HoTen} is busy with another class. Please change the teacher.`)
         return await this.prismaService.giaoVien.update({
-            where:{ID:teacherId}, data:{TrangThai:'INACTIVE'},
-            omit:{CreatedAt: true, UpdatedAt:true}
+            where: { ID: teacherId }, data: { TrangThai: 'INACTIVE' },
+            omit: { CreatedAt: true, UpdatedAt: true }
         })
     }
 
     //lấy danh sách lớp giáo viên dạy - phần dưới
-    async GetClassesByTeacherID(teacherId: number){
+    async GetClassesByTeacherID(teacherId: number) {
         await this.TeacherIdValidator(teacherId)
-        const classDB =  await this.prismaService.lopHoc.findMany({
-            where: {GiaoVienID: teacherId},
-            omit:{CreatedAt:true, updatedAt:true}
+        const classDB = await this.prismaService.lopHoc.findMany({
+            where: { GiaoVienID: teacherId },
+            omit: { CreatedAt: true, UpdatedAt: true }
         })
-        if(classDB.length==0) return {msg:"This teacher doesn't teach any classes."}
+        if (classDB.length == 0) return { msg: "This teacher doesn't teach any classes." }
         return classDB
     }
 }

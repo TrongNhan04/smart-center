@@ -35,22 +35,24 @@ export class AuthService {
         const passwordHash = await bcrypt.hash(registerDTO.phone, 10)
 
         // 3 lưu user vào DB
-        const user = await this.prismaService.user.create({
+        return await this.prismaService.user.create({
             data: {
                 Email: registerDTO.email,
                 DienThoai: registerDTO.phone,
                 MatKhauHash: passwordHash,
-                VaiTro: registerDTO.role
+                VaiTro: registerDTO.role,
+                CreatedAt: undefined
             },
             // hiện ra những trường nào
             select: {
                 ID: true,
                 Email: true,
                 DienThoai: true,
-                VaiTro: true
+                VaiTro: true,
+                CreatedAt:true
             }
         })
-        return {msg: "Successful"}
+        
     }
 
     // Xác thực
@@ -121,5 +123,4 @@ export class AuthService {
         })
         return { mgs: "Password has changed!" }
     }
-
 }
