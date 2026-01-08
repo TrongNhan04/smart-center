@@ -221,7 +221,7 @@ export class ClassService {
 
     // xóa mềm lớp học, hủy ghi danh và hủy các buổi học chưa diễn ra
     async DeleteClassByID(classId: number) {
-        // nếu hủy lớp OPEN hoặc RUNNING thì hủy ghi danh: STOPPED 
+        // nếu hủy lớp OPEN hoặc RUNNING thì hủy ghi danh: INACTIVE
         // và hủy các buổi học SCHEDULED -> CANCELLED 
         const classDB = await this.ClassIDValidator(classId)
         if (classDB.TrangThai !== 'CLOSED') {

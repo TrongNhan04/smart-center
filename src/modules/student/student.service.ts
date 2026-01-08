@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable } from "@nestjs/common";
+import { BadRequestException, ConflictException, forwardRef, Inject, Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { CreateStudentDTO, QueryStudentDTO, UpdateStudentDTO } from "./student.dto";
 import { Prisma } from "src/generated/prisma/client";
@@ -6,7 +6,6 @@ import * as bcrypt from 'bcrypt'
 import { EnrollService } from "../enroll/enroll.service";
 import { InvoiceService } from "../invoice/invoice.service";
 import { ClassService } from "../class/class.service";
-import { CourseService } from "../course/course.service";
 
 @Injectable()
 export class StudentService {
@@ -14,7 +13,6 @@ export class StudentService {
         private classService: ClassService,
         private enrollService: EnrollService,
         private invoiceService: InvoiceService,
-        private courseService: CourseService
     ) { }
 
     //kiểm tra trùng mã học viên
@@ -31,7 +29,7 @@ export class StudentService {
             where: { Email: email }
         })
         if (userEmail) throw new ConflictException(`Email: ${email} was used`)
-        
+
         const userPhone = await this.prismaService.user.findUnique({
             where: { DienThoai: phone }
         })
@@ -69,7 +67,7 @@ export class StudentService {
             })
 
             //thêm ghi danh
-            const newEnroll = await this.enrollService.CreateEnroll(newStudent.ID, body.classId, client)
+            const newEnroll = await this.enrollService.CreateEnrollAuto(newStudent.ID, body.classId, client)
 
             // thêm hóa đơn
             await this.invoiceService.CreateInvoice(newEnroll.ID, classDB?.DenNgay, body.fee, client)
@@ -87,12 +85,12 @@ export class StudentService {
     // thêm học viên dựa vào user
     async CreateStudent(body: CreateStudentDTO) {
         await this.StudentCodeValidator(body.code)
+        await this.enrollService.TotalSlot(body.classId)
         const userDB = await this.prismaService.user.findMany({
             where: {
-                OR: [{ Email: body.email}, { DienThoai: body.phone }]
+                OR: [{ Email: body.email }, { DienThoai: body.phone }]
             }
         })
-
         // ko có user => tạo mới
         if (userDB.length == 0) {
             const hashPW = await bcrypt.hash(body.phone, 10)
@@ -109,7 +107,7 @@ export class StudentService {
                 return await this.AddRecord_3Table(newUser.ID, body, tx)
             })
         }
-        else if(userDB.length == 1){// tìm được 1 user => user cũ
+        else if (userDB.length == 1) {// tìm được 1 user => user cũ
             const oldUser = userDB[0]
             return await this.AddRecord_3Table(oldUser.ID, body)
         }
@@ -159,7 +157,7 @@ export class StudentService {
         })
     }
 
-    //xóa mềm học viên
+    //xóa mềm học viên + hủy ghi danh
     async DelateStudentByID(studentId: number) {
         await this.StudentIdValidator(studentId)
         await this.prismaService.$transaction([
@@ -178,12 +176,15 @@ export class StudentService {
     //lấy danh sách lớp học viên học - phần dưới
     async GetClassesByStudentID(studentId: number) {
         await this.StudentIdValidator(studentId)
-        return await this.prismaService.ghiDanh.findMany({
-            where: { HocVienID: studentId },
-            select: {
-                lophoc: { omit: { CreatedAt: true, UpdatedAt: true } }
-            }
-        })
-
+        return await this.prismaService.$queryRaw`
+                    select hv."TenHocVien", lh."TenLop", gv."HoTen"
+                    from public."GhiDanh" gd 
+                    left join public."HocVien" hv
+                    on hv."ID" = gd."HocVienID"
+                    left join public."LopHoc" lh
+                    on gd."LopHocID" = lh."ID"
+                    left join public."GiaoVien" gv
+                    on gv."ID" = lh."GiaoVienID"
+                    where hv."ID" = ${studentId}`
     }
 }

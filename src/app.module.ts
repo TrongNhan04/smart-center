@@ -8,13 +8,15 @@ import { ClassModule } from './modules/class/class.module';
 import { CourseModule } from './modules/course/course.module';
 import { SessionModule } from './modules/session/session.module';
 import { StudentModule } from './modules/student/student.module';
+import { EnrollModule } from './modules/enroll/enroll.module';
 
 
 @Module({
   imports: [
     AuthModule, UserModule, PrismaModule, 
     TeacherModule, ConfigModule.forRoot({isGlobal:true}),
-    CourseModule, ClassModule, SessionModule, StudentModule
+    CourseModule, ClassModule, SessionModule, StudentModule,
+    EnrollModule
   ]
 })
 export class AppModule {}
