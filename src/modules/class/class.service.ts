@@ -86,8 +86,9 @@ export class ClassService {
         await this.TeacherValidator(classDTO.teacherId)
         await this.Timetable_SizeValidator(classDTO.startTime, classDTO.endTime, classDTO.classSize)
         await this.FromDateToDayValidator(classDTO.fromDate, classDTO.toDate)
+        //await this.DuplicateClass(classDTO.teacherId, classDTO.fromDate, classDTO.toDate, classDTO.timeTable, classDTO.startTime, classDTO.endTime)
         const toDate = new Date(classDTO.toDate)
-        toDate.setDate(toDate.getDate()+1)
+        toDate.setDate(toDate.getDate() + 1)
 
         await this.prismaService.$transaction([
             this.prismaService.lopHoc.create({
@@ -202,7 +203,7 @@ export class ClassService {
 
         return await this.prismaService.$transaction(async (tx) => {
             await this.prismaService.lopHoc.update({
-                where: { ID: classId},
+                where: { ID: classId },
                 data
             })
 
@@ -271,6 +272,33 @@ export class ClassService {
         })
     }
 
+    TimeOverlap(aStart: string, aEnd: string, bStart: string, bEnd: string) {
+        return aStart < bEnd && bStart < aEnd
+    }
+
+    HasCommonDay(aDays: number[], bDays: number[]){
+        const d = new Set(aDays)// tạo mảng d không trùng
+        return bDays.some((x)=>{d.has(x)})// nếu có 1 đứa trùng trả về true
+    }
+
+    async DuplicateClass(teacherId: number, startDate: Date, endDate: Date, dow:number[], sHour:string, eHour:string) {
+        const classDB = await this.prismaService.lopHoc.findMany({
+            where: { GiaoVienID: teacherId, TrangThai: { in: ['OPEN', 'RUNNING'] } },
+            select: {
+                TuNgay: true, DenNgay: true,
+                LichHoc: true, GioBatDau: true, GioKetThuc: true
+            }
+        })
+
+        classDB.map((x)=>{
+            let flag = 0
+            if(this.TimeOverlap(x.GioBatDau, x.GioKetThuc, sHour, eHour))
+                flag+=1
+            if(this.HasCommonDay(x.LichHoc, dow))
+                flag+=1
+            if(flag==2) throw new ConflictException(`Teacher schedule conflict with class ${x}`)
+        })
+    }
     //format giờ và phút
     parseHHmm(time: string) {
         const [h, m] = time.split(':').map(Number);
