@@ -86,12 +86,8 @@ export class EnrollService {
         if (q) {
             where.OR = [
                 { lophoc: { TenLop: { contains: q, mode: 'insensitive' } } },
-                {
-                    hocvien: {
-                        TenHocVien: { contains: q, mode: 'insensitive' },
-                        MaHocVien: { contains: q, mode: 'insensitive' }
-                    }
-                }
+                { hocvien: { TenHocVien: { contains: q, mode: 'insensitive' } } }, 
+                { hocvien: { MaHocVien: { contains: q, mode: 'insensitive' } } } 
             ]
         }
         return await this.prismaService.ghiDanh.findMany({
@@ -101,16 +97,16 @@ export class EnrollService {
     }
 
     // xóa mềm 
-    async DeleteEnrollByID(enrollId: number){
+    async DeleteEnrollByID(enrollId: number) {
         const enrollDB = await this.prismaService.ghiDanh.findUnique({
-            where:{ID:enrollId}
+            where: { ID: enrollId }
         })
-        if(!enrollDB) throw new BadRequestException('Enroll not found')
-        
+        if (!enrollDB) throw new BadRequestException('Enroll not found')
+
         return await this.prismaService.ghiDanh.update({
-            where:{ID:enrollId},
-            data:{TrangThai:'INACTIVE'},
-            omit:{CreatedAt:true, UpdatedAt:true}
+            where: { ID: enrollId },
+            data: { TrangThai: 'INACTIVE' },
+            omit: { CreatedAt: true, UpdatedAt: true }
         })
     }
 }

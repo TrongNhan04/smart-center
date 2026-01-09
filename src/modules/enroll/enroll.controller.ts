@@ -30,6 +30,6 @@ export class EnrollController {
     @Roles('ADMIN')
     @Patch(':id/inactive')
     async DeleteEnrollByID(@Param('id') StudentId: number) {
-        return await this.enrollService.DeleteEnrollByID(+StudentId)
+       return await this.enrollService.DeleteEnrollByID(+StudentId)
     }
 }

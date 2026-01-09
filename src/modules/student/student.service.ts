@@ -176,15 +176,22 @@ export class StudentService {
     //lấy danh sách lớp học viên học - phần dưới
     async GetClassesByStudentID(studentId: number) {
         await this.StudentIdValidator(studentId)
-        return await this.prismaService.$queryRaw`
-                    select hv."TenHocVien", lh."TenLop", gv."HoTen"
-                    from public."GhiDanh" gd 
-                    left join public."HocVien" hv
-                    on hv."ID" = gd."HocVienID"
-                    left join public."LopHoc" lh
-                    on gd."LopHocID" = lh."ID"
-                    left join public."GiaoVien" gv
-                    on gv."ID" = lh."GiaoVienID"
-                    where hv."ID" = ${studentId}`
+        const enrollDB = await this.prismaService.ghiDanh.findMany({
+            where: { HocVienID: studentId },
+            select: {
+                lophoc: {
+                    select: {
+                        MaLopHoc: true,
+                        TenLop: true,
+                        giaovien: { select: { HoTen: true } }
+                    }
+                },
+            }
+        })
+        return enrollDB.map(x=>({
+            MaLopHoc:x.lophoc.MaLopHoc,
+            TenLop: x.lophoc.TenLop,
+            GiaoVien: x.lophoc.giaovien.HoTen
+        }))
     }
 }
