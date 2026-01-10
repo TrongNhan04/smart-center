@@ -1,4 +1,5 @@
-import { ArrayNotEmpty, ArrayUnique, IsArray, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, MaxLength, Min } from "class-validator";
+import { Type } from "class-transformer";
+import { ArrayNotEmpty, ArrayUnique, IsArray, IsDate, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, MaxLength, Min } from "class-validator";
 import { TrangThaiLH } from "src/generated/prisma/enums";
 
 
@@ -24,11 +25,19 @@ export class CreateClassDTO {
 
     description?: string
 
+    // @IsNotEmpty()
+    // fromDate: string
     @IsNotEmpty()
-    fromDate: string
+    @Type(() => Date)
+    @IsDate()
+    fromDate: Date
 
+    // @IsNotEmpty()
+    // toDate: string
     @IsNotEmpty()
-    toDate: string
+    @Type(() => Date)
+    @IsDate()
+    toDate: Date
 
     @ArrayNotEmpty()
     @IsArray()
@@ -55,7 +64,7 @@ export class CreateClassDTO {
     classSize: number
 }
 
-export class ClassQueryDTO{
+export class QueryClassDTO {
     @IsOptional()
     @IsEnum(TrangThaiLH)
     status?: TrangThaiLH
@@ -64,7 +73,7 @@ export class ClassQueryDTO{
     q?: string
 }
 
-export class ClassUpdateDTO{
+export class UpdateClassDTO {
     @IsOptional()
     @IsInt()
     @Min(1)
@@ -82,16 +91,16 @@ export class ClassUpdateDTO{
     @IsOptional()
     @IsString()
     room?: string
- 
-    @IsOptional()
-    @IsNotEmpty()
-    @IsString()
-    fromDate?: string
 
     @IsOptional()
-    @IsNotEmpty()
-    @IsString()
-    toDate?: string
+    @Type(() => Date)
+    @IsDate()
+    fromDate?: Date
+
+    @IsOptional()
+    @Type(() => Date)
+    @IsDate()
+    toDate?: Date
 
     @IsOptional()
     @ArrayNotEmpty()
@@ -117,8 +126,8 @@ export class ClassUpdateDTO{
     endTime?: string
 
     @IsOptional()
-    @IsNotEmpty()
     @IsInt()
+    @Min(0)
     classSize?: number
 
     @IsOptional()

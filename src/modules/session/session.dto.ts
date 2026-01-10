@@ -1,24 +1,22 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
+import { Type } from "class-transformer";
+import { IsDate, IsEnum, IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
 import { TrangThaiBH } from "src/generated/prisma/enums";
 
-export class SessionStatusDTO{
+export class SessionStatusDTO {
     @IsOptional()
     @IsEnum(TrangThaiBH)
     status?: TrangThaiBH
 }
 
-export class CreateSessionDTO{
-//     ChuDe      String?
-//   BatDauLuc  DateTime 
-//   KetThucLuc DateTime
-//   MoTa       String?
+export class CreateSessionDTO {
     @IsOptional()
     @IsString()
-    topic?:string
+    topic?: string
 
     @IsNotEmpty()
-    @IsString()
-    date: string
+    @Type(() => Date)
+    @IsDate()
+    date: Date
 
     @IsNotEmpty()
     @IsString()

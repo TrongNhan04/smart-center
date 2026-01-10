@@ -3,13 +3,17 @@ import { ClassService } from "./class.service";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guard/roles.guard";
 import { Roles } from "src/auth/decorators/roles.decorator";
-import { ClassQueryDTO, ClassUpdateDTO, CreateClassDTO } from "./class.dto";
-import { CreateSessionDTO, SessionStatusDTO } from "../session/session.dto";
+import { QueryClassDTO, UpdateClassDTO, CreateClassDTO } from "./class.dto";
+import { SessionStatusDTO } from "../session/session.dto";
 import { MustChangePWGuard } from "src/auth/guard/must-change-pw.guard";
+import { SessionService } from "../session/session.service";
 
 @Controller('admin/classes')
 export class ClassController {
-    constructor(private classService: ClassService) { }
+    constructor(
+        private classService: ClassService,
+        private sessionService: SessionService
+    ) { }
 
     // thêm lớp
     @UseGuards(JwtAuthGuard, RolesGuard)
@@ -23,7 +27,7 @@ export class ClassController {
     @UseGuards(JwtAuthGuard, MustChangePWGuard,RolesGuard)
     @Roles('ADMIN','TEACHER')
     @Get()
-    async GetClasses(@Query() query: ClassQueryDTO) {
+    async GetClasses(@Query() query: QueryClassDTO) {
         return await this.classService.GetClasses(query)
     }
 
@@ -40,7 +44,7 @@ export class ClassController {
     @Roles('ADMIN')
     @Patch(':id')
     async UpdateClassById(@Param('id') classId: number,
-        @Body() body: ClassUpdateDTO) {
+        @Body() body: UpdateClassDTO) {
         return await this.classService.UpdateClassById(+classId, body)
     }
 
@@ -64,17 +68,8 @@ export class ClassController {
     // tạo buổi học tự động
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
-    @Post(':id/sessions/auto')
+    @Post(':id/sessions-auto')
     async AutoGenerateSession(@Param('id') classId: number) {
-        return await this.classService.AutoGenerateSession(+classId)
-    }
-
-    //tạo buổi học thủ công
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles('ADMIN')
-    @Post(':id/sessions/manual')
-    async ManualGenerateSession(@Param('id') classId: number,
-        @Body() body: CreateSessionDTO) {
-            return await this.classService.ManualGenerateSession(+classId, body)
+        return await this.sessionService.AutoGenerateSession(+classId)
     }
 }
