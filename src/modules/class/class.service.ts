@@ -20,7 +20,8 @@ export class ClassService {
     // kiểm tra id lớp
     async ClassIDValidator(classId: number) {
         const classDB = await this.prismaService.lopHoc.findUnique({
-            where: { ID: classId } })
+            where: { ID: classId }
+        })
         if (!classDB) throw new NotFoundException('Class is not found')
         return classDB
     }
@@ -60,21 +61,23 @@ export class ClassService {
     }
 
     // lấy danh sách lớp mặc đinh hoặc query
-    async GetClasses(query: QueryClassDTO) {
+    async GetClasses(userId: number | null, query: QueryClassDTO) {
         // tạo điều kiện where
-        const where: Prisma.LopHocWhereInput = {}
+        const condition: Prisma.LopHocWhereInput[] = []
+        if (userId) condition.push({ giaovien: { UserID: userId } })
+        if (query.status) condition.push({ TrangThai: query.status })
         const q = query?.q?.trim()
-
-        if (query.status) where.TrangThai = query.status
         if (q) {// nếu có câu truy vấn như tìm tên lớp, mã lớp, tên giáo viên,..
-            where.OR = [
-                { MaLopHoc: { contains: q, mode: 'insensitive' } },
-                { TenLop: { contains: q, mode: 'insensitive' } },
-                { giaovien: { HoTen: { contains: q, mode: 'insensitive' } } }
-            ]
+            condition.push({
+                OR: [
+                    { MaLopHoc: { contains: q, mode: 'insensitive' } },
+                    { TenLop: { contains: q, mode: 'insensitive' } },
+                    { giaovien: { HoTen: { contains: q, mode: 'insensitive' } } }
+                ]
+            })
         }
         return await this.prismaService.lopHoc.findMany({
-            where,
+            where: { AND: condition },
             omit: {
                 CreatedAt: true,
                 UpdatedAt: true,
@@ -142,11 +145,12 @@ export class ClassService {
 
         return await this.prismaService.$transaction(async (tx) => {
             await tx.lopHoc.update({
-                where: { ID: classId }, data})
+                where: { ID: classId }, data
+            })
 
             if (up.room) {
                 await tx.buoiHoc.updateMany({
-                    where: {LopHocID: classId, TrangThai: 'SCHEDULED'},
+                    where: { LopHocID: classId, TrangThai: 'SCHEDULED' },
                     data: { PhongHoc: up.room }
                 })
             }

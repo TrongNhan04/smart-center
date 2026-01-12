@@ -49,16 +49,16 @@ export class AuthService {
                 Email: true,
                 DienThoai: true,
                 VaiTro: true,
-                CreatedAt:true
+                CreatedAt: true
             }
         })
-        
+
     }
 
     // Xác thực
     async ValidateUser(loginDTO: LoginDTO) {
         const userDB = await this.prismaService.user.findUnique({
-            where: { Email: loginDTO.email },
+            where: { Email: loginDTO.email }
         })
         if (!userDB)
             throw new UnauthorizedException("User is not exist!")
@@ -72,7 +72,8 @@ export class AuthService {
             email: userDB.Email,
             phone: userDB.DienThoai,
             mustChangePassword: userDB.PhaiDoiMK,
-            role: userDB.VaiTro
+            role: userDB.VaiTro,
+            tokenVersion: userDB.ToKenVerSion
         }
     }
 
@@ -83,13 +84,14 @@ export class AuthService {
         const payload = {
             sub: userDB.id,
             role: userDB.role,
-            mustChangePW: userDB.mustChangePassword
+            mustChangePW: userDB.mustChangePassword,
+            tokenVersion: userDB.tokenVersion
         }
 
         const token = await this.jwtService.signAsync(payload)
         return {
             acccessToken: token,
-            userDB
+            role: userDB.role
         }
     }
 
@@ -118,9 +120,18 @@ export class AuthService {
             where: { ID: userID },
             data: {
                 MatKhauHash: hashPW,
-                PhaiDoiMK: false
+                PhaiDoiMK: false,
+                ToKenVerSion:{increment:1}
             }
         })
-        return { mgs: "Password has changed!" }
+        return { mgs: "Password was changed!" }
+    }
+
+    // đăng xuất: tăng token version lên 1
+    async Logout(userId: number) {
+        await this.prismaService.user.update({
+            where: { ID: userId }, data: { ToKenVerSion: { increment: 1 } }
+        })
+        return {msg:"Logout succesfull"}
     }
 }

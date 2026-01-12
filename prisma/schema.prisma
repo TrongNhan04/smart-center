@@ -28,6 +28,8 @@ model User {
   MatKhauHash String
   PhaiDoiMK   Boolean  @default(true) //bắt buộc đổi mật khẩu lần đầu đăng nhập
   VaiTro      Vaitro
+  ToKenVerSion Int @default(0)
+  
   CreatedAt   DateTime @default(dbgenerated("now()")) @db.Timestamptz(3)
   UpdatedAt   DateTime @updatedAt @db.Timestamptz(3)
 

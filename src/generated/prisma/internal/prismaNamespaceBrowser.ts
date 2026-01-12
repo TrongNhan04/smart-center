@@ -87,6 +87,7 @@ export const UserScalarFieldEnum = {
   MatKhauHash: 'MatKhauHash',
   PhaiDoiMK: 'PhaiDoiMK',
   VaiTro: 'VaiTro',
+  ToKenVerSion: 'ToKenVerSion',
   CreatedAt: 'CreatedAt',
   UpdatedAt: 'UpdatedAt'
 } as const

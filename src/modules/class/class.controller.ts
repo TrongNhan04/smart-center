@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards } from "@nestjs/common";
 import { ClassService } from "./class.service";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guard/roles.guard";
@@ -7,7 +7,9 @@ import { QueryClassDTO, UpdateClassDTO, CreateClassDTO } from "./class.dto";
 import { SessionStatusDTO } from "../session/session.dto";
 import { MustChangePWGuard } from "src/auth/guard/must-change-pw.guard";
 import { SessionService } from "../session/session.service";
-
+import { Request } from 'express';
+import { PrismaService } from "src/prisma/prisma.service";
+type RequestWithUser = Request & { user: { userId: number; role?: string } };
 @Controller('admin/classes')
 export class ClassController {
     constructor(
@@ -24,11 +26,12 @@ export class ClassController {
     }
 
     // lấy danh sách lớp hiện có hoặc theo điều kiện - query
-    @UseGuards(JwtAuthGuard, MustChangePWGuard,RolesGuard)
-    @Roles('ADMIN','TEACHER')
+    @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
+    @Roles('ADMIN', 'TEACHER')
     @Get()
-    async GetClasses(@Query() query: QueryClassDTO) {
-        return await this.classService.GetClasses(query)
+    async GetClasses(@Query() query: QueryClassDTO, @Req() req: RequestWithUser) {
+        const userId = req.user.role === 'ADMIN' ? null : req.user.userId
+        return await this.classService.GetClasses(userId, query)
     }
 
     // lấy chi tiết lớp - phần trên 

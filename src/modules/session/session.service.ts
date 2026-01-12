@@ -2,18 +2,20 @@ import { BadRequestException, ConflictException, Injectable, NotFoundException }
 import { Prisma } from "src/generated/prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import { CreateSessionDTO } from "./session.dto";
-import { lt } from "date-fns/locale";
 
 @Injectable()
 export class SessionService {
     constructor(private prismaService: PrismaService) { }
 
     //sửa buổi học, chỉ cho sửa chủ đề
-    async UpdateSessionById(sessionId: number, topic: string) {
-        const sessionDB = await this.prismaService.buoiHoc.findUnique({
-            where: { ID: sessionId }
-        })
-        if (!sessionDB) throw new BadRequestException('Session is not existed')
+    async UpdateSessionById(teacherId: number | null, sessionId: number, topic: string) {
+        const where: Prisma.BuoiHocWhereInput = { ID: sessionId, TrangThai: 'SCHEDULED' }
+        
+        if (teacherId)
+            where.lophoc = { giaovien: { ID: teacherId } }
+
+        const sessionDB = this.prismaService.buoiHoc.findFirst({where})
+        if (!sessionDB) throw new BadRequestException('Session is not existed or forbidden')
         return await this.prismaService.buoiHoc.update({
             where: { ID: sessionId }, data: { ChuDe: topic },
             select: {
@@ -175,15 +177,15 @@ export class SessionService {
         if (teacherDB.giaovien.TrangThai === 'INACTIVE')
             throw new ConflictException('Teacher was retired')
         const startDay = new Date(body.date)
-        startDay.setHours(0,0,0,0)
+        startDay.setHours(0, 0, 0, 0)
         const endDay = new Date(startDay)
-        endDay.setDate(endDay.getDate()+1)
+        endDay.setDate(endDay.getDate() + 1)
         const teacherSesssions = await this.prismaService.buoiHoc.findMany({
-            where: { 
+            where: {
                 lophoc: {
                     giaovien: { ID: teacherDB.GiaoVienID },
                     ID: { not: classId }
-                }, 
+                },
                 BatDauLuc: {
                     gt: startDay,
                     lt: endDay

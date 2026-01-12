@@ -13,20 +13,30 @@ export class AuthController {
         private authService: AuthService
     ) { }
 
+    // đăng ký
     @Post("register")
     async Register(@Body() registerDTO: RegisterDTO) {
-        return this.authService.Register(registerDTO);
+        return await this.authService.Register(registerDTO);
     }
 
+    // đăng nhập
     @Post("login")
     async Login(@Body() loginDTO: LoginDTO) {
-        return this.authService.Login(loginDTO);
+        return await this.authService.Login(loginDTO);
     }
 
-    @UseGuards(JwtAuthGuard,MustChangePWGuard)
+    // đổi mật khẩu
+    @UseGuards(JwtAuthGuard)
     @Patch("password")
     async ChangePassWord(@Req() req: RequestWithUser, @Body() changePW: ChangePasswordDTO) {
-        return this.authService.ChangePassword(
+        return await this.authService.ChangePassword(
             Number(req.user.userId), changePW.oldPassword, changePW.newPassword)
+    }
+
+    // đăng xuất
+    @UseGuards(JwtAuthGuard)
+    @Post("logout")
+    async Loout(@Req() req: RequestWithUser) {
+        return this.authService.Logout(req.user.userId);
     }
 }
