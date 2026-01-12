@@ -7,6 +7,9 @@ import { QueryClassDTO, UpdateClassDTO, CreateClassDTO } from "./class.dto";
 import { SessionStatusDTO } from "../session/session.dto";
 import { MustChangePWGuard } from "src/auth/guard/must-change-pw.guard";
 import { SessionService } from "../session/session.service";
+import { Request } from 'express';
+
+type RequestWithUser = Request & { user: { userId: number; role?: string } };
 
 @Controller()
 export class ClassController {
@@ -75,8 +78,12 @@ export class ClassController {
 
     //================================ TEACHER ================================
     // danh sách lớp đang dạy
-    // @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
-    // @Roles('TEACHER')
+    @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
+    @Roles('ADMIN','TEACHER')
+    @Get('teacher/classes')
+    async GetClassesByTeacherId(@Req() req:RequestWithUser){
+        return this.classService.GetClassesByTeacherId(req.user.userId)
+    }
 
     // danh sách buổi học của lớp đó
 

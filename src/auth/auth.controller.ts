@@ -3,7 +3,6 @@ import { AuthService } from './auth.service';
 import { ChangePasswordDTO, LoginDTO, RegisterDTO } from './auth.dto';
 import { JwtAuthGuard } from './guard/jwt-auth.guard';
 import { Request } from 'express';
-import { MustChangePWGuard } from './guard/must-change-pw.guard';
 
 type RequestWithUser = Request & { user: { userId: number; role?: string } };
 

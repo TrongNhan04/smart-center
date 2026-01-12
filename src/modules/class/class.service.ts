@@ -206,6 +206,31 @@ export class ClassService {
         return await this.sessionService.GetSessionsByClassId(classId, query)
     }
 
+    // lấy danh sách lớp theo giáo viên - userId
+    async GetClassesByTeacherId(userId: number) {
+        const teacherDB = await this.prismaService.giaoVien.findUnique({
+            where: { UserID: userId }
+        })
+        if (!teacherDB) throw new NotFoundException('Teacher not found')
+        if (teacherDB.TrangThai === 'INACTIVE')
+            throw new ConflictException('Teacher has INACTIVE')
+        const classes = await this.prismaService.lopHoc.findMany({
+            where: { GiaoVienID: teacherDB.ID },
+            select: {
+                MaLopHoc: true, khoahoc: { select: { TenKhoaHoc: true } },
+                TenLop: true, MoTa: true, TuNgay: true, DenNgay: true, LichHoc: true,
+                GioBatDau: true, GioKetThuc: true, SiSo: true, PhongHoc: true
+            }
+        })
+        return classes.map(x => ({
+            MaLopHoc: x.MaLopHoc, TenKhoaHoc: x.khoahoc.TenKhoaHoc,
+            TenLop: x.TenLop, MoTa: x.MoTa, TuNgay: x.TuNgay,
+            DenNgay: x.DenNgay, LichHoc: x.LichHoc,
+            GioBatDau: x.GioBatDau, GioKetThuc: x.GioKetThuc,
+            SiSo: 30, PhongHoc: x.PhongHoc
+        }))
+    }
+
     //kiểm tra id khóa học 
     private async CourseValidator(courseId: number) {
         const courseDB = await this.prismaService.khoaHoc.findUnique({
