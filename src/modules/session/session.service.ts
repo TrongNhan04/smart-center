@@ -1,20 +1,36 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { Prisma } from "src/generated/prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
-import { CreateSessionDTO } from "./session.dto";
+import { CreateSessionDTO, SessionStatusDTO } from "./session.dto";
 
 @Injectable()
 export class SessionService {
     constructor(private prismaService: PrismaService) { }
 
+    // lấy danh sách buổi học theo lớp
+    async GetSessionsByClassId(classId: number, query: SessionStatusDTO) {
+        const where: Prisma.BuoiHocWhereInput = {}
+        where.LopHocID = classId
+        if (query.status)
+            where.TrangThai = query.status
+        return await this.prismaService.buoiHoc.findMany({
+            where,
+            omit: {
+                ID: true,
+                CreatedAt: true,
+                UpdatedAt: true
+            }
+        })
+    }
+
     //sửa buổi học, chỉ cho sửa chủ đề
     async UpdateSessionById(teacherId: number | null, sessionId: number, topic: string) {
         const where: Prisma.BuoiHocWhereInput = { ID: sessionId, TrangThai: 'SCHEDULED' }
-        
+
         if (teacherId)
             where.lophoc = { giaovien: { ID: teacherId } }
 
-        const sessionDB = this.prismaService.buoiHoc.findFirst({where})
+        const sessionDB = this.prismaService.buoiHoc.findFirst({ where })
         if (!sessionDB) throw new BadRequestException('Session is not existed or forbidden')
         return await this.prismaService.buoiHoc.update({
             where: { ID: sessionId }, data: { ChuDe: topic },
@@ -31,9 +47,9 @@ export class SessionService {
             where: { ID: sessionId }
         })
         if (!sessionDB)
-            throw new BadRequestException('Session is not existed')
+            throw new NotFoundException('Session is not existed')
         if (sessionDB.TrangThai !== 'SCHEDULED')
-            throw new BadRequestException('Forbidden to action')
+            throw new ForbiddenException('Forbidden to action')
         if (!reason)
             throw new BadRequestException('Reason is missing')
         await this.prismaService.buoiHoc.update({
@@ -119,9 +135,9 @@ export class SessionService {
     }
 
     // tạo buổi học thủ công 
-    async ManualGenerateSession(classId: number, body: CreateSessionDTO) {
+    async ManualGenerateSession(body: CreateSessionDTO) {
         const classDB = await this.prismaService.lopHoc.findUnique({
-            where: { ID: classId }
+            where: { ID: body.classId }
         })
 
         if (!classDB) throw new NotFoundException('Class not found')
@@ -141,17 +157,17 @@ export class SessionService {
             // kiểm tra trùng buổi hoặc đè buổi trong cùng lớp
             const duplicate = await tx.buoiHoc.findFirst({
                 where: {
-                    LopHocID: classId,
+                    LopHocID: body.classId,
                     BatDauLuc: { lt: endAt },//lớn hơn
                     KetThucLuc: { gt: startAt },// nhỏ hơn
                 },
                 select: { ID: true }
             })
             if (duplicate) throw new ConflictException('Overlap session')
-            await this.CheckTeacherFree(classId, body)
+            await this.CheckTeacherFree(body.classId, body)
             // BuoiSo = max + 1 
             const max = await tx.buoiHoc.findFirst({
-                where: { LopHocID: classId },
+                where: { LopHocID: body.classId },
                 orderBy: { BuoiSo: 'desc' },
                 select: { BuoiSo: true }
             })
@@ -159,7 +175,7 @@ export class SessionService {
 
             return await tx.buoiHoc.create({
                 data: {
-                    BuoiSo: nextSs, LopHocID: classId, ChuDe: body.topic,
+                    BuoiSo: nextSs, LopHocID: body.classId, ChuDe: body.topic,
                     BatDauLuc: startAt, KetThucLuc: endAt
                 },
                 omit: { CreatedAt: true, UpdatedAt: true }

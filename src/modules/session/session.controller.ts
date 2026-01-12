@@ -14,10 +14,9 @@ export class SessionController {
     //tạo buổi học thủ công
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
-    @Post(':id')
-    async ManualGenerateSession(@Param('id') classId: number,
-        @Body() body: CreateSessionDTO) {
-        return await this.sessionService.ManualGenerateSession(+classId, body)
+    @Post()
+    async ManualGenerateSession(@Body() body: CreateSessionDTO) {
+        return await this.sessionService.ManualGenerateSession(body)
     }
 
     //sửa buổi học: chủ đề

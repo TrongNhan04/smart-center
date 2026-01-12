@@ -6,6 +6,7 @@ import { ReceiptService } from "../receipt/receipt.service";
 
 @Module({
     controllers:[InvoiceController],
-    providers:[InvoiceService, PrismaService, ReceiptService]
+    providers:[InvoiceService, PrismaService, ReceiptService],
+    exports:[InvoiceService]
 })
 export class InvoiceModule{}

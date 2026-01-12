@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsDate, IsEnum, IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
+import { IsDate, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Matches } from "class-validator";
 import { TrangThaiBH } from "src/generated/prisma/enums";
 
 export class SessionStatusDTO {
@@ -9,6 +9,10 @@ export class SessionStatusDTO {
 }
 
 export class CreateSessionDTO {
+    @IsNotEmpty()
+    @IsNumber()
+    classId:number
+
     @IsOptional()
     @IsString()
     topic?: string

@@ -2,11 +2,15 @@ import { BadRequestException, ConflictException, Injectable, NotFoundException }
 import { PrismaService } from "src/prisma/prisma.service";
 import { QueryClassDTO, UpdateClassDTO, CreateClassDTO } from "./class.dto";
 import { Prisma } from "src/generated/prisma/client";
-import { CreateSessionDTO, SessionStatusDTO } from "../session/session.dto";
+import { SessionStatusDTO } from "../session/session.dto";
+import { SessionService } from "../session/session.service";
 
 @Injectable()
 export class ClassService {
-    constructor(private prismaService: PrismaService) { }
+    constructor(
+        private prismaService: PrismaService,
+        private sessionService: SessionService
+    ) { }
 
     //kiểm tra trùng mã lớp 
     async ClassValidator(code: string) {
@@ -61,10 +65,10 @@ export class ClassService {
     }
 
     // lấy danh sách lớp mặc đinh hoặc query
-    async GetClasses(userId: number | null, query: QueryClassDTO) {
+    async GetClasses(query: QueryClassDTO) {
         // tạo điều kiện where
         const condition: Prisma.LopHocWhereInput[] = []
-        if (userId) condition.push({ giaovien: { UserID: userId } })
+        //if (userId) condition.push({ giaovien: { UserID: userId } })
         if (query.status) condition.push({ TrangThai: query.status })
         const q = query?.q?.trim()
         if (q) {// nếu có câu truy vấn như tìm tên lớp, mã lớp, tên giáo viên,..
@@ -94,6 +98,18 @@ export class ClassService {
                 ID: true,
                 UpdatedAt: true,
                 CreatedAt: true
+            }
+        })
+    }
+
+    // lấy danh sách lớp theo id khóa học
+    async GetClassesByCourseId(courseId: number) {
+        return await this.prismaService.lopHoc.findMany({
+            where: { KhoaHocID: courseId },
+            omit: {
+                ID: true,
+                CreatedAt: true,
+                UpdatedAt: true
             }
         })
     }
@@ -187,21 +203,7 @@ export class ClassService {
         const classDB = await this.ClassIDValidator(classId)
         if (classDB.TrangThai === 'CLOSED')
             throw new BadRequestException(`Class ${classDB.TenLop} is closed`)
-
-        const where: Prisma.BuoiHocWhereInput = {}
-        where.LopHocID = classId
-        if (query.status)
-            where.TrangThai = query.status
-        else
-            where.TrangThai = { in: ['SCHEDULED', 'COMPLETED'] }
-        return await this.prismaService.buoiHoc.findMany({
-            where,
-            omit: {
-                ID: true,
-                CreatedAt: true,
-                UpdatedAt: true
-            }
-        })
+        return await this.sessionService.GetSessionsByClassId(classId, query)
     }
 
     //kiểm tra id khóa học 

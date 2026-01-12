@@ -5,53 +5,21 @@ import { Prisma } from "src/generated/prisma/client";
 import * as bcrypt from 'bcrypt'
 import { EnrollService } from "../enroll/enroll.service";
 import { InvoiceService } from "../invoice/invoice.service";
-import { ClassService } from "../class/class.service";
 
 @Injectable()
 export class StudentService {
-    constructor(private prismaService: PrismaService,
-        private classService: ClassService,
+    constructor(
+        private prismaService: PrismaService,
         private enrollService: EnrollService,
         private invoiceService: InvoiceService,
     ) { }
-
-    //kiểm tra trùng mã học viên
-    async StudentCodeValidator(code: string) {
-        const StudentDB = await this.prismaService.hocVien.findUnique({
-            where: { MaHocVien: code }
-        })
-        if (StudentDB) throw new BadRequestException('Student code was duplicate')
-    }
-
-    //kiểm tra trùng email hoặc số điện thoại
-    async Email_PhoneValidator(email: string, phone: string) {
-        const userEmail = await this.prismaService.user.findUnique({
-            where: { Email: email }
-        })
-        if (userEmail) throw new ConflictException(`Email: ${email} was used`)
-
-        const userPhone = await this.prismaService.user.findUnique({
-            where: { DienThoai: phone }
-        })
-        if (userPhone) throw new ConflictException(`Phone number: ${phone} was used`)
-    }
-
-    // kiểm tra học viên có tồn tại 
-    async StudentIdValidator(studentId: number) {
-        const StudentDB = await this.prismaService.hocVien.findUnique({
-            where: { ID: studentId },
-            omit: { UpdatedAt: true, CreatedAt: true }
-        })
-        if (!StudentDB) throw new BadRequestException('Student is not existed')
-        return StudentDB
-    }
 
     // thêm học viên + ghi danh + hóa đơn 
     async AddRecord_3Table(userId: number, body: CreateStudentDTO, tx?: Prisma.TransactionClient) {
         const student = body.student.trim()
         const parent = body.parent.trim()
         const code = body.code.trim()
-        const classDB = await this.classService.GetClassById(body.classId)
+        const classDB = await this.ClassIdValidator(body.classId)
         if (!classDB) throw new ConflictException('Class is not existed')
 
         const runLogic = async (client: Prisma.TransactionClient) => {
@@ -193,5 +161,45 @@ export class StudentService {
             TenLop: x.lophoc.TenLop,
             GiaoVien: x.lophoc.giaovien.HoTen
         }))
+    }
+
+    //kiểm tra trùng mã học viên
+    private async StudentCodeValidator(code: string) {
+        const StudentDB = await this.prismaService.hocVien.findUnique({
+            where: { MaHocVien: code }
+        })
+        if (StudentDB) throw new BadRequestException('Student code was duplicate')
+    }
+
+    //kiểm tra trùng email hoặc số điện thoại
+    private async Email_PhoneValidator(email: string, phone: string) {
+        const userEmail = await this.prismaService.user.findUnique({
+            where: { Email: email }
+        })
+        if (userEmail) throw new ConflictException(`Email: ${email} was used`)
+
+        const userPhone = await this.prismaService.user.findUnique({
+            where: { DienThoai: phone }
+        })
+        if (userPhone) throw new ConflictException(`Phone number: ${phone} was used`)
+    }
+
+    // kiểm tra học viên có tồn tại 
+    private async StudentIdValidator(studentId: number) {
+        const StudentDB = await this.prismaService.hocVien.findUnique({
+            where: { ID: studentId },
+            omit: { UpdatedAt: true, CreatedAt: true }
+        })
+        if (!StudentDB) throw new BadRequestException('Student is not existed')
+        return StudentDB
+    }
+
+    // kiểm tra lớp 
+    private async ClassIdValidator(classId: number) {
+        const classDB = await this.prismaService.lopHoc.findUnique({
+            where: { ID: classId }
+        })
+        if (!classDB) throw new ConflictException('Class is not found')
+        return classDB
     }
 }

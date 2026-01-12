@@ -7,37 +7,34 @@ import { QueryClassDTO, UpdateClassDTO, CreateClassDTO } from "./class.dto";
 import { SessionStatusDTO } from "../session/session.dto";
 import { MustChangePWGuard } from "src/auth/guard/must-change-pw.guard";
 import { SessionService } from "../session/session.service";
-import { Request } from 'express';
-import { PrismaService } from "src/prisma/prisma.service";
-type RequestWithUser = Request & { user: { userId: number; role?: string } };
-@Controller('admin/classes')
+
+@Controller()
 export class ClassController {
     constructor(
         private classService: ClassService,
         private sessionService: SessionService
     ) { }
-
+    //================================ ADMIN ================================
     // thêm lớp
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
-    @Post()
+    @Post('admin/classes')
     async CreateClass(@Body() createClassDTO: CreateClassDTO) {
         return await this.classService.CreateClass(createClassDTO)
     }
 
     // lấy danh sách lớp hiện có hoặc theo điều kiện - query
     @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
-    @Roles('ADMIN', 'TEACHER')
-    @Get()
-    async GetClasses(@Query() query: QueryClassDTO, @Req() req: RequestWithUser) {
-        const userId = req.user.role === 'ADMIN' ? null : req.user.userId
-        return await this.classService.GetClasses(userId, query)
+    @Roles('ADMIN')
+    @Get('admin/classes')
+    async GetClasses(@Query() query: QueryClassDTO) {
+        return await this.classService.GetClasses(query)
     }
 
     // lấy chi tiết lớp - phần trên 
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
-    @Get(':id')
+    @Get('admin/classes/:id')
     async GetClassById(@Param('id') classId: number) {
         return await this.classService.GetClassById(+classId)
     }
@@ -45,7 +42,7 @@ export class ClassController {
     // cập nhật lớp theo trạng thái
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
-    @Patch(':id')
+    @Patch('admin/classes/:id')
     async UpdateClassById(@Param('id') classId: number,
         @Body() body: UpdateClassDTO) {
         return await this.classService.UpdateClassById(+classId, body)
@@ -54,7 +51,7 @@ export class ClassController {
     // xóa mềm lớp học
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
-    @Patch(':id/closed')
+    @Patch('admin/classes/:id/closed')
     async DeleteClassByID(@Param('id') classId: number) {
         return await this.classService.DeleteClassByID(+classId)
     }
@@ -62,7 +59,7 @@ export class ClassController {
     //  lấy danh sách buổi học của lớp - phần dưới
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
-    @Get(':id/sessions')
+    @Get('admin/classes/:id/sessions')
     async GetSessionsByClassId(@Param('id') classId: number,
         @Query() query: SessionStatusDTO) {
         return await this.classService.GetSessionsByClassId(+classId, query)
@@ -71,8 +68,23 @@ export class ClassController {
     // tạo buổi học tự động
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
-    @Post(':id/sessions-auto')
+    @Post('admin/classes/:id/sessions-auto')
     async AutoGenerateSession(@Param('id') classId: number) {
         return await this.sessionService.AutoGenerateSession(+classId)
     }
+
+    //================================ TEACHER ================================
+    // danh sách lớp đang dạy
+    // @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
+    // @Roles('TEACHER')
+
+    // danh sách buổi học của lớp đó
+
+    // thông tin buổi học + danh sách học viên ghi danh ACTIVE
+
+    // lưu nháp kết quả buổi học - DRAFT
+
+    // chốt gửi kết quả buổi học - SUBMITTED
+
+    // sửa chủ đề + phòng học 
 }

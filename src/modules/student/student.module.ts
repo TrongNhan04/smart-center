@@ -9,9 +9,9 @@ import { EnrollService } from "../enroll/enroll.service";
 
 @Module({
     // imports:[CourseModule, ClassModule],
-    controllers:[StudentController],
-    providers:[StudentService, PrismaService, CourseService,
-        ClassService, InvoiceService, EnrollService
+    controllers: [StudentController],
+    providers: [StudentService, PrismaService,
+        InvoiceService, EnrollService
     ]
 })
-export class StudentModule{}
+export class StudentModule { }
