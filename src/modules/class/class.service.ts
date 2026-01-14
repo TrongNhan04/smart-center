@@ -295,7 +295,7 @@ export class ClassService {
         return bDays.some(x => d.has(x))// nếu có 1 đứa trùng trả về true
     }
 
-    //kiểm tra giáo viên có trùng lớp học 
+    //kiểm tra giáo viên có trùng lịch dạy lớp học
     private async DuplicateClass(teacherId: number, startDate: Date, endDate: Date,
         dow: number[], sHour: string, eHour: string, excludeClassId?: number) {
 
@@ -309,7 +309,7 @@ export class ClassService {
         const classDB = await this.prismaService.lopHoc.findMany({
             where,
             select: {
-                TenLop: true, TuNgay: true, DenNgay: true,
+                MaLopHoc: true, TenLop: true, TuNgay: true, DenNgay: true,
                 LichHoc: true, GioBatDau: true, GioKetThuc: true
             }
         })
@@ -329,7 +329,7 @@ export class ClassService {
 
             // kiểm tra giờ học
             const isTimeOverlap = this.TimeOverlap(lh.GioBatDau, lh.GioKetThuc, sHour, eHour, true)
-            if (isTimeOverlap) throw new ConflictException(`Teacher schedule conflict with class '${lh.TenLop}'`)
+            if (isTimeOverlap) throw new ConflictException(`Teacher schedule conflict with class '${lh.MaLopHoc}'`)
         }
     }
 

@@ -48,7 +48,7 @@ export class CourseController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Patch(':id/inactive')
-    async DeleteCourseById(@Param('id') id: number){
+    async DeleteCourseById(@Param('id') id: number) {
         return await this.courseService.DeleteCouresByID(+id)
     }
 
@@ -57,6 +57,6 @@ export class CourseController {
     @Roles('ADMIN')
     @Get(':id/classes')
     async GetClassesByCourseId(@Param('id') courseId: number) {
-            return this.courseService.GetClassesByCourseId(+courseId)
+        return this.courseService.GetClassesByCourseId(+courseId)
     }
 }

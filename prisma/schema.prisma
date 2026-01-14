@@ -206,7 +206,7 @@ model KetQua_ChiTiet {
   GhiDanhID    Int
   NhanXetRieng String?
   DiemDanh     Boolean
-  Diem         Decimal @db.Decimal(4, 2)
+  Diem         Decimal? @db.Decimal(4, 2)
 
   CreatedAt      DateTime       @default(dbgenerated("now()")) @db.Timestamptz(3)
   UpdatedAt      DateTime       @updatedAt @db.Timestamptz(3)

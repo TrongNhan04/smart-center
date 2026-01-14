@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, NotFoundException, Param, Patch, Post, Query, Req, UseGuards } from "@nestjs/common";
 import { ClassService } from "./class.service";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guard/roles.guard";
@@ -77,7 +77,7 @@ export class ClassController {
     }
 
     //================================ TEACHER ================================
-    // danh sách lớp đang dạy
+    // danh sách lớp giáo viên A đang dạy - xong
     @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
     @Roles('ADMIN','TEACHER')
     @Get('teacher/classes')
@@ -85,9 +85,18 @@ export class ClassController {
         return this.classService.GetClassesByTeacherId(req.user.userId)
     }
 
-    // danh sách buổi học của lớp đó
-
-    // thông tin buổi học + danh sách học viên ghi danh ACTIVE
+    // danh sách buổi học của 1 lớp giáo viên A dạy - xong
+    @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
+    @Roles('ADMIN', 'TEACHER')
+    @Get('teacher/classes/:id/sessions')
+    async GetSessionsByTeacherId(
+        @Param('id') classId: number, 
+        @Req() req:RequestWithUser){
+        const userId = req.user.role === 'ADMIN' ? null : req.user.userId
+        if(!userId) throw new NotFoundException('Teacher not found')
+        return await this.sessionService.GetSessionsByTeacherId(+userId, +classId)
+    }
+    // thông tin buổi học + danh sách học viên ghi danh ACTIVE - xong
 
     // lưu nháp kết quả buổi học - DRAFT
 
