@@ -13,7 +13,7 @@ export class ClassService {
     ) { }
 
     //kiểm tra trùng mã lớp 
-    async ClassValidator(code: string) {
+    private async ClassValidator(code: string) {
         const classDB = await this.prismaService.lopHoc.findUnique({
             where: { MaLopHoc: code }
         })
@@ -22,7 +22,7 @@ export class ClassService {
     }
 
     // kiểm tra id lớp
-    async ClassIDValidator(classId: number) {
+    private async ClassIDValidator(classId: number) {
         const classDB = await this.prismaService.lopHoc.findUnique({
             where: { ID: classId }
         })
@@ -116,8 +116,8 @@ export class ClassService {
 
     // cập nhật lớp theo trạng thái
     async UpdateClassById(classId: number, up: UpdateClassDTO) {
-        await this.Timetable_SizeValidator(up.startTime, up.endTime, up.classSize)
-        await this.FromDateToDayValidator(up.fromDate, up.toDate)
+        this.Timetable_SizeValidator(up.startTime, up.endTime, up.classSize)
+        this.FromDateToDayValidator(up.fromDate, up.toDate)
         const classDB = await this.ClassIDValidator(classId)
 
         const data: Prisma.LopHocUpdateInput = {}
@@ -195,14 +195,12 @@ export class ClassService {
                 })
             ])
         }
-        return { meg: "Closed or already closed" }
+        return { meg: "Class Closed" }
     }
 
     // lấy danh sách buổi học theo lớp - phần dưới
     async GetSessionsByClassId(classId: number, query: SessionStatusDTO) {
         const classDB = await this.ClassIDValidator(classId)
-        if (classDB.TrangThai === 'CLOSED')
-            throw new BadRequestException(`Class ${classDB.TenLop} is closed`)
         return await this.sessionService.GetSessionsByClassId(classId, query)
     }
 
@@ -213,7 +211,7 @@ export class ClassService {
         })
         if (!teacherDB) throw new NotFoundException('Teacher not found')
         if (teacherDB.TrangThai === 'INACTIVE')
-            throw new ConflictException('Teacher has INACTIVE')
+            throw new ConflictException('Teacher is INACTIVE')
         const classes = await this.prismaService.lopHoc.findMany({
             where: { GiaoVienID: teacherDB.ID },
             select: {
@@ -227,7 +225,7 @@ export class ClassService {
             TenLop: x.TenLop, MoTa: x.MoTa, TuNgay: x.TuNgay,
             DenNgay: x.DenNgay, LichHoc: x.LichHoc,
             GioBatDau: x.GioBatDau, GioKetThuc: x.GioKetThuc,
-            SiSo: 30, PhongHoc: x.PhongHoc
+            SiSo: x.SiSo, PhongHoc: x.PhongHoc
         }))
     }
 

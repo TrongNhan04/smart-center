@@ -39,6 +39,16 @@ export class CreateSessionDTO {
     description?: string
 }
 
+export class UpdateSessionDTO{
+    @IsOptional()
+    @IsString()
+    topic?:string
+
+    @IsOptional()
+    @IsString()
+    room?: string
+}
+
 // định nghĩa lớp con
 export class ResultDetailDTO {
     @IsNotEmpty()

@@ -1,7 +1,7 @@
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { Prisma } from "src/generated/prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
-import { CreateSessionDTO, SessionsResultDTO, SessionStatusDTO } from "./session.dto";
+import { CreateSessionDTO, SessionsResultDTO, SessionStatusDTO, UpdateSessionDTO } from "./session.dto";
 
 @Injectable()
 export class SessionService {
@@ -21,16 +21,22 @@ export class SessionService {
         return sessions
     }
 
-    //sửa buổi học, chỉ cho sửa chủ đề
-    async UpdateSessionById(teacherId: number | null, sessionId: number, topic: string) {
-        const where: Prisma.BuoiHocWhereInput = { ID: sessionId, TrangThai: 'SCHEDULED' }
+    //sửa buổi học: chủ đề + phòng học
+    async UpdateSessionById(userId: number | null, sessionId: number, body: UpdateSessionDTO) {
+        if (userId) {
+            const { sessionDB } = await this.SessionAcsessValidate(userId, sessionId)
+            const otherSS = await this.prismaService.buoiHoc.findMany({
+                where: {
+                    ID: { not: sessionId }, TrangThai: 'SCHEDULED', PhongHoc: body.room,
+                }
+            })
+            const result = otherSS.find(x => x.BatDauLuc <= sessionDB.KetThucLuc && sessionDB.BatDauLuc <= x.KetThucLuc)
+            if (result) throw new ConflictException('Room is used by other session')
+        }
 
-        if (teacherId) where.lophoc = { giaovien: { ID: teacherId } }
-
-        const sessionDB = this.prismaService.buoiHoc.findFirst({ where })
-        if (!sessionDB) throw new BadRequestException('Session is not existed or forbidden')
         return await this.prismaService.buoiHoc.update({
-            where: { ID: sessionId }, data: { ChuDe: topic },
+            where: { ID: sessionId },
+            data: { ChuDe: body.topic, PhongHoc: body.room },
             select: { BuoiSo: true, ChuDe: true }
         })
     }
@@ -235,9 +241,10 @@ export class SessionService {
         // 2. check thời gian cho phép lưu NHÁP
         const minutesLeftStart = this.CheckTimeWindow(sessionDB.BatDauLuc)
         const minutesLeftEnd = this.CheckTimeWindow(sessionDB.KetThucLuc)
-        if (minutesLeftStart > 15 || minutesLeftEnd < -2880)
-            throw new BadRequestException(`Drafting is not allowed at this time`)
-
+        if (!sessionDB.AdminMoKhoa) {
+            if (minutesLeftStart > 15 || minutesLeftEnd < -2880)
+                throw new BadRequestException(`Drafting is not allowed at this time`)
+        }
         // 3. gọi hàm thục thi chung
         return await this.ProcessSessionResult(sessionDB, teacherId, body, 'DRAFT')
     }
@@ -249,14 +256,43 @@ export class SessionService {
 
         // 2. check thời gian cho lưu THẬT
         const minutesLeftEnd = this.CheckTimeWindow(sessionDB.KetThucLuc)
-        if (minutesLeftEnd > 0 || minutesLeftEnd < -2880)
-            throw new BadRequestException(`Submitting is not allowed at this time`)
-
+        if (!sessionDB.AdminMoKhoa) {
+            if (minutesLeftEnd > 0 || minutesLeftEnd < -2880)
+                throw new BadRequestException(`Submitting is not allowed at this time`)
+        }
         // 3. lưu thật phải có nhận xét chung
         if (!body.comment) throw new ConflictException('Comment is missing')
 
         // 4. gọi hàm thực thi chung
         return await this.ProcessSessionResult(sessionDB, teacherId, body, 'SUBMITTED')
+    }
+
+    // mở khóa lưu kết quả buổi học
+    async UnclokSession(sessionId: number) {
+        const sessionDB = await this.SessionIdValidator(sessionId)
+        if (sessionDB.TrangThai === 'SCHEDULED')
+            throw new ConflictException(`Session ID ${sessionId} not locked`)
+
+        return await this.prismaService.$transaction(async tx => {
+            await tx.ketQua_BuoiHoc.update({
+                where: { BuoiHocID: sessionId },
+                data: { TrangThai: 'DRAFT' }
+            })
+            await tx.buoiHoc.update({
+                where: { ID: sessionId },
+                data: { TrangThai: 'SCHEDULED', AdminMoKhoa: true }
+            })
+            const count = await tx.buoiHoc.count({
+                where: { LopHocID: sessionDB.LopHocID, TrangThai: 'COMPLETED' }
+            })
+            if (count < 2) {
+                await tx.lopHoc.update({
+                    where: { ID: sessionDB.LopHocID },
+                    data: { TrangThai: 'OPEN' }
+                })
+            }
+            return { mgs: `Unclock session id ${sessionDB.ID} successfully` }
+        })
     }
 
     //format giờ và phút
@@ -317,8 +353,6 @@ export class SessionService {
         })
         if (!sessionDB)
             throw new NotFoundException('Session is not existed')
-        if (sessionDB.TrangThai !== 'SCHEDULED')
-            throw new ForbiddenException('Forbidden to action')
         return sessionDB
     }
 
@@ -361,7 +395,7 @@ export class SessionService {
 
         if (!sessionDB) throw new NotFoundException('Session not found or Access denied')
         if (sessionDB.TrangThai !== 'SCHEDULED')
-            throw new ConflictException('Cannot do it')
+            throw new ConflictException(`Session ID ${sessionDB.ID} is ${sessionDB.TrangThai}`)
         return { sessionDB, teacherId: teacherDB.ID }
     }
 
@@ -393,7 +427,7 @@ export class SessionService {
             })
             // B. Chuẩn bị lệnh Upsert Chi Tiết
             const upsertPromise = listEnroll.map(mx => {
-                // từ mảng ghi danh lấy kết quả UI gửi lên
+                // từ ghi danh DB lấy kết quả UI gửi lên trong inputMap(key, value)
                 const details = inputMap.get(mx.ID)
 
                 // Nếu Mode là SUBMITTED -> Bắt buộc phải có dữ liệu input
@@ -436,11 +470,11 @@ export class SessionService {
             if (status === 'SUBMITTED') {
                 const bh = await tx.buoiHoc.update({
                     where: { ID: session.ID },
-                    data: { TrangThai: 'COMPLETED' }
+                    data: { TrangThai: 'COMPLETED', AdminMoKhoa: false }
                 })
-                await tx.lopHoc.update({
+                await tx.lopHoc.updateMany({
                     where: { ID: bh.LopHocID, TrangThai: 'OPEN' },
-                    data: { TrangThai: 'RUNNING' }
+                    data: { TrangThai: 'RUNNING' },
                 })
             }
             return { mgs: status === 'DRAFT' ? "DRAFT saved" : "Submitted successfully" }

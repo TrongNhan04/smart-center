@@ -1362,6 +1362,7 @@ export const BuoiHocScalarFieldEnum = {
   KetThucLuc: 'KetThucLuc',
   MoTa: 'MoTa',
   PhongHoc: 'PhongHoc',
+  AdminMoKhoa: 'AdminMoKhoa',
   TrangThai: 'TrangThai',
   CreatedAt: 'CreatedAt',
   UpdatedAt: 'UpdatedAt'

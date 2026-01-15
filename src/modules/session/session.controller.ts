@@ -1,9 +1,9 @@
-import { Body, Controller, Get, NotFoundException, Param, Patch, Post, Put, Query, Req, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, NotFoundException, Param, Patch, Post, Put, Req, UseGuards } from "@nestjs/common";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guard/roles.guard";
 import { SessionService } from "./session.service";
-import { CreateSessionDTO, SessionsResultDTO } from "./session.dto";
+import { CreateSessionDTO, SessionsResultDTO, UpdateSessionDTO } from "./session.dto";
 import { Request } from 'express';
 import { MustChangePWGuard } from "src/auth/guard/must-change-pw.guard";
 type RequestWithUser = Request & { user: { userId: number; role?: string } };
@@ -26,11 +26,11 @@ export class SessionController {
     @Patch('teacher/sessions/:id')
     async UpdateSessionById(
         @Param('id') sessionId: number,
-        @Body('topic') topic: string,
-        @Res() req: RequestWithUser) {
+        @Body() body: UpdateSessionDTO,
+        @Req() req: RequestWithUser) {
         const user = req.user
         const teacherId = user.role === 'ADMIN' ? null : user.userId
-        return await this.sessionService.UpdateSessionById(teacherId, +sessionId, topic)
+        return await this.sessionService.UpdateSessionById(teacherId, +sessionId, body)
     }
 
     // hủy buổi học: 
@@ -69,14 +69,22 @@ export class SessionController {
 
     // lưu thật kết quả buổi học - SUBMITTED
     @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
-    @Roles('ADMIN','TEACHER')
+    @Roles('ADMIN', 'TEACHER')
     @Put('teacher/sessions/:id/result-submit')
     async SubmittedResult(
         @Param('id') sessionId: number,
         @Body() body: SessionsResultDTO,
-        @Req() req: RequestWithUser){
+        @Req() req: RequestWithUser) {
         const userId = req.user.role === 'ADMIN' ? null : req.user.userId
-        if(!userId) throw new NotFoundException('Teacher not found')
+        if (!userId) throw new NotFoundException('Teacher not found')
         return await this.sessionService.SubmittedResult(+userId, +sessionId, body)
+    }
+
+    // mở khóa lưu kết quả buổi học
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADMIN')
+    @Post('admin/sessions/:id/unclock')
+    async UnclokSession(@Param('id') sessionId: number) {
+        return await this.sessionService.UnclokSession(+sessionId)
     }
 }

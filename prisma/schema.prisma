@@ -165,16 +165,16 @@ model BuoiHoc {
   KetThucLuc DateTime    @db.Timestamptz(3)
   MoTa       String?
   PhongHoc   String?
+  AdminMoKhoa Boolean @default(false)
   TrangThai  TrangThaiBH @default(SCHEDULED) //mặc định là SCHEDULE
 
   CreatedAt      DateTime        @default(dbgenerated("now()")) @db.Timestamptz(3)
   UpdatedAt      DateTime        @updatedAt @db.Timestamptz(3)
   lophoc         LopHoc          @relation(fields: [LopHocID], references: [ID]) //buổi học thuộc về lớp học
   ketqua_buoihoc KetQua_BuoiHoc? //buổi học có kết quả buổi học
-  //một lớp học không có hai buổi học cùng ngày + giờ bắt đầu
 
   //Quan hệ
-  @@unique([LopHocID, BatDauLuc])
+  @@unique([LopHocID, BatDauLuc])//một lớp học không có hai buổi học cùng ngày + giờ bắt đầu
 }
 
 // ============ 7. KETQUA_BUOIHOC ============//
