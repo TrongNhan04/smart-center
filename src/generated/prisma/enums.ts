@@ -75,3 +75,13 @@ export const TrangThai_GD = {
 } as const
 
 export type TrangThai_GD = (typeof TrangThai_GD)[keyof typeof TrangThai_GD]
+
+
+export const LoaiTB = {
+  SESSION_RESULT: 'SESSION_RESULT',
+  INVOICE: 'INVOICE',
+  SYSTEM: 'SYSTEM',
+  SCHEDULE_CHANGE: 'SCHEDULE_CHANGE'
+} as const
+
+export type LoaiTB = (typeof LoaiTB)[keyof typeof LoaiTB]

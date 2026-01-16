@@ -20,7 +20,7 @@ export class SessionController {
         return await this.sessionService.ManualGenerateSession(body)
     }
 
-    //sửa buổi học: chủ đề
+    //sửa buổi học: chủ đề + phòng học
     @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
     @Roles('ADMIN', 'TEACHER')
     @Patch('teacher/sessions/:id')

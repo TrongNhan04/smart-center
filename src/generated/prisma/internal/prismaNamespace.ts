@@ -394,7 +394,8 @@ export const ModelName = {
   KetQua_ChiTiet: 'KetQua_ChiTiet',
   GhiDanh: 'GhiDanh',
   HoaDon: 'HoaDon',
-  PhieuThu: 'PhieuThu'
+  PhieuThu: 'PhieuThu',
+  ThongBao: 'ThongBao'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -410,7 +411,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "giaoVien" | "hocVien" | "khoaHoc" | "lopHoc" | "buoiHoc" | "ketQua_BuoiHoc" | "ketQua_ChiTiet" | "ghiDanh" | "hoaDon" | "phieuThu"
+    modelProps: "user" | "giaoVien" | "hocVien" | "khoaHoc" | "lopHoc" | "buoiHoc" | "ketQua_BuoiHoc" | "ketQua_ChiTiet" | "ghiDanh" | "hoaDon" | "phieuThu" | "thongBao"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1228,6 +1229,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ThongBao: {
+      payload: Prisma.$ThongBaoPayload<ExtArgs>
+      fields: Prisma.ThongBaoFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ThongBaoFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThongBaoPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ThongBaoFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThongBaoPayload>
+        }
+        findFirst: {
+          args: Prisma.ThongBaoFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThongBaoPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ThongBaoFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThongBaoPayload>
+        }
+        findMany: {
+          args: Prisma.ThongBaoFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThongBaoPayload>[]
+        }
+        create: {
+          args: Prisma.ThongBaoCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThongBaoPayload>
+        }
+        createMany: {
+          args: Prisma.ThongBaoCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ThongBaoCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThongBaoPayload>[]
+        }
+        delete: {
+          args: Prisma.ThongBaoDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThongBaoPayload>
+        }
+        update: {
+          args: Prisma.ThongBaoUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThongBaoPayload>
+        }
+        deleteMany: {
+          args: Prisma.ThongBaoDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ThongBaoUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ThongBaoUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThongBaoPayload>[]
+        }
+        upsert: {
+          args: Prisma.ThongBaoUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThongBaoPayload>
+        }
+        aggregate: {
+          args: Prisma.ThongBaoAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateThongBao>
+        }
+        groupBy: {
+          args: Prisma.ThongBaoGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ThongBaoGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ThongBaoCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ThongBaoCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1441,12 +1516,33 @@ export const PhieuThuScalarFieldEnum = {
 export type PhieuThuScalarFieldEnum = (typeof PhieuThuScalarFieldEnum)[keyof typeof PhieuThuScalarFieldEnum]
 
 
+export const ThongBaoScalarFieldEnum = {
+  ID: 'ID',
+  UserId: 'UserId',
+  TieuDe: 'TieuDe',
+  NoiDung: 'NoiDung',
+  Loai: 'Loai',
+  DuLieu: 'DuLieu',
+  DaDoc: 'DaDoc',
+  CreatedAt: 'CreatedAt'
+} as const
+
+export type ThongBaoScalarFieldEnum = (typeof ThongBaoScalarFieldEnum)[keyof typeof ThongBaoScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -1463,6 +1559,15 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
 
@@ -1647,6 +1752,34 @@ export type ListEnumTrangThai_GDFieldRefInput<$PrismaModel> = FieldRefInputType<
 
 
 /**
+ * Reference to a field of type 'LoaiTB'
+ */
+export type EnumLoaiTBFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LoaiTB'>
+    
+
+
+/**
+ * Reference to a field of type 'LoaiTB[]'
+ */
+export type ListEnumLoaiTBFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LoaiTB[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -1765,6 +1898,7 @@ export type GlobalOmitConfig = {
   ghiDanh?: Prisma.GhiDanhOmit
   hoaDon?: Prisma.HoaDonOmit
   phieuThu?: Prisma.PhieuThuOmit
+  thongBao?: Prisma.ThongBaoOmit
 }
 
 /* Types for Logging */

@@ -36,6 +36,7 @@ model User {
   //Quan hệ
   GiaoVien GiaoVien? //là giáo viên
   HocVien  HocVien[] //phụ huynh của nhiều học viên
+  ThongBao ThongBao[]
 }
 
 // ============ 2. GIAOVIEN ============//
@@ -275,4 +276,28 @@ model PhieuThu {
 
   //Quan hệ
   hoadon HoaDon @relation(fields: [HoaDonID], references: [ID])
+}
+
+enum LoaiTB {
+  SESSION_RESULT
+  INVOICE
+  SYSTEM
+  SCHEDULE_CHANGE
+}
+
+// ============ 12. HOADON  ============//
+model ThongBao{
+  ID Int @default(autoincrement())
+
+  //userid, tieude, noidung, loai, dulieu:json, dadoc, createat
+  UserId Int @unique
+  TieuDe String
+  NoiDung String
+  Loai LoaiTB
+  DuLieu Json
+  DaDoc Boolean @default(false)// false = chưa đọc
+  CreatedAt DateTime @db.Timestamptz(3)
+
+  //quan hệ
+  User User @relation(fields: [UserId], references: [ID])
 }

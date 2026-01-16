@@ -23,17 +23,10 @@ export class SessionService {
 
     //sửa buổi học: chủ đề + phòng học
     async UpdateSessionById(userId: number | null, sessionId: number, body: UpdateSessionDTO) {
-        if (userId) {
-            const { sessionDB } = await this.SessionAcsessValidate(userId, sessionId)
-            const otherSS = await this.prismaService.buoiHoc.findMany({
-                where: {
-                    ID: { not: sessionId }, TrangThai: 'SCHEDULED', PhongHoc: body.room,
-                }
-            })
-            const result = otherSS.find(x => x.BatDauLuc <= sessionDB.KetThucLuc && sessionDB.BatDauLuc <= x.KetThucLuc)
-            if (result) throw new ConflictException('Room is used by other session')
-        }
-
+        if (!userId) return { mgs: "You are ADMIN?" }
+        const { sessionDB } = await this.SessionAcsessValidate(userId, sessionId)
+        if (body.room) await this.HasSameRoom(body.room, sessionDB.BatDauLuc, sessionDB.KetThucLuc, sessionDB.ID)
+            
         return await this.prismaService.buoiHoc.update({
             where: { ID: sessionId },
             data: { ChuDe: body.topic, PhongHoc: body.room },
@@ -59,24 +52,21 @@ export class SessionService {
             where: { ID: classId },
             select: {// lịch học 0..6 theo getDay(), giờ học "18:03"
                 ID: true, TuNgay: true, DenNgay: true,
-                LichHoc: true, GioBatDau: true,
+                LichHoc: true, GioBatDau: true, PhongHoc: true,
                 GioKetThuc: true, TrangThai: true,
                 khoahoc: { select: { TongSoBuoi: true, ThoiGian: true } }
             }
         })
 
         if (!classDB) throw new NotFoundException('Class not found');
-        if (!classDB.khoahoc) throw new ConflictException('Course data is null');
 
         const totalSessions = classDB.khoahoc.TongSoBuoi;
         const durationMonths = classDB.khoahoc.ThoiGian;
 
         // số buổi mỗi tháng
         const perChunk = Math.ceil(totalSessions / durationMonths)
-        // số buổi đã có trong dánh sách buổi học 
-        const currentCount = await this.prismaService.buoiHoc.count({
-            where: { LopHocID: classId }
-        })
+        // số buổi đã có trong danh sách buổi học của lớp
+        const currentCount = await this.prismaService.buoiHoc.count({ where: { LopHocID: classId } })
 
         if (currentCount >= totalSessions)
             return { mes: 'No sessions to generate (already full)' }
@@ -85,7 +75,7 @@ export class SessionService {
 
         // xác định ngày của buổi cuối trong danh sách buổi học
         const last = await this.prismaService.buoiHoc.findFirst({
-            where: { LopHocID: classId },
+            where: { LopHocID: classId, TrangThai: { not: 'CANCELLED' } },
             orderBy: { BatDauLuc: 'desc' },
             select: { BatDauLuc: true }
         })
@@ -105,10 +95,9 @@ export class SessionService {
             if (classDB.LichHoc.includes(dow)) {
                 const startAt = this.combineDateAndTime(xday, classDB.GioBatDau);
                 const endAt = this.combineDateAndTime(xday, classDB.GioKetThuc);
-
                 data.push({
                     LopHocID: classId, BuoiSo: buoiSo++,
-                    BatDauLuc: startAt, KetThucLuc: endAt,
+                    BatDauLuc: startAt, KetThucLuc: endAt, PhongHoc: classDB.PhongHoc
                 });
             }
             xday.setDate(xday.getDate() + 1);
@@ -133,7 +122,7 @@ export class SessionService {
 
         this.Timetable_SizeValidator(body.startAt, body.endAt, 1)
         const last = await this.prismaService.buoiHoc.findFirst({
-            where: { LopHocID: body.classId },
+            where: { LopHocID: body.classId, TrangThai:{not :'CANCELLED'} },
             orderBy: { BatDauLuc: 'desc' },
             select: { BatDauLuc: true },
         });
@@ -143,6 +132,8 @@ export class SessionService {
 
         const startAt = this.combineDateAndTime(body.date, body.startAt)
         const endAt = this.combineDateAndTime(body.date, body.endAt)
+
+        if (body.room) await this.HasSameRoom(body.room, startAt, endAt,)
 
         return await this.prismaService.$transaction(async (tx) => {
             // kiểm tra trùng buổi hoặc đè buổi trong cùng lớp
@@ -174,7 +165,7 @@ export class SessionService {
         })
     }
 
-    // danh sách buổi học 1 lớp giáo viên A dạy 
+    // lấy danh sách buổi học 1 lớp giáo viên A dạy 
     async GetSessionsByTeacherId(userId: number, classId: number) {
         const teacherDB = await this.GetTeacherByUserId(userId)
         const sessions = await this.prismaService.buoiHoc.findMany({
@@ -295,7 +286,7 @@ export class SessionService {
         })
     }
 
-    //format giờ và phút
+    // format giờ và phút
     private parseHHmm(time: string) {
         const [h, m] = time.split(':').map(Number);
         return { h, m };
@@ -375,7 +366,8 @@ export class SessionService {
                     giaovien: { ID: teacherDB.GiaoVienID },
                     ID: { not: classId }
                 },
-                BatDauLuc: { gt: startDay, lt: endDay }
+                BatDauLuc: { gt: startDay, lt: endDay },
+                TrangThai: 'SCHEDULED'
             }
         })
         for (var session of teacherSesssions) {
@@ -386,7 +378,7 @@ export class SessionService {
         }
     }
 
-    //Hàm check quyền sở hữu và trạng thái buổi học
+    // kiểm tra quyền sở hữu và trạng thái buổi học
     private async SessionAcsessValidate(userId: number, sessionId: number) {
         const teacherDB = await this.GetTeacherByUserId(userId)
         const sessionDB = await this.prismaService.buoiHoc.findUnique({
@@ -399,15 +391,15 @@ export class SessionService {
         return { sessionDB, teacherId: teacherDB.ID }
     }
 
-    //Hàm CORE xử lý Transaction lưu DB, Dùng chung cho cả Draft và Submit
+    // xử lý Transaction lưu DB, Dùng chung cho cả Draft và Submit
     private async ProcessSessionResult(session: any, teacherId: number,
         body: SessionsResultDTO, status: 'DRAFT' | 'SUBMITTED') {
-        // 1. Lấy danh sách học viên Active
+        // lấy danh sách học viên Active
         const listEnroll = await this.prismaService.ghiDanh.findMany({
             where: { LopHocID: session.LopHocID, TrangThai: 'ACTIVE' }
         })
-        // 2. TỐI ƯU HÓA: Chuyển mảng input thành Map để tìm kiếm O(1)
-        // Key: enrollmentId, Value: Data
+        // chuyển mảng input thành Map để tìm kiếm O(1)
+        // key: enrollmentId, value: Data
         const inputMap = new Map(body.details.map(m => [m.enrollmentId, m]))
 
         return await this.prismaService.$transaction(async tx => {
@@ -427,10 +419,10 @@ export class SessionService {
             })
             // B. Chuẩn bị lệnh Upsert Chi Tiết
             const upsertPromise = listEnroll.map(mx => {
-                // từ ghi danh DB lấy kết quả UI gửi lên trong inputMap(key, value)
+                // ghi danh DB lấy kết quả trong inputMap(key, value)
                 const details = inputMap.get(mx.ID)
 
-                // Nếu Mode là SUBMITTED -> Bắt buộc phải có dữ liệu input
+                // Nếu status là SUBMITTED -> Bắt buộc phải có dữ liệu input
                 if (status === 'SUBMITTED') {
                     if (!details) throw new NotFoundException(`Student with enroll id ${mx.ID} is not found`)
                     if (details.isAttend === null || details.isAttend === undefined)
@@ -479,5 +471,19 @@ export class SessionService {
             }
             return { mgs: status === 'DRAFT' ? "DRAFT saved" : "Submitted successfully" }
         })
+    }
+
+    // kiểm tra trùng phòng
+    private async HasSameRoom(room: string, start: Date, end: Date, excludeId?: number) {
+        if (!room) return
+        const conflict = await this.prismaService.buoiHoc.findFirst({
+            where: {
+                PhongHoc: room,// trùng phòng
+                BatDauLuc: { lt: end },// trùng giờ
+                KetThucLuc: { gt: start },
+                ID: excludeId ? { not: excludeId } : undefined
+            }
+        })
+        if (conflict) throw new BadRequestException(`${room} is used by other session at this time`)
     }
 }

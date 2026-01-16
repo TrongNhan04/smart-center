@@ -92,3 +92,8 @@ export type HoaDon = Prisma.HoaDonModel
  * 
  */
 export type PhieuThu = Prisma.PhieuThuModel
+/**
+ * Model ThongBao
+ * 
+ */
+export type ThongBao = Prisma.ThongBaoModel

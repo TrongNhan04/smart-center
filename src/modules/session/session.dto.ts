@@ -37,6 +37,10 @@ export class CreateSessionDTO {
     @IsString()
     @IsOptional()
     description?: string
+
+    @IsOptional()
+    @IsString()
+    room?: string
 }
 
 export class UpdateSessionDTO{

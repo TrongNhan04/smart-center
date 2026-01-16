@@ -25,15 +25,11 @@ export class CreateClassDTO {
 
     description?: string
 
-    // @IsNotEmpty()
-    // fromDate: string
     @IsNotEmpty()
     @Type(() => Date)
     @IsDate()
     fromDate: Date
 
-    // @IsNotEmpty()
-    // toDate: string
     @IsNotEmpty()
     @Type(() => Date)
     @IsDate()
@@ -44,7 +40,7 @@ export class CreateClassDTO {
     @ArrayUnique()// mỗi phần tử là duy nhất
     @IsInt({ each: true })// mỗi phần tử là số nguyên
     @Min(0, { each: true })// mỗi phần tử nhỏ nhất là 0 - chủ nhật
-    @Max(6, { each: true })// mỗi phần tử lơn nhất là 6 - thứ 7
+    @Max(6, { each: true })// mỗi phần tử lớn nhất là 6 - thứ 7
     timeTable: number[]
 
     @IsNotEmpty()
@@ -79,7 +75,7 @@ export class UpdateClassDTO {
     @Min(1)
     teacherId?: number
 
-    @IsOptional()// không gửi lên thì thôi, gửi thì phải theo validate
+    @IsOptional()// không gửi lên thì thôi, gửi thì phải theo @
     @IsString()
     @MaxLength(150)
     name?: string // field có thể undefined để không báo lỗi khi code
@@ -115,14 +111,14 @@ export class UpdateClassDTO {
     @IsNotEmpty()
     @IsString()
     @Matches(/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
-        { message: 'Time must be in valid 24-hour format (HH:MM, e.g., 14:30)', })
+        { message: 'Time must be in valid 24-hour format (HH:MM, e.g., 18:03)', })
     startTime?: string
 
     @IsOptional()
     @IsNotEmpty()
     @IsString()
     @Matches(/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
-        { message: 'Time must be in valid 24-hour format (HH:MM, e.g., 14:30)', })
+        { message: 'Time must be in valid 24-hour format (HH:MM, e.g., 18:03)', })
     endTime?: string
 
     @IsOptional()

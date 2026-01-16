@@ -36,8 +36,9 @@ export class ClassService {
         await this.CourseValidator(classDTO.courseId)
         await this.TeacherValidator(classDTO.teacherId)
         this.Timetable_SizeValidator(classDTO.startTime, classDTO.endTime, classDTO.classSize)
-        this.FromDateToDayValidator(classDTO.fromDate, classDTO.toDate)
-        await this.DuplicateClass(classDTO.teacherId, classDTO.fromDate, classDTO.toDate, classDTO.timeTable, classDTO.startTime, classDTO.endTime)
+        this.FromDateToDateValidator(classDTO.fromDate, classDTO.toDate)
+        await this.DuplicateClass(classDTO.teacherId, classDTO.fromDate, classDTO.toDate,
+            classDTO.timeTable, classDTO.startTime, classDTO.endTime, null)
         const toDate = new Date(classDTO.toDate)
         toDate.setDate(toDate.getDate() + 1)
 
@@ -116,52 +117,50 @@ export class ClassService {
 
     // cập nhật lớp theo trạng thái
     async UpdateClassById(classId: number, up: UpdateClassDTO) {
-        this.Timetable_SizeValidator(up.startTime, up.endTime, up.classSize)
-        this.FromDateToDayValidator(up.fromDate, up.toDate)
         const classDB = await this.ClassIDValidator(classId)
-
-        const data: Prisma.LopHocUpdateInput = {}
         // đếm buổi học của lớp
         const countSession = await this.prismaService.buoiHoc.count({
             where: { LopHocID: classId }
         })
 
+        // Lớp RUNNING & OPEN có buổi học
+        if (classDB.TrangThai === 'RUNNING' || (classDB.TrangThai === 'OPEN' && countSession > 0)) {
+            if (up.fromDate || up.toDate || up.timeTable)
+                throw new BadRequestException('Cannot do it for running class')
+            if (up.startTime || up.endTime)
+                throw new BadRequestException('Timetable is not change')
+        }
+
+        const name = up.name ?? classDB.TenLop
+        const description = up.description ?? classDB.MoTa
+        const size = up.classSize ?? classDB.SiSo
+
+        const fromDate = up.fromDate ?? classDB.TuNgay
+        const toDate = up.toDate ?? classDB.DenNgay
+        const timeTable = up.timeTable ?? classDB.LichHoc
+        const startTime = up.startTime ?? classDB.GioBatDau
+        const endTime = up.endTime ?? classDB.GioKetThuc
+
         // đổi giáo viên
         if (up.teacherId) {
             await this.TeacherValidator(up.teacherId)
-            await this.ChangeTeacher(classId, up, classId)
-            data.giaovien = { connect: { ID: up.teacherId } }
+            await this.ChangeTeacher(classId, up, classId)// kiểm tra giáo viên có rảnh không
         }
 
-        if (classDB.TrangThai === 'OPEN') {
-            data.TenLop = up.name
-            data.MoTa = up.description
-            data.TrangThai = up.status
-            data.SiSo = up.classSize
-            // nếu không có buổi học thì cho sửa thêm
-            if (countSession == 0) {
-                await this.ChangeTeacher(classId, up, classId)
-                data.TuNgay = up.fromDate
-                data.DenNgay = up.toDate
-                data.LichHoc = up.timeTable
-                data.GioBatDau = up.startTime
-                data.GioKetThuc = up.endTime
-            }
-        }
+        if(up.room) await this.HasSameRoom(up.room, fromDate, toDate, timeTable, startTime, endTime, classDB.ID)
 
-        if (classDB.TrangThai === 'RUNNING') {
-            data.TenLop = up.name
-            data.MoTa = up.description
-            if (up.status === 'CLOSED')
-                data.TrangThai = 'CLOSED'
-        }
-
-        if (up.room)
-            data.PhongHoc = up.room
+        this.FromDateToDateValidator(fromDate, toDate)
+        this.Timetable_SizeValidator(startTime, endTime, size)
 
         return await this.prismaService.$transaction(async (tx) => {
             await tx.lopHoc.update({
-                where: { ID: classId }, data
+                where: { ID: classId },
+                data: {
+                    TenLop: name, MoTa: description, SiSo: size,
+                    TuNgay: fromDate, DenNgay: toDate, LichHoc: timeTable,
+                    GioBatDau: startTime, GioKetThuc: endTime,
+                    GiaoVienID: up.teacherId, PhongHoc: up.room
+                }
             })
 
             if (up.room) {
@@ -254,30 +253,31 @@ export class ClassService {
     }
 
     //kiểm tra khoảng ngày hợp lệ
-    private FromDateToDayValidator(fromDate?: Date, toDate?: Date) {
-        if (fromDate && toDate) {
-            if (fromDate >= toDate)
-                throw new ConflictException('To date must greater than from date')
-        }
+    private FromDateToDateValidator(fromDate: Date, toDate: Date) {
+        if (fromDate >= toDate)
+            throw new ConflictException('To date must greater than from date')
+    }
+
+    private parseHHmm(time: string) {
+        const [h, m] = time.split(':').map(Number);
+        return { h, m };
     }
 
     // kiểm tra thời gian bắt đầu, kết thúc và sĩ số
-    private Timetable_SizeValidator(startTime?: string, endTime?: string, classSize?: number) {
-        if (startTime && endTime && classSize) {
-            // tách giờ bởi dấu ":" và chuyển thành số 
-            const startTimeSplit = startTime.split(":").map(Number)
-            // tổng số phút = giờ * 60 + phút --> để so sánh
-            const startMinutes = startTimeSplit[0] * 60 + startTimeSplit[1]
+    private Timetable_SizeValidator(startTime: string, endTime: string, classSize: number) {
+        const { h: hStart, m: mStart } = this.parseHHmm(startTime)
+        const { h: hEnd, m: mEnd } = this.parseHHmm(endTime)
+        const startMinutes = hStart * 60 + mStart
+        const endMinutes = hEnd * 60 + mEnd
 
-            const endTimeSplit = endTime.split(":").map(Number)
-            const endMinutes = endTimeSplit[0] * 60 + endTimeSplit[1]
+        if (startMinutes >= endMinutes)
+            throw new ConflictException('End time must greater than start time')
 
-            if (startMinutes >= endMinutes)
-                throw new ConflictException('End time must greater than start time')
+        if (startMinutes < 420 || startMinutes > 1260)
+            throw new BadRequestException('Outside of opening hours: 7am - 9pm')
 
-            if (classSize < 0)
-                throw new ConflictException('Class size must greater than 0')
-        }
+        if (classSize < 0)
+            throw new ConflictException('Class size must greater than 0')
     }
 
     // kiểm tra trùng thời gian
@@ -295,20 +295,19 @@ export class ClassService {
 
     //kiểm tra giáo viên có trùng lịch dạy lớp học
     private async DuplicateClass(teacherId: number, startDate: Date, endDate: Date,
-        dow: number[], sHour: string, eHour: string, excludeClassId?: number) {
+        dow: number[], sHour: string, eHour: string, room: string | null, excludeClassId?: number) {
 
         const where: Prisma.LopHocWhereInput = {
             GiaoVienID: teacherId,
             TrangThai: { in: ['OPEN', 'RUNNING'] }
         }
-        if (excludeClassId)
-            where.ID = { not: excludeClassId }
+        if (excludeClassId) where.ID = { not: excludeClassId }
 
         const classDB = await this.prismaService.lopHoc.findMany({
             where,
             select: {
                 MaLopHoc: true, TenLop: true, TuNgay: true, DenNgay: true,
-                LichHoc: true, GioBatDau: true, GioKetThuc: true
+                LichHoc: true, GioBatDau: true, GioKetThuc: true, PhongHoc: true
             }
         })
 
@@ -317,32 +316,57 @@ export class ClassService {
             const aEnd = new Date(lh.DenNgay).setHours(0, 0, 0, 0)
             const bStart = new Date(startDate).setHours(0, 0, 0, 0)
             const bEnd = new Date(endDate).setHours(0, 0, 0, 0)
-            // kiểm tra ngày
+            // kiểm tra khoảng ngày trùng
             const isDateOverlap = this.TimeOverlap(aStart, aEnd, bStart, bEnd, false)
             if (!isDateOverlap) continue
 
-            // kiểm tra thứ
+            // kiểm tra thứ trùng
             const isDayOverlap = this.HasCommonDay(lh.LichHoc, dow)
             if (!isDayOverlap) continue
 
-            // kiểm tra giờ học
+            // kiểm tra giờ học trùng
             const isTimeOverlap = this.TimeOverlap(lh.GioBatDau, lh.GioKetThuc, sHour, eHour, true)
-            if (isTimeOverlap) throw new ConflictException(`Teacher schedule conflict with class '${lh.MaLopHoc}'`)
+            if (isTimeOverlap) {
+                if (room && room === lh.PhongHoc)
+                    throw new ConflictException(`Teacher schedule or room conflict with class '${lh.MaLopHoc}'`)
+            }
         }
     }
 
     // kiểm tra đang đổi giáo viên hay thông tin lớp 
     private async ChangeTeacher(classId: number, up: UpdateClassDTO, excludeClassId?: number) {
-        const classDB = await this.prismaService.lopHoc.findUnique({
-            where: { ID: classId }
-        })
-        if (!classDB) throw new BadRequestException('Class not existed')
+        const classDB = await this.ClassIDValidator(classId)
         const teacher_check = up.teacherId ?? classDB.GiaoVienID
         const startDate = up.fromDate ?? classDB.TuNgay
         const endDate = up.toDate ?? classDB.DenNgay
         const timeTable = up.timeTable ?? classDB.LichHoc
         const startTime = up.startTime ?? classDB.GioBatDau
         const endTime = up.endTime ?? classDB.GioKetThuc
-        return await this.DuplicateClass(teacher_check, startDate, endDate, timeTable, startTime, endTime, excludeClassId)
+        const room = up.room ?? classDB.PhongHoc
+        return await this.DuplicateClass(teacher_check, startDate, endDate,
+            timeTable, startTime, endTime, room, excludeClassId)
+    }
+
+    // kiểm tra trùng phòng lớp
+    private async HasSameRoom(room: string, fromDate: Date, toDate: Date,
+        timeTable: number[], startTime: string, endTime: string, excludeClassId?: number) {
+        if (!room) return
+        const conflict = await this.prismaService.lopHoc.findMany({
+            where: {
+                PhongHoc: room,// trùng phòng
+                ID: excludeClassId ? { not: excludeClassId } : undefined
+            }
+        })
+        for (var lh of conflict) {
+            const dupDate = this.TimeOverlap(fromDate, toDate, lh.TuNgay, lh.DenNgay, false)
+            if (!dupDate) continue
+
+            const dupSchedule = this.HasCommonDay(timeTable, lh.LichHoc)
+            if(!dupSchedule) continue
+
+            const dupTime = this.TimeOverlap(startTime, endTime, lh.GioBatDau, lh.GioKetThuc, true)
+            if(dupTime)
+                throw new BadRequestException(`${room} is used by other class at this time`)
+        }
     }
 }
