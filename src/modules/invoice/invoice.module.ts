@@ -1,12 +1,13 @@
 import { Module } from "@nestjs/common";
 import { InvoiceController } from "./invoice.controller";
 import { InvoiceService } from "./invoice.service";
-import { PrismaService } from "src/prisma/prisma.service";
-import { ReceiptService } from "../receipt/receipt.service";
+import { ReceiptModule } from "../receipt/receipt.module";
+import { PrismaModule } from "src/prisma/prisma.module";
 
 @Module({
+    imports:[ReceiptModule, PrismaModule],
     controllers:[InvoiceController],
-    providers:[InvoiceService, PrismaService, ReceiptService],
+    providers:[InvoiceService],
     exports:[InvoiceService]
 })
 export class InvoiceModule{}

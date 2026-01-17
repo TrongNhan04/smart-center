@@ -3,9 +3,10 @@ import { Roles } from "src/auth/decorators/roles.decorator";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guard/roles.guard";
 import { SessionService } from "./session.service";
-import { CreateSessionDTO, SessionsResultDTO, UpdateSessionDTO } from "./session.dto";
+import { CreateSessionDTO, UpdateSessionDTO } from "./session.dto";
 import { Request } from 'express';
 import { MustChangePWGuard } from "src/auth/guard/must-change-pw.guard";
+import { SessionsResultDTO } from "../session-result/session-result.dto";
 type RequestWithUser = Request & { user: { userId: number; role?: string } };
 
 @Controller()

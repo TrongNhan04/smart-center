@@ -41,7 +41,7 @@ export type ThongBaoMinAggregateOutputType = {
   UserId: number | null
   TieuDe: string | null
   NoiDung: string | null
-  Loai: $Enums.LoaiTB | null
+  Loai: string | null
   DaDoc: boolean | null
   CreatedAt: Date | null
 }
@@ -51,7 +51,7 @@ export type ThongBaoMaxAggregateOutputType = {
   UserId: number | null
   TieuDe: string | null
   NoiDung: string | null
-  Loai: $Enums.LoaiTB | null
+  Loai: string | null
   DaDoc: boolean | null
   CreatedAt: Date | null
 }
@@ -202,7 +202,7 @@ export type ThongBaoGroupByOutputType = {
   UserId: number
   TieuDe: string
   NoiDung: string
-  Loai: $Enums.LoaiTB
+  Loai: string
   DuLieu: runtime.JsonValue
   DaDoc: boolean
   CreatedAt: Date
@@ -236,7 +236,7 @@ export type ThongBaoWhereInput = {
   UserId?: Prisma.IntFilter<"ThongBao"> | number
   TieuDe?: Prisma.StringFilter<"ThongBao"> | string
   NoiDung?: Prisma.StringFilter<"ThongBao"> | string
-  Loai?: Prisma.EnumLoaiTBFilter<"ThongBao"> | $Enums.LoaiTB
+  Loai?: Prisma.StringFilter<"ThongBao"> | string
   DuLieu?: Prisma.JsonFilter<"ThongBao">
   DaDoc?: Prisma.BoolFilter<"ThongBao"> | boolean
   CreatedAt?: Prisma.DateTimeFilter<"ThongBao"> | Date | string
@@ -256,19 +256,19 @@ export type ThongBaoOrderByWithRelationInput = {
 }
 
 export type ThongBaoWhereUniqueInput = Prisma.AtLeast<{
-  UserId?: number
+  ID?: number
   AND?: Prisma.ThongBaoWhereInput | Prisma.ThongBaoWhereInput[]
   OR?: Prisma.ThongBaoWhereInput[]
   NOT?: Prisma.ThongBaoWhereInput | Prisma.ThongBaoWhereInput[]
-  ID?: Prisma.IntFilter<"ThongBao"> | number
+  UserId?: Prisma.IntFilter<"ThongBao"> | number
   TieuDe?: Prisma.StringFilter<"ThongBao"> | string
   NoiDung?: Prisma.StringFilter<"ThongBao"> | string
-  Loai?: Prisma.EnumLoaiTBFilter<"ThongBao"> | $Enums.LoaiTB
+  Loai?: Prisma.StringFilter<"ThongBao"> | string
   DuLieu?: Prisma.JsonFilter<"ThongBao">
   DaDoc?: Prisma.BoolFilter<"ThongBao"> | boolean
   CreatedAt?: Prisma.DateTimeFilter<"ThongBao"> | Date | string
   User?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-}, "UserId">
+}, "ID">
 
 export type ThongBaoOrderByWithAggregationInput = {
   ID?: Prisma.SortOrder
@@ -294,17 +294,16 @@ export type ThongBaoScalarWhereWithAggregatesInput = {
   UserId?: Prisma.IntWithAggregatesFilter<"ThongBao"> | number
   TieuDe?: Prisma.StringWithAggregatesFilter<"ThongBao"> | string
   NoiDung?: Prisma.StringWithAggregatesFilter<"ThongBao"> | string
-  Loai?: Prisma.EnumLoaiTBWithAggregatesFilter<"ThongBao"> | $Enums.LoaiTB
+  Loai?: Prisma.StringWithAggregatesFilter<"ThongBao"> | string
   DuLieu?: Prisma.JsonWithAggregatesFilter<"ThongBao">
   DaDoc?: Prisma.BoolWithAggregatesFilter<"ThongBao"> | boolean
   CreatedAt?: Prisma.DateTimeWithAggregatesFilter<"ThongBao"> | Date | string
 }
 
 export type ThongBaoCreateInput = {
-  ID?: number
   TieuDe: string
   NoiDung: string
-  Loai: $Enums.LoaiTB
+  Loai: string
   DuLieu: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: boolean
   CreatedAt: Date | string
@@ -316,17 +315,16 @@ export type ThongBaoUncheckedCreateInput = {
   UserId: number
   TieuDe: string
   NoiDung: string
-  Loai: $Enums.LoaiTB
+  Loai: string
   DuLieu: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: boolean
   CreatedAt: Date | string
 }
 
 export type ThongBaoUpdateInput = {
-  ID?: Prisma.IntFieldUpdateOperationsInput | number
   TieuDe?: Prisma.StringFieldUpdateOperationsInput | string
   NoiDung?: Prisma.StringFieldUpdateOperationsInput | string
-  Loai?: Prisma.EnumLoaiTBFieldUpdateOperationsInput | $Enums.LoaiTB
+  Loai?: Prisma.StringFieldUpdateOperationsInput | string
   DuLieu?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: Prisma.BoolFieldUpdateOperationsInput | boolean
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -338,7 +336,7 @@ export type ThongBaoUncheckedUpdateInput = {
   UserId?: Prisma.IntFieldUpdateOperationsInput | number
   TieuDe?: Prisma.StringFieldUpdateOperationsInput | string
   NoiDung?: Prisma.StringFieldUpdateOperationsInput | string
-  Loai?: Prisma.EnumLoaiTBFieldUpdateOperationsInput | $Enums.LoaiTB
+  Loai?: Prisma.StringFieldUpdateOperationsInput | string
   DuLieu?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: Prisma.BoolFieldUpdateOperationsInput | boolean
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -349,17 +347,16 @@ export type ThongBaoCreateManyInput = {
   UserId: number
   TieuDe: string
   NoiDung: string
-  Loai: $Enums.LoaiTB
+  Loai: string
   DuLieu: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: boolean
   CreatedAt: Date | string
 }
 
 export type ThongBaoUpdateManyMutationInput = {
-  ID?: Prisma.IntFieldUpdateOperationsInput | number
   TieuDe?: Prisma.StringFieldUpdateOperationsInput | string
   NoiDung?: Prisma.StringFieldUpdateOperationsInput | string
-  Loai?: Prisma.EnumLoaiTBFieldUpdateOperationsInput | $Enums.LoaiTB
+  Loai?: Prisma.StringFieldUpdateOperationsInput | string
   DuLieu?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: Prisma.BoolFieldUpdateOperationsInput | boolean
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -370,7 +367,7 @@ export type ThongBaoUncheckedUpdateManyInput = {
   UserId?: Prisma.IntFieldUpdateOperationsInput | number
   TieuDe?: Prisma.StringFieldUpdateOperationsInput | string
   NoiDung?: Prisma.StringFieldUpdateOperationsInput | string
-  Loai?: Prisma.EnumLoaiTBFieldUpdateOperationsInput | $Enums.LoaiTB
+  Loai?: Prisma.StringFieldUpdateOperationsInput | string
   DuLieu?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: Prisma.BoolFieldUpdateOperationsInput | boolean
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -469,15 +466,10 @@ export type ThongBaoUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.ThongBaoScalarWhereInput | Prisma.ThongBaoScalarWhereInput[]
 }
 
-export type EnumLoaiTBFieldUpdateOperationsInput = {
-  set?: $Enums.LoaiTB
-}
-
 export type ThongBaoCreateWithoutUserInput = {
-  ID?: number
   TieuDe: string
   NoiDung: string
-  Loai: $Enums.LoaiTB
+  Loai: string
   DuLieu: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: boolean
   CreatedAt: Date | string
@@ -487,7 +479,7 @@ export type ThongBaoUncheckedCreateWithoutUserInput = {
   ID?: number
   TieuDe: string
   NoiDung: string
-  Loai: $Enums.LoaiTB
+  Loai: string
   DuLieu: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: boolean
   CreatedAt: Date | string
@@ -527,7 +519,7 @@ export type ThongBaoScalarWhereInput = {
   UserId?: Prisma.IntFilter<"ThongBao"> | number
   TieuDe?: Prisma.StringFilter<"ThongBao"> | string
   NoiDung?: Prisma.StringFilter<"ThongBao"> | string
-  Loai?: Prisma.EnumLoaiTBFilter<"ThongBao"> | $Enums.LoaiTB
+  Loai?: Prisma.StringFilter<"ThongBao"> | string
   DuLieu?: Prisma.JsonFilter<"ThongBao">
   DaDoc?: Prisma.BoolFilter<"ThongBao"> | boolean
   CreatedAt?: Prisma.DateTimeFilter<"ThongBao"> | Date | string
@@ -537,17 +529,16 @@ export type ThongBaoCreateManyUserInput = {
   ID?: number
   TieuDe: string
   NoiDung: string
-  Loai: $Enums.LoaiTB
+  Loai: string
   DuLieu: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: boolean
   CreatedAt: Date | string
 }
 
 export type ThongBaoUpdateWithoutUserInput = {
-  ID?: Prisma.IntFieldUpdateOperationsInput | number
   TieuDe?: Prisma.StringFieldUpdateOperationsInput | string
   NoiDung?: Prisma.StringFieldUpdateOperationsInput | string
-  Loai?: Prisma.EnumLoaiTBFieldUpdateOperationsInput | $Enums.LoaiTB
+  Loai?: Prisma.StringFieldUpdateOperationsInput | string
   DuLieu?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: Prisma.BoolFieldUpdateOperationsInput | boolean
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -557,7 +548,7 @@ export type ThongBaoUncheckedUpdateWithoutUserInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
   TieuDe?: Prisma.StringFieldUpdateOperationsInput | string
   NoiDung?: Prisma.StringFieldUpdateOperationsInput | string
-  Loai?: Prisma.EnumLoaiTBFieldUpdateOperationsInput | $Enums.LoaiTB
+  Loai?: Prisma.StringFieldUpdateOperationsInput | string
   DuLieu?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: Prisma.BoolFieldUpdateOperationsInput | boolean
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -567,7 +558,7 @@ export type ThongBaoUncheckedUpdateManyWithoutUserInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
   TieuDe?: Prisma.StringFieldUpdateOperationsInput | string
   NoiDung?: Prisma.StringFieldUpdateOperationsInput | string
-  Loai?: Prisma.EnumLoaiTBFieldUpdateOperationsInput | $Enums.LoaiTB
+  Loai?: Prisma.StringFieldUpdateOperationsInput | string
   DuLieu?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: Prisma.BoolFieldUpdateOperationsInput | boolean
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -643,7 +634,7 @@ export type $ThongBaoPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     UserId: number
     TieuDe: string
     NoiDung: string
-    Loai: $Enums.LoaiTB
+    Loai: string
     DuLieu: runtime.JsonValue
     DaDoc: boolean
     CreatedAt: Date
@@ -1075,7 +1066,7 @@ export interface ThongBaoFieldRefs {
   readonly UserId: Prisma.FieldRef<"ThongBao", 'Int'>
   readonly TieuDe: Prisma.FieldRef<"ThongBao", 'String'>
   readonly NoiDung: Prisma.FieldRef<"ThongBao", 'String'>
-  readonly Loai: Prisma.FieldRef<"ThongBao", 'LoaiTB'>
+  readonly Loai: Prisma.FieldRef<"ThongBao", 'String'>
   readonly DuLieu: Prisma.FieldRef<"ThongBao", 'Json'>
   readonly DaDoc: Prisma.FieldRef<"ThongBao", 'Boolean'>
   readonly CreatedAt: Prisma.FieldRef<"ThongBao", 'DateTime'>

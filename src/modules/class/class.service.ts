@@ -147,7 +147,7 @@ export class ClassService {
             await this.ChangeTeacher(classId, up, classId)// kiểm tra giáo viên có rảnh không
         }
 
-        if(up.room) await this.HasSameRoom(up.room, fromDate, toDate, timeTable, startTime, endTime, classDB.ID)
+        if (up.room) await this.HasSameRoom(up.room, fromDate, toDate, timeTable, startTime, endTime, classDB.ID)
 
         this.FromDateToDateValidator(fromDate, toDate)
         this.Timetable_SizeValidator(startTime, endTime, size)
@@ -327,8 +327,7 @@ export class ClassService {
             // kiểm tra giờ học trùng
             const isTimeOverlap = this.TimeOverlap(lh.GioBatDau, lh.GioKetThuc, sHour, eHour, true)
             if (isTimeOverlap) {
-                if (room && room === lh.PhongHoc)
-                    throw new ConflictException(`Teacher schedule or room conflict with class '${lh.MaLopHoc}'`)
+                throw new ConflictException(`Teacher schedule or room conflict with class '${lh.MaLopHoc}'`)
             }
         }
     }
@@ -362,11 +361,11 @@ export class ClassService {
             if (!dupDate) continue
 
             const dupSchedule = this.HasCommonDay(timeTable, lh.LichHoc)
-            if(!dupSchedule) continue
+            if (!dupSchedule) continue
 
             const dupTime = this.TimeOverlap(startTime, endTime, lh.GioBatDau, lh.GioKetThuc, true)
-            if(dupTime)
-                throw new BadRequestException(`${room} is used by other class at this time`)
+            if (dupTime)
+                throw new BadRequestException(`${room} is used by other class `)
         }
     }
 }

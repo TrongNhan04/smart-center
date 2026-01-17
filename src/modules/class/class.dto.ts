@@ -57,6 +57,7 @@ export class CreateClassDTO {
 
     @IsNotEmpty()
     @IsInt()
+    @Min(0)
     classSize: number
 }
 
@@ -72,7 +73,6 @@ export class QueryClassDTO {
 export class UpdateClassDTO {
     @IsOptional()
     @IsInt()
-    @Min(1)
     teacherId?: number
 
     @IsOptional()// không gửi lên thì thôi, gửi thì phải theo @

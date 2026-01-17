@@ -27,7 +27,7 @@ export class ClassController {
     }
 
     // lấy danh sách lớp hiện có hoặc theo điều kiện - query
-    @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Get('admin/classes')
     async GetClasses(@Query() query: QueryClassDTO) {
@@ -96,11 +96,4 @@ export class ClassController {
         if(!userId) throw new NotFoundException('Teacher not found')
         return await this.sessionService.GetSessionsByTeacherId(+userId, +classId)
     }
-    // thông tin buổi học + danh sách học viên ghi danh ACTIVE - xong
-
-    // lưu nháp kết quả buổi học - DRAFT
-
-    // chốt gửi kết quả buổi học - SUBMITTED
-
-    // sửa chủ đề + phòng học 
 }

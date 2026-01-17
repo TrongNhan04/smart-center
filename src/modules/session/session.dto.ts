@@ -54,31 +54,3 @@ export class UpdateSessionDTO{
 }
 
 // định nghĩa lớp con
-export class ResultDetailDTO {
-    @IsNotEmpty()
-    @IsNumber()
-    enrollmentId: number
-
-    @IsOptional()
-    @IsString()
-    privateComment?: string
-
-    @IsBoolean()
-    isAttend: boolean
-
-    @IsOptional()
-    @IsNumber()
-    @Min(0) @Max(10)
-    score?: number
-}
-
-//đinh nghĩa lớp cha
-export class SessionsResultDTO{
-    @IsString()
-    comment:string
-
-    @IsArray()
-    @ValidateNested({each:true})
-    @Type(()=>ResultDetailDTO)
-    details: ResultDetailDTO[]
-}

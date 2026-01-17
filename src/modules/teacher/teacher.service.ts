@@ -9,7 +9,7 @@ export class TeacherService {
     constructor(private prismaService: PrismaService) { }
 
     //kiểm tra trùng mã giáo viên
-    async TeacherCodeValidator(code: string) {
+    private async TeacherCodeValidator(code: string) {
         const teacherDB = await this.prismaService.giaoVien.findUnique({
             where: { MaGiaoVien: code }
         })
@@ -17,30 +17,16 @@ export class TeacherService {
     }
 
     //kiểm tra trùng email và số điện thoại
-    async UserValidator(email: string, phone: string) {
-        // const userDB = await this.prismaService.user.findMany({
-        //     where: {
-        //         OR: [
-        //             { Email: email },
-        //             { DienThoai: phone }]
-        //     }
-        // })
-        //if (userDB?.Email == email) throw new ConflictException(`${email} was used`)
-        //if (userDB) throw new ConflictException(`${email} or ${phone} was used`)
-        const userEmail = await this.prismaService.user.findUnique({
-            where: { Email: email }
+    private async UserValidator(email: string, phone: string) {
+        const user = await this.prismaService.user.findUnique({
+            where: { Email: email, DienThoai: phone }
         })
-        if (userEmail) throw new ConflictException(`Email: ${email} was used`)
-        
-        const userPhone = await this.prismaService.user.findUnique({
-            where: { DienThoai: phone }
-        })
-        if (userPhone) throw new ConflictException(`Phone number: ${phone} was used`)
-    
+        if(user){`${email} and ${phone} are used`}
+        return user
     }
 
     // kiểm tra giáo viên có tồn tại 
-    async TeacherIdValidator(teacherId: number) {
+    private async TeacherIdValidator(teacherId: number) {
         const teacherDB = await this.prismaService.giaoVien.findUnique({
             where: { ID: teacherId },
             omit: { UpdatedAt: true, CreatedAt: true }

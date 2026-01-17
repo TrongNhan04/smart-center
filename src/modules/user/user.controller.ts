@@ -14,6 +14,6 @@ export class UserController {
   @Roles('ADMIN','TEACHER','PARENT')
   @Get('me')
   GetProfile(@Req() request: RequestWithUser){
-    return this.userService.Profile(request.user.userId)
+    return this.userService.GetMe(+request.user.userId)
   }
 }

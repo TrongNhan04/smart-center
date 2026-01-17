@@ -278,22 +278,14 @@ model PhieuThu {
   hoadon HoaDon @relation(fields: [HoaDonID], references: [ID])
 }
 
-enum LoaiTB {
-  SESSION_RESULT
-  INVOICE
-  SYSTEM
-  SCHEDULE_CHANGE
-}
-
-// ============ 12. HOADON  ============//
+// ============ 12. THONGBAO  ============//
 model ThongBao{
-  ID Int @default(autoincrement())
+  ID Int @id @default(autoincrement())
 
-  //userid, tieude, noidung, loai, dulieu:json, dadoc, createat
-  UserId Int @unique
+  UserId Int 
   TieuDe String
   NoiDung String
-  Loai LoaiTB
+  Loai String
   DuLieu Json
   DaDoc Boolean @default(false)// false = chưa đọc
   CreatedAt DateTime @db.Timestamptz(3)

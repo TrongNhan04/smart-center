@@ -340,13 +340,6 @@ export type EnumTrangThai_GDWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumTrangThai_GDFilter<$PrismaModel>
 }
 
-export type EnumLoaiTBFilter<$PrismaModel = never> = {
-  equals?: $Enums.LoaiTB | Prisma.EnumLoaiTBFieldRefInput<$PrismaModel>
-  in?: $Enums.LoaiTB[] | Prisma.ListEnumLoaiTBFieldRefInput<$PrismaModel>
-  notIn?: $Enums.LoaiTB[] | Prisma.ListEnumLoaiTBFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumLoaiTBFilter<$PrismaModel> | $Enums.LoaiTB
-}
-
 export type JsonFilter<$PrismaModel = never> =
 | Prisma.PatchUndefined<
     Prisma.Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
@@ -369,16 +362,6 @@ export type JsonFilterBase<$PrismaModel = never> = {
   gt?: runtime.InputJsonValue | Prisma.JsonFieldRefInput<$PrismaModel>
   gte?: runtime.InputJsonValue | Prisma.JsonFieldRefInput<$PrismaModel>
   not?: runtime.InputJsonValue | Prisma.JsonFieldRefInput<$PrismaModel> | Prisma.JsonNullValueFilter
-}
-
-export type EnumLoaiTBWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.LoaiTB | Prisma.EnumLoaiTBFieldRefInput<$PrismaModel>
-  in?: $Enums.LoaiTB[] | Prisma.ListEnumLoaiTBFieldRefInput<$PrismaModel>
-  notIn?: $Enums.LoaiTB[] | Prisma.ListEnumLoaiTBFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumLoaiTBWithAggregatesFilter<$PrismaModel> | $Enums.LoaiTB
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumLoaiTBFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumLoaiTBFilter<$PrismaModel>
 }
 
 export type JsonWithAggregatesFilter<$PrismaModel = never> =
@@ -745,23 +728,6 @@ export type NestedEnumTrangThai_GDWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumTrangThai_GDFilter<$PrismaModel>
   _max?: Prisma.NestedEnumTrangThai_GDFilter<$PrismaModel>
-}
-
-export type NestedEnumLoaiTBFilter<$PrismaModel = never> = {
-  equals?: $Enums.LoaiTB | Prisma.EnumLoaiTBFieldRefInput<$PrismaModel>
-  in?: $Enums.LoaiTB[] | Prisma.ListEnumLoaiTBFieldRefInput<$PrismaModel>
-  notIn?: $Enums.LoaiTB[] | Prisma.ListEnumLoaiTBFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumLoaiTBFilter<$PrismaModel> | $Enums.LoaiTB
-}
-
-export type NestedEnumLoaiTBWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.LoaiTB | Prisma.EnumLoaiTBFieldRefInput<$PrismaModel>
-  in?: $Enums.LoaiTB[] | Prisma.ListEnumLoaiTBFieldRefInput<$PrismaModel>
-  notIn?: $Enums.LoaiTB[] | Prisma.ListEnumLoaiTBFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumLoaiTBWithAggregatesFilter<$PrismaModel> | $Enums.LoaiTB
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumLoaiTBFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumLoaiTBFilter<$PrismaModel>
 }
 
 export type NestedJsonFilter<$PrismaModel = never> =
