@@ -1,10 +1,11 @@
-import { BadRequestException, ConflictException, forwardRef, Inject, Injectable } from "@nestjs/common";
+import { BadRequestException, ConflictException, forwardRef, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { CreateStudentDTO, QueryStudentDTO, UpdateStudentDTO } from "./student.dto";
 import { Prisma } from "src/generated/prisma/client";
 import * as bcrypt from 'bcrypt'
 import { EnrollService } from "../enroll/enroll.service";
 import { InvoiceService } from "../invoice/invoice.service";
+import { NotifyService } from "../notify/notify.service";
 
 @Injectable()
 export class StudentService {
@@ -12,6 +13,7 @@ export class StudentService {
         private prismaService: PrismaService,
         private enrollService: EnrollService,
         private invoiceService: InvoiceService,
+        private notisService: NotifyService
     ) { }
 
     // thêm học viên + ghi danh + hóa đơn 
@@ -38,12 +40,15 @@ export class StudentService {
             const newEnroll = await this.enrollService.CreateEnrollAuto(newStudent.ID, body.classId, client)
 
             // thêm hóa đơn
-            await this.invoiceService.CreateInvoice(newEnroll.ID, classDB?.DenNgay, body.fee, client)
+            const newInvoice = await this.invoiceService.CreateInvoice(newEnroll.ID, classDB?.DenNgay, body.fee, client)
+
+            // thêm thông báo
+            await this.notisService.InvoiceNotify(userId, newInvoice, tx)
             return { mgs: "succesfull" }
         }
-
+        // nếu có user
         if (tx) return await runLogic(tx)
-        else {
+        else { // ko có 
             return await this.prismaService.$transaction(async (newTX) => {
                 return await runLogic(newTX)
             })
@@ -80,7 +85,7 @@ export class StudentService {
             return await this.AddRecord_3Table(oldUser.ID, body)
         }
         else// tìm được nhiều hơn 1 user => trùng Email hoặc phone
-            throw new ConflictException("The email and phone number are registered to different people")
+            throw new ConflictException("The email and phone number are used by different people")
     }
 
     // lấy danh sách + tìm kiếm + lọc theo điều kiện
@@ -171,19 +176,6 @@ export class StudentService {
         if (StudentDB) throw new BadRequestException('Student code was duplicate')
     }
 
-    //kiểm tra trùng email hoặc số điện thoại
-    private async Email_PhoneValidator(email: string, phone: string) {
-        const userEmail = await this.prismaService.user.findUnique({
-            where: { Email: email }
-        })
-        if (userEmail) throw new ConflictException(`Email: ${email} was used`)
-
-        const userPhone = await this.prismaService.user.findUnique({
-            where: { DienThoai: phone }
-        })
-        if (userPhone) throw new ConflictException(`Phone number: ${phone} was used`)
-    }
-
     // kiểm tra học viên có tồn tại 
     private async StudentIdValidator(studentId: number) {
         const StudentDB = await this.prismaService.hocVien.findUnique({
@@ -199,7 +191,7 @@ export class StudentService {
         const classDB = await this.prismaService.lopHoc.findUnique({
             where: { ID: classId }
         })
-        if (!classDB) throw new ConflictException('Class is not found')
+        if (!classDB) throw new NotFoundException('Class not found')
         return classDB
     }
 }

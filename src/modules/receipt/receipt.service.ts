@@ -1,9 +1,13 @@
 import { BadRequestException, ConflictException, Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
+import { NotifyService } from "../notify/notify.service";
 
 @Injectable()
 export class ReceiptService {
-    constructor(private prismaService: PrismaService) { }
+    constructor(
+        private prismaService: PrismaService,
+        private notisService: NotifyService
+    ) { }
 
     // kiểm tra trùng mã phiếu thu
     async ReceiptCodeValidator(code: string) {
@@ -14,39 +18,45 @@ export class ReceiptService {
     }
 
     //thêm phiếu thu
-    async CreateReceipt(invoiceId: number, amount: number) {
-        const invoiceDB = await this.prismaService.hoaDon.findUnique({
-            where: { ID: invoiceId }
-        })
-        if (!invoiceDB) throw new ConflictException('Invoice not existed')
+    async CreateReceipt(userId:number, invoiceId: number, amount: number) {
+        if (amount <= 0) throw new ConflictException('Paymount must greater than 0')
 
-        const totalAmount = invoiceDB.TongTien.toNumber()
-        const paidAmount = invoiceDB.DaTra.toNumber()
-        let count = await this.prismaService.phieuThu.count()
-        const code = count < 10 ? "PT0" + (count + 1) : "PT" + (count + 1)
-        const today = new Date()
-
-        await this.ReceiptCodeValidator(code)
-
-        if (amount > totalAmount - paidAmount)
-            throw new BadRequestException('Amount must less than or equal Total')
-        await this.prismaService.$transaction([
-            // thêm phiếu thu
-            this.prismaService.phieuThu.create({
-                data: {
-                    MaPhieuThu: code,
-                    HoaDonID: invoiceId,
-                    SoTien: amount,
-                    NgayThu: today
-                }
-            }),
-            //cập nhật hóa đơn
-            this.prismaService.hoaDon.update({
+        return await this.prismaService.$transaction(async tx => {
+            const invoiceDB = await this.prismaService.hoaDon.findUnique({
                 where: { ID: invoiceId },
-                data: { DaTra: paidAmount + amount }
+                select: {
+                    TongTien: true, DaTra: true,
+                    ghidanh: { select: { hocvien: { select: { UserID: true } } } }
+                }
             })
-        ])
-        return { mgs: "Succesfull" }
+            if (!invoiceDB) throw new ConflictException('Invoice not existed')
+
+            const remain = invoiceDB.TongTien.toNumber() - invoiceDB.DaTra.toNumber()
+            if (amount > remain)
+                throw new BadRequestException('Amount must less than or equal Remain')
+
+            let count = await this.prismaService.phieuThu.count()
+            const code = count < 10 ? "PT0" + (count + 1) : "PT" + (count + 1)
+
+            await this.ReceiptCodeValidator(code)
+            const receipt = await tx.phieuThu.create({
+                data: {
+                    UserID: userId,
+                    HoaDonID: invoiceId,
+                    MaPhieuThu: code,
+                    NgayThu: new Date(),
+                    SoTien: amount
+                }, omit: { CreatedAt: true, UpdatedAt: true }
+            })
+
+            await tx.hoaDon.update({
+                where: { ID: invoiceId },
+                data: { DaTra: { increment: amount } }
+            })
+
+            await this.notisService.PaymentNotify(invoiceDB.ghidanh.hocvien.UserID, receipt)
+            return { mgs: "Create receipt and notisy successfully" }
+        })
     }
 
     //Lấy danh sách phiếu thu theo hóa đơn
@@ -54,7 +64,7 @@ export class ReceiptService {
         return await this.prismaService.phieuThu.findMany({
             where: { HoaDonID: invoiceId },
             omit: {
-                HoaDonID: true, 
+                HoaDonID: true,
                 UpdatedAt: true, CreatedAt: true
             }
         })

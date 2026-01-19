@@ -15,24 +15,44 @@ export class InvoiceService {
             where: { ID: invoiceId }
         })
         if (!invoiceDB) throw new ConflictException('Invoice not existed')
+        return invoiceDB
     }
 
     // tạo hóa đơn
     async CreateInvoice(enrollId: number, dueDate: Date, toTal: number, tx: Prisma.TransactionClient) {
-        // await this.enrollService.EnrollValidator(enrollId)
         let count = await this.prismaService.hoaDon.count()
         const code = count < 10 ? "HD0" + (count + 1) : "HD" + (count + 1)
         let client: Prisma.TransactionClient | null = null
         if (tx) client = tx
         else client = this.prismaService
-        return await client.hoaDon.create({
+        const invoice = await client.hoaDon.create({
             data: {
                 MaHoaDon: code,
                 ThoiHan: dueDate,
                 TongTien: toTal,
                 GhiDanhID: enrollId
+            },
+            select: {
+                ThoiHan: true,
+                TongTien: true,
+                ghidanh: {
+                    select: {
+                        HocVienID: true,
+                        lophoc: {
+                            select: { ID: true, TenLop: true }
+                        }
+                    }
+                }
             }
         })
+        const flat = {
+            ThoiHan: invoice.ThoiHan,
+            TongTien: invoice.TongTien,
+            HocVienID: invoice.ghidanh.HocVienID,
+            LopHocID: invoice.ghidanh.lophoc.ID,
+            TenLop: invoice.ghidanh.lophoc.TenLop
+        }
+        return flat
     }
 
     // lấy danh sách hóa đơn + tìm kiếm 

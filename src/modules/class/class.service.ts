@@ -4,6 +4,7 @@ import { QueryClassDTO, UpdateClassDTO, CreateClassDTO } from "./class.dto";
 import { Prisma } from "src/generated/prisma/client";
 import { SessionStatusDTO } from "../session/session.dto";
 import { SessionService } from "../session/session.service";
+import { DateHelper } from "src/common/date.helper";
 
 @Injectable()
 export class ClassService {
@@ -26,7 +27,7 @@ export class ClassService {
         const classDB = await this.prismaService.lopHoc.findUnique({
             where: { ID: classId }
         })
-        if (!classDB) throw new NotFoundException('Class is not found')
+        if (!classDB) throw new NotFoundException('Class not found')
         return classDB
     }
 
@@ -35,8 +36,8 @@ export class ClassService {
         await this.ClassValidator(classDTO.code)
         await this.CourseValidator(classDTO.courseId)
         await this.TeacherValidator(classDTO.teacherId)
-        this.Timetable_SizeValidator(classDTO.startTime, classDTO.endTime, classDTO.classSize)
-        this.FromDateToDateValidator(classDTO.fromDate, classDTO.toDate)
+        DateHelper.ValidateTimeRange(classDTO.startTime, classDTO.endTime)
+        DateHelper.FromDateToDateValidator(classDTO.fromDate, classDTO.toDate)
         await this.DuplicateClass(classDTO.teacherId, classDTO.fromDate, classDTO.toDate,
             classDTO.timeTable, classDTO.startTime, classDTO.endTime, null)
         const toDate = new Date(classDTO.toDate)
@@ -120,13 +121,13 @@ export class ClassService {
         const classDB = await this.ClassIDValidator(classId)
         // đếm buổi học của lớp
         const countSession = await this.prismaService.buoiHoc.count({
-            where: { LopHocID: classId }
+            where: { LopHocID: classId, TrangThai: { not: 'CANCELLED' } }
         })
 
-        // Lớp RUNNING & OPEN có buổi học
+        // Lớp RUNNING || OPEN có buổi học
         if (classDB.TrangThai === 'RUNNING' || (classDB.TrangThai === 'OPEN' && countSession > 0)) {
             if (up.fromDate || up.toDate || up.timeTable)
-                throw new BadRequestException('Cannot do it for running class')
+                throw new BadRequestException('Cannot do it for this class')
             if (up.startTime || up.endTime)
                 throw new BadRequestException('Timetable is not change')
         }
@@ -149,8 +150,8 @@ export class ClassService {
 
         if (up.room) await this.HasSameRoom(up.room, fromDate, toDate, timeTable, startTime, endTime, classDB.ID)
 
-        this.FromDateToDateValidator(fromDate, toDate)
-        this.Timetable_SizeValidator(startTime, endTime, size)
+        DateHelper.FromDateToDateValidator(fromDate, toDate)
+        DateHelper.ValidateTimeRange(startTime, endTime)
 
         return await this.prismaService.$transaction(async (tx) => {
             await tx.lopHoc.update({
@@ -175,26 +176,29 @@ export class ClassService {
 
     // xóa mềm lớp học, hủy ghi danh và hủy các buổi học chưa diễn ra
     async DeleteClassByID(classId: number) {
-        // nếu hủy lớp OPEN hoặc RUNNING thì hủy ghi danh: INACTIVE
-        // và hủy các buổi học SCHEDULED -> CANCELLED 
         const classDB = await this.ClassIDValidator(classId)
-        if (classDB.TrangThai !== 'CLOSED') {
-            await this.prismaService.$transaction([
-                this.prismaService.lopHoc.update({
-                    where: { ID: classId },
-                    data: { TrangThai: 'CLOSED' }
-                }),
-                this.prismaService.ghiDanh.updateMany({
-                    where: { LopHocID: classId, TrangThai: 'ACTIVE' },
-                    data: { TrangThai: 'INACTIVE' }
-                }),
-                this.prismaService.buoiHoc.updateMany({
-                    where: { LopHocID: classId, TrangThai: 'SCHEDULED' },
-                    data: { TrangThai: 'CANCELLED' }
-                })
-            ])
-        }
-        return { meg: "Class Closed" }
+        if (classDB.TrangThai === 'CLOSED')
+            throw new BadRequestException('Class already closed')
+
+        await this.prismaService.$transaction(async tx => {
+            const now = new Date()
+            await tx.lopHoc.update({
+                where: { ID: classId },
+                data: { TrangThai: 'CLOSED' }
+            })
+            await tx.ghiDanh.updateMany({
+                where: { LopHocID: classId, TrangThai: 'ACTIVE' },
+                data: { TrangThai: 'INACTIVE' }
+            })
+            await tx.buoiHoc.updateMany({
+                where: { 
+                    LopHocID: classId, 
+                    TrangThai: 'SCHEDULED', 
+                    BatDauLuc: { gt: now } },
+                data: { TrangThai: 'CANCELLED' }
+            })
+        })
+        return { msg: "Class Closed" }
     }
 
     // lấy danh sách buổi học theo lớp - phần dưới
@@ -252,41 +256,6 @@ export class ClassService {
         return teacherDB
     }
 
-    //kiểm tra khoảng ngày hợp lệ
-    private FromDateToDateValidator(fromDate: Date, toDate: Date) {
-        if (fromDate >= toDate)
-            throw new ConflictException('To date must greater than from date')
-    }
-
-    private parseHHmm(time: string) {
-        const [h, m] = time.split(':').map(Number);
-        return { h, m };
-    }
-
-    // kiểm tra thời gian bắt đầu, kết thúc và sĩ số
-    private Timetable_SizeValidator(startTime: string, endTime: string, classSize: number) {
-        const { h: hStart, m: mStart } = this.parseHHmm(startTime)
-        const { h: hEnd, m: mEnd } = this.parseHHmm(endTime)
-        const startMinutes = hStart * 60 + mStart
-        const endMinutes = hEnd * 60 + mEnd
-
-        if (startMinutes >= endMinutes)
-            throw new ConflictException('End time must greater than start time')
-
-        if (startMinutes < 420 || startMinutes > 1260)
-            throw new BadRequestException('Outside of opening hours: 7am - 9pm')
-
-        if (classSize < 0)
-            throw new ConflictException('Class size must greater than 0')
-    }
-
-    // kiểm tra trùng thời gian
-    private TimeOverlap<T>(aStart: T, aEnd: T, bStart: T, bEnd: T, isTime: boolean) {
-        if (isTime)
-            return aStart < bEnd && bStart < aEnd
-        return aStart <= bEnd && bStart <= aEnd
-    }
-
     //kiểm tra trùng lịch học
     private HasCommonDay(aDays: number[], bDays: number[]) {
         const d = new Set(aDays)// tạo mảng d không trùng
@@ -317,7 +286,7 @@ export class ClassService {
             const bStart = new Date(startDate).setHours(0, 0, 0, 0)
             const bEnd = new Date(endDate).setHours(0, 0, 0, 0)
             // kiểm tra khoảng ngày trùng
-            const isDateOverlap = this.TimeOverlap(aStart, aEnd, bStart, bEnd, false)
+            const isDateOverlap = DateHelper.TimeOverlap(aStart, aEnd, bStart, bEnd, false)
             if (!isDateOverlap) continue
 
             // kiểm tra thứ trùng
@@ -325,7 +294,7 @@ export class ClassService {
             if (!isDayOverlap) continue
 
             // kiểm tra giờ học trùng
-            const isTimeOverlap = this.TimeOverlap(lh.GioBatDau, lh.GioKetThuc, sHour, eHour, true)
+            const isTimeOverlap = DateHelper.TimeOverlap(lh.GioBatDau, lh.GioKetThuc, sHour, eHour, true)
             if (isTimeOverlap) {
                 throw new ConflictException(`Teacher schedule or room conflict with class '${lh.MaLopHoc}'`)
             }
@@ -357,13 +326,13 @@ export class ClassService {
             }
         })
         for (var lh of conflict) {
-            const dupDate = this.TimeOverlap(fromDate, toDate, lh.TuNgay, lh.DenNgay, false)
+            const dupDate = DateHelper.TimeOverlap(fromDate, toDate, lh.TuNgay, lh.DenNgay, false)
             if (!dupDate) continue
 
             const dupSchedule = this.HasCommonDay(timeTable, lh.LichHoc)
             if (!dupSchedule) continue
 
-            const dupTime = this.TimeOverlap(startTime, endTime, lh.GioBatDau, lh.GioKetThuc, true)
+            const dupTime = DateHelper.TimeOverlap(startTime, endTime, lh.GioBatDau, lh.GioKetThuc, true)
             if (dupTime)
                 throw new BadRequestException(`${room} is used by other class `)
         }

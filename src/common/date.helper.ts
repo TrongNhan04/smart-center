@@ -15,6 +15,12 @@ export class DateHelper {
         return d;
     }
 
+    //kiểm tra khoảng ngày hợp lệ
+    static FromDateToDateValidator(fromDate: Date, toDate: Date) {
+        if (fromDate >= toDate)
+            throw new ConflictException('To date must greater than from date')
+    }
+
     // kiểm tra lịch - hiện tại = bao nhiêu phút
     static CheckTimeWindow(time: Date) {
         const now = new Date().getTime()
@@ -35,5 +41,12 @@ export class DateHelper {
             throw new ConflictException('Open from 7am to 9pm')
         if (startMinutes >= endMinutes)
             throw new ConflictException('End time must greater than start time')
+    }
+
+    // kiểm tra trùng thời gian
+    static TimeOverlap<T>(aStart: T, aEnd: T, bStart: T, bEnd: T, isTime: boolean) {
+        if (isTime)
+            return aStart < bEnd && bStart < aEnd
+        return aStart <= bEnd && bStart <= aEnd
     }
 }

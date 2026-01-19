@@ -1,4 +1,5 @@
 import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
+import { Prisma } from "src/generated/prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
@@ -12,7 +13,7 @@ export class NotifyService {
     }) {
         return await this.prisma.thongBao.create({
             data: {
-                UserId: payload.userId,
+                UserID: payload.userId,
                 TieuDe: payload.title,
                 NoiDung: payload.body,
                 Loai: payload.type,
@@ -23,9 +24,9 @@ export class NotifyService {
     }
 
     // tạo NHIỀU thông báo cùng lúc
-    async CreateManyNotis(listParentID:number[], session:any) {
+    async CreateManyNotis(listParentID: number[], session: any) {
         const notionData = listParentID.map(id => ({
-            UserId: id,
+            UserID: id,
             TieuDe: 'Kết quả học tập mới',
             NoiDung: `Kết quả buổi học ngày ${session.BatDauLuc.toLocaleDateString()}`,
             Loai: 'SESSION_RESULT',
@@ -47,15 +48,15 @@ export class NotifyService {
         const [items, total, unReadCount] = await this.prisma.$transaction([
             // lấy danh sách thông báo theo phân trang
             this.prisma.thongBao.findMany({
-                where: { UserId: userId },
+                where: { UserID: userId },
                 orderBy: { CreatedAt: 'desc' },// lấy tin mới nhất
                 take: take,
                 skip: skip
             }),
             // tổng số lượng thông báo
-            this.prisma.thongBao.count({ where: { UserId: userId } }),
+            this.prisma.thongBao.count({ where: { UserID: userId } }),
             // tổng số lượng thông báo chưa đọc
-            this.prisma.thongBao.count({ where: { UserId: userId, DaDoc: false } })
+            this.prisma.thongBao.count({ where: { UserID: userId, DaDoc: false } })
         ])
         return { items, total, unReadCount }
     }
@@ -65,7 +66,7 @@ export class NotifyService {
         await this.NotifyValidator(userId, notifyId)
         return await this.prisma.thongBao.update({
             where: {
-                UserId: userId, ID: notifyId
+                UserID: userId, ID: notifyId
             },
             data: { DaDoc: true }
         })
@@ -75,11 +76,89 @@ export class NotifyService {
     async MaskAllRead(userId: number) {
         await this.prisma.thongBao.updateMany({
             where: {
-                UserId: userId, DaDoc: false
+                UserID: userId, DaDoc: false
             },
             data: { DaDoc: true }
         })
         return { msg: "successful" }
+    }
+
+    // thông báo hủy buổi học 
+    async SSCancelledNotify(userId: number[], session: any, reason: string) {
+        const title = "Thông báo hủy buổi học"
+        const dateStr = session.BatDauLuc.toLocaleDateString('vi-VN')
+        const body = `Lớp ${session.lophoc.MaLopHoc} - Buổi ngày ${dateStr} đã bị hủy. Lý do: ${reason}`
+
+        const notisData = userId.map(id => ({
+            UserID: id,
+            TieuDe: title,
+            NoiDung: body,
+            Loai: "SESSION_CANCEL",
+            DuLieu: {
+                sessionId: session.ID,
+                classId: session.LopHocID
+            },
+            DaDoc: false,
+        }))
+
+        if (notisData.length > 0)
+            return this.prisma.thongBao.createMany({ data: notisData })
+    }
+
+    // thông báo học phí
+    async InvoiceNotify(userId: number, invoice: any, tx?: Prisma.TransactionClient) {
+        let client: Prisma.TransactionClient | null = null
+        if (tx) client = tx
+        else client = this.prisma
+        const dateStr = invoice.ThoiHan.toLocaleDateString('vi-VN')
+
+        return await client.thongBao.create({
+            data: {
+                UserID: userId,
+                TieuDe: 'Thông báo học phí',
+                NoiDung: `Học phí lớp ${invoice.TenLop}: ${invoice.TongTien}. Hạn thanh toán là ${dateStr}.`,
+                Loai: 'INVOICE',
+                DuLieu: {
+                    invoiceId: invoice.ID,
+                    studentId: invoice.HocVienID,
+                    classId: invoice.LopHocID
+                },
+                DaDoc: false,
+            }
+        })
+    }
+
+    // thông báo thu tiền
+    async PaymentNotify(userId: number, receipt: any) {
+        // userId, title, body, tpye, data, isRead
+        return await this.prisma.thongBao.create({
+            data: {
+                UserID: userId,
+                TieuDe: 'Thanh toán học phí thành công',
+                NoiDung: `Đã ghi nhận thanh toán học phí, số tiền là ${receipt.SoTien}. Vui lòng kiểm tra lịch sử thanh toán trong ứng dụng.`,
+                Loai: 'RECEIPT',
+                DuLieu: {
+                    receiptId: receipt.ID,
+                    invoiceId: receipt.HoaDonID
+                }
+            }
+        })
+    }
+
+    async UnLockSSNotify(userId: number, session: any) {
+        const dateStr = session.BatDauLuc.toLocaleDateString('vi-VN')
+        return await this.prisma.thongBao.create({
+            data: {
+                UserID: userId,
+                TieuDe: "Thông báo hệ thống",
+                NoiDung: `Đã mở khóa buổi học ngày ${dateStr} của lớp ${session.TenLop}. Vui lòng kiểm tra lại buổi`,
+                Loai: 'SYSTERM_ARLERT',
+                DuLieu: {
+                    sessionId: session.ID
+                },
+                DaDoc: false
+            }
+        })
     }
 
     // kiểm tra id thông báo
@@ -89,7 +168,7 @@ export class NotifyService {
         })
         if (!notis) throw new NotFoundException('Notis not found')
 
-        if (notis.UserId !== userId)
+        if (notis.UserID !== userId)
             throw new ForbiddenException('Access denied')
         return notis
     }

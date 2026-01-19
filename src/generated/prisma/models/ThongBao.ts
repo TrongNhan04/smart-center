@@ -28,17 +28,17 @@ export type AggregateThongBao = {
 
 export type ThongBaoAvgAggregateOutputType = {
   ID: number | null
-  UserId: number | null
+  UserID: number | null
 }
 
 export type ThongBaoSumAggregateOutputType = {
   ID: number | null
-  UserId: number | null
+  UserID: number | null
 }
 
 export type ThongBaoMinAggregateOutputType = {
   ID: number | null
-  UserId: number | null
+  UserID: number | null
   TieuDe: string | null
   NoiDung: string | null
   Loai: string | null
@@ -48,7 +48,7 @@ export type ThongBaoMinAggregateOutputType = {
 
 export type ThongBaoMaxAggregateOutputType = {
   ID: number | null
-  UserId: number | null
+  UserID: number | null
   TieuDe: string | null
   NoiDung: string | null
   Loai: string | null
@@ -58,7 +58,7 @@ export type ThongBaoMaxAggregateOutputType = {
 
 export type ThongBaoCountAggregateOutputType = {
   ID: number
-  UserId: number
+  UserID: number
   TieuDe: number
   NoiDung: number
   Loai: number
@@ -71,17 +71,17 @@ export type ThongBaoCountAggregateOutputType = {
 
 export type ThongBaoAvgAggregateInputType = {
   ID?: true
-  UserId?: true
+  UserID?: true
 }
 
 export type ThongBaoSumAggregateInputType = {
   ID?: true
-  UserId?: true
+  UserID?: true
 }
 
 export type ThongBaoMinAggregateInputType = {
   ID?: true
-  UserId?: true
+  UserID?: true
   TieuDe?: true
   NoiDung?: true
   Loai?: true
@@ -91,7 +91,7 @@ export type ThongBaoMinAggregateInputType = {
 
 export type ThongBaoMaxAggregateInputType = {
   ID?: true
-  UserId?: true
+  UserID?: true
   TieuDe?: true
   NoiDung?: true
   Loai?: true
@@ -101,7 +101,7 @@ export type ThongBaoMaxAggregateInputType = {
 
 export type ThongBaoCountAggregateInputType = {
   ID?: true
-  UserId?: true
+  UserID?: true
   TieuDe?: true
   NoiDung?: true
   Loai?: true
@@ -199,7 +199,7 @@ export type ThongBaoGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 
 export type ThongBaoGroupByOutputType = {
   ID: number
-  UserId: number
+  UserID: number
   TieuDe: string
   NoiDung: string
   Loai: string
@@ -233,7 +233,7 @@ export type ThongBaoWhereInput = {
   OR?: Prisma.ThongBaoWhereInput[]
   NOT?: Prisma.ThongBaoWhereInput | Prisma.ThongBaoWhereInput[]
   ID?: Prisma.IntFilter<"ThongBao"> | number
-  UserId?: Prisma.IntFilter<"ThongBao"> | number
+  UserID?: Prisma.IntFilter<"ThongBao"> | number
   TieuDe?: Prisma.StringFilter<"ThongBao"> | string
   NoiDung?: Prisma.StringFilter<"ThongBao"> | string
   Loai?: Prisma.StringFilter<"ThongBao"> | string
@@ -245,7 +245,7 @@ export type ThongBaoWhereInput = {
 
 export type ThongBaoOrderByWithRelationInput = {
   ID?: Prisma.SortOrder
-  UserId?: Prisma.SortOrder
+  UserID?: Prisma.SortOrder
   TieuDe?: Prisma.SortOrder
   NoiDung?: Prisma.SortOrder
   Loai?: Prisma.SortOrder
@@ -260,7 +260,7 @@ export type ThongBaoWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.ThongBaoWhereInput | Prisma.ThongBaoWhereInput[]
   OR?: Prisma.ThongBaoWhereInput[]
   NOT?: Prisma.ThongBaoWhereInput | Prisma.ThongBaoWhereInput[]
-  UserId?: Prisma.IntFilter<"ThongBao"> | number
+  UserID?: Prisma.IntFilter<"ThongBao"> | number
   TieuDe?: Prisma.StringFilter<"ThongBao"> | string
   NoiDung?: Prisma.StringFilter<"ThongBao"> | string
   Loai?: Prisma.StringFilter<"ThongBao"> | string
@@ -272,7 +272,7 @@ export type ThongBaoWhereUniqueInput = Prisma.AtLeast<{
 
 export type ThongBaoOrderByWithAggregationInput = {
   ID?: Prisma.SortOrder
-  UserId?: Prisma.SortOrder
+  UserID?: Prisma.SortOrder
   TieuDe?: Prisma.SortOrder
   NoiDung?: Prisma.SortOrder
   Loai?: Prisma.SortOrder
@@ -291,7 +291,7 @@ export type ThongBaoScalarWhereWithAggregatesInput = {
   OR?: Prisma.ThongBaoScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ThongBaoScalarWhereWithAggregatesInput | Prisma.ThongBaoScalarWhereWithAggregatesInput[]
   ID?: Prisma.IntWithAggregatesFilter<"ThongBao"> | number
-  UserId?: Prisma.IntWithAggregatesFilter<"ThongBao"> | number
+  UserID?: Prisma.IntWithAggregatesFilter<"ThongBao"> | number
   TieuDe?: Prisma.StringWithAggregatesFilter<"ThongBao"> | string
   NoiDung?: Prisma.StringWithAggregatesFilter<"ThongBao"> | string
   Loai?: Prisma.StringWithAggregatesFilter<"ThongBao"> | string
@@ -306,19 +306,19 @@ export type ThongBaoCreateInput = {
   Loai: string
   DuLieu: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: boolean
-  CreatedAt: Date | string
+  CreatedAt?: Date | string
   User: Prisma.UserCreateNestedOneWithoutThongBaoInput
 }
 
 export type ThongBaoUncheckedCreateInput = {
   ID?: number
-  UserId: number
+  UserID: number
   TieuDe: string
   NoiDung: string
   Loai: string
   DuLieu: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: boolean
-  CreatedAt: Date | string
+  CreatedAt?: Date | string
 }
 
 export type ThongBaoUpdateInput = {
@@ -333,7 +333,7 @@ export type ThongBaoUpdateInput = {
 
 export type ThongBaoUncheckedUpdateInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
-  UserId?: Prisma.IntFieldUpdateOperationsInput | number
+  UserID?: Prisma.IntFieldUpdateOperationsInput | number
   TieuDe?: Prisma.StringFieldUpdateOperationsInput | string
   NoiDung?: Prisma.StringFieldUpdateOperationsInput | string
   Loai?: Prisma.StringFieldUpdateOperationsInput | string
@@ -344,13 +344,13 @@ export type ThongBaoUncheckedUpdateInput = {
 
 export type ThongBaoCreateManyInput = {
   ID?: number
-  UserId: number
+  UserID: number
   TieuDe: string
   NoiDung: string
   Loai: string
   DuLieu: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: boolean
-  CreatedAt: Date | string
+  CreatedAt?: Date | string
 }
 
 export type ThongBaoUpdateManyMutationInput = {
@@ -364,7 +364,7 @@ export type ThongBaoUpdateManyMutationInput = {
 
 export type ThongBaoUncheckedUpdateManyInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
-  UserId?: Prisma.IntFieldUpdateOperationsInput | number
+  UserID?: Prisma.IntFieldUpdateOperationsInput | number
   TieuDe?: Prisma.StringFieldUpdateOperationsInput | string
   NoiDung?: Prisma.StringFieldUpdateOperationsInput | string
   Loai?: Prisma.StringFieldUpdateOperationsInput | string
@@ -385,7 +385,7 @@ export type ThongBaoOrderByRelationAggregateInput = {
 
 export type ThongBaoCountOrderByAggregateInput = {
   ID?: Prisma.SortOrder
-  UserId?: Prisma.SortOrder
+  UserID?: Prisma.SortOrder
   TieuDe?: Prisma.SortOrder
   NoiDung?: Prisma.SortOrder
   Loai?: Prisma.SortOrder
@@ -396,12 +396,12 @@ export type ThongBaoCountOrderByAggregateInput = {
 
 export type ThongBaoAvgOrderByAggregateInput = {
   ID?: Prisma.SortOrder
-  UserId?: Prisma.SortOrder
+  UserID?: Prisma.SortOrder
 }
 
 export type ThongBaoMaxOrderByAggregateInput = {
   ID?: Prisma.SortOrder
-  UserId?: Prisma.SortOrder
+  UserID?: Prisma.SortOrder
   TieuDe?: Prisma.SortOrder
   NoiDung?: Prisma.SortOrder
   Loai?: Prisma.SortOrder
@@ -411,7 +411,7 @@ export type ThongBaoMaxOrderByAggregateInput = {
 
 export type ThongBaoMinOrderByAggregateInput = {
   ID?: Prisma.SortOrder
-  UserId?: Prisma.SortOrder
+  UserID?: Prisma.SortOrder
   TieuDe?: Prisma.SortOrder
   NoiDung?: Prisma.SortOrder
   Loai?: Prisma.SortOrder
@@ -421,7 +421,7 @@ export type ThongBaoMinOrderByAggregateInput = {
 
 export type ThongBaoSumOrderByAggregateInput = {
   ID?: Prisma.SortOrder
-  UserId?: Prisma.SortOrder
+  UserID?: Prisma.SortOrder
 }
 
 export type ThongBaoCreateNestedManyWithoutUserInput = {
@@ -472,7 +472,7 @@ export type ThongBaoCreateWithoutUserInput = {
   Loai: string
   DuLieu: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: boolean
-  CreatedAt: Date | string
+  CreatedAt?: Date | string
 }
 
 export type ThongBaoUncheckedCreateWithoutUserInput = {
@@ -482,7 +482,7 @@ export type ThongBaoUncheckedCreateWithoutUserInput = {
   Loai: string
   DuLieu: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: boolean
-  CreatedAt: Date | string
+  CreatedAt?: Date | string
 }
 
 export type ThongBaoCreateOrConnectWithoutUserInput = {
@@ -516,7 +516,7 @@ export type ThongBaoScalarWhereInput = {
   OR?: Prisma.ThongBaoScalarWhereInput[]
   NOT?: Prisma.ThongBaoScalarWhereInput | Prisma.ThongBaoScalarWhereInput[]
   ID?: Prisma.IntFilter<"ThongBao"> | number
-  UserId?: Prisma.IntFilter<"ThongBao"> | number
+  UserID?: Prisma.IntFilter<"ThongBao"> | number
   TieuDe?: Prisma.StringFilter<"ThongBao"> | string
   NoiDung?: Prisma.StringFilter<"ThongBao"> | string
   Loai?: Prisma.StringFilter<"ThongBao"> | string
@@ -532,7 +532,7 @@ export type ThongBaoCreateManyUserInput = {
   Loai: string
   DuLieu: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: boolean
-  CreatedAt: Date | string
+  CreatedAt?: Date | string
 }
 
 export type ThongBaoUpdateWithoutUserInput = {
@@ -568,7 +568,7 @@ export type ThongBaoUncheckedUpdateManyWithoutUserInput = {
 
 export type ThongBaoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   ID?: boolean
-  UserId?: boolean
+  UserID?: boolean
   TieuDe?: boolean
   NoiDung?: boolean
   Loai?: boolean
@@ -580,7 +580,7 @@ export type ThongBaoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
 
 export type ThongBaoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   ID?: boolean
-  UserId?: boolean
+  UserID?: boolean
   TieuDe?: boolean
   NoiDung?: boolean
   Loai?: boolean
@@ -592,7 +592,7 @@ export type ThongBaoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
 
 export type ThongBaoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   ID?: boolean
-  UserId?: boolean
+  UserID?: boolean
   TieuDe?: boolean
   NoiDung?: boolean
   Loai?: boolean
@@ -604,7 +604,7 @@ export type ThongBaoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
 
 export type ThongBaoSelectScalar = {
   ID?: boolean
-  UserId?: boolean
+  UserID?: boolean
   TieuDe?: boolean
   NoiDung?: boolean
   Loai?: boolean
@@ -613,7 +613,7 @@ export type ThongBaoSelectScalar = {
   CreatedAt?: boolean
 }
 
-export type ThongBaoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"ID" | "UserId" | "TieuDe" | "NoiDung" | "Loai" | "DuLieu" | "DaDoc" | "CreatedAt", ExtArgs["result"]["thongBao"]>
+export type ThongBaoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"ID" | "UserID" | "TieuDe" | "NoiDung" | "Loai" | "DuLieu" | "DaDoc" | "CreatedAt", ExtArgs["result"]["thongBao"]>
 export type ThongBaoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -631,7 +631,7 @@ export type $ThongBaoPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     ID: number
-    UserId: number
+    UserID: number
     TieuDe: string
     NoiDung: string
     Loai: string
@@ -1063,7 +1063,7 @@ export interface Prisma__ThongBaoClient<T, Null = never, ExtArgs extends runtime
  */
 export interface ThongBaoFieldRefs {
   readonly ID: Prisma.FieldRef<"ThongBao", 'Int'>
-  readonly UserId: Prisma.FieldRef<"ThongBao", 'Int'>
+  readonly UserID: Prisma.FieldRef<"ThongBao", 'Int'>
   readonly TieuDe: Prisma.FieldRef<"ThongBao", 'String'>
   readonly NoiDung: Prisma.FieldRef<"ThongBao", 'String'>
   readonly Loai: Prisma.FieldRef<"ThongBao", 'String'>

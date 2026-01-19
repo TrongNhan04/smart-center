@@ -1,7 +1,6 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { Prisma } from "src/generated/prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
-import { ClassService } from "../class/class.service";
 import { CreateEnrollDTO, QueryEnrollDTO } from "./enroll.dto";
 import { InvoiceService } from "../invoice/invoice.service";
 

@@ -19,7 +19,7 @@ export class SessionResultService {
         // 2. check thời gian cho phép lưu NHÁP
         const minutesLeftStart = DateHelper.CheckTimeWindow(sessionDB.BatDauLuc)
         const minutesLeftEnd = DateHelper.CheckTimeWindow(sessionDB.KetThucLuc)
-        if (!sessionDB.AdminMoKhoa) {
+        if (sessionDB.AdminMoKhoa == false) {
             if (minutesLeftStart > 15 || minutesLeftEnd < -2880)
                 throw new BadRequestException(`Drafting is not allowed at this time`)
         }
@@ -46,30 +46,41 @@ export class SessionResultService {
     }
 
     // mở khóa lưu kết quả buổi học
-    async UnclokSession(sessionId: number) {
+    async UnLokSession(sessionId: number) {
         const sessionDB = await this.SessionIdValidator(sessionId)
-        if (sessionDB.TrangThai === 'SCHEDULED')
+        if (sessionDB.TrangThai === 'CANCELLED')
             throw new ConflictException(`Session ID ${sessionId} not locked`)
 
         return await this.prisma.$transaction(async tx => {
-            await tx.ketQua_BuoiHoc.update({
-                where: { BuoiHocID: sessionId },
-                data: { TrangThai: 'DRAFT' }
-            })
             await tx.buoiHoc.update({
                 where: { ID: sessionId },
-                data: { TrangThai: 'SCHEDULED', AdminMoKhoa: true }
+                data: { AdminMoKhoa: true }
             })
-            const count = await tx.buoiHoc.count({
+            const now = new Date()
+            if (now < sessionDB.KetThucLuc)
+                throw new ConflictException('Only previous sessions are unlocked')
+            const isComplete = await tx.buoiHoc.findFirst({
                 where: { LopHocID: sessionDB.LopHocID, TrangThai: 'COMPLETED' }
             })
-            if (count < 2) {
-                await tx.lopHoc.update({
-                    where: { ID: sessionDB.LopHocID },
-                    data: { TrangThai: 'OPEN' }
-                })
+            const mess = `Unlock session id ${sessionDB.ID} successfully`
+            if (isComplete) return { msg: mess }
+
+            const classDB = await tx.lopHoc.update({
+                where: { ID: sessionDB.LopHocID },
+                data: { TrangThai: 'OPEN' },
+                select: { TenLop: true, giaovien: { select: { UserID: true } } }
+            })
+
+            const flatSS = {
+                ID: sessionId,
+                TenLop: classDB.TenLop,
+                UserId: classDB.giaovien.UserID,
+                BatDauLuc: sessionDB.BatDauLuc
             }
-            return { mgs: `Unclock session id ${sessionDB.ID} successfully` }
+
+            await this.notisService.UnLockSSNotify(flatSS.UserId, flatSS)
+
+            return { msg: mess }
         })
     }
 
@@ -85,8 +96,9 @@ export class SessionResultService {
         // key: enrollmentId, value: Data
         const inputMap = new Map(body.details.map(m => [m.enrollmentId, m]))
         const listParent = listEnroll.map(e => e.hocvien.UserID)
+
         return await this.prisma.$transaction(async tx => {
-            // A. Upsert bảng Tổng Quát (KetQua_BuoiHoc)
+            // A. Upsert bảng KetQua_BuoiHoc
             const sessionResult = await tx.ketQua_BuoiHoc.upsert({
                 where: { BuoiHocID: session.ID },
                 create: {

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from "@nestjs/common";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guard/roles.guard";
@@ -6,6 +6,10 @@ import { InvoiceService } from "./invoice.service";
 import { QueryInvoiceDTO } from "./invoice.dto";
 import { ReceiptService } from "../receipt/receipt.service";
 import { CreateReceiptDTO } from "../receipt/receipt.dto";
+import { Request } from 'express';
+
+type RequestWithUser = Request & { user: { userId: number; role?: string } };
+
 
 @Controller('admin/invoices')
 export class InvoiceController {
@@ -25,9 +29,11 @@ export class InvoiceController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Post(':id/receipt')
-    async CreateInvoices(@Param('id') invoiceId: number,
-        @Body() body: CreateReceiptDTO) {
-        return await this.receiptService.CreateReceipt(+invoiceId, body.amount)
+    async CreateInvoices(
+        @Param('id') invoiceId: number,
+        @Body() body: CreateReceiptDTO,
+        @Req() req:RequestWithUser) {
+        return await this.receiptService.CreateReceipt(+req.user.userId,+invoiceId, body.amount)
     }
     //Lấy danh sách phiếu thu theo hóa đơn
     @UseGuards(JwtAuthGuard, RolesGuard)

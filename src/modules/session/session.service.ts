@@ -5,12 +5,14 @@ import { CreateSessionDTO, SessionStatusDTO, UpdateSessionDTO } from "./session.
 import { DateHelper } from "src/common/date.helper";
 import { SessionResultService } from "../session-result/session-result.service";
 import { SessionsResultDTO } from "../session-result/session-result.dto";
+import { NotifyService } from "../notify/notify.service";
 
 @Injectable()
 export class SessionService {
     constructor(
         private prisma: PrismaService,
-        private resultService: SessionResultService
+        private resultService: SessionResultService,
+        private notisService: NotifyService
     ) { }
 
     // lấy danh sách buổi học theo lớp
@@ -42,15 +44,32 @@ export class SessionService {
 
     // hủy buổi học kèm lý do
     async CancelSessionById(sessionId: number, reason: string) {
-        await this.SessionIdValidator(sessionId)
+        const sessionDB = await this.SessionIdValidator(sessionId)
+        if (sessionDB.TrangThai !== 'SCHEDULED')
+            throw new ConflictException('Session is COMPLETED or already CANCELLED')
         if (!reason) throw new BadRequestException('Reason is missing')
 
-        await this.prisma.buoiHoc.update({
+        const updateSS = await this.prisma.buoiHoc.update({
             where: { ID: sessionId, TrangThai: 'SCHEDULED' },
-            data: { MoTa: reason, TrangThai: 'CANCELLED' }
+            data: { MoTa: reason, TrangThai: 'CANCELLED' },
+            select: {
+                BatDauLuc: true, LopHocID: true,
+                lophoc: {
+                    select: {
+                        ID:true, MaLopHoc: true,
+                        ghidanh: {
+                            where: { TrangThai: 'ACTIVE' },
+                            select: { hocvien: { select: { UserID: true } } }
+                        }
+                    }
+                }
+            }
         })
-        return { mgs: "Cancelled successfully" }
-        
+        const listParentID = updateSS.lophoc.ghidanh.map(e => e.hocvien.UserID)
+        const uniqueId = [...new Set(listParentID)]
+        await this.notisService.SSCancelledNotify(uniqueId, updateSS, reason)
+        return { mgs: "Session cancelled and notify parent successfully" }
+
     }
 
     // tạo buổi học tự động
@@ -102,10 +121,23 @@ export class SessionService {
             if (classDB.LichHoc.includes(dow)) {
                 const startAt = DateHelper.combineDateAndTime(xday, classDB.GioBatDau);
                 const endAt = DateHelper.combineDateAndTime(xday, classDB.GioKetThuc);
-                data.push({
-                    LopHocID: classId, BuoiSo: buoiSo++,
-                    BatDauLuc: startAt, KetThucLuc: endAt, PhongHoc: classDB.PhongHoc
-                });
+
+                const conflict = await this.prisma.buoiHoc.findFirst({
+                    where: {
+                        PhongHoc: classDB.PhongHoc,
+                        TrangThai: 'SCHEDULED',
+                        BatDauLuc: { lt: endAt },
+                        KetThucLuc: { gt: startAt }
+                    }
+                })
+                if (!conflict) {
+                    data.push({
+                        LopHocID: classId, BuoiSo: buoiSo++,
+                        BatDauLuc: startAt, KetThucLuc: endAt, PhongHoc: classDB.PhongHoc
+                    })
+                }
+                else 
+                    console.log(`skip ${xday} because duplicate with session ID ${conflict.ID}`)
             }
             xday.setDate(xday.getDate() + 1);
         }
@@ -165,7 +197,7 @@ export class SessionService {
             return await tx.buoiHoc.create({
                 data: {
                     BuoiSo: nextSs, LopHocID: body.classId, ChuDe: body.topic,
-                    BatDauLuc: startAt, KetThucLuc: endAt
+                    BatDauLuc: startAt, KetThucLuc: endAt, PhongHoc: body.room
                 },
                 omit: { CreatedAt: true, UpdatedAt: true }
             })
@@ -243,7 +275,7 @@ export class SessionService {
 
     // mở khóa lưu kết quả buổi học
     async UnclokSession(sessionId: number) {
-        return await this.resultService.UnclokSession(sessionId)
+        return await this.resultService.UnLokSession(sessionId)
     }
 
     // lấy giáo viên từ userId

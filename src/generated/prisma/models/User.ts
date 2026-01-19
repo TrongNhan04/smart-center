@@ -255,6 +255,7 @@ export type UserWhereInput = {
   GiaoVien?: Prisma.XOR<Prisma.GiaoVienNullableScalarRelationFilter, Prisma.GiaoVienWhereInput> | null
   HocVien?: Prisma.HocVienListRelationFilter
   ThongBao?: Prisma.ThongBaoListRelationFilter
+  PhieuThu?: Prisma.PhieuThuListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -270,6 +271,7 @@ export type UserOrderByWithRelationInput = {
   GiaoVien?: Prisma.GiaoVienOrderByWithRelationInput
   HocVien?: Prisma.HocVienOrderByRelationAggregateInput
   ThongBao?: Prisma.ThongBaoOrderByRelationAggregateInput
+  PhieuThu?: Prisma.PhieuThuOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -288,6 +290,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   GiaoVien?: Prisma.XOR<Prisma.GiaoVienNullableScalarRelationFilter, Prisma.GiaoVienWhereInput> | null
   HocVien?: Prisma.HocVienListRelationFilter
   ThongBao?: Prisma.ThongBaoListRelationFilter
+  PhieuThu?: Prisma.PhieuThuListRelationFilter
 }, "ID" | "Email" | "DienThoai">
 
 export type UserOrderByWithAggregationInput = {
@@ -334,6 +337,7 @@ export type UserCreateInput = {
   GiaoVien?: Prisma.GiaoVienCreateNestedOneWithoutUserInput
   HocVien?: Prisma.HocVienCreateNestedManyWithoutParentInput
   ThongBao?: Prisma.ThongBaoCreateNestedManyWithoutUserInput
+  PhieuThu?: Prisma.PhieuThuCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -349,6 +353,7 @@ export type UserUncheckedCreateInput = {
   GiaoVien?: Prisma.GiaoVienUncheckedCreateNestedOneWithoutUserInput
   HocVien?: Prisma.HocVienUncheckedCreateNestedManyWithoutParentInput
   ThongBao?: Prisma.ThongBaoUncheckedCreateNestedManyWithoutUserInput
+  PhieuThu?: Prisma.PhieuThuUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -363,6 +368,7 @@ export type UserUpdateInput = {
   GiaoVien?: Prisma.GiaoVienUpdateOneWithoutUserNestedInput
   HocVien?: Prisma.HocVienUpdateManyWithoutParentNestedInput
   ThongBao?: Prisma.ThongBaoUpdateManyWithoutUserNestedInput
+  PhieuThu?: Prisma.PhieuThuUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -378,6 +384,7 @@ export type UserUncheckedUpdateInput = {
   GiaoVien?: Prisma.GiaoVienUncheckedUpdateOneWithoutUserNestedInput
   HocVien?: Prisma.HocVienUncheckedUpdateManyWithoutParentNestedInput
   ThongBao?: Prisma.ThongBaoUncheckedUpdateManyWithoutUserNestedInput
+  PhieuThu?: Prisma.PhieuThuUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -518,6 +525,20 @@ export type UserUpdateOneRequiredWithoutHocVienNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutHocVienInput, Prisma.UserUpdateWithoutHocVienInput>, Prisma.UserUncheckedUpdateWithoutHocVienInput>
 }
 
+export type UserCreateNestedOneWithoutPhieuThuInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPhieuThuInput, Prisma.UserUncheckedCreateWithoutPhieuThuInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPhieuThuInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutPhieuThuNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPhieuThuInput, Prisma.UserUncheckedCreateWithoutPhieuThuInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPhieuThuInput
+  upsert?: Prisma.UserUpsertWithoutPhieuThuInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPhieuThuInput, Prisma.UserUpdateWithoutPhieuThuInput>, Prisma.UserUncheckedUpdateWithoutPhieuThuInput>
+}
+
 export type UserCreateNestedOneWithoutThongBaoInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutThongBaoInput, Prisma.UserUncheckedCreateWithoutThongBaoInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutThongBaoInput
@@ -543,6 +564,7 @@ export type UserCreateWithoutGiaoVienInput = {
   UpdatedAt?: Date | string
   HocVien?: Prisma.HocVienCreateNestedManyWithoutParentInput
   ThongBao?: Prisma.ThongBaoCreateNestedManyWithoutUserInput
+  PhieuThu?: Prisma.PhieuThuCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutGiaoVienInput = {
@@ -557,6 +579,7 @@ export type UserUncheckedCreateWithoutGiaoVienInput = {
   UpdatedAt?: Date | string
   HocVien?: Prisma.HocVienUncheckedCreateNestedManyWithoutParentInput
   ThongBao?: Prisma.ThongBaoUncheckedCreateNestedManyWithoutUserInput
+  PhieuThu?: Prisma.PhieuThuUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutGiaoVienInput = {
@@ -586,6 +609,7 @@ export type UserUpdateWithoutGiaoVienInput = {
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   HocVien?: Prisma.HocVienUpdateManyWithoutParentNestedInput
   ThongBao?: Prisma.ThongBaoUpdateManyWithoutUserNestedInput
+  PhieuThu?: Prisma.PhieuThuUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutGiaoVienInput = {
@@ -600,6 +624,7 @@ export type UserUncheckedUpdateWithoutGiaoVienInput = {
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   HocVien?: Prisma.HocVienUncheckedUpdateManyWithoutParentNestedInput
   ThongBao?: Prisma.ThongBaoUncheckedUpdateManyWithoutUserNestedInput
+  PhieuThu?: Prisma.PhieuThuUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutHocVienInput = {
@@ -613,6 +638,7 @@ export type UserCreateWithoutHocVienInput = {
   UpdatedAt?: Date | string
   GiaoVien?: Prisma.GiaoVienCreateNestedOneWithoutUserInput
   ThongBao?: Prisma.ThongBaoCreateNestedManyWithoutUserInput
+  PhieuThu?: Prisma.PhieuThuCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutHocVienInput = {
@@ -627,6 +653,7 @@ export type UserUncheckedCreateWithoutHocVienInput = {
   UpdatedAt?: Date | string
   GiaoVien?: Prisma.GiaoVienUncheckedCreateNestedOneWithoutUserInput
   ThongBao?: Prisma.ThongBaoUncheckedCreateNestedManyWithoutUserInput
+  PhieuThu?: Prisma.PhieuThuUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutHocVienInput = {
@@ -656,6 +683,7 @@ export type UserUpdateWithoutHocVienInput = {
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   GiaoVien?: Prisma.GiaoVienUpdateOneWithoutUserNestedInput
   ThongBao?: Prisma.ThongBaoUpdateManyWithoutUserNestedInput
+  PhieuThu?: Prisma.PhieuThuUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutHocVienInput = {
@@ -670,6 +698,81 @@ export type UserUncheckedUpdateWithoutHocVienInput = {
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   GiaoVien?: Prisma.GiaoVienUncheckedUpdateOneWithoutUserNestedInput
   ThongBao?: Prisma.ThongBaoUncheckedUpdateManyWithoutUserNestedInput
+  PhieuThu?: Prisma.PhieuThuUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutPhieuThuInput = {
+  Email: string
+  DienThoai: string
+  MatKhauHash: string
+  PhaiDoiMK?: boolean
+  VaiTro: $Enums.Vaitro
+  ToKenVerSion?: number
+  CreatedAt?: Date | string
+  UpdatedAt?: Date | string
+  GiaoVien?: Prisma.GiaoVienCreateNestedOneWithoutUserInput
+  HocVien?: Prisma.HocVienCreateNestedManyWithoutParentInput
+  ThongBao?: Prisma.ThongBaoCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutPhieuThuInput = {
+  ID?: number
+  Email: string
+  DienThoai: string
+  MatKhauHash: string
+  PhaiDoiMK?: boolean
+  VaiTro: $Enums.Vaitro
+  ToKenVerSion?: number
+  CreatedAt?: Date | string
+  UpdatedAt?: Date | string
+  GiaoVien?: Prisma.GiaoVienUncheckedCreateNestedOneWithoutUserInput
+  HocVien?: Prisma.HocVienUncheckedCreateNestedManyWithoutParentInput
+  ThongBao?: Prisma.ThongBaoUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutPhieuThuInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPhieuThuInput, Prisma.UserUncheckedCreateWithoutPhieuThuInput>
+}
+
+export type UserUpsertWithoutPhieuThuInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPhieuThuInput, Prisma.UserUncheckedUpdateWithoutPhieuThuInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPhieuThuInput, Prisma.UserUncheckedCreateWithoutPhieuThuInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPhieuThuInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPhieuThuInput, Prisma.UserUncheckedUpdateWithoutPhieuThuInput>
+}
+
+export type UserUpdateWithoutPhieuThuInput = {
+  Email?: Prisma.StringFieldUpdateOperationsInput | string
+  DienThoai?: Prisma.StringFieldUpdateOperationsInput | string
+  MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
+  PhaiDoiMK?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  VaiTro?: Prisma.EnumVaitroFieldUpdateOperationsInput | $Enums.Vaitro
+  ToKenVerSion?: Prisma.IntFieldUpdateOperationsInput | number
+  CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  GiaoVien?: Prisma.GiaoVienUpdateOneWithoutUserNestedInput
+  HocVien?: Prisma.HocVienUpdateManyWithoutParentNestedInput
+  ThongBao?: Prisma.ThongBaoUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPhieuThuInput = {
+  ID?: Prisma.IntFieldUpdateOperationsInput | number
+  Email?: Prisma.StringFieldUpdateOperationsInput | string
+  DienThoai?: Prisma.StringFieldUpdateOperationsInput | string
+  MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
+  PhaiDoiMK?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  VaiTro?: Prisma.EnumVaitroFieldUpdateOperationsInput | $Enums.Vaitro
+  ToKenVerSion?: Prisma.IntFieldUpdateOperationsInput | number
+  CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  GiaoVien?: Prisma.GiaoVienUncheckedUpdateOneWithoutUserNestedInput
+  HocVien?: Prisma.HocVienUncheckedUpdateManyWithoutParentNestedInput
+  ThongBao?: Prisma.ThongBaoUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutThongBaoInput = {
@@ -683,6 +786,7 @@ export type UserCreateWithoutThongBaoInput = {
   UpdatedAt?: Date | string
   GiaoVien?: Prisma.GiaoVienCreateNestedOneWithoutUserInput
   HocVien?: Prisma.HocVienCreateNestedManyWithoutParentInput
+  PhieuThu?: Prisma.PhieuThuCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutThongBaoInput = {
@@ -697,6 +801,7 @@ export type UserUncheckedCreateWithoutThongBaoInput = {
   UpdatedAt?: Date | string
   GiaoVien?: Prisma.GiaoVienUncheckedCreateNestedOneWithoutUserInput
   HocVien?: Prisma.HocVienUncheckedCreateNestedManyWithoutParentInput
+  PhieuThu?: Prisma.PhieuThuUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutThongBaoInput = {
@@ -726,6 +831,7 @@ export type UserUpdateWithoutThongBaoInput = {
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   GiaoVien?: Prisma.GiaoVienUpdateOneWithoutUserNestedInput
   HocVien?: Prisma.HocVienUpdateManyWithoutParentNestedInput
+  PhieuThu?: Prisma.PhieuThuUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutThongBaoInput = {
@@ -740,6 +846,7 @@ export type UserUncheckedUpdateWithoutThongBaoInput = {
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   GiaoVien?: Prisma.GiaoVienUncheckedUpdateOneWithoutUserNestedInput
   HocVien?: Prisma.HocVienUncheckedUpdateManyWithoutParentNestedInput
+  PhieuThu?: Prisma.PhieuThuUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -750,11 +857,13 @@ export type UserUncheckedUpdateWithoutThongBaoInput = {
 export type UserCountOutputType = {
   HocVien: number
   ThongBao: number
+  PhieuThu: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   HocVien?: boolean | UserCountOutputTypeCountHocVienArgs
   ThongBao?: boolean | UserCountOutputTypeCountThongBaoArgs
+  PhieuThu?: boolean | UserCountOutputTypeCountPhieuThuArgs
 }
 
 /**
@@ -781,6 +890,13 @@ export type UserCountOutputTypeCountThongBaoArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.ThongBaoWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPhieuThuArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PhieuThuWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   ID?: boolean
@@ -795,6 +911,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   GiaoVien?: boolean | Prisma.User$GiaoVienArgs<ExtArgs>
   HocVien?: boolean | Prisma.User$HocVienArgs<ExtArgs>
   ThongBao?: boolean | Prisma.User$ThongBaoArgs<ExtArgs>
+  PhieuThu?: boolean | Prisma.User$PhieuThuArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -839,6 +956,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   GiaoVien?: boolean | Prisma.User$GiaoVienArgs<ExtArgs>
   HocVien?: boolean | Prisma.User$HocVienArgs<ExtArgs>
   ThongBao?: boolean | Prisma.User$ThongBaoArgs<ExtArgs>
+  PhieuThu?: boolean | Prisma.User$PhieuThuArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -850,6 +968,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     GiaoVien: Prisma.$GiaoVienPayload<ExtArgs> | null
     HocVien: Prisma.$HocVienPayload<ExtArgs>[]
     ThongBao: Prisma.$ThongBaoPayload<ExtArgs>[]
+    PhieuThu: Prisma.$PhieuThuPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     ID: number
@@ -1258,6 +1377,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   GiaoVien<T extends Prisma.User$GiaoVienArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$GiaoVienArgs<ExtArgs>>): Prisma.Prisma__GiaoVienClient<runtime.Types.Result.GetResult<Prisma.$GiaoVienPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   HocVien<T extends Prisma.User$HocVienArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$HocVienArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HocVienPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   ThongBao<T extends Prisma.User$ThongBaoArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ThongBaoArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ThongBaoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  PhieuThu<T extends Prisma.User$PhieuThuArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$PhieuThuArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PhieuThuPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1748,6 +1868,30 @@ export type User$ThongBaoArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.ThongBaoScalarFieldEnum | Prisma.ThongBaoScalarFieldEnum[]
+}
+
+/**
+ * User.PhieuThu
+ */
+export type User$PhieuThuArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PhieuThu
+   */
+  select?: Prisma.PhieuThuSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PhieuThu
+   */
+  omit?: Prisma.PhieuThuOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PhieuThuInclude<ExtArgs> | null
+  where?: Prisma.PhieuThuWhereInput
+  orderBy?: Prisma.PhieuThuOrderByWithRelationInput | Prisma.PhieuThuOrderByWithRelationInput[]
+  cursor?: Prisma.PhieuThuWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PhieuThuScalarFieldEnum | Prisma.PhieuThuScalarFieldEnum[]
 }
 
 /**
