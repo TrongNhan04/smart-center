@@ -395,7 +395,8 @@ export const ModelName = {
   GhiDanh: 'GhiDanh',
   HoaDon: 'HoaDon',
   PhieuThu: 'PhieuThu',
-  ThongBao: 'ThongBao'
+  ThongBao: 'ThongBao',
+  PhieuChi: 'PhieuChi'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -411,7 +412,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "giaoVien" | "hocVien" | "khoaHoc" | "lopHoc" | "buoiHoc" | "ketQua_BuoiHoc" | "ketQua_ChiTiet" | "ghiDanh" | "hoaDon" | "phieuThu" | "thongBao"
+    modelProps: "user" | "giaoVien" | "hocVien" | "khoaHoc" | "lopHoc" | "buoiHoc" | "ketQua_BuoiHoc" | "ketQua_ChiTiet" | "ghiDanh" | "hoaDon" | "phieuThu" | "thongBao" | "phieuChi"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1303,6 +1304,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PhieuChi: {
+      payload: Prisma.$PhieuChiPayload<ExtArgs>
+      fields: Prisma.PhieuChiFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PhieuChiFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuChiPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PhieuChiFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuChiPayload>
+        }
+        findFirst: {
+          args: Prisma.PhieuChiFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuChiPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PhieuChiFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuChiPayload>
+        }
+        findMany: {
+          args: Prisma.PhieuChiFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuChiPayload>[]
+        }
+        create: {
+          args: Prisma.PhieuChiCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuChiPayload>
+        }
+        createMany: {
+          args: Prisma.PhieuChiCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PhieuChiCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuChiPayload>[]
+        }
+        delete: {
+          args: Prisma.PhieuChiDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuChiPayload>
+        }
+        update: {
+          args: Prisma.PhieuChiUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuChiPayload>
+        }
+        deleteMany: {
+          args: Prisma.PhieuChiDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PhieuChiUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PhieuChiUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuChiPayload>[]
+        }
+        upsert: {
+          args: Prisma.PhieuChiUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuChiPayload>
+        }
+        aggregate: {
+          args: Prisma.PhieuChiAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePhieuChi>
+        }
+        groupBy: {
+          args: Prisma.PhieuChiGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PhieuChiGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PhieuChiCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PhieuChiCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1495,6 +1570,7 @@ export const HoaDonScalarFieldEnum = {
   DaTra: 'DaTra',
   ThoiHan: 'ThoiHan',
   GhiChu: 'GhiChu',
+  TrangThai: 'TrangThai',
   CreatedAt: 'CreatedAt',
   UpdatedAt: 'UpdatedAt'
 } as const
@@ -1529,6 +1605,18 @@ export const ThongBaoScalarFieldEnum = {
 } as const
 
 export type ThongBaoScalarFieldEnum = (typeof ThongBaoScalarFieldEnum)[keyof typeof ThongBaoScalarFieldEnum]
+
+
+export const PhieuChiScalarFieldEnum = {
+  ID: 'ID',
+  HoaDonID: 'HoaDonID',
+  SoTien: 'SoTien',
+  LyDo: 'LyDo',
+  NguoiLapID: 'NguoiLapID',
+  NgayChi: 'NgayChi'
+} as const
+
+export type PhieuChiScalarFieldEnum = (typeof PhieuChiScalarFieldEnum)[keyof typeof PhieuChiScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1886,6 +1974,7 @@ export type GlobalOmitConfig = {
   hoaDon?: Prisma.HoaDonOmit
   phieuThu?: Prisma.PhieuThuOmit
   thongBao?: Prisma.ThongBaoOmit
+  phieuChi?: Prisma.PhieuChiOmit
 }
 
 /* Types for Logging */

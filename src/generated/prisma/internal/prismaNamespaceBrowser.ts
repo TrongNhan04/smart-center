@@ -62,7 +62,8 @@ export const ModelName = {
   GhiDanh: 'GhiDanh',
   HoaDon: 'HoaDon',
   PhieuThu: 'PhieuThu',
-  ThongBao: 'ThongBao'
+  ThongBao: 'ThongBao',
+  PhieuChi: 'PhieuChi'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -234,6 +235,7 @@ export const HoaDonScalarFieldEnum = {
   DaTra: 'DaTra',
   ThoiHan: 'ThoiHan',
   GhiChu: 'GhiChu',
+  TrangThai: 'TrangThai',
   CreatedAt: 'CreatedAt',
   UpdatedAt: 'UpdatedAt'
 } as const
@@ -268,6 +270,18 @@ export const ThongBaoScalarFieldEnum = {
 } as const
 
 export type ThongBaoScalarFieldEnum = (typeof ThongBaoScalarFieldEnum)[keyof typeof ThongBaoScalarFieldEnum]
+
+
+export const PhieuChiScalarFieldEnum = {
+  ID: 'ID',
+  HoaDonID: 'HoaDonID',
+  SoTien: 'SoTien',
+  LyDo: 'LyDo',
+  NguoiLapID: 'NguoiLapID',
+  NgayChi: 'NgayChi'
+} as const
+
+export type PhieuChiScalarFieldEnum = (typeof PhieuChiScalarFieldEnum)[keyof typeof PhieuChiScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -21,8 +21,15 @@ export class StudentService {
         const student = body.student.trim()
         const parent = body.parent.trim()
         const code = body.code.trim()
-        const classDB = await this.ClassIdValidator(body.classId)
-        if (!classDB) throw new ConflictException('Class is not existed')
+        const classDB = await this.prismaService.lopHoc.findUnique({
+            where: { ID: body.classId },
+            select: {
+                ID: true, DenNgay: true,
+                khoahoc: { select: { HocPhi: true } }
+            }
+        })
+        if (!classDB) throw new NotFoundException('Class not found')
+        const fee = body.fee ?? classDB.khoahoc.HocPhi
 
         const runLogic = async (client: Prisma.TransactionClient) => {
             const newStudent = await client.hocVien.create({
@@ -40,7 +47,7 @@ export class StudentService {
             const newEnroll = await this.enrollService.CreateEnrollAuto(newStudent.ID, body.classId, client)
 
             // thêm hóa đơn
-            const newInvoice = await this.invoiceService.CreateInvoice(newEnroll.ID, classDB?.DenNgay, body.fee, client)
+            const newInvoice = await this.invoiceService.CreateInvoice(newEnroll.ID, classDB?.DenNgay, fee, client)
 
             // thêm thông báo
             await this.notisService.InvoiceNotify(userId, newInvoice, tx)
@@ -161,8 +168,8 @@ export class StudentService {
                 },
             }
         })
-        return enrollDB.map(x=>({
-            MaLopHoc:x.lophoc.MaLopHoc,
+        return enrollDB.map(x => ({
+            MaLopHoc: x.lophoc.MaLopHoc,
             TenLop: x.lophoc.TenLop,
             GiaoVien: x.lophoc.giaovien.HoTen
         }))
@@ -189,7 +196,7 @@ export class StudentService {
     // kiểm tra lớp 
     private async ClassIdValidator(classId: number) {
         const classDB = await this.prismaService.lopHoc.findUnique({
-            where: { ID: classId }
+            where: { ID: classId },
         })
         if (!classDB) throw new NotFoundException('Class not found')
         return classDB

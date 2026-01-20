@@ -10,6 +10,7 @@ import { SessionModule } from './modules/session/session.module';
 import { StudentModule } from './modules/student/student.module';
 import { EnrollModule } from './modules/enroll/enroll.module';
 import { InvoiceModule } from './modules/invoice/invoice.module';
+import { PaymentModule } from './modules/payment/payment.module';
 
 
 @Module({
@@ -17,7 +18,7 @@ import { InvoiceModule } from './modules/invoice/invoice.module';
     AuthModule, UserModule, PrismaModule, 
     TeacherModule, ConfigModule.forRoot({isGlobal:true}),
     CourseModule, ClassModule, SessionModule, StudentModule,
-    EnrollModule, InvoiceModule
+    EnrollModule, InvoiceModule, PaymentModule
   ]
 })
 export class AppModule {}

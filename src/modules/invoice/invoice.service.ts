@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from "@nestjs/common";
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { Prisma } from "src/generated/prisma/client";
 import { QueryInvoiceDTO } from "./invoice.dto";
@@ -14,7 +14,7 @@ export class InvoiceService {
         const invoiceDB = this.prismaService.hoaDon.findUnique({
             where: { ID: invoiceId }
         })
-        if (!invoiceDB) throw new ConflictException('Invoice not existed')
+        if (!invoiceDB) throw new NotFoundException('Invoice not found')
         return invoiceDB
     }
 
@@ -81,15 +81,27 @@ export class InvoiceService {
                 ThoiHan: true
             }
         })
-        // x=>({}) tương đương với (x) => { return {}; }
+        // x=>({}) tương đương với (x) => { return {} }
         return invoiceDB.map(invoice => ({
             MaHoaDon: invoice.MaHoaDon,
             TenHocVien: invoice.ghidanh.hocvien.TenHocVien,
             TenLop: invoice.ghidanh.lophoc.TenLop,
             TongTien: invoice.TongTien,
             DaTra: invoice.DaTra,
-            NgayPhatHanh: invoice.CreatedAt,
-            NgayHetHan: invoice.ThoiHan
+            NgayPhatHanh: invoice.CreatedAt.toLocaleDateString('vi-VN'),
+            NgayHetHan: invoice.ThoiHan.toLocaleDateString('vi-VN')
         }))
+    }
+
+    // xóa mềm hóa đơn()
+    async DeleteInvoiceByID(invoiceId: number, tx: Prisma.TransactionClient) {
+        let client: Prisma.TransactionClient | null = null
+        if (tx) client = tx
+        else client = this.prismaService
+        await this.InvoiceValidator(invoiceId)
+        return await client.hoaDon.update({
+            where: { ID: invoiceId },
+            data: { TrangThai: 'CANCELLED' }
+        })
     }
 }

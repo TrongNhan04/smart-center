@@ -48,6 +48,7 @@ export type HoaDonMinAggregateOutputType = {
   DaTra: runtime.Decimal | null
   ThoiHan: Date | null
   GhiChu: string | null
+  TrangThai: string | null
   CreatedAt: Date | null
   UpdatedAt: Date | null
 }
@@ -60,6 +61,7 @@ export type HoaDonMaxAggregateOutputType = {
   DaTra: runtime.Decimal | null
   ThoiHan: Date | null
   GhiChu: string | null
+  TrangThai: string | null
   CreatedAt: Date | null
   UpdatedAt: Date | null
 }
@@ -72,6 +74,7 @@ export type HoaDonCountAggregateOutputType = {
   DaTra: number
   ThoiHan: number
   GhiChu: number
+  TrangThai: number
   CreatedAt: number
   UpdatedAt: number
   _all: number
@@ -100,6 +103,7 @@ export type HoaDonMinAggregateInputType = {
   DaTra?: true
   ThoiHan?: true
   GhiChu?: true
+  TrangThai?: true
   CreatedAt?: true
   UpdatedAt?: true
 }
@@ -112,6 +116,7 @@ export type HoaDonMaxAggregateInputType = {
   DaTra?: true
   ThoiHan?: true
   GhiChu?: true
+  TrangThai?: true
   CreatedAt?: true
   UpdatedAt?: true
 }
@@ -124,6 +129,7 @@ export type HoaDonCountAggregateInputType = {
   DaTra?: true
   ThoiHan?: true
   GhiChu?: true
+  TrangThai?: true
   CreatedAt?: true
   UpdatedAt?: true
   _all?: true
@@ -223,6 +229,7 @@ export type HoaDonGroupByOutputType = {
   DaTra: runtime.Decimal
   ThoiHan: Date
   GhiChu: string | null
+  TrangThai: string | null
   CreatedAt: Date
   UpdatedAt: Date
   _count: HoaDonCountAggregateOutputType | null
@@ -258,10 +265,12 @@ export type HoaDonWhereInput = {
   DaTra?: Prisma.DecimalFilter<"HoaDon"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   ThoiHan?: Prisma.DateTimeFilter<"HoaDon"> | Date | string
   GhiChu?: Prisma.StringNullableFilter<"HoaDon"> | string | null
+  TrangThai?: Prisma.StringNullableFilter<"HoaDon"> | string | null
   CreatedAt?: Prisma.DateTimeFilter<"HoaDon"> | Date | string
   UpdatedAt?: Prisma.DateTimeFilter<"HoaDon"> | Date | string
   ghidanh?: Prisma.XOR<Prisma.GhiDanhScalarRelationFilter, Prisma.GhiDanhWhereInput>
   phieuthu?: Prisma.PhieuThuListRelationFilter
+  phieuchi?: Prisma.XOR<Prisma.PhieuChiNullableScalarRelationFilter, Prisma.PhieuChiWhereInput> | null
 }
 
 export type HoaDonOrderByWithRelationInput = {
@@ -272,10 +281,12 @@ export type HoaDonOrderByWithRelationInput = {
   DaTra?: Prisma.SortOrder
   ThoiHan?: Prisma.SortOrder
   GhiChu?: Prisma.SortOrderInput | Prisma.SortOrder
+  TrangThai?: Prisma.SortOrderInput | Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
   UpdatedAt?: Prisma.SortOrder
   ghidanh?: Prisma.GhiDanhOrderByWithRelationInput
   phieuthu?: Prisma.PhieuThuOrderByRelationAggregateInput
+  phieuchi?: Prisma.PhieuChiOrderByWithRelationInput
 }
 
 export type HoaDonWhereUniqueInput = Prisma.AtLeast<{
@@ -289,10 +300,12 @@ export type HoaDonWhereUniqueInput = Prisma.AtLeast<{
   DaTra?: Prisma.DecimalFilter<"HoaDon"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   ThoiHan?: Prisma.DateTimeFilter<"HoaDon"> | Date | string
   GhiChu?: Prisma.StringNullableFilter<"HoaDon"> | string | null
+  TrangThai?: Prisma.StringNullableFilter<"HoaDon"> | string | null
   CreatedAt?: Prisma.DateTimeFilter<"HoaDon"> | Date | string
   UpdatedAt?: Prisma.DateTimeFilter<"HoaDon"> | Date | string
   ghidanh?: Prisma.XOR<Prisma.GhiDanhScalarRelationFilter, Prisma.GhiDanhWhereInput>
   phieuthu?: Prisma.PhieuThuListRelationFilter
+  phieuchi?: Prisma.XOR<Prisma.PhieuChiNullableScalarRelationFilter, Prisma.PhieuChiWhereInput> | null
 }, "ID" | "MaHoaDon" | "GhiDanhID">
 
 export type HoaDonOrderByWithAggregationInput = {
@@ -303,6 +316,7 @@ export type HoaDonOrderByWithAggregationInput = {
   DaTra?: Prisma.SortOrder
   ThoiHan?: Prisma.SortOrder
   GhiChu?: Prisma.SortOrderInput | Prisma.SortOrder
+  TrangThai?: Prisma.SortOrderInput | Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
   UpdatedAt?: Prisma.SortOrder
   _count?: Prisma.HoaDonCountOrderByAggregateInput
@@ -323,6 +337,7 @@ export type HoaDonScalarWhereWithAggregatesInput = {
   DaTra?: Prisma.DecimalWithAggregatesFilter<"HoaDon"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   ThoiHan?: Prisma.DateTimeWithAggregatesFilter<"HoaDon"> | Date | string
   GhiChu?: Prisma.StringNullableWithAggregatesFilter<"HoaDon"> | string | null
+  TrangThai?: Prisma.StringNullableWithAggregatesFilter<"HoaDon"> | string | null
   CreatedAt?: Prisma.DateTimeWithAggregatesFilter<"HoaDon"> | Date | string
   UpdatedAt?: Prisma.DateTimeWithAggregatesFilter<"HoaDon"> | Date | string
 }
@@ -333,10 +348,12 @@ export type HoaDonCreateInput = {
   DaTra?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ThoiHan: Date | string
   GhiChu?: string | null
+  TrangThai?: string | null
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   ghidanh: Prisma.GhiDanhCreateNestedOneWithoutHoadonInput
   phieuthu?: Prisma.PhieuThuCreateNestedManyWithoutHoadonInput
+  phieuchi?: Prisma.PhieuChiCreateNestedOneWithoutHoadonInput
 }
 
 export type HoaDonUncheckedCreateInput = {
@@ -347,9 +364,11 @@ export type HoaDonUncheckedCreateInput = {
   DaTra?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ThoiHan: Date | string
   GhiChu?: string | null
+  TrangThai?: string | null
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   phieuthu?: Prisma.PhieuThuUncheckedCreateNestedManyWithoutHoadonInput
+  phieuchi?: Prisma.PhieuChiUncheckedCreateNestedOneWithoutHoadonInput
 }
 
 export type HoaDonUpdateInput = {
@@ -358,10 +377,12 @@ export type HoaDonUpdateInput = {
   DaTra?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ThoiHan?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  TrangThai?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ghidanh?: Prisma.GhiDanhUpdateOneRequiredWithoutHoadonNestedInput
   phieuthu?: Prisma.PhieuThuUpdateManyWithoutHoadonNestedInput
+  phieuchi?: Prisma.PhieuChiUpdateOneWithoutHoadonNestedInput
 }
 
 export type HoaDonUncheckedUpdateInput = {
@@ -372,9 +393,11 @@ export type HoaDonUncheckedUpdateInput = {
   DaTra?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ThoiHan?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  TrangThai?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   phieuthu?: Prisma.PhieuThuUncheckedUpdateManyWithoutHoadonNestedInput
+  phieuchi?: Prisma.PhieuChiUncheckedUpdateOneWithoutHoadonNestedInput
 }
 
 export type HoaDonCreateManyInput = {
@@ -385,6 +408,7 @@ export type HoaDonCreateManyInput = {
   DaTra?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ThoiHan: Date | string
   GhiChu?: string | null
+  TrangThai?: string | null
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
 }
@@ -395,6 +419,7 @@ export type HoaDonUpdateManyMutationInput = {
   DaTra?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ThoiHan?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  TrangThai?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -407,6 +432,7 @@ export type HoaDonUncheckedUpdateManyInput = {
   DaTra?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ThoiHan?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  TrangThai?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -424,6 +450,7 @@ export type HoaDonCountOrderByAggregateInput = {
   DaTra?: Prisma.SortOrder
   ThoiHan?: Prisma.SortOrder
   GhiChu?: Prisma.SortOrder
+  TrangThai?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
   UpdatedAt?: Prisma.SortOrder
 }
@@ -443,6 +470,7 @@ export type HoaDonMaxOrderByAggregateInput = {
   DaTra?: Prisma.SortOrder
   ThoiHan?: Prisma.SortOrder
   GhiChu?: Prisma.SortOrder
+  TrangThai?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
   UpdatedAt?: Prisma.SortOrder
 }
@@ -455,6 +483,7 @@ export type HoaDonMinOrderByAggregateInput = {
   DaTra?: Prisma.SortOrder
   ThoiHan?: Prisma.SortOrder
   GhiChu?: Prisma.SortOrder
+  TrangThai?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
   UpdatedAt?: Prisma.SortOrder
 }
@@ -517,15 +546,33 @@ export type HoaDonUpdateOneRequiredWithoutPhieuthuNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.HoaDonUpdateToOneWithWhereWithoutPhieuthuInput, Prisma.HoaDonUpdateWithoutPhieuthuInput>, Prisma.HoaDonUncheckedUpdateWithoutPhieuthuInput>
 }
 
+export type HoaDonCreateNestedOneWithoutPhieuchiInput = {
+  create?: Prisma.XOR<Prisma.HoaDonCreateWithoutPhieuchiInput, Prisma.HoaDonUncheckedCreateWithoutPhieuchiInput>
+  connectOrCreate?: Prisma.HoaDonCreateOrConnectWithoutPhieuchiInput
+  connect?: Prisma.HoaDonWhereUniqueInput
+}
+
+export type HoaDonUpdateOneWithoutPhieuchiNestedInput = {
+  create?: Prisma.XOR<Prisma.HoaDonCreateWithoutPhieuchiInput, Prisma.HoaDonUncheckedCreateWithoutPhieuchiInput>
+  connectOrCreate?: Prisma.HoaDonCreateOrConnectWithoutPhieuchiInput
+  upsert?: Prisma.HoaDonUpsertWithoutPhieuchiInput
+  disconnect?: Prisma.HoaDonWhereInput | boolean
+  delete?: Prisma.HoaDonWhereInput | boolean
+  connect?: Prisma.HoaDonWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.HoaDonUpdateToOneWithWhereWithoutPhieuchiInput, Prisma.HoaDonUpdateWithoutPhieuchiInput>, Prisma.HoaDonUncheckedUpdateWithoutPhieuchiInput>
+}
+
 export type HoaDonCreateWithoutGhidanhInput = {
   MaHoaDon: string
   TongTien: runtime.Decimal | runtime.DecimalJsLike | number | string
   DaTra?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ThoiHan: Date | string
   GhiChu?: string | null
+  TrangThai?: string | null
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   phieuthu?: Prisma.PhieuThuCreateNestedManyWithoutHoadonInput
+  phieuchi?: Prisma.PhieuChiCreateNestedOneWithoutHoadonInput
 }
 
 export type HoaDonUncheckedCreateWithoutGhidanhInput = {
@@ -535,9 +582,11 @@ export type HoaDonUncheckedCreateWithoutGhidanhInput = {
   DaTra?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ThoiHan: Date | string
   GhiChu?: string | null
+  TrangThai?: string | null
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   phieuthu?: Prisma.PhieuThuUncheckedCreateNestedManyWithoutHoadonInput
+  phieuchi?: Prisma.PhieuChiUncheckedCreateNestedOneWithoutHoadonInput
 }
 
 export type HoaDonCreateOrConnectWithoutGhidanhInput = {
@@ -562,9 +611,11 @@ export type HoaDonUpdateWithoutGhidanhInput = {
   DaTra?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ThoiHan?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  TrangThai?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   phieuthu?: Prisma.PhieuThuUpdateManyWithoutHoadonNestedInput
+  phieuchi?: Prisma.PhieuChiUpdateOneWithoutHoadonNestedInput
 }
 
 export type HoaDonUncheckedUpdateWithoutGhidanhInput = {
@@ -574,9 +625,11 @@ export type HoaDonUncheckedUpdateWithoutGhidanhInput = {
   DaTra?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ThoiHan?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  TrangThai?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   phieuthu?: Prisma.PhieuThuUncheckedUpdateManyWithoutHoadonNestedInput
+  phieuchi?: Prisma.PhieuChiUncheckedUpdateOneWithoutHoadonNestedInput
 }
 
 export type HoaDonCreateWithoutPhieuthuInput = {
@@ -585,9 +638,11 @@ export type HoaDonCreateWithoutPhieuthuInput = {
   DaTra?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ThoiHan: Date | string
   GhiChu?: string | null
+  TrangThai?: string | null
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   ghidanh: Prisma.GhiDanhCreateNestedOneWithoutHoadonInput
+  phieuchi?: Prisma.PhieuChiCreateNestedOneWithoutHoadonInput
 }
 
 export type HoaDonUncheckedCreateWithoutPhieuthuInput = {
@@ -598,8 +653,10 @@ export type HoaDonUncheckedCreateWithoutPhieuthuInput = {
   DaTra?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ThoiHan: Date | string
   GhiChu?: string | null
+  TrangThai?: string | null
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
+  phieuchi?: Prisma.PhieuChiUncheckedCreateNestedOneWithoutHoadonInput
 }
 
 export type HoaDonCreateOrConnectWithoutPhieuthuInput = {
@@ -624,9 +681,11 @@ export type HoaDonUpdateWithoutPhieuthuInput = {
   DaTra?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ThoiHan?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  TrangThai?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ghidanh?: Prisma.GhiDanhUpdateOneRequiredWithoutHoadonNestedInput
+  phieuchi?: Prisma.PhieuChiUpdateOneWithoutHoadonNestedInput
 }
 
 export type HoaDonUncheckedUpdateWithoutPhieuthuInput = {
@@ -637,8 +696,80 @@ export type HoaDonUncheckedUpdateWithoutPhieuthuInput = {
   DaTra?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ThoiHan?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  TrangThai?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  phieuchi?: Prisma.PhieuChiUncheckedUpdateOneWithoutHoadonNestedInput
+}
+
+export type HoaDonCreateWithoutPhieuchiInput = {
+  MaHoaDon: string
+  TongTien: runtime.Decimal | runtime.DecimalJsLike | number | string
+  DaTra?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ThoiHan: Date | string
+  GhiChu?: string | null
+  TrangThai?: string | null
+  CreatedAt?: Date | string
+  UpdatedAt?: Date | string
+  ghidanh: Prisma.GhiDanhCreateNestedOneWithoutHoadonInput
+  phieuthu?: Prisma.PhieuThuCreateNestedManyWithoutHoadonInput
+}
+
+export type HoaDonUncheckedCreateWithoutPhieuchiInput = {
+  ID?: number
+  MaHoaDon: string
+  GhiDanhID: number
+  TongTien: runtime.Decimal | runtime.DecimalJsLike | number | string
+  DaTra?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ThoiHan: Date | string
+  GhiChu?: string | null
+  TrangThai?: string | null
+  CreatedAt?: Date | string
+  UpdatedAt?: Date | string
+  phieuthu?: Prisma.PhieuThuUncheckedCreateNestedManyWithoutHoadonInput
+}
+
+export type HoaDonCreateOrConnectWithoutPhieuchiInput = {
+  where: Prisma.HoaDonWhereUniqueInput
+  create: Prisma.XOR<Prisma.HoaDonCreateWithoutPhieuchiInput, Prisma.HoaDonUncheckedCreateWithoutPhieuchiInput>
+}
+
+export type HoaDonUpsertWithoutPhieuchiInput = {
+  update: Prisma.XOR<Prisma.HoaDonUpdateWithoutPhieuchiInput, Prisma.HoaDonUncheckedUpdateWithoutPhieuchiInput>
+  create: Prisma.XOR<Prisma.HoaDonCreateWithoutPhieuchiInput, Prisma.HoaDonUncheckedCreateWithoutPhieuchiInput>
+  where?: Prisma.HoaDonWhereInput
+}
+
+export type HoaDonUpdateToOneWithWhereWithoutPhieuchiInput = {
+  where?: Prisma.HoaDonWhereInput
+  data: Prisma.XOR<Prisma.HoaDonUpdateWithoutPhieuchiInput, Prisma.HoaDonUncheckedUpdateWithoutPhieuchiInput>
+}
+
+export type HoaDonUpdateWithoutPhieuchiInput = {
+  MaHoaDon?: Prisma.StringFieldUpdateOperationsInput | string
+  TongTien?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  DaTra?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ThoiHan?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  TrangThai?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ghidanh?: Prisma.GhiDanhUpdateOneRequiredWithoutHoadonNestedInput
+  phieuthu?: Prisma.PhieuThuUpdateManyWithoutHoadonNestedInput
+}
+
+export type HoaDonUncheckedUpdateWithoutPhieuchiInput = {
+  ID?: Prisma.IntFieldUpdateOperationsInput | number
+  MaHoaDon?: Prisma.StringFieldUpdateOperationsInput | string
+  GhiDanhID?: Prisma.IntFieldUpdateOperationsInput | number
+  TongTien?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  DaTra?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ThoiHan?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  TrangThai?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  phieuthu?: Prisma.PhieuThuUncheckedUpdateManyWithoutHoadonNestedInput
 }
 
 
@@ -680,10 +811,12 @@ export type HoaDonSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   DaTra?: boolean
   ThoiHan?: boolean
   GhiChu?: boolean
+  TrangThai?: boolean
   CreatedAt?: boolean
   UpdatedAt?: boolean
   ghidanh?: boolean | Prisma.GhiDanhDefaultArgs<ExtArgs>
   phieuthu?: boolean | Prisma.HoaDon$phieuthuArgs<ExtArgs>
+  phieuchi?: boolean | Prisma.HoaDon$phieuchiArgs<ExtArgs>
   _count?: boolean | Prisma.HoaDonCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["hoaDon"]>
 
@@ -695,6 +828,7 @@ export type HoaDonSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   DaTra?: boolean
   ThoiHan?: boolean
   GhiChu?: boolean
+  TrangThai?: boolean
   CreatedAt?: boolean
   UpdatedAt?: boolean
   ghidanh?: boolean | Prisma.GhiDanhDefaultArgs<ExtArgs>
@@ -708,6 +842,7 @@ export type HoaDonSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   DaTra?: boolean
   ThoiHan?: boolean
   GhiChu?: boolean
+  TrangThai?: boolean
   CreatedAt?: boolean
   UpdatedAt?: boolean
   ghidanh?: boolean | Prisma.GhiDanhDefaultArgs<ExtArgs>
@@ -721,14 +856,16 @@ export type HoaDonSelectScalar = {
   DaTra?: boolean
   ThoiHan?: boolean
   GhiChu?: boolean
+  TrangThai?: boolean
   CreatedAt?: boolean
   UpdatedAt?: boolean
 }
 
-export type HoaDonOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"ID" | "MaHoaDon" | "GhiDanhID" | "TongTien" | "DaTra" | "ThoiHan" | "GhiChu" | "CreatedAt" | "UpdatedAt", ExtArgs["result"]["hoaDon"]>
+export type HoaDonOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"ID" | "MaHoaDon" | "GhiDanhID" | "TongTien" | "DaTra" | "ThoiHan" | "GhiChu" | "TrangThai" | "CreatedAt" | "UpdatedAt", ExtArgs["result"]["hoaDon"]>
 export type HoaDonInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ghidanh?: boolean | Prisma.GhiDanhDefaultArgs<ExtArgs>
   phieuthu?: boolean | Prisma.HoaDon$phieuthuArgs<ExtArgs>
+  phieuchi?: boolean | Prisma.HoaDon$phieuchiArgs<ExtArgs>
   _count?: boolean | Prisma.HoaDonCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type HoaDonIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -743,6 +880,7 @@ export type $HoaDonPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   objects: {
     ghidanh: Prisma.$GhiDanhPayload<ExtArgs>
     phieuthu: Prisma.$PhieuThuPayload<ExtArgs>[]
+    phieuchi: Prisma.$PhieuChiPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     ID: number
@@ -752,6 +890,7 @@ export type $HoaDonPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     DaTra: runtime.Decimal
     ThoiHan: Date
     GhiChu: string | null
+    TrangThai: string | null
     CreatedAt: Date
     UpdatedAt: Date
   }, ExtArgs["result"]["hoaDon"]>
@@ -1150,6 +1289,7 @@ export interface Prisma__HoaDonClient<T, Null = never, ExtArgs extends runtime.T
   readonly [Symbol.toStringTag]: "PrismaPromise"
   ghidanh<T extends Prisma.GhiDanhDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GhiDanhDefaultArgs<ExtArgs>>): Prisma.Prisma__GhiDanhClient<runtime.Types.Result.GetResult<Prisma.$GhiDanhPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   phieuthu<T extends Prisma.HoaDon$phieuthuArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.HoaDon$phieuthuArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PhieuThuPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  phieuchi<T extends Prisma.HoaDon$phieuchiArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.HoaDon$phieuchiArgs<ExtArgs>>): Prisma.Prisma__PhieuChiClient<runtime.Types.Result.GetResult<Prisma.$PhieuChiPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1186,6 +1326,7 @@ export interface HoaDonFieldRefs {
   readonly DaTra: Prisma.FieldRef<"HoaDon", 'Decimal'>
   readonly ThoiHan: Prisma.FieldRef<"HoaDon", 'DateTime'>
   readonly GhiChu: Prisma.FieldRef<"HoaDon", 'String'>
+  readonly TrangThai: Prisma.FieldRef<"HoaDon", 'String'>
   readonly CreatedAt: Prisma.FieldRef<"HoaDon", 'DateTime'>
   readonly UpdatedAt: Prisma.FieldRef<"HoaDon", 'DateTime'>
 }
@@ -1605,6 +1746,25 @@ export type HoaDon$phieuthuArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.PhieuThuScalarFieldEnum | Prisma.PhieuThuScalarFieldEnum[]
+}
+
+/**
+ * HoaDon.phieuchi
+ */
+export type HoaDon$phieuchiArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PhieuChi
+   */
+  select?: Prisma.PhieuChiSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PhieuChi
+   */
+  omit?: Prisma.PhieuChiOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PhieuChiInclude<ExtArgs> | null
+  where?: Prisma.PhieuChiWhereInput
 }
 
 /**

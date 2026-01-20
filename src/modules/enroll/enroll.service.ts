@@ -3,12 +3,14 @@ import { Prisma } from "src/generated/prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import { CreateEnrollDTO, QueryEnrollDTO } from "./enroll.dto";
 import { InvoiceService } from "../invoice/invoice.service";
+import { NotifyService } from "../notify/notify.service";
 
 @Injectable()
 export class EnrollService {
     constructor(
         private prismaService: PrismaService,
-        private invoiceService: InvoiceService
+        private invoiceService: InvoiceService,
+        private notisService: NotifyService
     ) { }
 
     // tạo ghi danh tự động
@@ -27,25 +29,26 @@ export class EnrollService {
         })
     }
 
-    //tạo ghi danh thủ công
+    //tạo ghi danh thủ công + hóa đơn + thông báo
     async CreateEnroll(body: CreateEnrollDTO) {
-        const today = new Date()
-        const classDB = await this.ClassIdValidator(body.classId)
-        await this.StudentIdValidator(body.studentId)
-        await this.EnrollValidator(body.studentId, body.classId)
-        await this.TotalSlot(body.classId)
-
         return await this.prismaService.$transaction(async (tx) => {
+            const classDB = await this.ClassIdValidator(body.classId)
+            const studentDB = await this.StudentIdValidator(body.studentId)
+            await this.EnrollValidator(body.studentId, body.classId)
+            await this.TotalSlot(body.classId)
+
             const newEnroll = await tx.ghiDanh.create({
                 data: {
                     HocVienID: body.studentId,
                     LopHocID: body.classId,
-                    NgayGhiDanh: today
+                    NgayGhiDanh: new Date()
                 }
             })
-
-            await this.invoiceService.CreateInvoice(newEnroll.ID, classDB.DenNgay, body.fee, tx)
-            return { mgs: "Succesfull" }
+            // thêm hóa đơn
+            const newInvoice = await this.invoiceService.CreateInvoice(newEnroll.ID, classDB.DenNgay, body.fee, tx)
+            // thêm thông báo
+            await this.notisService.InvoiceNotify(studentDB.UserID, newInvoice, tx)
+            return { mgs: "Create enroll, invoice and notify succesfully" }
         })
     }
 
@@ -72,15 +75,22 @@ export class EnrollService {
 
     // xóa mềm 
     async DeleteEnrollByID(enrollId: number) {
-        const enrollDB = await this.prismaService.ghiDanh.findUnique({
-            where: { ID: enrollId }
-        })
-        if (!enrollDB) throw new BadRequestException('Enroll not found')
+        return this.prismaService.$transaction(async tx => {
+            const enrollDB = await tx.ghiDanh.findUnique({
+                where: { ID: enrollId },
+                include: { hoadon: true }
+            })
+            if (!enrollDB) throw new NotFoundException('Enroll not found')
+            if (!enrollDB.hoadon)
+                throw new ConflictException('Enroll don\'t have any invoice')
 
-        return await this.prismaService.ghiDanh.update({
-            where: { ID: enrollId },
-            data: { TrangThai: 'INACTIVE' },
-            omit: { CreatedAt: true, UpdatedAt: true }
+            await tx.ghiDanh.update({
+                where: { ID: enrollId },
+                data: { TrangThai: 'INACTIVE' }
+            })
+
+            await this.invoiceService.DeleteInvoiceByID(enrollDB.hoadon?.ID, tx)
+            return { mgs: 'Soft delete enroll and invoice Succesfull' }
         })
     }
 

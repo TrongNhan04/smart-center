@@ -1,8 +1,7 @@
-import { IsNotEmpty, IsNumber, Min } from "class-validator";
+import { IsNotEmpty, IsNumber, IsPositive, Min } from "class-validator";
 
 export class CreateReceiptDTO{
     @IsNotEmpty()
-    @IsNumber()
-    @Min(1)
+    @IsPositive()
     amount: number
 }

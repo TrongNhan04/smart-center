@@ -97,3 +97,8 @@ export type PhieuThu = Prisma.PhieuThuModel
  * 
  */
 export type ThongBao = Prisma.ThongBaoModel
+/**
+ * Model PhieuChi
+ * 
+ */
+export type PhieuChi = Prisma.PhieuChiModel

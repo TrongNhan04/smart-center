@@ -38,6 +38,7 @@ model User {
   HocVien  HocVien[] //phụ huynh của nhiều học viên
   ThongBao ThongBao[]
   PhieuThu PhieuThu[]
+  PhieuChi PhieuChi[]
 }
 
 // ============ 2. GIAOVIEN ============//
@@ -254,6 +255,7 @@ model HoaDon {
   DaTra     Decimal  @default(0) @db.Decimal(10, 2)
   ThoiHan   DateTime @db.Timestamptz(3)
   GhiChu    String?
+  TrangThai String?
 
   CreatedAt DateTime @default(dbgenerated("now()")) @db.Timestamptz(3)
   UpdatedAt DateTime @updatedAt @db.Timestamptz(3)
@@ -261,6 +263,7 @@ model HoaDon {
   //Quan hệ
   ghidanh  GhiDanh    @relation(fields: [GhiDanhID], references: [ID])
   phieuthu PhieuThu[] //hóa đơn có nhiều phiếu thu
+  phieuchi PhieuChi?
 }
 
 // ============ 11. PHIEUTHU  ============//
@@ -296,4 +299,19 @@ model ThongBao{
 
   //quan hệ
   User User @relation(fields: [UserID], references: [ID])
+}
+
+// ============ 13. PHIEUCHI  ============//
+model PhieuChi {
+  ID Int @id @default(autoincrement())
+  HoaDonID Int? @unique
+
+  SoTien Decimal  @db.Decimal(10,2)
+  LyDo String
+  NguoiLapID Int
+  NgayChi DateTime @db.Timestamptz(3)
+
+  //quan hệ
+  hoadon HoaDon? @relation(fields: [HoaDonID], references: [ID])
+  user User @relation(fields: [NguoiLapID], references: [ID])
 }

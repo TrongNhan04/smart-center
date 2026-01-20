@@ -29,11 +29,17 @@ export class SessionService {
         return sessions
     }
 
-    //sửa buổi học: chủ đề + phòng học
+    //sửa buổi học: chủ đề 
     async UpdateSessionById(userId: number | null, sessionId: number, body: UpdateSessionDTO) {
-        if (!userId) return { mgs: "You are ADMIN?" }
-        const { sessionDB } = await this.SessionAcsessValidate(userId, sessionId)
-        if (body.room) await this.HasSameRoom(body.room, sessionDB.BatDauLuc, sessionDB.KetThucLuc, sessionDB.ID)
+        // const data: Prisma.BuoiHocUpdateInput = {}
+        if (!userId) {// admin
+            const sessionDB = await this.SessionIdValidator(sessionId)
+            if (body.room) await this.HasSameRoom(body.room, sessionDB.BatDauLuc, sessionDB.KetThucLuc, sessionId)
+        }
+        else{//giáo viên
+            const { sessionDB } = await this.SessionAcsessValidate(userId, sessionId)
+            if (body.room) await this.HasSameRoom(body.room, sessionDB.BatDauLuc, sessionDB.KetThucLuc, sessionId)
+        }
 
         return await this.prisma.buoiHoc.update({
             where: { ID: sessionId },
@@ -56,7 +62,7 @@ export class SessionService {
                 BatDauLuc: true, LopHocID: true,
                 lophoc: {
                     select: {
-                        ID:true, MaLopHoc: true,
+                        ID: true, MaLopHoc: true,
                         ghidanh: {
                             where: { TrangThai: 'ACTIVE' },
                             select: { hocvien: { select: { UserID: true } } }
@@ -136,7 +142,7 @@ export class SessionService {
                         BatDauLuc: startAt, KetThucLuc: endAt, PhongHoc: classDB.PhongHoc
                     })
                 }
-                else 
+                else
                     console.log(`skip ${xday} because duplicate with session ID ${conflict.ID}`)
             }
             xday.setDate(xday.getDate() + 1);
@@ -347,7 +353,7 @@ export class SessionService {
         if (!room) return
         const conflict = await this.prisma.buoiHoc.findFirst({
             where: {
-                TrangThai: { not: 'CANCELLED' },
+                TrangThai: 'SCHEDULED',
                 PhongHoc: room,// trùng phòng
                 BatDauLuc: { lt: end },// trùng giờ
                 KetThucLuc: { gt: start },

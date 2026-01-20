@@ -18,11 +18,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         })
     }
 
-    async validate(payload: { sub: number, email: string, role: string, tokenVersion:number }) {
-        const userDB = await this.prismaService.user.findUnique({ 
-            where: { ID: payload.sub } })
-        if(!userDB) throw new UnauthorizedException('Who are you?')
-        if(userDB.ToKenVerSion !== payload.tokenVersion )
+    async validate(payload: { sub: number, email: string, role: string, tokenVersion: number }) {
+        const userDB = await this.prismaService.user.findUnique({
+            where: { ID: payload.sub }
+        })
+        if (!userDB) throw new UnauthorizedException('Who are you?')
+        if (userDB.ToKenVerSion !== payload.tokenVersion)
             throw new UnauthorizedException('Token was expired or cancelled')
         return { userId: payload.sub, email: payload.email, role: payload.role };
     }

@@ -27,7 +27,7 @@ export class ClassService {
         const classDB = await this.prismaService.lopHoc.findUnique({
             where: { ID: classId }
         })
-        if (!classDB) throw new NotFoundException('Class not found')
+        if (!classDB) throw new NotFoundException('No English classes found')
         return classDB
     }
 
@@ -39,7 +39,7 @@ export class ClassService {
         DateHelper.ValidateTimeRange(classDTO.startTime, classDTO.endTime)
         DateHelper.FromDateToDateValidator(classDTO.fromDate, classDTO.toDate)
         await this.DuplicateClass(classDTO.teacherId, classDTO.fromDate, classDTO.toDate,
-            classDTO.timeTable, classDTO.startTime, classDTO.endTime, null)
+            classDTO.timeTable, classDTO.startTime, classDTO.endTime)
         const toDate = new Date(classDTO.toDate)
         toDate.setDate(toDate.getDate() + 1)
 
@@ -66,7 +66,7 @@ export class ClassService {
         return { mgs: "succesfull" }
     }
 
-    // lấy danh sách lớp mặc đinh hoặc query
+    // lấy danh sách lớp mặc định hoặc query
     async GetClasses(query: QueryClassDTO) {
         // tạo điều kiện where
         const condition: Prisma.LopHocWhereInput[] = []
@@ -203,7 +203,7 @@ export class ClassService {
 
     // lấy danh sách buổi học theo lớp - phần dưới
     async GetSessionsByClassId(classId: number, query: SessionStatusDTO) {
-        const classDB = await this.ClassIDValidator(classId)
+        await this.ClassIDValidator(classId)
         return await this.sessionService.GetSessionsByClassId(classId, query)
     }
 
@@ -264,7 +264,7 @@ export class ClassService {
 
     //kiểm tra giáo viên có trùng lịch dạy lớp học
     private async DuplicateClass(teacherId: number, startDate: Date, endDate: Date,
-        dow: number[], sHour: string, eHour: string, room: string | null, excludeClassId?: number) {
+        dow: number[], sHour: string, eHour: string, excludeClassId?: number) {
 
         const where: Prisma.LopHocWhereInput = {
             GiaoVienID: teacherId,
@@ -310,9 +310,8 @@ export class ClassService {
         const timeTable = up.timeTable ?? classDB.LichHoc
         const startTime = up.startTime ?? classDB.GioBatDau
         const endTime = up.endTime ?? classDB.GioKetThuc
-        const room = up.room ?? classDB.PhongHoc
         return await this.DuplicateClass(teacher_check, startDate, endDate,
-            timeTable, startTime, endTime, room, excludeClassId)
+            timeTable, startTime, endTime, excludeClassId)
     }
 
     // kiểm tra trùng phòng lớp
