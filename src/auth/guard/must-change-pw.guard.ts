@@ -23,7 +23,7 @@ export class MustChangePWGuard implements CanActivate {
 
         const allowed =
             (method === 'POST' && url.startsWith('/auth/password')) ||
-            (method === 'GET' && url.startsWith('/user/me'));
+            (method === 'GET' && url.startsWith('/users/me'));
 
         if (allowed) return true;
 

@@ -11,14 +11,15 @@ import { StudentModule } from './modules/student/student.module';
 import { EnrollModule } from './modules/enroll/enroll.module';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { PaymentModule } from './modules/payment/payment.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 
 
 @Module({
-  imports: [
+  imports: [// thiếu NotifyModule
     AuthModule, UserModule, PrismaModule, 
     TeacherModule, ConfigModule.forRoot({isGlobal:true}),
     CourseModule, ClassModule, SessionModule, StudentModule,
-    EnrollModule, InvoiceModule, PaymentModule
+    EnrollModule, InvoiceModule, PaymentModule, DashboardModule
   ]
 })
 export class AppModule {}

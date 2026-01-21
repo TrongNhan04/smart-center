@@ -21,7 +21,7 @@ export class InvoiceService {
     // tạo hóa đơn
     async CreateInvoice(enrollId: number, dueDate: Date, toTal: number, tx: Prisma.TransactionClient) {
         let count = await this.prismaService.hoaDon.count()
-        const code = count < 10 ? "HD0" + (count + 1) : "HD" + (count + 1)
+        const code = count < 9 ? "HD0" + (count + 1) : "HD" + (count + 1)
         let client: Prisma.TransactionClient | null = null
         if (tx) client = tx
         else client = this.prismaService

@@ -6,14 +6,14 @@ import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 type RequestWithUser = Request & { user: { userId: number; role?: string } };
 
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) { }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN','TEACHER','PARENT')
   @Get('me')
-  GetProfile(@Req() request: RequestWithUser){
+  GetMe(@Req() request: RequestWithUser){
     return this.userService.GetMe(+request.user.userId)
   }
 }

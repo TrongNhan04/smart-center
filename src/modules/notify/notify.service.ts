@@ -145,6 +145,7 @@ export class NotifyService {
         })
     }
 
+    // thông báo mở khóa buổi học
     async UnLockSSNotify(userId: number, session: any) {
         const dateStr = session.BatDauLuc.toLocaleDateString('vi-VN')
         return await this.prisma.thongBao.create({
