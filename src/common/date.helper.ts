@@ -1,4 +1,5 @@
 import { ConflictException } from "@nestjs/common";
+import { addDays, addMonths, startOfDay, startOfMonth } from "date-fns";
 
 export class DateHelper {
     // format giờ và phút
@@ -48,5 +49,17 @@ export class DateHelper {
         if (isTime)
             return aStart < bEnd && bStart < aEnd
         return aStart <= bEnd && bStart <= aEnd
+    }
+
+    static GetStartEndOfMonth(now: Date){
+        const start = startOfMonth(now)// ngày đầu tháng
+        const end = startOfMonth(addMonths(now,1)) // ngày đầu tháng sau
+        return {start, end}
+    }
+
+    static GetStartEndOfDay(now: Date){
+        const start = startOfDay(now)// ngày đầu tháng
+        const end = startOfDay(addDays(now,1)) // ngày đầu tháng sau
+        return {start, end}
     }
 }

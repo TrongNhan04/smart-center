@@ -46,42 +46,49 @@ export class SessionResultService {
     }
 
     // mở khóa lưu kết quả buổi học
-    async UnLokSession(sessionId: number) {
+    async UnlockSession(sessionId: number) {
         const sessionDB = await this.SessionIdValidator(sessionId)
         if (sessionDB.TrangThai === 'CANCELLED')
-            throw new ConflictException(`Session ID ${sessionId} not locked`)
+            throw new ConflictException(`Session ID ${sessionId} is CANCELLED`)
 
         return await this.prisma.$transaction(async tx => {
-            await tx.buoiHoc.update({
-                where: { ID: sessionId },
-                data: { AdminMoKhoa: true }
-            })
             const now = new Date()
             if (now < sessionDB.KetThucLuc)
                 throw new ConflictException('Only previous sessions are unlocked')
-            const isComplete = await tx.buoiHoc.findFirst({
-                where: { LopHocID: sessionDB.LopHocID, TrangThai: 'COMPLETED' }
+
+            const sessionUp = await tx.buoiHoc.update({
+                where: { ID: sessionId },
+                data: {
+                    AdminMoKhoa: true,
+                    YeuCauMoKhoa: false
+                },
+                select: {ID: true, BatDauLuc: true,
+                    lophoc: {select: {TenLop: true,
+                            giaovien: { select: { UserID: true } }
+                        }
+                    }
+                }
             })
-            const mess = `Unlock session id ${sessionDB.ID} successfully`
-            if (isComplete) return { msg: mess }
+            await this.notisService.UnLockSSNotify(sessionUp.lophoc.giaovien.UserID, sessionUp)
 
-            const classDB = await tx.lopHoc.update({
-                where: { ID: sessionDB.LopHocID },
-                data: { TrangThai: 'OPEN' },
-                select: { TenLop: true, giaovien: { select: { UserID: true } } }
-            })
-
-            const flatSS = {
-                ID: sessionId,
-                TenLop: classDB.TenLop,
-                UserId: classDB.giaovien.UserID,
-                BatDauLuc: sessionDB.BatDauLuc
-            }
-
-            await this.notisService.UnLockSSNotify(flatSS.UserId, flatSS)
-
-            return { msg: mess }
+            return { msg: `Unlock session id ${sessionDB.ID} successfully` }
         })
+    }
+
+    async RequestUnlock(userId: number, sessionId: number, reason: string) {
+        const { sessionDB } = await this.SessionAcsessValidate(userId, sessionId)
+        if (sessionDB.BatDauLuc > new Date())
+            throw new BadRequestException('Session in the future, not to unlock')
+        if (!reason) throw new BadRequestException('Reason is missing')
+        await this.prisma.buoiHoc.update({
+            where: { ID: sessionId },
+            data: {
+                YeuCauMoKhoa: true,
+                LyDoMoKhoa: reason.trim(),
+                NgayYeuCau: new Date()
+            }
+        })
+        return {msg:"Send request successfully"}
     }
 
     // xử lý Transaction lưu DB, Dùng chung cho cả Draft và Submit
@@ -177,7 +184,7 @@ export class SessionResultService {
             where: { ID: sessionId, lophoc: { GiaoVienID: teacherDB.ID } }
         })
         if (!sessionDB) throw new NotFoundException('Session not found or Access denied')
-        if (sessionDB.TrangThai !== 'SCHEDULED')
+        if (sessionDB.TrangThai === 'CANCELLED')
             throw new ConflictException(`Session ID ${sessionDB.ID} is ${sessionDB.TrangThai}`)
         return { sessionDB, teacherId: teacherDB.ID }
     }

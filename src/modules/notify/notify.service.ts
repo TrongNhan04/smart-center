@@ -152,7 +152,7 @@ export class NotifyService {
             data: {
                 UserID: userId,
                 TieuDe: "Thông báo hệ thống",
-                NoiDung: `Đã mở khóa buổi học ngày ${dateStr} của lớp ${session.TenLop}. Vui lòng kiểm tra lại buổi`,
+                NoiDung: `Đã mở khóa buổi học ngày ${dateStr} của lớp ${session.lophoc.TenLop}. Vui lòng kiểm tra lại buổi học`,
                 Loai: 'SYSTERM_ARLERT',
                 DuLieu: {
                     sessionId: session.ID

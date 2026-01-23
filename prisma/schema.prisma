@@ -89,6 +89,9 @@ model HocVien {
   //Quan hệ
   Parent  User      @relation(fields: [UserID], references: [ID])
   Ghidanh GhiDanh[] //lớp học có nhiều học viên ghi danh
+
+  // index
+  @@index([TenHocVien])
 }
 
 // ============ 4. KHOAHOC ============//
@@ -169,6 +172,9 @@ model BuoiHoc {
   MoTa       String?
   PhongHoc   String?
   AdminMoKhoa Boolean @default(false)
+  YeuCauMoKhoa Boolean @default(false)
+  LyDoMoKhoa String?
+  NgayYeuCau DateTime? @db.Timestamptz(3)
   TrangThai  TrangThaiBH @default(SCHEDULED) //mặc định là SCHEDULE
 
   CreatedAt      DateTime        @default(dbgenerated("now()")) @db.Timestamptz(3)
@@ -178,6 +184,11 @@ model BuoiHoc {
 
   //Quan hệ
   @@unique([LopHocID, BatDauLuc])//một lớp học không có hai buổi học cùng ngày + giờ bắt đầu
+
+  //index
+  @@index([LopHocID])
+  @@index([BatDauLuc])
+  @@index([PhongHoc,BatDauLuc])
 }
 
 // ============ 7. KETQUA_BUOIHOC ============//
@@ -244,6 +255,10 @@ model GhiDanh {
 
   //Quan hệ
   @@unique([HocVienID, LopHocID]) //một học viên chỉ được ghi danh một lần vào một lớp học
+
+  //index
+  @@index([HocVienID])
+  @@index([LopHocID,TrangThai])
 }
 
 // ============ 10. HOADON  ============//
@@ -264,6 +279,9 @@ model HoaDon {
   ghidanh  GhiDanh    @relation(fields: [GhiDanhID], references: [ID])
   phieuthu PhieuThu[] //hóa đơn có nhiều phiếu thu
   phieuchi PhieuChi?
+
+  //index
+  @@index([ThoiHan])
 }
 
 // ============ 11. PHIEUTHU  ============//
@@ -283,6 +301,9 @@ model PhieuThu {
   //Quan hệ
   hoadon HoaDon @relation(fields: [HoaDonID], references: [ID])
   user User @relation(fields: [UserID], references: [ID])
+
+  //index
+  @@index([NgayThu])
 }
 
 // ============ 12. THONGBAO  ============//
@@ -296,6 +317,7 @@ model ThongBao{
   DuLieu Json
   DaDoc Boolean @default(false)// false = chưa đọc
   CreatedAt DateTime @default(now()) @db.Timestamptz(3)
+  UpdatedAt DateTime @updatedAt()
 
   //quan hệ
   User User @relation(fields: [UserID], references: [ID])
@@ -311,7 +333,13 @@ model PhieuChi {
   NguoiLapID Int
   NgayChi DateTime @db.Timestamptz(3)
 
+  CreatedAt DateTime @default(now()) @db.Timestamptz(3)
+  UpdatedAt DateTime @updatedAt()
+
   //quan hệ
   hoadon HoaDon? @relation(fields: [HoaDonID], references: [ID])
   user User @relation(fields: [NguoiLapID], references: [ID])
+
+  // index
+  @@index([NgayChi])
 }

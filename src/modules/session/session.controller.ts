@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotFoundException, Param, Patch, Post, Put, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, NotFoundException, Param, Patch, Post, Put, Query, Req, UseGuards } from "@nestjs/common";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guard/roles.guard";
@@ -85,7 +85,19 @@ export class SessionController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Post('admin/sessions/:id/unclock')
-    async UnclokSession(@Param('id') sessionId: number) {
-        return await this.sessionService.UnclokSession(+sessionId)
+    async UnlockSession(@Param('id') sessionId: number) {
+        return await this.sessionService.UnlockSession(+sessionId)
+    }
+
+    // gửi yêu cầu mở khóa buổi học 
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADMIN')
+    @Post('admin/sessions/:id/unclock')
+    async RequestUnlock(
+        @Req() req:RequestWithUser,
+        @Param('id') sessionId: number,
+        @Body('reason') reason:string) {
+        const userId = req.user.userId
+        return await this.sessionService.RequestUnlock(+userId,+sessionId, reason)
     }
 }

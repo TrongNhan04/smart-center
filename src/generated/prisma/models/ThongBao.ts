@@ -44,6 +44,7 @@ export type ThongBaoMinAggregateOutputType = {
   Loai: string | null
   DaDoc: boolean | null
   CreatedAt: Date | null
+  UpdatedAt: Date | null
 }
 
 export type ThongBaoMaxAggregateOutputType = {
@@ -54,6 +55,7 @@ export type ThongBaoMaxAggregateOutputType = {
   Loai: string | null
   DaDoc: boolean | null
   CreatedAt: Date | null
+  UpdatedAt: Date | null
 }
 
 export type ThongBaoCountAggregateOutputType = {
@@ -65,6 +67,7 @@ export type ThongBaoCountAggregateOutputType = {
   DuLieu: number
   DaDoc: number
   CreatedAt: number
+  UpdatedAt: number
   _all: number
 }
 
@@ -87,6 +90,7 @@ export type ThongBaoMinAggregateInputType = {
   Loai?: true
   DaDoc?: true
   CreatedAt?: true
+  UpdatedAt?: true
 }
 
 export type ThongBaoMaxAggregateInputType = {
@@ -97,6 +101,7 @@ export type ThongBaoMaxAggregateInputType = {
   Loai?: true
   DaDoc?: true
   CreatedAt?: true
+  UpdatedAt?: true
 }
 
 export type ThongBaoCountAggregateInputType = {
@@ -108,6 +113,7 @@ export type ThongBaoCountAggregateInputType = {
   DuLieu?: true
   DaDoc?: true
   CreatedAt?: true
+  UpdatedAt?: true
   _all?: true
 }
 
@@ -206,6 +212,7 @@ export type ThongBaoGroupByOutputType = {
   DuLieu: runtime.JsonValue
   DaDoc: boolean
   CreatedAt: Date
+  UpdatedAt: Date
   _count: ThongBaoCountAggregateOutputType | null
   _avg: ThongBaoAvgAggregateOutputType | null
   _sum: ThongBaoSumAggregateOutputType | null
@@ -240,6 +247,7 @@ export type ThongBaoWhereInput = {
   DuLieu?: Prisma.JsonFilter<"ThongBao">
   DaDoc?: Prisma.BoolFilter<"ThongBao"> | boolean
   CreatedAt?: Prisma.DateTimeFilter<"ThongBao"> | Date | string
+  UpdatedAt?: Prisma.DateTimeFilter<"ThongBao"> | Date | string
   User?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
@@ -252,6 +260,7 @@ export type ThongBaoOrderByWithRelationInput = {
   DuLieu?: Prisma.SortOrder
   DaDoc?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
+  UpdatedAt?: Prisma.SortOrder
   User?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -267,6 +276,7 @@ export type ThongBaoWhereUniqueInput = Prisma.AtLeast<{
   DuLieu?: Prisma.JsonFilter<"ThongBao">
   DaDoc?: Prisma.BoolFilter<"ThongBao"> | boolean
   CreatedAt?: Prisma.DateTimeFilter<"ThongBao"> | Date | string
+  UpdatedAt?: Prisma.DateTimeFilter<"ThongBao"> | Date | string
   User?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "ID">
 
@@ -279,6 +289,7 @@ export type ThongBaoOrderByWithAggregationInput = {
   DuLieu?: Prisma.SortOrder
   DaDoc?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
+  UpdatedAt?: Prisma.SortOrder
   _count?: Prisma.ThongBaoCountOrderByAggregateInput
   _avg?: Prisma.ThongBaoAvgOrderByAggregateInput
   _max?: Prisma.ThongBaoMaxOrderByAggregateInput
@@ -298,6 +309,7 @@ export type ThongBaoScalarWhereWithAggregatesInput = {
   DuLieu?: Prisma.JsonWithAggregatesFilter<"ThongBao">
   DaDoc?: Prisma.BoolWithAggregatesFilter<"ThongBao"> | boolean
   CreatedAt?: Prisma.DateTimeWithAggregatesFilter<"ThongBao"> | Date | string
+  UpdatedAt?: Prisma.DateTimeWithAggregatesFilter<"ThongBao"> | Date | string
 }
 
 export type ThongBaoCreateInput = {
@@ -307,6 +319,7 @@ export type ThongBaoCreateInput = {
   DuLieu: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: boolean
   CreatedAt?: Date | string
+  UpdatedAt?: Date | string
   User: Prisma.UserCreateNestedOneWithoutThongBaoInput
 }
 
@@ -319,6 +332,7 @@ export type ThongBaoUncheckedCreateInput = {
   DuLieu: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: boolean
   CreatedAt?: Date | string
+  UpdatedAt?: Date | string
 }
 
 export type ThongBaoUpdateInput = {
@@ -328,6 +342,7 @@ export type ThongBaoUpdateInput = {
   DuLieu?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: Prisma.BoolFieldUpdateOperationsInput | boolean
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   User?: Prisma.UserUpdateOneRequiredWithoutThongBaoNestedInput
 }
 
@@ -340,6 +355,7 @@ export type ThongBaoUncheckedUpdateInput = {
   DuLieu?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: Prisma.BoolFieldUpdateOperationsInput | boolean
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ThongBaoCreateManyInput = {
@@ -351,6 +367,7 @@ export type ThongBaoCreateManyInput = {
   DuLieu: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: boolean
   CreatedAt?: Date | string
+  UpdatedAt?: Date | string
 }
 
 export type ThongBaoUpdateManyMutationInput = {
@@ -360,6 +377,7 @@ export type ThongBaoUpdateManyMutationInput = {
   DuLieu?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: Prisma.BoolFieldUpdateOperationsInput | boolean
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ThongBaoUncheckedUpdateManyInput = {
@@ -371,6 +389,7 @@ export type ThongBaoUncheckedUpdateManyInput = {
   DuLieu?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: Prisma.BoolFieldUpdateOperationsInput | boolean
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ThongBaoListRelationFilter = {
@@ -392,6 +411,7 @@ export type ThongBaoCountOrderByAggregateInput = {
   DuLieu?: Prisma.SortOrder
   DaDoc?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
+  UpdatedAt?: Prisma.SortOrder
 }
 
 export type ThongBaoAvgOrderByAggregateInput = {
@@ -407,6 +427,7 @@ export type ThongBaoMaxOrderByAggregateInput = {
   Loai?: Prisma.SortOrder
   DaDoc?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
+  UpdatedAt?: Prisma.SortOrder
 }
 
 export type ThongBaoMinOrderByAggregateInput = {
@@ -417,6 +438,7 @@ export type ThongBaoMinOrderByAggregateInput = {
   Loai?: Prisma.SortOrder
   DaDoc?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
+  UpdatedAt?: Prisma.SortOrder
 }
 
 export type ThongBaoSumOrderByAggregateInput = {
@@ -473,6 +495,7 @@ export type ThongBaoCreateWithoutUserInput = {
   DuLieu: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: boolean
   CreatedAt?: Date | string
+  UpdatedAt?: Date | string
 }
 
 export type ThongBaoUncheckedCreateWithoutUserInput = {
@@ -483,6 +506,7 @@ export type ThongBaoUncheckedCreateWithoutUserInput = {
   DuLieu: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: boolean
   CreatedAt?: Date | string
+  UpdatedAt?: Date | string
 }
 
 export type ThongBaoCreateOrConnectWithoutUserInput = {
@@ -523,6 +547,7 @@ export type ThongBaoScalarWhereInput = {
   DuLieu?: Prisma.JsonFilter<"ThongBao">
   DaDoc?: Prisma.BoolFilter<"ThongBao"> | boolean
   CreatedAt?: Prisma.DateTimeFilter<"ThongBao"> | Date | string
+  UpdatedAt?: Prisma.DateTimeFilter<"ThongBao"> | Date | string
 }
 
 export type ThongBaoCreateManyUserInput = {
@@ -533,6 +558,7 @@ export type ThongBaoCreateManyUserInput = {
   DuLieu: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: boolean
   CreatedAt?: Date | string
+  UpdatedAt?: Date | string
 }
 
 export type ThongBaoUpdateWithoutUserInput = {
@@ -542,6 +568,7 @@ export type ThongBaoUpdateWithoutUserInput = {
   DuLieu?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: Prisma.BoolFieldUpdateOperationsInput | boolean
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ThongBaoUncheckedUpdateWithoutUserInput = {
@@ -552,6 +579,7 @@ export type ThongBaoUncheckedUpdateWithoutUserInput = {
   DuLieu?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: Prisma.BoolFieldUpdateOperationsInput | boolean
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ThongBaoUncheckedUpdateManyWithoutUserInput = {
@@ -562,6 +590,7 @@ export type ThongBaoUncheckedUpdateManyWithoutUserInput = {
   DuLieu?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   DaDoc?: Prisma.BoolFieldUpdateOperationsInput | boolean
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -575,6 +604,7 @@ export type ThongBaoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   DuLieu?: boolean
   DaDoc?: boolean
   CreatedAt?: boolean
+  UpdatedAt?: boolean
   User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["thongBao"]>
 
@@ -587,6 +617,7 @@ export type ThongBaoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   DuLieu?: boolean
   DaDoc?: boolean
   CreatedAt?: boolean
+  UpdatedAt?: boolean
   User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["thongBao"]>
 
@@ -599,6 +630,7 @@ export type ThongBaoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   DuLieu?: boolean
   DaDoc?: boolean
   CreatedAt?: boolean
+  UpdatedAt?: boolean
   User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["thongBao"]>
 
@@ -611,9 +643,10 @@ export type ThongBaoSelectScalar = {
   DuLieu?: boolean
   DaDoc?: boolean
   CreatedAt?: boolean
+  UpdatedAt?: boolean
 }
 
-export type ThongBaoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"ID" | "UserID" | "TieuDe" | "NoiDung" | "Loai" | "DuLieu" | "DaDoc" | "CreatedAt", ExtArgs["result"]["thongBao"]>
+export type ThongBaoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"ID" | "UserID" | "TieuDe" | "NoiDung" | "Loai" | "DuLieu" | "DaDoc" | "CreatedAt" | "UpdatedAt", ExtArgs["result"]["thongBao"]>
 export type ThongBaoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -638,6 +671,7 @@ export type $ThongBaoPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     DuLieu: runtime.JsonValue
     DaDoc: boolean
     CreatedAt: Date
+    UpdatedAt: Date
   }, ExtArgs["result"]["thongBao"]>
   composites: {}
 }
@@ -1070,6 +1104,7 @@ export interface ThongBaoFieldRefs {
   readonly DuLieu: Prisma.FieldRef<"ThongBao", 'Json'>
   readonly DaDoc: Prisma.FieldRef<"ThongBao", 'Boolean'>
   readonly CreatedAt: Prisma.FieldRef<"ThongBao", 'DateTime'>
+  readonly UpdatedAt: Prisma.FieldRef<"ThongBao", 'DateTime'>
 }
     
 

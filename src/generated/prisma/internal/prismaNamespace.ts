@@ -1513,6 +1513,9 @@ export const BuoiHocScalarFieldEnum = {
   MoTa: 'MoTa',
   PhongHoc: 'PhongHoc',
   AdminMoKhoa: 'AdminMoKhoa',
+  YeuCauMoKhoa: 'YeuCauMoKhoa',
+  LyDoMoKhoa: 'LyDoMoKhoa',
+  NgayYeuCau: 'NgayYeuCau',
   TrangThai: 'TrangThai',
   CreatedAt: 'CreatedAt',
   UpdatedAt: 'UpdatedAt'
@@ -1601,7 +1604,8 @@ export const ThongBaoScalarFieldEnum = {
   Loai: 'Loai',
   DuLieu: 'DuLieu',
   DaDoc: 'DaDoc',
-  CreatedAt: 'CreatedAt'
+  CreatedAt: 'CreatedAt',
+  UpdatedAt: 'UpdatedAt'
 } as const
 
 export type ThongBaoScalarFieldEnum = (typeof ThongBaoScalarFieldEnum)[keyof typeof ThongBaoScalarFieldEnum]
@@ -1613,7 +1617,9 @@ export const PhieuChiScalarFieldEnum = {
   SoTien: 'SoTien',
   LyDo: 'LyDo',
   NguoiLapID: 'NguoiLapID',
-  NgayChi: 'NgayChi'
+  NgayChi: 'NgayChi',
+  CreatedAt: 'CreatedAt',
+  UpdatedAt: 'UpdatedAt'
 } as const
 
 export type PhieuChiScalarFieldEnum = (typeof PhieuChiScalarFieldEnum)[keyof typeof PhieuChiScalarFieldEnum]

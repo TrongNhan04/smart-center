@@ -280,8 +280,13 @@ export class SessionService {
     }
 
     // mở khóa lưu kết quả buổi học
-    async UnclokSession(sessionId: number) {
-        return await this.resultService.UnLokSession(sessionId)
+    async UnlockSession(sessionId: number) {
+        return await this.resultService.UnlockSession(sessionId)
+    }
+
+    // gửi yêu cầu mở khóa buổi học
+    async RequestUnlock(userId: number, sessionId:number, reason:string){
+        return await this.resultService.RequestUnlock(userId, sessionId, reason)
     }
 
     // lấy giáo viên từ userId
