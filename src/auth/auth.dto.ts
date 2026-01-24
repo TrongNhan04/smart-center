@@ -10,9 +10,6 @@ export class RegisterDTO{
     @IsNotEmpty()
     phone: string
 
-    // @IsNotEmpty()
-    // password: string
-
     @IsEnum(Vaitro,{message:`User có vai trò là ${Object.values(Vaitro).join(",")}`})
     @IsNotEmpty()
     role: Vaitro
@@ -29,15 +26,4 @@ export class LoginDTO{
 
     @IsOptional()
     mustChangePW?: boolean
-}
-
-
-export class ChangePasswordDTO{
-    @IsNotEmpty()
-    @IsString()
-    oldPassword: string
-
-    @IsNotEmpty()
-    @IsString()
-    newPassword: string
 }

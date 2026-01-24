@@ -3,14 +3,12 @@ import { PrismaService } from '../prisma/prisma.service';
 import { LoginDTO, RegisterDTO } from './auth.dto';
 import * as bcrypt from 'bcrypt'
 import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class AuthService {
     constructor(
         private prismaService: PrismaService,
         private jwtService: JwtService,
-        private configService: ConfigService
     ) { }
 
     // Đăng ký 
@@ -25,11 +23,7 @@ export class AuthService {
             }
         })
 
-        if (userDB) {
-            throw new HttpException({
-                msg: `${registerDTO.phone} or ${registerDTO.email} was used`
-            }, HttpStatus.BAD_REQUEST)
-        }
+        if (userDB) throw new BadRequestException('Email or phone number is used')
 
         // 2 băm mật khẩu là số điện thoại
         const passwordHash = await bcrypt.hash(registerDTO.phone, 10)
@@ -49,7 +43,6 @@ export class AuthService {
                 Email: true,
                 DienThoai: true,
                 VaiTro: true,
-                CreatedAt: true
             }
         })
 
@@ -67,14 +60,7 @@ export class AuthService {
         if (!ok)
             throw new UnauthorizedException("Incorrect password!")
 
-        return {
-            id: userDB.ID,
-            email: userDB.Email,
-            phone: userDB.DienThoai,
-            mustChangePassword: userDB.PhaiDoiMK,
-            role: userDB.VaiTro,
-            tokenVersion: userDB.ToKenVerSion
-        }
+        return userDB
     }
 
     // Đăng nhập
@@ -82,49 +68,17 @@ export class AuthService {
         // check user
         const userDB = await this.ValidateUser(loginDTO)
         const payload = {
-            sub: userDB.id,
-            role: userDB.role,
-            mustChangePW: userDB.mustChangePassword,
-            tokenVersion: userDB.tokenVersion
+            sub: userDB.ID,
+            role: userDB.VaiTro,
+            mustChangePW: userDB.PhaiDoiMK,
+            tokenVersion: userDB.ToKenVerSion
         }
 
         const token = await this.jwtService.signAsync(payload)
         return {
             acccessToken: token,
-            role: userDB.role
+            role: userDB.VaiTro
         }
-    }
-
-    //Đổi mật khẩu đăng nhập
-    async ChangePassword(userID: number, oldpw: string, newpw: string) {
-        const userDB = await this.prismaService.user.findUnique({
-            where: { ID: userID },
-            select: {
-                ID: true,
-                MatKhauHash: true
-            }
-        })
-        if (!userDB)
-            throw new UnauthorizedException("User is not exist!")
-
-        const pw = await bcrypt.compare(oldpw, userDB.MatKhauHash)
-        if (!pw)
-            throw new UnauthorizedException("Incorrect password!")
-
-        if (oldpw === newpw)
-            throw new BadRequestException("Password doesn't change!")
-
-        const hashPW = await bcrypt.hash(newpw, 10)
-
-        await this.prismaService.user.update({
-            where: { ID: userID },
-            data: {
-                MatKhauHash: hashPW,
-                PhaiDoiMK: false,
-                ToKenVerSion:{increment:1}
-            }
-        })
-        return { mgs: "Password was changed!" }
     }
 
     // đăng xuất: tăng token version lên 1
@@ -132,6 +86,6 @@ export class AuthService {
         await this.prismaService.user.update({
             where: { ID: userId }, data: { ToKenVerSion: { increment: 1 } }
         })
-        return {msg:"Logout succesfull"}
+        return { msg: "Logout succesfully" }
     }
 }

@@ -112,7 +112,7 @@ export class DashboardService {
                 lophoc: {
                     select: {
                         TenLop: true,
-                        giaovien: { select: { HoTen: true } }
+                        giaovien: { select: { User: { select: { HoTen: true } } } }
                     }
                 },
                 TrangThai: true
@@ -123,7 +123,7 @@ export class DashboardService {
             time: sm.BatDauLuc.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
                 + '-' + sm.KetThucLuc.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
             class: sm.lophoc.TenLop,
-            teacher: sm.lophoc.giaovien.HoTen,
+            teacher: sm.lophoc.giaovien.User.HoTen,
             room: sm.PhongHoc,
             status: sm.TrangThai
         }))
@@ -165,21 +165,21 @@ export class DashboardService {
                 where: { YeuCauMoKhoa: true },
                 select: {
                     ID: true, BuoiSo: true, PhongHoc: true,
-                    lophoc: { select: { giaovien: { select: { HoTen: true } } } },
+                    lophoc: { select: { giaovien: { select: { User: { select: { HoTen: true } } } } } },
                     LyDoMoKhoa: true, NgayYeuCau: true
                 },
                 orderBy: { NgayYeuCau: 'asc' }// ai trước xử lý trước
             }),
             //session > 48h chưa nhập điểm
             this.prisma.buoiHoc.findMany({
-                where: {
+                where: { // 48h = 48 x 60p x 60 ms x 1000
                     KetThucLuc: { lt: new Date(Date.now() - 48 * 60 * 60 * 1000) },
                     TrangThai: 'SCHEDULED',
                     YeuCauMoKhoa: false
                 },
                 select: {
                     ID: true, BuoiSo: true, PhongHoc: true,
-                    lophoc: { select: { giaovien: { select: { HoTen: true } } } }
+                    lophoc: { select: { giaovien: { select: { User: { select: { HoTen: true } } } } } }
                 }
             })
         ])
@@ -189,7 +189,7 @@ export class DashboardService {
                 id: rm.ID,
                 lesson: rm.BuoiSo,
                 room: rm.PhongHoc ?? "No room",
-                teacher: rm.lophoc.giaovien.HoTen,
+                teacher: rm.lophoc.giaovien.User.HoTen,
                 reason: rm.LyDoMoKhoa,
                 date: rm.NgayYeuCau
             })),
@@ -198,7 +198,7 @@ export class DashboardService {
                 id: um.ID,
                 lesson: um.BuoiSo,
                 room: um.PhongHoc ?? "No room",
-                teacher: um.lophoc.giaovien.HoTen,
+                teacher: um.lophoc.giaovien.User.HoTen,
             }))
         }
     }

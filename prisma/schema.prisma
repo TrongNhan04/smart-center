@@ -22,16 +22,17 @@ enum Vaitro {
 }
 
 model User {
-  ID          Int      @id @default(autoincrement())
-  Email       String   @unique
-  DienThoai   String   @unique
-  MatKhauHash String
-  PhaiDoiMK   Boolean  @default(true) //bắt buộc đổi mật khẩu lần đầu đăng nhập
-  VaiTro      Vaitro
-  ToKenVerSion Int @default(0)
-  
-  CreatedAt   DateTime @default(dbgenerated("now()")) @db.Timestamptz(3)
-  UpdatedAt   DateTime @updatedAt @db.Timestamptz(3)
+  ID           Int     @id @default(autoincrement())
+  HoTen        String?
+  Email        String  @unique
+  DienThoai    String  @unique
+  MatKhauHash  String
+  PhaiDoiMK    Boolean @default(true) //bắt buộc đổi mật khẩu lần đầu đăng nhập
+  VaiTro       Vaitro
+  ToKenVerSion Int     @default(0)
+
+  CreatedAt DateTime @default(dbgenerated("now()")) @db.Timestamptz(3)
+  UpdatedAt DateTime @updatedAt @db.Timestamptz(3)
 
   //Quan hệ
   GiaoVien GiaoVien? //là giáo viên
@@ -52,7 +53,6 @@ model GiaoVien {
   MaGiaoVien String @unique
   UserID     Int    @unique
 
-  HoTen     String
   ChuyenMon String?
   GhiChu    String?
   TrangThai TrangThaiGV @default(ACTIVE) //thêm mới là ACTIVE
@@ -77,7 +77,6 @@ model HocVien {
   UserID    Int //id phụ huynh
 
   TenHocVien  String
-  TenPhuHuynh String
   NgaySinh    DateTime    @db.Timestamptz(3)
   DiaChi      String?
   GhiChu      String?
@@ -165,17 +164,17 @@ model BuoiHoc {
   ID       Int @id @default(autoincrement())
   LopHocID Int
 
-  BuoiSo     Int
-  ChuDe      String?
-  BatDauLuc  DateTime    @db.Timestamptz(3)
-  KetThucLuc DateTime    @db.Timestamptz(3)
-  MoTa       String?
-  PhongHoc   String?
-  AdminMoKhoa Boolean @default(false)
-  YeuCauMoKhoa Boolean @default(false)
-  LyDoMoKhoa String?
-  NgayYeuCau DateTime? @db.Timestamptz(3)
-  TrangThai  TrangThaiBH @default(SCHEDULED) //mặc định là SCHEDULE
+  BuoiSo       Int
+  ChuDe        String?
+  BatDauLuc    DateTime    @db.Timestamptz(3)
+  KetThucLuc   DateTime    @db.Timestamptz(3)
+  MoTa         String?
+  PhongHoc     String?
+  AdminMoKhoa  Boolean     @default(false)
+  YeuCauMoKhoa Boolean     @default(false)
+  LyDoMoKhoa   String?
+  NgayYeuCau   DateTime?   @db.Timestamptz(3)
+  TrangThai    TrangThaiBH @default(SCHEDULED) //mặc định là SCHEDULE
 
   CreatedAt      DateTime        @default(dbgenerated("now()")) @db.Timestamptz(3)
   UpdatedAt      DateTime        @updatedAt @db.Timestamptz(3)
@@ -183,12 +182,11 @@ model BuoiHoc {
   ketqua_buoihoc KetQua_BuoiHoc? //buổi học có kết quả buổi học
 
   //Quan hệ
-  @@unique([LopHocID, BatDauLuc])//một lớp học không có hai buổi học cùng ngày + giờ bắt đầu
-
+  @@unique([LopHocID, BatDauLuc]) //một lớp học không có hai buổi học cùng ngày + giờ bắt đầu
   //index
   @@index([LopHocID])
   @@index([BatDauLuc])
-  @@index([PhongHoc,BatDauLuc])
+  @@index([PhongHoc, BatDauLuc])
 }
 
 // ============ 7. KETQUA_BUOIHOC ============//
@@ -215,7 +213,7 @@ model KetQua_BuoiHoc {
 
 // ============ 8. KETQUA_CHITIET ============//
 model KetQua_ChiTiet {
-  ID           Int     @id @default(autoincrement())
+  ID           Int      @id @default(autoincrement())
   KetQuaID     Int
   GhiDanhID    Int
   NhanXetRieng String?
@@ -255,10 +253,9 @@ model GhiDanh {
 
   //Quan hệ
   @@unique([HocVienID, LopHocID]) //một học viên chỉ được ghi danh một lần vào một lớp học
-
   //index
   @@index([HocVienID])
-  @@index([LopHocID,TrangThai])
+  @@index([LopHocID, TrangThai])
 }
 
 // ============ 10. HOADON  ============//
@@ -286,7 +283,7 @@ model HoaDon {
 
 // ============ 11. PHIEUTHU  ============//
 model PhieuThu {
-  ID         Int      @id @default(autoincrement())
+  ID     Int @id @default(autoincrement())
   UserID Int
 
   MaPhieuThu String   @unique
@@ -300,22 +297,22 @@ model PhieuThu {
 
   //Quan hệ
   hoadon HoaDon @relation(fields: [HoaDonID], references: [ID])
-  user User @relation(fields: [UserID], references: [ID])
+  user   User   @relation(fields: [UserID], references: [ID])
 
   //index
   @@index([NgayThu])
 }
 
 // ============ 12. THONGBAO  ============//
-model ThongBao{
+model ThongBao {
   ID Int @id @default(autoincrement())
 
-  UserID Int 
-  TieuDe String
-  NoiDung String
-  Loai String
-  DuLieu Json
-  DaDoc Boolean @default(false)// false = chưa đọc
+  UserID    Int
+  TieuDe    String
+  NoiDung   String
+  Loai      String
+  DuLieu    Json
+  DaDoc     Boolean  @default(false) // false = chưa đọc
   CreatedAt DateTime @default(now()) @db.Timestamptz(3)
   UpdatedAt DateTime @updatedAt()
 
@@ -325,20 +322,20 @@ model ThongBao{
 
 // ============ 13. PHIEUCHI  ============//
 model PhieuChi {
-  ID Int @id @default(autoincrement())
+  ID       Int  @id @default(autoincrement())
   HoaDonID Int? @unique
 
-  SoTien Decimal  @db.Decimal(10,2)
-  LyDo String
+  SoTien     Decimal  @db.Decimal(10, 2)
+  LyDo       String
   NguoiLapID Int
-  NgayChi DateTime @db.Timestamptz(3)
+  NgayChi    DateTime @db.Timestamptz(3)
 
   CreatedAt DateTime @default(now()) @db.Timestamptz(3)
   UpdatedAt DateTime @updatedAt()
 
   //quan hệ
   hoadon HoaDon? @relation(fields: [HoaDonID], references: [ID])
-  user User @relation(fields: [NguoiLapID], references: [ID])
+  user   User    @relation(fields: [NguoiLapID], references: [ID])
 
   // index
   @@index([NgayChi])

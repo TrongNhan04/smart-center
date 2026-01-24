@@ -40,7 +40,6 @@ export type GiaoVienMinAggregateOutputType = {
   ID: number | null
   MaGiaoVien: string | null
   UserID: number | null
-  HoTen: string | null
   ChuyenMon: string | null
   GhiChu: string | null
   TrangThai: $Enums.TrangThaiGV | null
@@ -52,7 +51,6 @@ export type GiaoVienMaxAggregateOutputType = {
   ID: number | null
   MaGiaoVien: string | null
   UserID: number | null
-  HoTen: string | null
   ChuyenMon: string | null
   GhiChu: string | null
   TrangThai: $Enums.TrangThaiGV | null
@@ -64,7 +62,6 @@ export type GiaoVienCountAggregateOutputType = {
   ID: number
   MaGiaoVien: number
   UserID: number
-  HoTen: number
   ChuyenMon: number
   GhiChu: number
   TrangThai: number
@@ -88,7 +85,6 @@ export type GiaoVienMinAggregateInputType = {
   ID?: true
   MaGiaoVien?: true
   UserID?: true
-  HoTen?: true
   ChuyenMon?: true
   GhiChu?: true
   TrangThai?: true
@@ -100,7 +96,6 @@ export type GiaoVienMaxAggregateInputType = {
   ID?: true
   MaGiaoVien?: true
   UserID?: true
-  HoTen?: true
   ChuyenMon?: true
   GhiChu?: true
   TrangThai?: true
@@ -112,7 +107,6 @@ export type GiaoVienCountAggregateInputType = {
   ID?: true
   MaGiaoVien?: true
   UserID?: true
-  HoTen?: true
   ChuyenMon?: true
   GhiChu?: true
   TrangThai?: true
@@ -211,7 +205,6 @@ export type GiaoVienGroupByOutputType = {
   ID: number
   MaGiaoVien: string
   UserID: number
-  HoTen: string
   ChuyenMon: string | null
   GhiChu: string | null
   TrangThai: $Enums.TrangThaiGV
@@ -246,7 +239,6 @@ export type GiaoVienWhereInput = {
   ID?: Prisma.IntFilter<"GiaoVien"> | number
   MaGiaoVien?: Prisma.StringFilter<"GiaoVien"> | string
   UserID?: Prisma.IntFilter<"GiaoVien"> | number
-  HoTen?: Prisma.StringFilter<"GiaoVien"> | string
   ChuyenMon?: Prisma.StringNullableFilter<"GiaoVien"> | string | null
   GhiChu?: Prisma.StringNullableFilter<"GiaoVien"> | string | null
   TrangThai?: Prisma.EnumTrangThaiGVFilter<"GiaoVien"> | $Enums.TrangThaiGV
@@ -261,7 +253,6 @@ export type GiaoVienOrderByWithRelationInput = {
   ID?: Prisma.SortOrder
   MaGiaoVien?: Prisma.SortOrder
   UserID?: Prisma.SortOrder
-  HoTen?: Prisma.SortOrder
   ChuyenMon?: Prisma.SortOrderInput | Prisma.SortOrder
   GhiChu?: Prisma.SortOrderInput | Prisma.SortOrder
   TrangThai?: Prisma.SortOrder
@@ -279,7 +270,6 @@ export type GiaoVienWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.GiaoVienWhereInput | Prisma.GiaoVienWhereInput[]
   OR?: Prisma.GiaoVienWhereInput[]
   NOT?: Prisma.GiaoVienWhereInput | Prisma.GiaoVienWhereInput[]
-  HoTen?: Prisma.StringFilter<"GiaoVien"> | string
   ChuyenMon?: Prisma.StringNullableFilter<"GiaoVien"> | string | null
   GhiChu?: Prisma.StringNullableFilter<"GiaoVien"> | string | null
   TrangThai?: Prisma.EnumTrangThaiGVFilter<"GiaoVien"> | $Enums.TrangThaiGV
@@ -294,7 +284,6 @@ export type GiaoVienOrderByWithAggregationInput = {
   ID?: Prisma.SortOrder
   MaGiaoVien?: Prisma.SortOrder
   UserID?: Prisma.SortOrder
-  HoTen?: Prisma.SortOrder
   ChuyenMon?: Prisma.SortOrderInput | Prisma.SortOrder
   GhiChu?: Prisma.SortOrderInput | Prisma.SortOrder
   TrangThai?: Prisma.SortOrder
@@ -314,7 +303,6 @@ export type GiaoVienScalarWhereWithAggregatesInput = {
   ID?: Prisma.IntWithAggregatesFilter<"GiaoVien"> | number
   MaGiaoVien?: Prisma.StringWithAggregatesFilter<"GiaoVien"> | string
   UserID?: Prisma.IntWithAggregatesFilter<"GiaoVien"> | number
-  HoTen?: Prisma.StringWithAggregatesFilter<"GiaoVien"> | string
   ChuyenMon?: Prisma.StringNullableWithAggregatesFilter<"GiaoVien"> | string | null
   GhiChu?: Prisma.StringNullableWithAggregatesFilter<"GiaoVien"> | string | null
   TrangThai?: Prisma.EnumTrangThaiGVWithAggregatesFilter<"GiaoVien"> | $Enums.TrangThaiGV
@@ -324,7 +312,6 @@ export type GiaoVienScalarWhereWithAggregatesInput = {
 
 export type GiaoVienCreateInput = {
   MaGiaoVien: string
-  HoTen: string
   ChuyenMon?: string | null
   GhiChu?: string | null
   TrangThai?: $Enums.TrangThaiGV
@@ -339,7 +326,6 @@ export type GiaoVienUncheckedCreateInput = {
   ID?: number
   MaGiaoVien: string
   UserID: number
-  HoTen: string
   ChuyenMon?: string | null
   GhiChu?: string | null
   TrangThai?: $Enums.TrangThaiGV
@@ -351,7 +337,6 @@ export type GiaoVienUncheckedCreateInput = {
 
 export type GiaoVienUpdateInput = {
   MaGiaoVien?: Prisma.StringFieldUpdateOperationsInput | string
-  HoTen?: Prisma.StringFieldUpdateOperationsInput | string
   ChuyenMon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   TrangThai?: Prisma.EnumTrangThaiGVFieldUpdateOperationsInput | $Enums.TrangThaiGV
@@ -366,7 +351,6 @@ export type GiaoVienUncheckedUpdateInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
   MaGiaoVien?: Prisma.StringFieldUpdateOperationsInput | string
   UserID?: Prisma.IntFieldUpdateOperationsInput | number
-  HoTen?: Prisma.StringFieldUpdateOperationsInput | string
   ChuyenMon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   TrangThai?: Prisma.EnumTrangThaiGVFieldUpdateOperationsInput | $Enums.TrangThaiGV
@@ -380,7 +364,6 @@ export type GiaoVienCreateManyInput = {
   ID?: number
   MaGiaoVien: string
   UserID: number
-  HoTen: string
   ChuyenMon?: string | null
   GhiChu?: string | null
   TrangThai?: $Enums.TrangThaiGV
@@ -390,7 +373,6 @@ export type GiaoVienCreateManyInput = {
 
 export type GiaoVienUpdateManyMutationInput = {
   MaGiaoVien?: Prisma.StringFieldUpdateOperationsInput | string
-  HoTen?: Prisma.StringFieldUpdateOperationsInput | string
   ChuyenMon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   TrangThai?: Prisma.EnumTrangThaiGVFieldUpdateOperationsInput | $Enums.TrangThaiGV
@@ -402,7 +384,6 @@ export type GiaoVienUncheckedUpdateManyInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
   MaGiaoVien?: Prisma.StringFieldUpdateOperationsInput | string
   UserID?: Prisma.IntFieldUpdateOperationsInput | number
-  HoTen?: Prisma.StringFieldUpdateOperationsInput | string
   ChuyenMon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   TrangThai?: Prisma.EnumTrangThaiGVFieldUpdateOperationsInput | $Enums.TrangThaiGV
@@ -419,7 +400,6 @@ export type GiaoVienCountOrderByAggregateInput = {
   ID?: Prisma.SortOrder
   MaGiaoVien?: Prisma.SortOrder
   UserID?: Prisma.SortOrder
-  HoTen?: Prisma.SortOrder
   ChuyenMon?: Prisma.SortOrder
   GhiChu?: Prisma.SortOrder
   TrangThai?: Prisma.SortOrder
@@ -436,7 +416,6 @@ export type GiaoVienMaxOrderByAggregateInput = {
   ID?: Prisma.SortOrder
   MaGiaoVien?: Prisma.SortOrder
   UserID?: Prisma.SortOrder
-  HoTen?: Prisma.SortOrder
   ChuyenMon?: Prisma.SortOrder
   GhiChu?: Prisma.SortOrder
   TrangThai?: Prisma.SortOrder
@@ -448,7 +427,6 @@ export type GiaoVienMinOrderByAggregateInput = {
   ID?: Prisma.SortOrder
   MaGiaoVien?: Prisma.SortOrder
   UserID?: Prisma.SortOrder
-  HoTen?: Prisma.SortOrder
   ChuyenMon?: Prisma.SortOrder
   GhiChu?: Prisma.SortOrder
   TrangThai?: Prisma.SortOrder
@@ -498,10 +476,6 @@ export type GiaoVienUncheckedUpdateOneWithoutUserNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.GiaoVienUpdateToOneWithWhereWithoutUserInput, Prisma.GiaoVienUpdateWithoutUserInput>, Prisma.GiaoVienUncheckedUpdateWithoutUserInput>
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type EnumTrangThaiGVFieldUpdateOperationsInput = {
   set?: $Enums.TrangThaiGV
 }
@@ -536,7 +510,6 @@ export type GiaoVienUpdateOneRequiredWithoutKetQua_BuoiHocNestedInput = {
 
 export type GiaoVienCreateWithoutUserInput = {
   MaGiaoVien: string
-  HoTen: string
   ChuyenMon?: string | null
   GhiChu?: string | null
   TrangThai?: $Enums.TrangThaiGV
@@ -549,7 +522,6 @@ export type GiaoVienCreateWithoutUserInput = {
 export type GiaoVienUncheckedCreateWithoutUserInput = {
   ID?: number
   MaGiaoVien: string
-  HoTen: string
   ChuyenMon?: string | null
   GhiChu?: string | null
   TrangThai?: $Enums.TrangThaiGV
@@ -577,7 +549,6 @@ export type GiaoVienUpdateToOneWithWhereWithoutUserInput = {
 
 export type GiaoVienUpdateWithoutUserInput = {
   MaGiaoVien?: Prisma.StringFieldUpdateOperationsInput | string
-  HoTen?: Prisma.StringFieldUpdateOperationsInput | string
   ChuyenMon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   TrangThai?: Prisma.EnumTrangThaiGVFieldUpdateOperationsInput | $Enums.TrangThaiGV
@@ -590,7 +561,6 @@ export type GiaoVienUpdateWithoutUserInput = {
 export type GiaoVienUncheckedUpdateWithoutUserInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
   MaGiaoVien?: Prisma.StringFieldUpdateOperationsInput | string
-  HoTen?: Prisma.StringFieldUpdateOperationsInput | string
   ChuyenMon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   TrangThai?: Prisma.EnumTrangThaiGVFieldUpdateOperationsInput | $Enums.TrangThaiGV
@@ -602,7 +572,6 @@ export type GiaoVienUncheckedUpdateWithoutUserInput = {
 
 export type GiaoVienCreateWithoutLopHocInput = {
   MaGiaoVien: string
-  HoTen: string
   ChuyenMon?: string | null
   GhiChu?: string | null
   TrangThai?: $Enums.TrangThaiGV
@@ -616,7 +585,6 @@ export type GiaoVienUncheckedCreateWithoutLopHocInput = {
   ID?: number
   MaGiaoVien: string
   UserID: number
-  HoTen: string
   ChuyenMon?: string | null
   GhiChu?: string | null
   TrangThai?: $Enums.TrangThaiGV
@@ -643,7 +611,6 @@ export type GiaoVienUpdateToOneWithWhereWithoutLopHocInput = {
 
 export type GiaoVienUpdateWithoutLopHocInput = {
   MaGiaoVien?: Prisma.StringFieldUpdateOperationsInput | string
-  HoTen?: Prisma.StringFieldUpdateOperationsInput | string
   ChuyenMon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   TrangThai?: Prisma.EnumTrangThaiGVFieldUpdateOperationsInput | $Enums.TrangThaiGV
@@ -657,7 +624,6 @@ export type GiaoVienUncheckedUpdateWithoutLopHocInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
   MaGiaoVien?: Prisma.StringFieldUpdateOperationsInput | string
   UserID?: Prisma.IntFieldUpdateOperationsInput | number
-  HoTen?: Prisma.StringFieldUpdateOperationsInput | string
   ChuyenMon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   TrangThai?: Prisma.EnumTrangThaiGVFieldUpdateOperationsInput | $Enums.TrangThaiGV
@@ -668,7 +634,6 @@ export type GiaoVienUncheckedUpdateWithoutLopHocInput = {
 
 export type GiaoVienCreateWithoutKetQua_BuoiHocInput = {
   MaGiaoVien: string
-  HoTen: string
   ChuyenMon?: string | null
   GhiChu?: string | null
   TrangThai?: $Enums.TrangThaiGV
@@ -682,7 +647,6 @@ export type GiaoVienUncheckedCreateWithoutKetQua_BuoiHocInput = {
   ID?: number
   MaGiaoVien: string
   UserID: number
-  HoTen: string
   ChuyenMon?: string | null
   GhiChu?: string | null
   TrangThai?: $Enums.TrangThaiGV
@@ -709,7 +673,6 @@ export type GiaoVienUpdateToOneWithWhereWithoutKetQua_BuoiHocInput = {
 
 export type GiaoVienUpdateWithoutKetQua_BuoiHocInput = {
   MaGiaoVien?: Prisma.StringFieldUpdateOperationsInput | string
-  HoTen?: Prisma.StringFieldUpdateOperationsInput | string
   ChuyenMon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   TrangThai?: Prisma.EnumTrangThaiGVFieldUpdateOperationsInput | $Enums.TrangThaiGV
@@ -723,7 +686,6 @@ export type GiaoVienUncheckedUpdateWithoutKetQua_BuoiHocInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
   MaGiaoVien?: Prisma.StringFieldUpdateOperationsInput | string
   UserID?: Prisma.IntFieldUpdateOperationsInput | number
-  HoTen?: Prisma.StringFieldUpdateOperationsInput | string
   ChuyenMon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   TrangThai?: Prisma.EnumTrangThaiGVFieldUpdateOperationsInput | $Enums.TrangThaiGV
@@ -776,7 +738,6 @@ export type GiaoVienSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   ID?: boolean
   MaGiaoVien?: boolean
   UserID?: boolean
-  HoTen?: boolean
   ChuyenMon?: boolean
   GhiChu?: boolean
   TrangThai?: boolean
@@ -792,7 +753,6 @@ export type GiaoVienSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   ID?: boolean
   MaGiaoVien?: boolean
   UserID?: boolean
-  HoTen?: boolean
   ChuyenMon?: boolean
   GhiChu?: boolean
   TrangThai?: boolean
@@ -805,7 +765,6 @@ export type GiaoVienSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   ID?: boolean
   MaGiaoVien?: boolean
   UserID?: boolean
-  HoTen?: boolean
   ChuyenMon?: boolean
   GhiChu?: boolean
   TrangThai?: boolean
@@ -818,7 +777,6 @@ export type GiaoVienSelectScalar = {
   ID?: boolean
   MaGiaoVien?: boolean
   UserID?: boolean
-  HoTen?: boolean
   ChuyenMon?: boolean
   GhiChu?: boolean
   TrangThai?: boolean
@@ -826,7 +784,7 @@ export type GiaoVienSelectScalar = {
   UpdatedAt?: boolean
 }
 
-export type GiaoVienOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"ID" | "MaGiaoVien" | "UserID" | "HoTen" | "ChuyenMon" | "GhiChu" | "TrangThai" | "CreatedAt" | "UpdatedAt", ExtArgs["result"]["giaoVien"]>
+export type GiaoVienOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"ID" | "MaGiaoVien" | "UserID" | "ChuyenMon" | "GhiChu" | "TrangThai" | "CreatedAt" | "UpdatedAt", ExtArgs["result"]["giaoVien"]>
 export type GiaoVienInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   LopHoc?: boolean | Prisma.GiaoVien$LopHocArgs<ExtArgs>
@@ -851,7 +809,6 @@ export type $GiaoVienPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     ID: number
     MaGiaoVien: string
     UserID: number
-    HoTen: string
     ChuyenMon: string | null
     GhiChu: string | null
     TrangThai: $Enums.TrangThaiGV
@@ -1286,7 +1243,6 @@ export interface GiaoVienFieldRefs {
   readonly ID: Prisma.FieldRef<"GiaoVien", 'Int'>
   readonly MaGiaoVien: Prisma.FieldRef<"GiaoVien", 'String'>
   readonly UserID: Prisma.FieldRef<"GiaoVien", 'Int'>
-  readonly HoTen: Prisma.FieldRef<"GiaoVien", 'String'>
   readonly ChuyenMon: Prisma.FieldRef<"GiaoVien", 'String'>
   readonly GhiChu: Prisma.FieldRef<"GiaoVien", 'String'>
   readonly TrangThai: Prisma.FieldRef<"GiaoVien", 'TrangThaiGV'>

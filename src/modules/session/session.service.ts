@@ -36,7 +36,7 @@ export class SessionService {
             const sessionDB = await this.SessionIdValidator(sessionId)
             if (body.room) await this.HasSameRoom(body.room, sessionDB.BatDauLuc, sessionDB.KetThucLuc, sessionId)
         }
-        else{//giáo viên
+        else {//giáo viên
             const { sessionDB } = await this.SessionAcsessValidate(userId, sessionId)
             if (body.room) await this.HasSameRoom(body.room, sessionDB.BatDauLuc, sessionDB.KetThucLuc, sessionId)
         }
@@ -239,8 +239,8 @@ export class SessionService {
                             select: {
                                 hocvien: {
                                     select: {
-                                        MaHocVien: true, TenHocVien: true, TenPhuHuynh: true,
-                                        Parent: { select: { Email: true, DienThoai: true } }
+                                        MaHocVien: true, TenHocVien: true,
+                                        Parent: { select: { Email: true, DienThoai: true, HoTen: true } }
                                     }
                                 }
                             }
@@ -256,7 +256,7 @@ export class SessionService {
 
         const studentMap = sessionDB.lophoc.ghidanh.map(x => ({
             MaHocVien: x.hocvien.MaHocVien, TenHocVien: x.hocvien.TenHocVien,
-            TenPhuHuynh: x.hocvien.TenPhuHuynh, DienThoai: x.hocvien.Parent.DienThoai
+            TenPhuHuynh: x.hocvien.Parent.HoTen, DienThoai: x.hocvien.Parent.DienThoai
         }))
 
         return {
@@ -285,7 +285,7 @@ export class SessionService {
     }
 
     // gửi yêu cầu mở khóa buổi học
-    async RequestUnlock(userId: number, sessionId:number, reason:string){
+    async RequestUnlock(userId: number, sessionId: number, reason: string) {
         return await this.resultService.RequestUnlock(userId, sessionId, reason)
     }
 

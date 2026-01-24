@@ -41,7 +41,6 @@ export type HocVienMinAggregateOutputType = {
   MaHocVien: string | null
   UserID: number | null
   TenHocVien: string | null
-  TenPhuHuynh: string | null
   NgaySinh: Date | null
   DiaChi: string | null
   GhiChu: string | null
@@ -55,7 +54,6 @@ export type HocVienMaxAggregateOutputType = {
   MaHocVien: string | null
   UserID: number | null
   TenHocVien: string | null
-  TenPhuHuynh: string | null
   NgaySinh: Date | null
   DiaChi: string | null
   GhiChu: string | null
@@ -69,7 +67,6 @@ export type HocVienCountAggregateOutputType = {
   MaHocVien: number
   UserID: number
   TenHocVien: number
-  TenPhuHuynh: number
   NgaySinh: number
   DiaChi: number
   GhiChu: number
@@ -95,7 +92,6 @@ export type HocVienMinAggregateInputType = {
   MaHocVien?: true
   UserID?: true
   TenHocVien?: true
-  TenPhuHuynh?: true
   NgaySinh?: true
   DiaChi?: true
   GhiChu?: true
@@ -109,7 +105,6 @@ export type HocVienMaxAggregateInputType = {
   MaHocVien?: true
   UserID?: true
   TenHocVien?: true
-  TenPhuHuynh?: true
   NgaySinh?: true
   DiaChi?: true
   GhiChu?: true
@@ -123,7 +118,6 @@ export type HocVienCountAggregateInputType = {
   MaHocVien?: true
   UserID?: true
   TenHocVien?: true
-  TenPhuHuynh?: true
   NgaySinh?: true
   DiaChi?: true
   GhiChu?: true
@@ -224,7 +218,6 @@ export type HocVienGroupByOutputType = {
   MaHocVien: string
   UserID: number
   TenHocVien: string
-  TenPhuHuynh: string
   NgaySinh: Date
   DiaChi: string | null
   GhiChu: string | null
@@ -261,7 +254,6 @@ export type HocVienWhereInput = {
   MaHocVien?: Prisma.StringFilter<"HocVien"> | string
   UserID?: Prisma.IntFilter<"HocVien"> | number
   TenHocVien?: Prisma.StringFilter<"HocVien"> | string
-  TenPhuHuynh?: Prisma.StringFilter<"HocVien"> | string
   NgaySinh?: Prisma.DateTimeFilter<"HocVien"> | Date | string
   DiaChi?: Prisma.StringNullableFilter<"HocVien"> | string | null
   GhiChu?: Prisma.StringNullableFilter<"HocVien"> | string | null
@@ -277,7 +269,6 @@ export type HocVienOrderByWithRelationInput = {
   MaHocVien?: Prisma.SortOrder
   UserID?: Prisma.SortOrder
   TenHocVien?: Prisma.SortOrder
-  TenPhuHuynh?: Prisma.SortOrder
   NgaySinh?: Prisma.SortOrder
   DiaChi?: Prisma.SortOrderInput | Prisma.SortOrder
   GhiChu?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -296,7 +287,6 @@ export type HocVienWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.HocVienWhereInput | Prisma.HocVienWhereInput[]
   UserID?: Prisma.IntFilter<"HocVien"> | number
   TenHocVien?: Prisma.StringFilter<"HocVien"> | string
-  TenPhuHuynh?: Prisma.StringFilter<"HocVien"> | string
   NgaySinh?: Prisma.DateTimeFilter<"HocVien"> | Date | string
   DiaChi?: Prisma.StringNullableFilter<"HocVien"> | string | null
   GhiChu?: Prisma.StringNullableFilter<"HocVien"> | string | null
@@ -312,7 +302,6 @@ export type HocVienOrderByWithAggregationInput = {
   MaHocVien?: Prisma.SortOrder
   UserID?: Prisma.SortOrder
   TenHocVien?: Prisma.SortOrder
-  TenPhuHuynh?: Prisma.SortOrder
   NgaySinh?: Prisma.SortOrder
   DiaChi?: Prisma.SortOrderInput | Prisma.SortOrder
   GhiChu?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -334,7 +323,6 @@ export type HocVienScalarWhereWithAggregatesInput = {
   MaHocVien?: Prisma.StringWithAggregatesFilter<"HocVien"> | string
   UserID?: Prisma.IntWithAggregatesFilter<"HocVien"> | number
   TenHocVien?: Prisma.StringWithAggregatesFilter<"HocVien"> | string
-  TenPhuHuynh?: Prisma.StringWithAggregatesFilter<"HocVien"> | string
   NgaySinh?: Prisma.DateTimeWithAggregatesFilter<"HocVien"> | Date | string
   DiaChi?: Prisma.StringNullableWithAggregatesFilter<"HocVien"> | string | null
   GhiChu?: Prisma.StringNullableWithAggregatesFilter<"HocVien"> | string | null
@@ -346,7 +334,6 @@ export type HocVienScalarWhereWithAggregatesInput = {
 export type HocVienCreateInput = {
   MaHocVien: string
   TenHocVien: string
-  TenPhuHuynh: string
   NgaySinh: Date | string
   DiaChi?: string | null
   GhiChu?: string | null
@@ -362,7 +349,6 @@ export type HocVienUncheckedCreateInput = {
   MaHocVien: string
   UserID: number
   TenHocVien: string
-  TenPhuHuynh: string
   NgaySinh: Date | string
   DiaChi?: string | null
   GhiChu?: string | null
@@ -375,7 +361,6 @@ export type HocVienUncheckedCreateInput = {
 export type HocVienUpdateInput = {
   MaHocVien?: Prisma.StringFieldUpdateOperationsInput | string
   TenHocVien?: Prisma.StringFieldUpdateOperationsInput | string
-  TenPhuHuynh?: Prisma.StringFieldUpdateOperationsInput | string
   NgaySinh?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   DiaChi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -391,7 +376,6 @@ export type HocVienUncheckedUpdateInput = {
   MaHocVien?: Prisma.StringFieldUpdateOperationsInput | string
   UserID?: Prisma.IntFieldUpdateOperationsInput | number
   TenHocVien?: Prisma.StringFieldUpdateOperationsInput | string
-  TenPhuHuynh?: Prisma.StringFieldUpdateOperationsInput | string
   NgaySinh?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   DiaChi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -406,7 +390,6 @@ export type HocVienCreateManyInput = {
   MaHocVien: string
   UserID: number
   TenHocVien: string
-  TenPhuHuynh: string
   NgaySinh: Date | string
   DiaChi?: string | null
   GhiChu?: string | null
@@ -418,7 +401,6 @@ export type HocVienCreateManyInput = {
 export type HocVienUpdateManyMutationInput = {
   MaHocVien?: Prisma.StringFieldUpdateOperationsInput | string
   TenHocVien?: Prisma.StringFieldUpdateOperationsInput | string
-  TenPhuHuynh?: Prisma.StringFieldUpdateOperationsInput | string
   NgaySinh?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   DiaChi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -432,7 +414,6 @@ export type HocVienUncheckedUpdateManyInput = {
   MaHocVien?: Prisma.StringFieldUpdateOperationsInput | string
   UserID?: Prisma.IntFieldUpdateOperationsInput | number
   TenHocVien?: Prisma.StringFieldUpdateOperationsInput | string
-  TenPhuHuynh?: Prisma.StringFieldUpdateOperationsInput | string
   NgaySinh?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   DiaChi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -456,7 +437,6 @@ export type HocVienCountOrderByAggregateInput = {
   MaHocVien?: Prisma.SortOrder
   UserID?: Prisma.SortOrder
   TenHocVien?: Prisma.SortOrder
-  TenPhuHuynh?: Prisma.SortOrder
   NgaySinh?: Prisma.SortOrder
   DiaChi?: Prisma.SortOrder
   GhiChu?: Prisma.SortOrder
@@ -475,7 +455,6 @@ export type HocVienMaxOrderByAggregateInput = {
   MaHocVien?: Prisma.SortOrder
   UserID?: Prisma.SortOrder
   TenHocVien?: Prisma.SortOrder
-  TenPhuHuynh?: Prisma.SortOrder
   NgaySinh?: Prisma.SortOrder
   DiaChi?: Prisma.SortOrder
   GhiChu?: Prisma.SortOrder
@@ -489,7 +468,6 @@ export type HocVienMinOrderByAggregateInput = {
   MaHocVien?: Prisma.SortOrder
   UserID?: Prisma.SortOrder
   TenHocVien?: Prisma.SortOrder
-  TenPhuHuynh?: Prisma.SortOrder
   NgaySinh?: Prisma.SortOrder
   DiaChi?: Prisma.SortOrder
   GhiChu?: Prisma.SortOrder
@@ -571,7 +549,6 @@ export type HocVienUpdateOneRequiredWithoutGhidanhNestedInput = {
 export type HocVienCreateWithoutParentInput = {
   MaHocVien: string
   TenHocVien: string
-  TenPhuHuynh: string
   NgaySinh: Date | string
   DiaChi?: string | null
   GhiChu?: string | null
@@ -585,7 +562,6 @@ export type HocVienUncheckedCreateWithoutParentInput = {
   ID?: number
   MaHocVien: string
   TenHocVien: string
-  TenPhuHuynh: string
   NgaySinh: Date | string
   DiaChi?: string | null
   GhiChu?: string | null
@@ -629,7 +605,6 @@ export type HocVienScalarWhereInput = {
   MaHocVien?: Prisma.StringFilter<"HocVien"> | string
   UserID?: Prisma.IntFilter<"HocVien"> | number
   TenHocVien?: Prisma.StringFilter<"HocVien"> | string
-  TenPhuHuynh?: Prisma.StringFilter<"HocVien"> | string
   NgaySinh?: Prisma.DateTimeFilter<"HocVien"> | Date | string
   DiaChi?: Prisma.StringNullableFilter<"HocVien"> | string | null
   GhiChu?: Prisma.StringNullableFilter<"HocVien"> | string | null
@@ -641,7 +616,6 @@ export type HocVienScalarWhereInput = {
 export type HocVienCreateWithoutGhidanhInput = {
   MaHocVien: string
   TenHocVien: string
-  TenPhuHuynh: string
   NgaySinh: Date | string
   DiaChi?: string | null
   GhiChu?: string | null
@@ -656,7 +630,6 @@ export type HocVienUncheckedCreateWithoutGhidanhInput = {
   MaHocVien: string
   UserID: number
   TenHocVien: string
-  TenPhuHuynh: string
   NgaySinh: Date | string
   DiaChi?: string | null
   GhiChu?: string | null
@@ -684,7 +657,6 @@ export type HocVienUpdateToOneWithWhereWithoutGhidanhInput = {
 export type HocVienUpdateWithoutGhidanhInput = {
   MaHocVien?: Prisma.StringFieldUpdateOperationsInput | string
   TenHocVien?: Prisma.StringFieldUpdateOperationsInput | string
-  TenPhuHuynh?: Prisma.StringFieldUpdateOperationsInput | string
   NgaySinh?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   DiaChi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -699,7 +671,6 @@ export type HocVienUncheckedUpdateWithoutGhidanhInput = {
   MaHocVien?: Prisma.StringFieldUpdateOperationsInput | string
   UserID?: Prisma.IntFieldUpdateOperationsInput | number
   TenHocVien?: Prisma.StringFieldUpdateOperationsInput | string
-  TenPhuHuynh?: Prisma.StringFieldUpdateOperationsInput | string
   NgaySinh?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   DiaChi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -712,7 +683,6 @@ export type HocVienCreateManyParentInput = {
   ID?: number
   MaHocVien: string
   TenHocVien: string
-  TenPhuHuynh: string
   NgaySinh: Date | string
   DiaChi?: string | null
   GhiChu?: string | null
@@ -724,7 +694,6 @@ export type HocVienCreateManyParentInput = {
 export type HocVienUpdateWithoutParentInput = {
   MaHocVien?: Prisma.StringFieldUpdateOperationsInput | string
   TenHocVien?: Prisma.StringFieldUpdateOperationsInput | string
-  TenPhuHuynh?: Prisma.StringFieldUpdateOperationsInput | string
   NgaySinh?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   DiaChi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -738,7 +707,6 @@ export type HocVienUncheckedUpdateWithoutParentInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
   MaHocVien?: Prisma.StringFieldUpdateOperationsInput | string
   TenHocVien?: Prisma.StringFieldUpdateOperationsInput | string
-  TenPhuHuynh?: Prisma.StringFieldUpdateOperationsInput | string
   NgaySinh?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   DiaChi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -752,7 +720,6 @@ export type HocVienUncheckedUpdateManyWithoutParentInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
   MaHocVien?: Prisma.StringFieldUpdateOperationsInput | string
   TenHocVien?: Prisma.StringFieldUpdateOperationsInput | string
-  TenPhuHuynh?: Prisma.StringFieldUpdateOperationsInput | string
   NgaySinh?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   DiaChi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -797,7 +764,6 @@ export type HocVienSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   MaHocVien?: boolean
   UserID?: boolean
   TenHocVien?: boolean
-  TenPhuHuynh?: boolean
   NgaySinh?: boolean
   DiaChi?: boolean
   GhiChu?: boolean
@@ -814,7 +780,6 @@ export type HocVienSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   MaHocVien?: boolean
   UserID?: boolean
   TenHocVien?: boolean
-  TenPhuHuynh?: boolean
   NgaySinh?: boolean
   DiaChi?: boolean
   GhiChu?: boolean
@@ -829,7 +794,6 @@ export type HocVienSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   MaHocVien?: boolean
   UserID?: boolean
   TenHocVien?: boolean
-  TenPhuHuynh?: boolean
   NgaySinh?: boolean
   DiaChi?: boolean
   GhiChu?: boolean
@@ -844,7 +808,6 @@ export type HocVienSelectScalar = {
   MaHocVien?: boolean
   UserID?: boolean
   TenHocVien?: boolean
-  TenPhuHuynh?: boolean
   NgaySinh?: boolean
   DiaChi?: boolean
   GhiChu?: boolean
@@ -853,7 +816,7 @@ export type HocVienSelectScalar = {
   UpdatedAt?: boolean
 }
 
-export type HocVienOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"ID" | "MaHocVien" | "UserID" | "TenHocVien" | "TenPhuHuynh" | "NgaySinh" | "DiaChi" | "GhiChu" | "TrangThai" | "CreatedAt" | "UpdatedAt", ExtArgs["result"]["hocVien"]>
+export type HocVienOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"ID" | "MaHocVien" | "UserID" | "TenHocVien" | "NgaySinh" | "DiaChi" | "GhiChu" | "TrangThai" | "CreatedAt" | "UpdatedAt", ExtArgs["result"]["hocVien"]>
 export type HocVienInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   Parent?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   Ghidanh?: boolean | Prisma.HocVien$GhidanhArgs<ExtArgs>
@@ -877,7 +840,6 @@ export type $HocVienPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     MaHocVien: string
     UserID: number
     TenHocVien: string
-    TenPhuHuynh: string
     NgaySinh: Date
     DiaChi: string | null
     GhiChu: string | null
@@ -1313,7 +1275,6 @@ export interface HocVienFieldRefs {
   readonly MaHocVien: Prisma.FieldRef<"HocVien", 'String'>
   readonly UserID: Prisma.FieldRef<"HocVien", 'Int'>
   readonly TenHocVien: Prisma.FieldRef<"HocVien", 'String'>
-  readonly TenPhuHuynh: Prisma.FieldRef<"HocVien", 'String'>
   readonly NgaySinh: Prisma.FieldRef<"HocVien", 'DateTime'>
   readonly DiaChi: Prisma.FieldRef<"HocVien", 'String'>
   readonly GhiChu: Prisma.FieldRef<"HocVien", 'String'>

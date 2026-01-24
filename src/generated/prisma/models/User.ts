@@ -38,6 +38,7 @@ export type UserSumAggregateOutputType = {
 
 export type UserMinAggregateOutputType = {
   ID: number | null
+  HoTen: string | null
   Email: string | null
   DienThoai: string | null
   MatKhauHash: string | null
@@ -50,6 +51,7 @@ export type UserMinAggregateOutputType = {
 
 export type UserMaxAggregateOutputType = {
   ID: number | null
+  HoTen: string | null
   Email: string | null
   DienThoai: string | null
   MatKhauHash: string | null
@@ -62,6 +64,7 @@ export type UserMaxAggregateOutputType = {
 
 export type UserCountAggregateOutputType = {
   ID: number
+  HoTen: number
   Email: number
   DienThoai: number
   MatKhauHash: number
@@ -86,6 +89,7 @@ export type UserSumAggregateInputType = {
 
 export type UserMinAggregateInputType = {
   ID?: true
+  HoTen?: true
   Email?: true
   DienThoai?: true
   MatKhauHash?: true
@@ -98,6 +102,7 @@ export type UserMinAggregateInputType = {
 
 export type UserMaxAggregateInputType = {
   ID?: true
+  HoTen?: true
   Email?: true
   DienThoai?: true
   MatKhauHash?: true
@@ -110,6 +115,7 @@ export type UserMaxAggregateInputType = {
 
 export type UserCountAggregateInputType = {
   ID?: true
+  HoTen?: true
   Email?: true
   DienThoai?: true
   MatKhauHash?: true
@@ -209,6 +215,7 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 
 export type UserGroupByOutputType = {
   ID: number
+  HoTen: string | null
   Email: string
   DienThoai: string
   MatKhauHash: string
@@ -244,6 +251,7 @@ export type UserWhereInput = {
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   ID?: Prisma.IntFilter<"User"> | number
+  HoTen?: Prisma.StringNullableFilter<"User"> | string | null
   Email?: Prisma.StringFilter<"User"> | string
   DienThoai?: Prisma.StringFilter<"User"> | string
   MatKhauHash?: Prisma.StringFilter<"User"> | string
@@ -261,6 +269,7 @@ export type UserWhereInput = {
 
 export type UserOrderByWithRelationInput = {
   ID?: Prisma.SortOrder
+  HoTen?: Prisma.SortOrderInput | Prisma.SortOrder
   Email?: Prisma.SortOrder
   DienThoai?: Prisma.SortOrder
   MatKhauHash?: Prisma.SortOrder
@@ -283,6 +292,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
+  HoTen?: Prisma.StringNullableFilter<"User"> | string | null
   MatKhauHash?: Prisma.StringFilter<"User"> | string
   PhaiDoiMK?: Prisma.BoolFilter<"User"> | boolean
   VaiTro?: Prisma.EnumVaitroFilter<"User"> | $Enums.Vaitro
@@ -298,6 +308,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
 
 export type UserOrderByWithAggregationInput = {
   ID?: Prisma.SortOrder
+  HoTen?: Prisma.SortOrderInput | Prisma.SortOrder
   Email?: Prisma.SortOrder
   DienThoai?: Prisma.SortOrder
   MatKhauHash?: Prisma.SortOrder
@@ -318,6 +329,7 @@ export type UserScalarWhereWithAggregatesInput = {
   OR?: Prisma.UserScalarWhereWithAggregatesInput[]
   NOT?: Prisma.UserScalarWhereWithAggregatesInput | Prisma.UserScalarWhereWithAggregatesInput[]
   ID?: Prisma.IntWithAggregatesFilter<"User"> | number
+  HoTen?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   Email?: Prisma.StringWithAggregatesFilter<"User"> | string
   DienThoai?: Prisma.StringWithAggregatesFilter<"User"> | string
   MatKhauHash?: Prisma.StringWithAggregatesFilter<"User"> | string
@@ -329,6 +341,7 @@ export type UserScalarWhereWithAggregatesInput = {
 }
 
 export type UserCreateInput = {
+  HoTen?: string | null
   Email: string
   DienThoai: string
   MatKhauHash: string
@@ -346,6 +359,7 @@ export type UserCreateInput = {
 
 export type UserUncheckedCreateInput = {
   ID?: number
+  HoTen?: string | null
   Email: string
   DienThoai: string
   MatKhauHash: string
@@ -362,6 +376,7 @@ export type UserUncheckedCreateInput = {
 }
 
 export type UserUpdateInput = {
+  HoTen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   Email?: Prisma.StringFieldUpdateOperationsInput | string
   DienThoai?: Prisma.StringFieldUpdateOperationsInput | string
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -379,6 +394,7 @@ export type UserUpdateInput = {
 
 export type UserUncheckedUpdateInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
+  HoTen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   Email?: Prisma.StringFieldUpdateOperationsInput | string
   DienThoai?: Prisma.StringFieldUpdateOperationsInput | string
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -396,6 +412,7 @@ export type UserUncheckedUpdateInput = {
 
 export type UserCreateManyInput = {
   ID?: number
+  HoTen?: string | null
   Email: string
   DienThoai: string
   MatKhauHash: string
@@ -407,6 +424,7 @@ export type UserCreateManyInput = {
 }
 
 export type UserUpdateManyMutationInput = {
+  HoTen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   Email?: Prisma.StringFieldUpdateOperationsInput | string
   DienThoai?: Prisma.StringFieldUpdateOperationsInput | string
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -419,6 +437,7 @@ export type UserUpdateManyMutationInput = {
 
 export type UserUncheckedUpdateManyInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
+  HoTen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   Email?: Prisma.StringFieldUpdateOperationsInput | string
   DienThoai?: Prisma.StringFieldUpdateOperationsInput | string
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -431,6 +450,7 @@ export type UserUncheckedUpdateManyInput = {
 
 export type UserCountOrderByAggregateInput = {
   ID?: Prisma.SortOrder
+  HoTen?: Prisma.SortOrder
   Email?: Prisma.SortOrder
   DienThoai?: Prisma.SortOrder
   MatKhauHash?: Prisma.SortOrder
@@ -448,6 +468,7 @@ export type UserAvgOrderByAggregateInput = {
 
 export type UserMaxOrderByAggregateInput = {
   ID?: Prisma.SortOrder
+  HoTen?: Prisma.SortOrder
   Email?: Prisma.SortOrder
   DienThoai?: Prisma.SortOrder
   MatKhauHash?: Prisma.SortOrder
@@ -460,6 +481,7 @@ export type UserMaxOrderByAggregateInput = {
 
 export type UserMinOrderByAggregateInput = {
   ID?: Prisma.SortOrder
+  HoTen?: Prisma.SortOrder
   Email?: Prisma.SortOrder
   DienThoai?: Prisma.SortOrder
   MatKhauHash?: Prisma.SortOrder
@@ -478,6 +500,10 @@ export type UserSumOrderByAggregateInput = {
 export type UserScalarRelationFilter = {
   is?: Prisma.UserWhereInput
   isNot?: Prisma.UserWhereInput
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
 }
 
 export type StringFieldUpdateOperationsInput = {
@@ -575,6 +601,7 @@ export type UserUpdateOneRequiredWithoutPhieuChiNestedInput = {
 }
 
 export type UserCreateWithoutGiaoVienInput = {
+  HoTen?: string | null
   Email: string
   DienThoai: string
   MatKhauHash: string
@@ -591,6 +618,7 @@ export type UserCreateWithoutGiaoVienInput = {
 
 export type UserUncheckedCreateWithoutGiaoVienInput = {
   ID?: number
+  HoTen?: string | null
   Email: string
   DienThoai: string
   MatKhauHash: string
@@ -622,6 +650,7 @@ export type UserUpdateToOneWithWhereWithoutGiaoVienInput = {
 }
 
 export type UserUpdateWithoutGiaoVienInput = {
+  HoTen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   Email?: Prisma.StringFieldUpdateOperationsInput | string
   DienThoai?: Prisma.StringFieldUpdateOperationsInput | string
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -638,6 +667,7 @@ export type UserUpdateWithoutGiaoVienInput = {
 
 export type UserUncheckedUpdateWithoutGiaoVienInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
+  HoTen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   Email?: Prisma.StringFieldUpdateOperationsInput | string
   DienThoai?: Prisma.StringFieldUpdateOperationsInput | string
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -653,6 +683,7 @@ export type UserUncheckedUpdateWithoutGiaoVienInput = {
 }
 
 export type UserCreateWithoutHocVienInput = {
+  HoTen?: string | null
   Email: string
   DienThoai: string
   MatKhauHash: string
@@ -669,6 +700,7 @@ export type UserCreateWithoutHocVienInput = {
 
 export type UserUncheckedCreateWithoutHocVienInput = {
   ID?: number
+  HoTen?: string | null
   Email: string
   DienThoai: string
   MatKhauHash: string
@@ -700,6 +732,7 @@ export type UserUpdateToOneWithWhereWithoutHocVienInput = {
 }
 
 export type UserUpdateWithoutHocVienInput = {
+  HoTen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   Email?: Prisma.StringFieldUpdateOperationsInput | string
   DienThoai?: Prisma.StringFieldUpdateOperationsInput | string
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -716,6 +749,7 @@ export type UserUpdateWithoutHocVienInput = {
 
 export type UserUncheckedUpdateWithoutHocVienInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
+  HoTen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   Email?: Prisma.StringFieldUpdateOperationsInput | string
   DienThoai?: Prisma.StringFieldUpdateOperationsInput | string
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -731,6 +765,7 @@ export type UserUncheckedUpdateWithoutHocVienInput = {
 }
 
 export type UserCreateWithoutPhieuThuInput = {
+  HoTen?: string | null
   Email: string
   DienThoai: string
   MatKhauHash: string
@@ -747,6 +782,7 @@ export type UserCreateWithoutPhieuThuInput = {
 
 export type UserUncheckedCreateWithoutPhieuThuInput = {
   ID?: number
+  HoTen?: string | null
   Email: string
   DienThoai: string
   MatKhauHash: string
@@ -778,6 +814,7 @@ export type UserUpdateToOneWithWhereWithoutPhieuThuInput = {
 }
 
 export type UserUpdateWithoutPhieuThuInput = {
+  HoTen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   Email?: Prisma.StringFieldUpdateOperationsInput | string
   DienThoai?: Prisma.StringFieldUpdateOperationsInput | string
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -794,6 +831,7 @@ export type UserUpdateWithoutPhieuThuInput = {
 
 export type UserUncheckedUpdateWithoutPhieuThuInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
+  HoTen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   Email?: Prisma.StringFieldUpdateOperationsInput | string
   DienThoai?: Prisma.StringFieldUpdateOperationsInput | string
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -809,6 +847,7 @@ export type UserUncheckedUpdateWithoutPhieuThuInput = {
 }
 
 export type UserCreateWithoutThongBaoInput = {
+  HoTen?: string | null
   Email: string
   DienThoai: string
   MatKhauHash: string
@@ -825,6 +864,7 @@ export type UserCreateWithoutThongBaoInput = {
 
 export type UserUncheckedCreateWithoutThongBaoInput = {
   ID?: number
+  HoTen?: string | null
   Email: string
   DienThoai: string
   MatKhauHash: string
@@ -856,6 +896,7 @@ export type UserUpdateToOneWithWhereWithoutThongBaoInput = {
 }
 
 export type UserUpdateWithoutThongBaoInput = {
+  HoTen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   Email?: Prisma.StringFieldUpdateOperationsInput | string
   DienThoai?: Prisma.StringFieldUpdateOperationsInput | string
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -872,6 +913,7 @@ export type UserUpdateWithoutThongBaoInput = {
 
 export type UserUncheckedUpdateWithoutThongBaoInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
+  HoTen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   Email?: Prisma.StringFieldUpdateOperationsInput | string
   DienThoai?: Prisma.StringFieldUpdateOperationsInput | string
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -887,6 +929,7 @@ export type UserUncheckedUpdateWithoutThongBaoInput = {
 }
 
 export type UserCreateWithoutPhieuChiInput = {
+  HoTen?: string | null
   Email: string
   DienThoai: string
   MatKhauHash: string
@@ -903,6 +946,7 @@ export type UserCreateWithoutPhieuChiInput = {
 
 export type UserUncheckedCreateWithoutPhieuChiInput = {
   ID?: number
+  HoTen?: string | null
   Email: string
   DienThoai: string
   MatKhauHash: string
@@ -934,6 +978,7 @@ export type UserUpdateToOneWithWhereWithoutPhieuChiInput = {
 }
 
 export type UserUpdateWithoutPhieuChiInput = {
+  HoTen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   Email?: Prisma.StringFieldUpdateOperationsInput | string
   DienThoai?: Prisma.StringFieldUpdateOperationsInput | string
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -950,6 +995,7 @@ export type UserUpdateWithoutPhieuChiInput = {
 
 export type UserUncheckedUpdateWithoutPhieuChiInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
+  HoTen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   Email?: Prisma.StringFieldUpdateOperationsInput | string
   DienThoai?: Prisma.StringFieldUpdateOperationsInput | string
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1024,6 +1070,7 @@ export type UserCountOutputTypeCountPhieuChiArgs<ExtArgs extends runtime.Types.E
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   ID?: boolean
+  HoTen?: boolean
   Email?: boolean
   DienThoai?: boolean
   MatKhauHash?: boolean
@@ -1042,6 +1089,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
 
 export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   ID?: boolean
+  HoTen?: boolean
   Email?: boolean
   DienThoai?: boolean
   MatKhauHash?: boolean
@@ -1054,6 +1102,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   ID?: boolean
+  HoTen?: boolean
   Email?: boolean
   DienThoai?: boolean
   MatKhauHash?: boolean
@@ -1066,6 +1115,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
 
 export type UserSelectScalar = {
   ID?: boolean
+  HoTen?: boolean
   Email?: boolean
   DienThoai?: boolean
   MatKhauHash?: boolean
@@ -1076,7 +1126,7 @@ export type UserSelectScalar = {
   UpdatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"ID" | "Email" | "DienThoai" | "MatKhauHash" | "PhaiDoiMK" | "VaiTro" | "ToKenVerSion" | "CreatedAt" | "UpdatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"ID" | "HoTen" | "Email" | "DienThoai" | "MatKhauHash" | "PhaiDoiMK" | "VaiTro" | "ToKenVerSion" | "CreatedAt" | "UpdatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   GiaoVien?: boolean | Prisma.User$GiaoVienArgs<ExtArgs>
   HocVien?: boolean | Prisma.User$HocVienArgs<ExtArgs>
@@ -1099,6 +1149,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     ID: number
+    HoTen: string | null
     Email: string
     DienThoai: string
     MatKhauHash: string
@@ -1536,6 +1587,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
  */
 export interface UserFieldRefs {
   readonly ID: Prisma.FieldRef<"User", 'Int'>
+  readonly HoTen: Prisma.FieldRef<"User", 'String'>
   readonly Email: Prisma.FieldRef<"User", 'String'>
   readonly DienThoai: Prisma.FieldRef<"User", 'String'>
   readonly MatKhauHash: Prisma.FieldRef<"User", 'String'>

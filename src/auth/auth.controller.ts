@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ChangePasswordDTO, LoginDTO, RegisterDTO } from './auth.dto';
+import { LoginDTO, RegisterDTO } from './auth.dto';
 import { JwtAuthGuard } from './guard/jwt-auth.guard';
 import { Request } from 'express';
 
@@ -22,14 +22,6 @@ export class AuthController {
     @Post("login")
     async Login(@Body() loginDTO: LoginDTO) {
         return await this.authService.Login(loginDTO);
-    }
-
-    // đổi mật khẩu
-    @UseGuards(JwtAuthGuard)
-    @Patch("password")
-    async ChangePassWord(@Req() req: RequestWithUser, @Body() changePW: ChangePasswordDTO) {
-        return await this.authService.ChangePassword(
-            Number(req.user.userId), changePW.oldPassword, changePW.newPassword)
     }
 
     // đăng xuất

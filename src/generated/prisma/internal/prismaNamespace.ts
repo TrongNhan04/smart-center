@@ -1419,6 +1419,7 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const UserScalarFieldEnum = {
   ID: 'ID',
+  HoTen: 'HoTen',
   Email: 'Email',
   DienThoai: 'DienThoai',
   MatKhauHash: 'MatKhauHash',
@@ -1436,7 +1437,6 @@ export const GiaoVienScalarFieldEnum = {
   ID: 'ID',
   MaGiaoVien: 'MaGiaoVien',
   UserID: 'UserID',
-  HoTen: 'HoTen',
   ChuyenMon: 'ChuyenMon',
   GhiChu: 'GhiChu',
   TrangThai: 'TrangThai',
@@ -1452,7 +1452,6 @@ export const HocVienScalarFieldEnum = {
   MaHocVien: 'MaHocVien',
   UserID: 'UserID',
   TenHocVien: 'TenHocVien',
-  TenPhuHuynh: 'TenPhuHuynh',
   NgaySinh: 'NgaySinh',
   DiaChi: 'DiaChi',
   GhiChu: 'GhiChu',

@@ -12,14 +12,14 @@ import { EnrollModule } from './modules/enroll/enroll.module';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
-
+import { AppParentModule } from './modules/app-parent/app-parent.module';
 
 @Module({
   imports: [// thiếu NotifyModule
-    AuthModule, UserModule, PrismaModule, 
-    TeacherModule, ConfigModule.forRoot({isGlobal:true}),
-    CourseModule, ClassModule, SessionModule, StudentModule,
-    EnrollModule, InvoiceModule, PaymentModule, DashboardModule
+    AuthModule, UserModule, PrismaModule, TeacherModule, 
+    ConfigModule.forRoot({isGlobal:true}), CourseModule, 
+    ClassModule, SessionModule, StudentModule, EnrollModule, 
+    InvoiceModule, PaymentModule, DashboardModule, AppParentModule
   ]
 })
 export class AppModule {}

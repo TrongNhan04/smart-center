@@ -18,9 +18,6 @@ export class StudentService {
 
     // thêm học viên + ghi danh + hóa đơn 
     async AddRecord_3Table(userId: number, body: CreateStudentDTO, tx?: Prisma.TransactionClient) {
-        const student = body.student.trim()
-        const parent = body.parent.trim()
-        const code = body.code.trim()
         const classDB = await this.prismaService.lopHoc.findUnique({
             where: { ID: body.classId },
             select: {
@@ -34,9 +31,8 @@ export class StudentService {
         const runLogic = async (client: Prisma.TransactionClient) => {
             const newStudent = await client.hocVien.create({
                 data: {
-                    MaHocVien: code,
-                    TenHocVien: student,
-                    TenPhuHuynh: parent,
+                    MaHocVien: body.code.trim(),
+                    TenHocVien: body.student.trim(),
                     NgaySinh: body.dob,
                     UserID: userId
                 },
@@ -78,6 +74,7 @@ export class StudentService {
                 // thêm user
                 const newUser = await tx.user.create({
                     data: {
+                        HoTen: body.parent.trim(),
                         Email: body.email,
                         DienThoai: body.phone,
                         MatKhauHash: hashPW,
@@ -106,7 +103,7 @@ export class StudentService {
             where.OR = [
                 { TenHocVien: { contains: q, mode: 'insensitive' } },
                 { MaHocVien: { contains: q, mode: 'insensitive' } },
-                { TenPhuHuynh: { contains: q, mode: 'insensitive' } }
+                { Parent: { HoTen: { contains: q, mode: 'insensitive' } } }
             ]
         }
         return await this.prismaService.hocVien.findMany({
@@ -118,7 +115,9 @@ export class StudentService {
     // lấy chi tiết 1 học viên - phần trên
     async GetStudentByID(studentId: number) {
         const studentDB = await this.StudentIdValidator(studentId)
-        if (studentDB) return studentDB
+        if (!studentDB)
+            throw new NotFoundException('Student not found')
+        return studentDB
     }
 
     // sửa thông tin 1 học viên
@@ -129,7 +128,6 @@ export class StudentService {
             await this.DelateStudentByID(studentId)
 
         data.TenHocVien = body.student?.trim()
-        data.TenPhuHuynh = body.parent?.trim()
         data.GhiChu = body.note?.trim()
         return await this.prismaService.hocVien.update({
             where: { ID: studentId },
@@ -163,7 +161,7 @@ export class StudentService {
                     select: {
                         MaLopHoc: true,
                         TenLop: true,
-                        giaovien: { select: { HoTen: true } }
+                        giaovien: { select: { User: { select: { HoTen: true } } } }
                     }
                 },
             }
@@ -171,7 +169,7 @@ export class StudentService {
         return enrollDB.map(x => ({
             MaLopHoc: x.lophoc.MaLopHoc,
             TenLop: x.lophoc.TenLop,
-            GiaoVien: x.lophoc.giaovien.HoTen
+            GiaoVien: x.lophoc.giaovien.User.HoTen
         }))
     }
 

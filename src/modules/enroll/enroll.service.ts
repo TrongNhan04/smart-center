@@ -102,8 +102,8 @@ export class EnrollService {
                 hocvien: {
                     select:
                     {
-                        MaHocVien: true, TenHocVien: true, TenPhuHuynh: true,
-                        Parent: { select: { Email: true, DienThoai: true } }
+                        MaHocVien: true, TenHocVien: true,
+                        Parent: { select: { Email: true, DienThoai: true, HoTen: true } }
                     }
                 },
             }
@@ -111,7 +111,7 @@ export class EnrollService {
         return enrolls.map(x => ({
             MaHocVien: x.hocvien.MaHocVien,
             TenHocVien: x.hocvien.TenHocVien,
-            TenPhuHuynh: x.hocvien.TenPhuHuynh,
+            TenPhuHuynh: x.hocvien.Parent.HoTen,
             Email: x.hocvien.Parent.Email,
             DienThoai: x.hocvien.Parent.DienThoai
         }))

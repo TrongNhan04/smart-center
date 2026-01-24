@@ -78,7 +78,7 @@ export class ClassService {
                 OR: [
                     { MaLopHoc: { contains: q, mode: 'insensitive' } },
                     { TenLop: { contains: q, mode: 'insensitive' } },
-                    { giaovien: { HoTen: { contains: q, mode: 'insensitive' } } }
+                    { giaovien: { User: { HoTen: { contains: q, mode: 'insensitive' } } } }
                 ]
             })
         }
@@ -191,10 +191,11 @@ export class ClassService {
                 data: { TrangThai: 'INACTIVE' }
             })
             await tx.buoiHoc.updateMany({
-                where: { 
-                    LopHocID: classId, 
-                    TrangThai: 'SCHEDULED', 
-                    BatDauLuc: { gt: now } },
+                where: {
+                    LopHocID: classId,
+                    TrangThai: 'SCHEDULED',
+                    BatDauLuc: { gt: now }
+                },
                 data: { TrangThai: 'CANCELLED' }
             })
         })

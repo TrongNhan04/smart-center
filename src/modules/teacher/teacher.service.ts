@@ -21,7 +21,7 @@ export class TeacherService {
         const user = await this.prismaService.user.findUnique({
             where: { Email: email, DienThoai: phone }
         })
-        if(user){`${email} and ${phone} are used`}
+        if (user) { `${email} and ${phone} are used` }
         return user
     }
 
@@ -29,7 +29,7 @@ export class TeacherService {
     private async TeacherIdValidator(teacherId: number) {
         const teacherDB = await this.prismaService.giaoVien.findUnique({
             where: { ID: teacherId },
-            omit: { UpdatedAt: true, CreatedAt: true }
+            include: { User: true }
         })
         if (!teacherDB) throw new BadRequestException('Teacher is not existed')
         return teacherDB
@@ -39,15 +39,13 @@ export class TeacherService {
     async CreateTeacher(body: CreateTeacherDTO) {
         await this.TeacherCodeValidator(body.code)
         await this.UserValidator(body.email, body.phone)
-        const name = body.name.trim()
-        const major = body.major?.trim()
         const hashPW = await bcrypt.hash(body.phone, 10)
 
         return await this.prismaService.$transaction(async (tx) => {
             // thêm user
-
-            const newUser = tx.user.create({
+            const newUser = await tx.user.create({
                 data: {
+                    HoTen: body.name.trim(),
                     Email: body.email,
                     DienThoai: body.phone,
                     MatKhauHash: hashPW,
@@ -58,9 +56,8 @@ export class TeacherService {
             return await tx.giaoVien.create({
                 data: {
                     MaGiaoVien: body.code,
-                    HoTen: body.name,
                     ChuyenMon: body.major,
-                    UserID: (await newUser).ID
+                    UserID: newUser.ID
                 },
                 omit: {
                     CreatedAt: true,
@@ -78,7 +75,7 @@ export class TeacherService {
             where.TrangThai = query.status
         if (q) {
             where.OR = [
-                { HoTen: { contains: q, mode: 'insensitive' } },
+                { User: { HoTen: { contains: q, mode: 'insensitive' } } },
                 { MaGiaoVien: { contains: q, mode: 'insensitive' } },
                 { ChuyenMon: { contains: q, mode: 'insensitive' } }
             ]
@@ -98,18 +95,18 @@ export class TeacherService {
     // sửa thông tin 1 giáo viên
     async UpdateTeacherByID(teacherId: number, body: UpdateTeacherDTO) {
         await this.TeacherIdValidator(teacherId)
-
-        const data: Prisma.GiaoVienUpdateInput = {}
         if (body.status === 'INACTIVE') {
             await this.DelateTeacherByID(teacherId)
             // data.TrangThai = body.status
         }
-        data.HoTen = body.name
-        data.ChuyenMon = body.major
-        data.GhiChu = body.note
+
         return await this.prismaService.giaoVien.update({
             where: { ID: teacherId },
-            data, omit: { CreatedAt: true, UpdatedAt: true }
+            data: {
+                ChuyenMon: body.major,
+                GhiChu: body.note
+            },
+            omit: { CreatedAt: true, UpdatedAt: true }
         })
     }
 
@@ -124,7 +121,7 @@ export class TeacherService {
             select: { TenLop: true }
         })
         if (hasClass.length > 0)
-            throw new BadRequestException(`Teacher ${teacherDB.HoTen} is busy with another class. Please change the teacher.`)
+            throw new BadRequestException(`Teacher ${teacherDB.User.HoTen} is busy with another class. Please change the teacher.`)
         return await this.prismaService.giaoVien.update({
             where: { ID: teacherId }, data: { TrangThai: 'INACTIVE' },
             omit: { CreatedAt: true, UpdatedAt: true }
