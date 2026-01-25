@@ -2,7 +2,7 @@ import { ConflictException } from "@nestjs/common";
 import { addDays, addMonths, startOfDay, startOfMonth } from "date-fns";
 
 export class DateHelper {
-    // format giờ và phút
+    // format giờ và phút, input "HH:mm" -> h = "HH", m = "mm"
     static parseHHmm(time: string) {
         const [h, m] = time.split(':').map(Number);
         return { h, m };
@@ -51,15 +51,25 @@ export class DateHelper {
         return aStart <= bEnd && bStart <= aEnd
     }
 
-    static GetStartEndOfMonth(now: Date){
+    // lấy đầu tháng này đến đầu tháng kia
+    static GetStartEndOfMonth(now: Date) {
         const start = startOfMonth(now)// ngày đầu tháng
-        const end = startOfMonth(addMonths(now,1)) // ngày đầu tháng sau
-        return {start, end}
+        const end = startOfMonth(addMonths(now, 1)) // ngày đầu tháng sau
+        return { start, end }
     }
 
-    static GetStartEndOfDay(now: Date){
+    // lấy đầu ngày đến cuối ngày
+    static GetStartEndOfDay(now: Date) {
         const start = startOfDay(now)// ngày đầu tháng
-        const end = startOfDay(addDays(now,1)) // ngày đầu tháng sau
-        return {start, end}
+        const end = startOfDay(addDays(now, 1)) // ngày đầu tháng sau
+        return { start, end }
+    }
+
+    // format giờ ISO 2026-01-10T03:30:00.000Z về dạng "HH:mm"
+    static ISOToHHMM(start: Date, end: Date) {
+        return start.toLocaleTimeString('vi-VN',
+            { hour: '2-digit', minute: '2-digit' })
+            + '-' + end.toLocaleTimeString('vi-VN',
+                { hour: '2-digit', minute: '2-digit' })
     }
 }

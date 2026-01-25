@@ -53,4 +53,7 @@ export class UpdateSessionDTO{
     room?: string
 }
 
-// định nghĩa lớp con
+export class Pagination{
+    page:number
+    limit:number
+}

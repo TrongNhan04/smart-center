@@ -120,8 +120,7 @@ export class DashboardService {
             take: 10
         })
         return sessionDB.map(sm => ({
-            time: sm.BatDauLuc.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
-                + '-' + sm.KetThucLuc.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+            time: DateHelper.ISOToHHMM(sm.BatDauLuc, sm.KetThucLuc),
             class: sm.lophoc.TenLop,
             teacher: sm.lophoc.giaovien.User.HoTen,
             room: sm.PhongHoc,
