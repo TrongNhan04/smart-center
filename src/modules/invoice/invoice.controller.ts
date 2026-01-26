@@ -3,12 +3,8 @@ import { Roles } from "src/auth/decorators/roles.decorator";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guard/roles.guard";
 import { InvoiceService } from "./invoice.service";
-import { QueryInvoiceDTO } from "./invoice.dto";
-import { ReceiptService } from "../receipt/receipt.service";
-import { CreateReceiptDTO } from "../receipt/receipt.dto";
+import { CreatePaymentDTO, QueryInvoiceDTO } from "./invoice.dto";
 import { Request } from 'express';
-import { CreatePaymentDTO } from "../payment/payment.dto";
-import { PaymentService } from "../payment/payment.service";
 
 type RequestWithUser = Request & { user: { userId: number; role?: string } };
 
@@ -16,9 +12,7 @@ type RequestWithUser = Request & { user: { userId: number; role?: string } };
 @Controller('admin/invoices')
 export class InvoiceController {
     constructor(
-        private invoiceService: InvoiceService,
-        private receiptService: ReceiptService,
-        private paymentService: PaymentService
+        private invoiceService: InvoiceService
     ) { }
 
     //lấy danh sách hóa đơn + tìm kiếm mã hóa đơn, tên học viên
@@ -35,9 +29,9 @@ export class InvoiceController {
     @Post(':id/receipts')
     async CreateInvoices(
         @Param('id') invoiceId: number,
-        @Body() body: CreateReceiptDTO,
+        @Body('amount') amount: number,
         @Req() req: RequestWithUser) {
-        return await this.receiptService.CreateReceipt(+req.user.userId, +invoiceId, body.amount)
+        return await this.invoiceService.CreateReceipt(+req.user.userId, +invoiceId, amount)
     }
 
     //Lấy danh sách phiếu thu theo hóa đơn
@@ -45,7 +39,7 @@ export class InvoiceController {
     @Roles('ADMIN')
     @Get(':id/receipts')
     async GetReceipts(@Param('id') invoiceId: number,) {
-        return await this.receiptService.GetReceiptsByInvoiceID(+invoiceId)
+        return await this.invoiceService.GetReceiptsByInvoiceID(+invoiceId)
     }
 
     // thêm phiếu chi
@@ -57,6 +51,6 @@ export class InvoiceController {
         @Body() body: CreatePaymentDTO,
         @Req() req: RequestWithUser) {
         const userId = req.user.userId
-        return await this.paymentService.CreatePayment(+userId, +invoiceId, body)
+        return await this.invoiceService.CreatePayment(+userId, +invoiceId, body)
     }
 }

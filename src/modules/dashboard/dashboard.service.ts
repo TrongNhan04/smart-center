@@ -8,24 +8,38 @@ type MonthlyData = {
 }
 
 type OverdueInvoice = {
-    code: string,
-    student: string,
+    inv_id: number,
+    inv_code: string,
+    student_code: string,
+    student_name: string,
+    parent_phone: string,
     class: string,
     debt: number,
-    overdue: string
+    payment_term: string
+    overdue: number
+}
+
+type Notis = 'CREATE_MORE'|'ENDING_CLASS'
+
+export interface lophoc {
+    class_id: number, class_name: string,
+    type: Notis, mgs:string
 }
 
 @Injectable()
 export class DashboardService {
     constructor(private prisma: PrismaService) { }
 
-    // tổng học viên, lớp học, ghi danh mới, tổng thu - chi trong tháng
-    async GetSumary() {
-        const { start, end } = DateHelper.GetStartEndOfMonth(new Date())
-        const [activeStudents, activeClass, newEnrollments, totalDebt
-            , receiptThisMonth, paymentThisMonth] = await Promise.all([
+    // tổng học viên active, ghi danh mới, tổng thu và nợ xấu trong tháng
+    async GetSumary(month: number, year: number) {
+        const now = new Date()
+        const m = month ?? now.getMonth()
+        const y = year ?? now.getFullYear()
+        const { start, end } = DateHelper.GetStartEndOfMonth(new Date(y, m))
+
+        const [activeStudents, newEnrollments, invoiceOverdue
+            , receiptThisMonth] = await Promise.all([
                 this.prisma.hocVien.count({ where: { TrangThai: 'ACTIVE' } }),
-                this.prisma.lopHoc.count({ where: { TrangThai: { not: 'CLOSED' } } }),
                 this.prisma.ghiDanh.count({
                     where: {
                         NgayGhiDanh: {
@@ -34,39 +48,30 @@ export class DashboardService {
                         }
                     }
                 }),
-                this.prisma.hoaDon.aggregate({
-                    _sum: { TongTien: true, DaTra: true },
-                    where: { // hóa đơn quá hạn
-                        ThoiHan: { lt: new Date() },
-                        TrangThai: null
-                    }
+                this.prisma.hoaDon.findMany({
+                    where: { TrangThai: null, ThoiHan: { lt: now } }
                 }),
                 this.prisma.phieuThu.aggregate({
                     _sum: { SoTien: true },
                     where: {
                         NgayThu: { gte: start, lt: end }
                     }
-                }),
-                this.prisma.phieuChi.aggregate({
-                    _sum: { SoTien: true },
-                    where: {
-                        NgayChi: { gte: start, lt: end }
-                    }
                 })
             ])
-        const receipts = receiptThisMonth._sum.SoTien?.toNumber() ?? 0
-        const payments = paymentThisMonth._sum.SoTien?.toNumber() ?? 0
 
-        const total = totalDebt._sum.TongTien?.toNumber()
-        const paidAmont = totalDebt._sum.DaTra?.toNumber()
-        if (!total || !paidAmont)
-            throw new ConflictException('Invoice: total or paidmount is null')
+        let sum = 0
+        for (var inv of invoiceOverdue) {
+            const total = Number(inv.TongTien)
+            const paid = Number(inv.DaTra)
+            const debt = total - paid
+            if (debt > 0)
+                sum += debt
+        }
+
         return {
-            activeStudents, activeClass, newEnrollments
-            , receiptThisMonth: receipts,
-            paymentThisMonth: payments,
-            totalRevenue: receipts - payments,// doanh thu theo tháng
-            totalDebt: total - paidAmont // nợ của hóa đơn quá hạn 
+            activeStudents, newEnrollments,
+            receiptThisMonth: Number(receiptThisMonth._sum.SoTien), // tổng thu theo tháng
+            totalDebt: sum
         }
     }
 
@@ -130,33 +135,97 @@ export class DashboardService {
 
     // lấy danh sách hóa đơn quá hạn 
     async GetOverdueInvoices() {
-        return await this.prisma.$queryRaw<OverdueInvoice[]>`
-        select hd."MaHoaDon" as "code", hv."TenHocVien" as "student", 
-            lh."TenLop" as "class", hd."TongTien"-hd."DaTra" as "debt", 
-            to_char(NOW()-hd."ThoiHan", 'DD') as "overdue" 
-        from "HoaDon" as hd
-            left join "GhiDanh" gd
-            on hd."GhiDanhID" = gd."ID"
-            left join "HocVien" hv
-            on hv."ID" = gd."HocVienID"
-            left join "LopHoc" lh
-            on lh."ID" = gd."LopHocID"
-        where hd."ThoiHan" < NOW()
-            and hd."DaTra" < hd."TongTien"
-            and hd."TrangThai" is null`
+        const invoiceDB = await this.prisma.hoaDon.findMany({
+            where: {
+                TrangThai: null,
+                ThoiHan: { lt: new Date() }
+            },
+            select: {
+                ID: true, MaHoaDon: true, TongTien: true,
+                DaTra: true, ThoiHan: true,
+                ghidanh: {
+                    select: {
+                        hocvien: {
+                            select: {
+                                TenHocVien: true, MaHocVien: true,
+                                Parent: { select: { DienThoai: true } }
+                            }
+                        },
+                        lophoc: { select: { TenLop: true } }
+                    }
+                }
+            }, orderBy: { ThoiHan: 'asc' }
+        })
+
+        const debts: OverdueInvoice[] = []
+        for (var inv of invoiceDB) {
+            const total = Number(inv.TongTien)
+            const paid = Number(inv.DaTra)
+            if (paid < total) {
+                const debt = total - paid
+
+                const overTime = Math.abs(new Date().getTime() - inv.ThoiHan.getTime())
+                const overDay = Math.floor(overTime / (24 * 60 * 60 * 1000))
+
+                debts.push({
+                    inv_id: inv.ID,
+                    inv_code: inv.MaHoaDon,
+                    student_code: inv.ghidanh.hocvien.MaHocVien,
+                    student_name: inv.ghidanh.hocvien.TenHocVien,
+                    parent_phone: inv.ghidanh.hocvien.Parent.DienThoai,
+                    class: inv.ghidanh.lophoc.TenLop,
+                    debt: debt,
+                    payment_term: inv.ThoiHan.toLocaleDateString(),
+                    overdue: overDay
+                })
+            }
+        }
+        return debts
     }
 
+    // lấy danh sách lớp gần hết buổi học hoặc cần sinh thêm buổi
     async GetExpiringClasses() {
-        // remaining_days
-        return await this.prisma.$queryRaw`
-        select lh."MaLopHoc", lh."TenLop", 
-            to_char(lh."DenNgay"-NOW(),'DD') as "ConLai"
-        from "LopHoc" lh
-        where lh."DenNgay" > NOW() 
-        and lh."DenNgay" < (NOW()+interval '7 days')`
+        const classDB = await this.prisma.lopHoc.findMany({
+            where: { TrangThai: 'RUNNING' },
+            include: {
+                khoahoc: true, // lấy tổng buổi khóa
+                _count: { select: { buoihoc: true } } // lấy tổng buổi đã tạo
+            }
+        })
+
+        const alert:lophoc[] = []
+
+        for(var lh of classDB){
+            const future = await this.prisma.buoiHoc.count({
+                where:{LopHocID:lh.ID, TrangThai:'SCHEDULED'}
+            })
+
+            const total = lh.khoahoc.TongSoBuoi
+            const created = lh._count.buoihoc
+
+            if(future<=3){
+                if(created<total){
+                    alert.push({
+                        class_id: lh.ID,
+                        class_name: lh.TenLop,
+                        type:'CREATE_MORE',
+                        mgs:`The class schedule is almost finished. Created ${created}/${total} sessions`
+                    })
+                }
+                else{
+                    alert.push({
+                        class_id: lh.ID,
+                        class_name: lh.TenLop,
+                        type:'ENDING_CLASS',
+                        mgs:`The class is about to end. Please check the unpaid tuition fees`
+                    })
+                }
+            }
+        }
+        return alert
     }
 
-    // lấy danh sách khóa học cần xử lý
+    // lấy danh sách buổi học cần xử lý
     async GetPendingSessions() {
         const [requestUnlock, unSubmitted] = await Promise.all([
             // buổi học được yêu cầu mở khóa

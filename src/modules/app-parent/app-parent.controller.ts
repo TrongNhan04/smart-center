@@ -28,29 +28,53 @@ export class AppParentController {
     }
 
     // Tab trang chủ: buổi học sắp tới, 
-    // kết quả gần nhất, số tiền nợ của con 
+    // kết quả gần nhất, số hóa đơn nợ của con 
     @Get('students/:id/dashboard')
     async GetDashboard(@Req() req: RequestWithUser, @Param('id') studentId: number) {
         return await this.appParent.GetDashboard(+req.user.userId, +studentId)
     }
 
-    // Tab lịch học lấy danh sách buổi học của học viên
+    // Tab lịch học lấy danh sách buổi học của con
     @Get('students/:id/sessions')
     async GetSessionByStudentID(@Req() req: RequestWithUser,
-        @Param('id') studentId: number, 
-        @Query() p: Pagination ) {
+        @Param('id') studentId: number,
+        @Query() p: Pagination) {
         return await this.appParent.GetSessionByStudentID(
             +req.user.userId, studentId, p
         )
-    }   
+    }
 
-    // Tab học tập: lấy kết quả buổi học đã học, chi tiết kết quả,
-    // vẽ biểu đồ 5-7 buổi học gần nhất + tính điểm trung bình
+    // Tab học tập: biểu đồ điểm 5-7 buổi gần nhất 
+    // điểm trung bình + chuyên cần 
+    @Get('students/:id/result-sumaries')
+    async GetResultSumary(@Req() req: RequestWithUser,
+        @Param('id') studentId: number) {
+        const userId = req.user.userId
+        return await this.appParent.GetResultSumary(+userId, studentId)
+    }
+
+    // Tab học tập: lịch sử buổi học gồm ngày, lớp, chủ đề, điểm
+    @Get('students/:id/session-results')
+    async GetSessionResults(@Req() req: RequestWithUser,
+        @Param('id') studentId: number,
+        @Query() p: Pagination) {
+        const userId = req.user.userId
+        return await this.appParent.GetSessionResults(+userId, studentId, p)
+    }
+
+    // Tab học tập: xem chi tiết 1 buổi học
+    @Get('students/:sdId/sessions/:ssId')
+    async GetSessionDetail(
+        @Param('sdId') studentId: number,
+        @Param('ssId') sessionId: number) {
+        return await this.appParent.GetSessionDetail(+studentId, +sessionId)
+    }
 
     // Thông báo - notisService
     // Đã đọc - notisService
 
     // Danh sách hóa đơn của con
+    
 
     // Thông tin chuyển khoản
 }

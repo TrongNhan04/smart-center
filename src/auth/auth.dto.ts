@@ -27,3 +27,20 @@ export class LoginDTO{
     @IsOptional()
     mustChangePW?: boolean
 }
+
+export class ProfileDTO{
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    userName?: string
+
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    oldPassword: string
+
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    newPassword: string
+}

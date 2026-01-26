@@ -12,8 +12,8 @@ export class DashboardController {
 
     // lấy tổng học viên, lớp học, ghi danh mới, tổng thu - chi trong tháng
     @Get('sumaries')
-    async GetSumary() {
-        return this.dashboard.GetSumary()
+    async GetSumary(@Query() q:{m:number, y:number}) {
+        return this.dashboard.GetSumary(q.m, q.y)
     }
 
     // lấy dữ liệu thu - chi, ghi danh mới theo tháng để vẽ biểu đồ
@@ -30,8 +30,9 @@ export class DashboardController {
     }
 
     // danh sách việc cần làm: các hóa đơn hết hạn, 
-    // các lớp sắp hết hạn, yêu cầu mở khóa buổi học
-    // các buổi học đã kết thúc > 48h chưa SUBMITTED
+    // các lớp sắp hết hạn, 
+    // yêu cầu mở khóa buổi học, các buổi học đã kết thúc 
+    // > 48h chưa SUBMITTED
     @Get('tasks')
     async GetTasks(){
         const [invoices, classs, sessions] = await Promise.all([

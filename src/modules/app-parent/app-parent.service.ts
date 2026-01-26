@@ -2,6 +2,8 @@ import { BadRequestException, Injectable, NotFoundException } from "@nestjs/comm
 import { DateHelper } from "src/common/date.helper";
 import { PrismaService } from "src/prisma/prisma.service";
 import { Pagination } from "../session/session.dto";
+import { startOfMonth } from "date-fns";
+import { Prisma } from "src/generated/prisma/client";
 
 @Injectable()
 export class AppParentService {
@@ -124,7 +126,8 @@ export class AppParentService {
                     }
                 }
             },
-            take: take, skip: skip
+            take: take, skip: skip,
+            orderBy: { BatDauLuc: 'asc' }
         })
 
         return {
@@ -136,6 +139,136 @@ export class AppParentService {
             total: sessionDB.length
         }
     }
+
+    // tab buổi học phần trên: đtb, %tham gia, biểu đồ
+    async GetResultSumary(userId: number, studentId: number) {
+        // tính điểm trung bình tháng -> avg._avg.Diem
+        // tính tổng số buổi học đã diễn ra -> result.length
+        // tính tổng số buổi học học viên tham gia -> avg._count.ID
+        // lấy dữ liệu 5 buổi học tham gần nhất vẽ điểm  -> results
+        const { start } = DateHelper.GetStartEndOfMonth(new Date())
+        await this.StudentValidator(userId, studentId)
+
+        const baseWhere: Prisma.KetQua_ChiTietWhereInput = {
+            ketqua_buoihoc: {
+                buoihoc: {
+                    TrangThai: { not: 'CANCELLED' },
+                    BatDauLuc: { gte: start },
+                    KetThucLuc: { lte: new Date() }
+                }
+            },
+            ghidanh: { HocVienID: studentId }
+        }
+        const [avg, results] = await Promise.all([
+            // tính trung bình tháng + tổng buổi đi học
+            this.prisma.ketQua_ChiTiet.aggregate({
+                _count: { ID: true },
+                _avg: { Diem: true },
+                where: {
+                    ...baseWhere,
+                    DiemDanh: true
+                }
+            })
+            // các buổi đã diễn ra 
+            , this.prisma.ketQua_ChiTiet.findMany({
+                where: { ...baseWhere },
+                orderBy: { ketqua_buoihoc: { buoihoc: { BatDauLuc: 'asc' } } },
+                include: { ketqua_buoihoc: { include: { buoihoc: true } } },
+            })
+        ])
+        return {
+            average_score: Number(avg._avg.Diem),
+            attendance: {
+                total: results.length,
+                attend: avg._count.ID,
+                percent: (avg._count.ID / results.length) * 100
+            },
+            chart_data: results.map(m => ({
+                date: m.ketqua_buoihoc.buoihoc.BatDauLuc.toLocaleDateString(),
+                grade: m.Diem ? Number(m.Diem) : m.Diem
+            }))
+        }
+    }
+
+    // Tab buổi học phần dưới: các buổi đã học (phân trang) 
+    async GetSessionResults(userId: number, studentId: number, p: Pagination) {
+        await this.StudentValidator(userId, studentId)
+        const take = Number(p.limit)
+        const skip = Number(p.page - 1) * Number(p.limit)
+        const results = await this.prisma.ketQua_ChiTiet.findMany({
+            where: {
+                ketqua_buoihoc: {
+                    buoihoc: {
+                        TrangThai: { not: 'CANCELLED' },
+                        KetThucLuc: { lte: new Date() }
+                    }
+                },
+                ghidanh: { HocVienID: studentId }
+            },
+            select: {
+                Diem: true,
+                ketqua_buoihoc: {
+                    select: {
+                        buoihoc: {
+                            select: {
+                                BatDauLuc: true, ChuDe: true,
+                                lophoc: { select: { TenLop: true } }
+                            }
+                        }
+                    }
+                }
+            },
+            take: take, skip: skip
+        })
+        return {  //lịch sử buổi học gồm ngày, lớp, chủ đề, điểm
+            session_results: results.map(m => ({
+                date: m.ketqua_buoihoc.buoihoc.BatDauLuc.toLocaleDateString(),
+                class: m.ketqua_buoihoc.buoihoc.lophoc.TenLop,
+                topic: m.ketqua_buoihoc.buoihoc.ChuDe,
+                grade: m.Diem
+            }))
+        }
+    }
+
+    // phần dưới: chi tiết các buổi học 
+    async GetSessionDetail(studentId: number, sessionId: number) {
+        //nhận xét, điểm, điểm danh, ngày học, lớp, giáo viên, chủ đề học, phòng
+        const detail = await this.prisma.ketQua_ChiTiet.findFirst({
+            where: {
+                ketqua_buoihoc: { BuoiHocID: sessionId },
+                ghidanh: { HocVienID: studentId }
+            },
+            select: {
+                NhanXetRieng: true, Diem: true, DiemDanh: true,
+                ketqua_buoihoc: { 
+                    select: { NhanXetChung:true,
+                        buoihoc: { select: {
+                                BatDauLuc: true, ChuDe:true, PhongHoc:true,
+                                lophoc: {
+                                    select: { TenLop: true, 
+                                        giaovien:{select:{User:{select:{HoTen:true}}}}
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+        })
+        if (!detail) throw new NotFoundException('Student\'s result not found')
+        return {
+            comment: detail.NhanXetRieng??detail.ketqua_buoihoc.NhanXetChung,
+            grade: detail.Diem, attend: detail.DiemDanh,
+            date: detail.ketqua_buoihoc.buoihoc.BatDauLuc.toLocaleDateString(),
+            class: detail.ketqua_buoihoc.buoihoc.lophoc.TenLop,
+            teacher: detail.ketqua_buoihoc.buoihoc.lophoc.giaovien.User.HoTen,
+            topic: detail.ketqua_buoihoc.buoihoc.ChuDe,
+            room: detail.ketqua_buoihoc.buoihoc.PhongHoc
+        }
+    }
+
+    GetInvoiceByStudentID
 
     // check con ai người nấy xem
     private async StudentValidator(userId: number, studentId: number) {
