@@ -1,5 +1,5 @@
 import { ConflictException } from "@nestjs/common";
-import { addDays, addMonths, startOfDay, startOfMonth } from "date-fns";
+import { addDays, addMonths, addWeeks, startOfDay, startOfMonth, startOfWeek } from "date-fns";
 
 export class DateHelper {
     // format giờ và phút, input "HH:mm" -> h = "HH", m = "mm"
@@ -56,6 +56,15 @@ export class DateHelper {
         const start = startOfMonth(now)// ngày đầu tháng
         const end = startOfMonth(addMonths(now, 1)) // ngày đầu tháng sau
         return { start, end }
+    }
+
+    // lấy đầu tuần đến trước đầu tuần sau
+    static GetStartEndOfWeek(now: Date){
+        const start = startOfWeek(now)
+        const end = startOfWeek(addWeeks(now,1))
+        const sow = new Date(start.setDate(start.getDate()+1))
+        const eow = new Date(end.setDate(end.getDate()+1))
+        return {sow, eow}
     }
 
     // lấy đầu ngày hôm nay đến đầu ngày mai

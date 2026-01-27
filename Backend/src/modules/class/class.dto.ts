@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { ArrayNotEmpty, ArrayUnique, IsArray, IsDate, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, MaxLength, Min } from "class-validator";
+import { ArrayNotEmpty, ArrayUnique, IsArray, IsDate, IsDateString, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, MaxLength, Min } from "class-validator";
 import { TrangThaiLH } from "src/generated/prisma/enums";
 
 
@@ -131,3 +131,16 @@ export class UpdateClassDTO {
     status?: TrangThaiLH
 }
 
+export class SchechuleDTO{
+    @IsNotEmpty()
+    @Matches(/^\d{4}-\d{2}-\d{2}$/, { 
+    message: 'startDate must in format YYYY-MM-DD (exp: 2026-01-27)' 
+  })
+    startDate:string
+
+    @IsNotEmpty()
+    @Matches(/^\d{4}-\d{2}-\d{2}$/, { 
+    message: 'endDate must in format YYYY-MM-DD (exp: 2026-01-27)' 
+  })
+    endDate:string
+}

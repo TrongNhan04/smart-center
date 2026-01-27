@@ -47,7 +47,7 @@ export class StudentController {
     @Roles('ADMIN')
     @Patch(':id/inactive')
     async DelateStudentByID(@Param('id') StudentId: number) {
-        return await this.studentService.DelateStudentByID(+StudentId)
+        return await this.studentService.DeleteStudentByID(+StudentId)
     }
 
     // lấy danh sách lớp học viên đang học

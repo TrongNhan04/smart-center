@@ -3,7 +3,7 @@ import { ClassService } from "./class.service";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guard/roles.guard";
 import { Roles } from "src/auth/decorators/roles.decorator";
-import { QueryClassDTO, UpdateClassDTO, CreateClassDTO } from "./class.dto";
+import { QueryClassDTO, UpdateClassDTO, CreateClassDTO, SchechuleDTO } from "./class.dto";
 import { SessionStatusDTO } from "../session/session.dto";
 import { MustChangePWGuard } from "src/auth/guard/must-change-pw.guard";
 import { SessionService } from "../session/session.service";
@@ -76,11 +76,11 @@ export class ClassController {
         return await this.sessionService.AutoGenerateSession(+classId)
     }
 
-    //================================ TEACHER ================================
+    //======================== TEACHER ========================
     // danh sách lớp giáo viên A đang dạy - xong
     @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
     @Roles('ADMIN', 'TEACHER')
-    @Get('teacher/classes')
+    @Get('teachers/classes')
     async GetClassesByTeacherId(@Req() req: RequestWithUser) {
         return this.classService.GetClassesByTeacherId(req.user.userId)
     }
@@ -88,12 +88,23 @@ export class ClassController {
     // danh sách buổi học của 1 lớp giáo viên A dạy - xong
     @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
     @Roles('ADMIN', 'TEACHER')
-    @Get('teacher/classes/:id/sessions')
+    @Get('teachers/classes/:id/sessions')
     async GetSessionsByTeacherId(
         @Param('id') classId: number,
         @Req() req: RequestWithUser) {
         const userId = req.user.role === 'ADMIN' ? null : req.user.userId
         if (!userId) throw new NotFoundException('Teacher not found')
         return await this.sessionService.GetSessionsByTeacherId(+userId, +classId)
+    }
+    
+    // lịch dạy của giáo viên
+    @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
+    @Roles('ADMIN', 'TEACHER')
+    @Get('teachers/sessions-week')
+    async GetSessionsOneWeek(@Req() req: RequestWithUser,
+        @Query() q:SchechuleDTO) {
+        const userId = req.user.role === 'ADMIN' ? null : req.user.userId
+        if (!userId) throw new NotFoundException('Teacher not found')
+        return await this.sessionService.GetSessionsOneWeek(+userId, q.startDate, q.endDate)
     }
 }

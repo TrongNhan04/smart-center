@@ -6,6 +6,7 @@ import { DateHelper } from "src/common/date.helper";
 import { SessionResultService } from "../session-result/session-result.service";
 import { SessionsResultDTO } from "../session-result/session-result.dto";
 import { NotifyService } from "../notify/notify.service";
+import { endOfDay, startOfDay } from "date-fns";
 
 @Injectable()
 export class SessionService {
@@ -207,6 +208,28 @@ export class SessionService {
                 omit: { CreatedAt: true, UpdatedAt: true }
             })
         })
+    }
+
+    // lấy lịch dạy 1 tuần cho giáo viên
+    async GetSessionsOneWeek(userId: number, start: string, end: string) { 
+        let sod = new Date(start)
+        sod = startOfDay(sod)
+        let eod = new Date(end)
+        eod = endOfDay(eod)
+        const teacherDB = await this.GetTeacherByUserId(userId)
+        const sessionDB = await this.prisma.buoiHoc.findMany({
+            where: {
+                lophoc: { GiaoVienID: teacherDB.ID },
+                BatDauLuc: { gte: sod },
+                KetThucLuc: { lt: eod },
+            }, orderBy: { BatDauLuc: 'asc' }, include: { lophoc: true }
+        })
+        if (sessionDB.length == 0) return { mgs: 'free period' }
+
+        return sessionDB.map(m => ({
+            id: m.ID, start: m.BatDauLuc, end: m.KetThucLuc,
+            class: m.lophoc.TenLop, status: m.TrangThai,
+        }))
     }
 
     // lấy danh sách buổi học 1 lớp giáo viên A dạy 
