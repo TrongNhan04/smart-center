@@ -202,12 +202,6 @@ export class ClassService {
         return { msg: "Class Closed" }
     }
 
-    // lấy danh sách buổi học theo lớp - phần dưới
-    async GetSessionsByClassId(classId: number, query: SessionStatusDTO) {
-        await this.ClassIDValidator(classId)
-        return await this.sessionService.GetSessionsByClassId(classId, query)
-    }
-
     // lấy danh sách lớp theo giáo viên - userId
     async GetClassesByTeacherId(userId: number) {
         const teacherDB = await this.prismaService.giaoVien.findUnique({
@@ -297,7 +291,7 @@ export class ClassService {
             // kiểm tra giờ học trùng
             const isTimeOverlap = DateHelper.TimeOverlap(lh.GioBatDau, lh.GioKetThuc, sHour, eHour, true)
             if (isTimeOverlap) {
-                throw new ConflictException(`Teacher schedule or room conflict with class '${lh.MaLopHoc}'`)
+                throw new ConflictException(`Teacher schedule conflict with class '${lh.MaLopHoc}'`)
             }
         }
     }
@@ -334,7 +328,7 @@ export class ClassService {
 
             const dupTime = DateHelper.TimeOverlap(startTime, endTime, lh.GioBatDau, lh.GioKetThuc, true)
             if (dupTime)
-                throw new BadRequestException(`${room} is used by other class `)
+                throw new BadRequestException(`${room} is used by other class ${lh.MaLopHoc} `)
         }
     }
 }

@@ -17,7 +17,7 @@ export class ClassController {
         private classService: ClassService,
         private sessionService: SessionService
     ) { }
-    //================================ ADMIN ================================
+    //================== ADMIN ==================
     // thêm lớp
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
@@ -65,7 +65,7 @@ export class ClassController {
     @Get('admin/classes/:id/sessions')
     async GetSessionsByClassId(@Param('id') classId: number,
         @Query() query: SessionStatusDTO) {
-        return await this.classService.GetSessionsByClassId(+classId, query)
+        return await this.sessionService.GetSessionsByClassId(classId, query)
     }
 
     // tạo buổi học tự động
@@ -79,9 +79,9 @@ export class ClassController {
     //================================ TEACHER ================================
     // danh sách lớp giáo viên A đang dạy - xong
     @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
-    @Roles('ADMIN','TEACHER')
+    @Roles('ADMIN', 'TEACHER')
     @Get('teacher/classes')
-    async GetClassesByTeacherId(@Req() req:RequestWithUser){
+    async GetClassesByTeacherId(@Req() req: RequestWithUser) {
         return this.classService.GetClassesByTeacherId(req.user.userId)
     }
 
@@ -90,10 +90,10 @@ export class ClassController {
     @Roles('ADMIN', 'TEACHER')
     @Get('teacher/classes/:id/sessions')
     async GetSessionsByTeacherId(
-        @Param('id') classId: number, 
-        @Req() req:RequestWithUser){
+        @Param('id') classId: number,
+        @Req() req: RequestWithUser) {
         const userId = req.user.role === 'ADMIN' ? null : req.user.userId
-        if(!userId) throw new NotFoundException('Teacher not found')
+        if (!userId) throw new NotFoundException('Teacher not found')
         return await this.sessionService.GetSessionsByTeacherId(+userId, +classId)
     }
 }

@@ -47,7 +47,7 @@ export class StudentService {
 
             // thêm thông báo
             await this.notisService.InvoiceNotify(userId, newInvoice, tx)
-            return { mgs: "succesfull" }
+            return { msg: "succesfull" }
         }
         // nếu có user
         if (tx) return await runLogic(tx)
@@ -89,7 +89,7 @@ export class StudentService {
             return await this.AddRecord_3Table(oldUser.ID, body)
         }
         else// tìm được nhiều hơn 1 user => trùng Email hoặc phone
-            throw new ConflictException("The email and phone number are used by different people")
+            throw new ConflictException("The email and phone number are used by different user")
     }
 
     // lấy danh sách + tìm kiếm + lọc theo điều kiện
@@ -136,7 +136,7 @@ export class StudentService {
     }
 
     //xóa mềm học viên + hủy ghi danh
-    async DelateStudentByID(studentId: number) {
+    async DeleteStudentByID(studentId: number) {
         await this.StudentIdValidator(studentId)
         await this.prismaService.$transaction([
             this.prismaService.hocVien.update({
@@ -148,7 +148,7 @@ export class StudentService {
                 data: { TrangThai: 'INACTIVE' }
             })
         ])
-        return { mgs: "Succesfull" }
+        return { msg: "Succesfull" }
     }
 
     //lấy danh sách lớp học viên học - phần dưới

@@ -146,7 +146,7 @@ export class InvoiceService {
                 data: { DaTra: { increment: amount } }
             })
 
-            await this.notisService.PaymentNotify(+userId, receipt)
+            await this.notisService.PaymentNotify(+invoiceDB.ghidanh.hocvien.UserID, receipt)
             return { mgs: "Create receipt and notisy successfully" }
         })
     }
@@ -162,7 +162,7 @@ export class InvoiceService {
         })
     }
 
-    // tạo phiếu chi từ hóa đơn
+    // lấy danh sách phiếu chi theo hóa đơn
     async GetPaymentByInvoiceID(invoiceId:number){
         const invoiceDB = await this.prismaService.hoaDon.findUnique({
             where:{ID:invoiceId}

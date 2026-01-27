@@ -73,8 +73,4 @@ export class UpdateStudentDTO {
     @IsOptional()
     @IsString()
     note?: string
-
-    @IsOptional()
-    @IsEnum(TrangThaiHV)
-    status: TrangThaiHV
 }

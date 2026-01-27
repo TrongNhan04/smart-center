@@ -22,14 +22,14 @@ export class DateHelper {
             throw new ConflictException('To date must greater than from date')
     }
 
-    // kiểm tra lịch - hiện tại = bao nhiêu phút
+    // kiểm tra thời gian trong lịch - hiện tại = bao nhiêu phút
     static CheckTimeWindow(time: Date) {
         const now = new Date().getTime()
         const timeLeft = time.getTime() - now
         return Math.floor(timeLeft / 60000)
     }
 
-    // kiểm tra giờ bắt đầu + kết thúc và sĩ số
+    // kiểm tra giờ bắt đầu + kết thúc
     static ValidateTimeRange(startTime: string, endTime: string) {
         // tách giờ bởi dấu ":" và chuyển thành số 
         const startTimeSplit = startTime.split(":").map(Number)
@@ -58,7 +58,7 @@ export class DateHelper {
         return { start, end }
     }
 
-    // lấy đầu ngày đến cuối ngày
+    // lấy đầu ngày hôm nay đến đầu ngày mai
     static GetStartEndOfDay(now: Date) {
         const start = startOfDay(now)// ngày đầu tháng
         const end = startOfDay(addDays(now, 1)) // ngày đầu tháng sau

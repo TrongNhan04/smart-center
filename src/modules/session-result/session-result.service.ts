@@ -75,6 +75,7 @@ export class SessionResultService {
         })
     }
 
+    // gửi yêu cầu mở khóa
     async RequestUnlock(userId: number, sessionId: number, reason: string) {
         const { sessionDB } = await this.SessionAcsessValidate(userId, sessionId)
         if (sessionDB.BatDauLuc > new Date())

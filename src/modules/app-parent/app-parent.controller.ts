@@ -16,10 +16,8 @@ export class AppParentController {
     constructor(
         private appParent: AppParentService
     ) { }
-
-    // đăng nhập - auth service
+    // đăng xuất | đăng nhập - auth service
     // đổi tên | mật khẩu - auth service
-    // đăng xuất - auth service
 
     // lấy thông tin tài khoản + danh sách con
     @Get('children')
@@ -30,7 +28,8 @@ export class AppParentController {
     // Tab trang chủ: buổi học sắp tới, 
     // kết quả gần nhất, số hóa đơn nợ của con 
     @Get('students/:id/dashboard')
-    async GetDashboard(@Req() req: RequestWithUser, @Param('id') studentId: number) {
+    async GetDashboard(@Req() req: RequestWithUser,
+        @Param('id') studentId: number) {
         return await this.appParent.GetDashboard(+req.user.userId, +studentId)
     }
 
@@ -64,17 +63,23 @@ export class AppParentController {
 
     // Tab học tập: xem chi tiết 1 buổi học
     @Get('students/:sdId/sessions/:ssId')
-    async GetSessionDetail(
+    async GetSessionDetail(@Req() req: RequestWithUser,
         @Param('sdId') studentId: number,
         @Param('ssId') sessionId: number) {
-        return await this.appParent.GetSessionDetail(+studentId, +sessionId)
+        const userId = req.user.userId
+        return await this.appParent.GetSessionDetail(+userId, +studentId, +sessionId)
     }
 
     // Thông báo - notisService
     // Đã đọc - notisService
 
     // Danh sách hóa đơn của con
-    
+    @Get('students/:id/invoices')
+    async GetInvoiceByStudentID(@Req() req: RequestWithUser,
+        @Param('id') studentId: number) {
+        const userId = req.user.userId
+        return await this.appParent.GetInvoiceByStudentID(+userId, studentId)
+    }
 
     // Thông tin chuyển khoản
 }

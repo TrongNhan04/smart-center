@@ -127,7 +127,7 @@ export class SessionService {
             if (classDB.LichHoc.includes(dow)) {
                 const startAt = DateHelper.combineDateAndTime(xday, classDB.GioBatDau);
                 const endAt = DateHelper.combineDateAndTime(xday, classDB.GioKetThuc);
-
+                // tìm những buổi học của lớp khác có trùng phòng không
                 const conflict = await this.prisma.buoiHoc.findFirst({
                     where: {
                         PhongHoc: classDB.PhongHoc,
@@ -152,7 +152,7 @@ export class SessionService {
         await this.prisma.buoiHoc.createMany({
             data, skipDuplicates: true
         })
-        return { mes: 'successful', created: data.length }
+        return { msg: 'Create successfully', created: data.length }
     }
 
     // tạo buổi học thủ công 
@@ -160,7 +160,6 @@ export class SessionService {
         const classDB = await this.prisma.lopHoc.findUnique({
             where: { ID: body.classId }
         })
-
         if (!classDB) throw new NotFoundException('Class not found')
         if (classDB.TrangThai === 'CLOSED')
             throw new ConflictException('Class already closed')

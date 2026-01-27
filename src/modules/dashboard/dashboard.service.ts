@@ -154,7 +154,7 @@ export class DashboardService {
                         lophoc: { select: { TenLop: true } }
                     }
                 }
-            }, orderBy: { ThoiHan: 'asc' }
+            }, orderBy: { ThoiHan: 'asc' }, take:5
         })
 
         const debts: OverdueInvoice[] = []

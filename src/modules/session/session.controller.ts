@@ -6,7 +6,7 @@ import { SessionService } from "./session.service";
 import { CreateSessionDTO, UpdateSessionDTO } from "./session.dto";
 import { Request } from 'express';
 import { MustChangePWGuard } from "src/auth/guard/must-change-pw.guard";
-import { SessionsResultDTO } from "../session-result/session-result.dto";
+import { RequestUnlock, SessionsResultDTO } from "../session-result/session-result.dto";
 type RequestWithUser = Request & { user: { userId: number; role?: string } };
 
 @Controller()
@@ -90,14 +90,14 @@ export class SessionController {
     }
 
     // gửi yêu cầu mở khóa buổi học 
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles('ADMIN')
-    @Post('admin/sessions/:id/unclock')
+    @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
+    @Roles('TEACHER')
+    @Post('sessions/:id/request-unlock')
     async RequestUnlock(
         @Req() req:RequestWithUser,
         @Param('id') sessionId: number,
-        @Body('reason') reason:string) {
+        @Body() reason:RequestUnlock) {
         const userId = req.user.userId
-        return await this.sessionService.RequestUnlock(+userId,+sessionId, reason)
+        return await this.sessionService.RequestUnlock(+userId,+sessionId, reason.reason)
     }
 }

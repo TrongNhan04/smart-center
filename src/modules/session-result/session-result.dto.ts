@@ -29,3 +29,9 @@ export class SessionsResultDTO{
     @Type(()=>ResultDetailDTO)
     details: ResultDetailDTO[]
 }
+
+export class RequestUnlock{
+    @IsNotEmpty()
+    @IsString()
+    reason:string
+}

@@ -15,10 +15,10 @@ export class AuthController {
     ) { }
 
     // đăng ký
-    @Post("register")
-    async Register(@Body() registerDTO: RegisterDTO) {
-        return await this.authService.Register(registerDTO);
-    }
+    // @Post("register")
+    // async Register(@Body() registerDTO: RegisterDTO) {
+    //     return await this.authService.Register(registerDTO);
+    // }
 
     // đăng nhập
     @Post("login")
@@ -30,15 +30,15 @@ export class AuthController {
     @UseGuards(JwtAuthGuard)
     @Post("logout")
     async Loout(@Req() req: RequestWithUser) {
-        return this.authService.Logout(req.user.userId);
+        return await this.authService.Logout(req.user.userId);
     }
 
     // lấy thông tin tài khoản
 	@UseGuards(JwtAuthGuard, RolesGuard)
 	@Roles('ADMIN', 'TEACHER', 'PARENT')
 	@Get('me')
-	GetMe(@Req() request: RequestWithUser) {
-		return this.authService.GetMe(+request.user.userId)
+	async GetMe(@Req() request: RequestWithUser) {
+		return await this.authService.GetMe(+request.user.userId)
 	}
 
 	// đổi mật khẩu + tên

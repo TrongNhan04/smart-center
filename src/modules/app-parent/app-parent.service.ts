@@ -231,8 +231,9 @@ export class AppParentService {
     }
 
     // phần dưới: chi tiết các buổi học 
-    async GetSessionDetail(studentId: number, sessionId: number) {
+    async GetSessionDetail(userId: number, studentId: number, sessionId: number) {
         //nhận xét, điểm, điểm danh, ngày học, lớp, giáo viên, chủ đề học, phòng
+        await this.StudentValidator(userId, studentId)
         const detail = await this.prisma.ketQua_ChiTiet.findFirst({
             where: {
                 ketqua_buoihoc: { BuoiHocID: sessionId },
@@ -240,13 +241,16 @@ export class AppParentService {
             },
             select: {
                 NhanXetRieng: true, Diem: true, DiemDanh: true,
-                ketqua_buoihoc: { 
-                    select: { NhanXetChung:true,
-                        buoihoc: { select: {
-                                BatDauLuc: true, ChuDe:true, PhongHoc:true,
+                ketqua_buoihoc: {
+                    select: {
+                        NhanXetChung: true,
+                        buoihoc: {
+                            select: {
+                                BatDauLuc: true, ChuDe: true, PhongHoc: true,
                                 lophoc: {
-                                    select: { TenLop: true, 
-                                        giaovien:{select:{User:{select:{HoTen:true}}}}
+                                    select: {
+                                        TenLop: true,
+                                        giaovien: { select: { User: { select: { HoTen: true } } } }
                                     }
                                 }
                             }
@@ -258,7 +262,7 @@ export class AppParentService {
         })
         if (!detail) throw new NotFoundException('Student\'s result not found')
         return {
-            comment: detail.NhanXetRieng??detail.ketqua_buoihoc.NhanXetChung,
+            comment: detail.NhanXetRieng ?? detail.ketqua_buoihoc.NhanXetChung,
             grade: detail.Diem, attend: detail.DiemDanh,
             date: detail.ketqua_buoihoc.buoihoc.BatDauLuc.toLocaleDateString(),
             class: detail.ketqua_buoihoc.buoihoc.lophoc.TenLop,
@@ -268,7 +272,23 @@ export class AppParentService {
         }
     }
 
-    GetInvoiceByStudentID
+    // lấy danh sách hóa đơn của học viên
+    async GetInvoiceByStudentID(userId: number, studentId: number) {
+        await this.StudentValidator(userId, studentId)
+        const inv = await this.prisma.hoaDon.findMany({
+            where: { ghidanh: { HocVienID: studentId } }
+        })
+        return inv.map(m => ({
+            id: m.ID,
+            code: m.MaHoaDon,
+            total: Number(m.TongTien),
+            paid: Number(m.DaTra),
+            debt: m.TrangThai ? 0 : Number(m.TongTien) - Number(m.DaTra),
+            status: m.TrangThai,
+            term: m.ThoiHan,
+            note: m.GhiChu
+        }))
+    }
 
     // check con ai người nấy xem
     private async StudentValidator(userId: number, studentId: number) {

@@ -90,7 +90,7 @@ export class EnrollService {
             })
 
             await this.invoiceService.DeleteInvoiceByID(enrollDB.hoadon?.ID, tx)
-            return { mgs: 'Soft delete enroll and invoice Succesfull' }
+            return { mgs: 'Soft delete enroll and invoice succesfully' }
         })
     }
 
