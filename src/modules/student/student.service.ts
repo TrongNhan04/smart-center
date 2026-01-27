@@ -124,8 +124,6 @@ export class StudentService {
     async UpdateStudentByID(studentId: number, body: UpdateStudentDTO) {
         await this.StudentIdValidator(studentId)
         const data: Prisma.HocVienUpdateInput = {}
-        if (body.status === 'INACTIVE')
-            await this.DelateStudentByID(studentId)
 
         data.TenHocVien = body.student?.trim()
         data.GhiChu = body.note?.trim()
