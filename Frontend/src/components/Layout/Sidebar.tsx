@@ -1,26 +1,106 @@
-import Header from './Header';
-import { Link, Outlet } from 'react-router-dom';
+import React, { useState } from 'react';
+import {
+  BookOutlined,
+  CreditCardOutlined,
+  FormOutlined,
+  HomeOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  TeamOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
+import type { MenuProps } from 'antd';
+import { Button, Layout, Menu, theme } from 'antd';
+import Logo from './Logo';
+import '../../index.css';
+import Toggle from './Toggle';
+import HeaderCN from './Header';
+import { Outlet, useNavigate } from 'react-router-dom';
 
-const SidebarComponent = () => {
-  return (
-    <><Header />
-      <div style={{ display: 'flex' }}>
-        <div className="sidebar" style={{ width: '200px', background: '#eee' }}>
+const { Header, Sider, Content } = Layout;
 
-          <h3>Menu</h3>
-          <ul>
-            <li><Link to="/admin/dashboard">Trang chủ</Link></li>
-            <li><Link to="/admin/class">Quản lý lớp</Link></li>
-            <li><Link to="/admin/course">Quản lý khóa</Link></li>
-          </ul>
-        </div>
+type MenuItem = Required<MenuProps>['items'][number];
 
-        <div className="content" style={{ flex: 1, padding: '20px' }}>
-          <Outlet />
-        </div>
-      </div>
-    </>
-  )
+function getItem(
+  label: React.ReactNode,
+  key: React.Key,
+  icon?: React.ReactNode,
+  children?: MenuItem[],
+): MenuItem {
+  return {
+    key,
+    icon,
+    children,
+    label,
+  } as MenuItem;
 }
 
-export default SidebarComponent
+const items: MenuItem[] = [
+  getItem('Trang chủ', 'home', <HomeOutlined />),
+  getItem('Đào tạo', 'train', <BookOutlined />, [
+    getItem('Khóa học', 'course'),
+    getItem('Lớp học', 'class'),
+  ]),
+  getItem('Người dùng', 'users', <TeamOutlined />, [
+    getItem('Giáo viên', 'teacher'),
+    getItem('Học viên', 'student'),
+  ]),
+  getItem('Ghi danh', 'enroll', <FormOutlined />),
+  getItem('Tài chính', 'finance', <CreditCardOutlined />, [
+    getItem('Hóa đơn', 'invoice'),
+    getItem('Nợ xấu', 'debt')
+  ]),
+  getItem('Tài khoản', 'account', <UserOutlined />),
+];
+
+const SidebarComponent = () => {
+  const navigate = useNavigate()
+  const [darkTheme, setDarkTheme] = useState(true)
+  const handleToggleTheme = () => {
+    setDarkTheme(!darkTheme)
+  }
+  const [collapsed, setCollapsed] = useState(false);
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken();
+
+  const handleMenuclick = (e: { key: string }) => {
+    navigate(`${e.key}`)
+  }
+
+  return (
+    <Layout style={{ minHeight: '100vh' }}>
+      <Sider collapsible collapsed={collapsed} trigger={null} theme={darkTheme ? 'dark' : 'light'} >
+        <Logo />
+        <Menu
+          theme={darkTheme ? 'dark' : 'light'}
+          defaultSelectedKeys={['1']}
+          mode="inline" items={items}
+          onClick={handleMenuclick} />
+        <Toggle darkTheme={darkTheme} toggleTheme={handleToggleTheme} />
+      </Sider>
+      <Layout>
+        <Header style={{
+          padding: '0 16px',
+          background: colorBgContainer,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <Button
+            className='toggle'
+            onClick={() => setCollapsed(!collapsed)}
+            type='text'
+            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+          />
+          <HeaderCN />
+        </Header>
+        <Content>
+          <Outlet />
+        </Content>
+      </Layout>
+    </Layout>
+  );
+};
+
+export default SidebarComponent;

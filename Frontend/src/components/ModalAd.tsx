@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { Button, Modal } from 'antd';
-// import { useAuthStore } from '../store/useAuthStore';
-// import { useNavigate } from 'react-router-dom';
 
 const ModalAD: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -17,14 +15,6 @@ const ModalAD: React.FC = () => {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-
-  // const user = useAuthStore(state => state.user)
- // const logout = useAuthStore(state => state.logout)
-
-  // const handleLogout = () => {
-  //   logout()
-  //   navigate('/login')
-  // }
 
   return (
     <>
@@ -42,7 +32,6 @@ const ModalAD: React.FC = () => {
         <p>Some contents...</p>
         <p>Some contents...</p>
       </Modal>
-      {/* <Button onClick={handleLogout} danger>Đăng xuất</Button> */}
     </>
   );
 };
