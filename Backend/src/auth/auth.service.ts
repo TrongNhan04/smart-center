@@ -81,6 +81,7 @@ export class AuthService {
             user: {
                 id: userDB.ID,
                 email: userDB.Email,
+                full_name:userDB.HoTen,
                 phone: userDB.DienThoai,
                 role: userDB.VaiTro
             }
