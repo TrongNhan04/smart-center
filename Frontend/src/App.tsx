@@ -4,7 +4,7 @@ import Login from "./components/Login";
 // import { useState } from "react";
 import PrivateRoute from "./components/PrivateRoute";
 import SidebarComponent from "./components/layout/Sidebar";
-import CourseList from "./components/page/CourseList";
+import CourseList from "./components/course/CourseList";
 
 const router = createBrowserRouter([
   {
@@ -18,8 +18,8 @@ const router = createBrowserRouter([
         path: '/admin',
         element: <SidebarComponent />,
         children: [
-          { path: 'home', element: <CourseList/>},
-          { path: 'course', element: <div>Trang khóa học</div> },
+          { path: 'home', element: <div>Trang home</div>},
+          { path: 'course', element: <CourseList/> },
           { path: 'class', element: <div>Trang lớp học</div> },
           { path: 'teacher', element: <div>Trang giáo viên</div> },
           { path: 'student', element: <div>Trang học viên</div> },
