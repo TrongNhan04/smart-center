@@ -1,0 +1,10 @@
+# File rác của Mac/Windows
+.DS_Store
+Thumbs.db
+
+# File log lỗi chung
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+.vscode/

@@ -12,10 +12,11 @@ export class CourseService {
     ) { }
 
     //kiểm tra id khóa học
-    async CourseIdValidator(courseId: number){
+    async CourseIdValidator(courseId: number) {
         const courseDB = await this.prismaService.khoaHoc.findUnique({
-            where:{ID:courseId}})
-        if(!courseDB) throw new NotFoundException('Course not found')
+            where: { ID: courseId }
+        })
+        if (!courseDB) throw new NotFoundException('Course not found')
         return courseDB
     }
 
@@ -44,9 +45,9 @@ export class CourseService {
                 ThoiGian: courseDTO.duration,
                 HocPhi: courseDTO.courseFee,
                 TongSoBuoi: courseDTO.totalSession,
+                MoTa: courseDTO.description
             },
             omit: { // bỏ những trường nào
-                ID: true,
                 CreatedAt: true,
                 UpdatedAt: true
             }
@@ -74,7 +75,8 @@ export class CourseService {
             omit: {
                 CreatedAt: true,
                 UpdatedAt: true
-            }
+            },
+            orderBy:{ID:'desc'}
         })
     }
 
@@ -92,25 +94,25 @@ export class CourseService {
     // cập nhật khóa học theo trạng thái
     async UpdateCourseById(courseId: number, courseUpdate: CourseUpdateDTO) {
         const courseDB = await this.CourseIdValidator(courseId)
-        
+
         //tạo data cho update
         const data: Prisma.KhoaHocUpdateInput = {}
 
         // data update cho DRAFT
         if (courseDB.TrangThai === 'DRAFT') {
             data.TenKhoaHoc = courseUpdate.name,
-            data.TrinhDo = courseUpdate.level,
-            data.TongSoBuoi = courseUpdate.totalSession,
-            data.ThoiGian = courseUpdate.duration,
-            data.HocPhi = courseUpdate.courseFee,
-            data.MoTa = courseUpdate.description
+                data.TrinhDo = courseUpdate.level,
+                data.TongSoBuoi = courseUpdate.totalSession,
+                data.ThoiGian = courseUpdate.duration,
+                data.HocPhi = courseUpdate.courseFee,
+                data.MoTa = courseUpdate.description
             data.TrangThai = courseUpdate.status
         }
 
         //data update cho ACTIVE
         if (courseDB.TrangThai === 'ACTIVE') {
             data.TenKhoaHoc = courseUpdate.name,
-            data.MoTa = courseUpdate.description
+                data.MoTa = courseUpdate.description
             if (courseUpdate.status === 'INACTIVE')
                 data.TrangThai = courseUpdate.status
         }
@@ -128,12 +130,12 @@ export class CourseService {
     }
 
     // xóa mềm khóa học
-    async DeleteCouresByID(courseId: number){
+    async DeleteCouresByID(courseId: number) {
         await this.CourseIdValidator(courseId)
         return await this.prismaService.khoaHoc.update({
-            where: {ID: courseId},
-            data: {TrangThai: 'INACTIVE'},
-            omit:{CreatedAt:true, UpdatedAt: true}
+            where: { ID: courseId },
+            data: { TrangThai: 'INACTIVE' },
+            omit: { CreatedAt: true, UpdatedAt: true }
         })
     }
 

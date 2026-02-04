@@ -44,12 +44,21 @@
 }
 
 .toggle-theme-btn{
-  position: absolute;
-  /* padding-top: 20px; */
+  /* position: absolute; */
+  padding-top: 20px;
   bottom: 30px;
   left: 17px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1rem;
+}
+
+@keyframes flashRow{
+  0%{background-color: #fff1b8;}
+  100%{background-color: transparent;}
+}
+
+.highlight-row td{
+  animation: flashRow 2s ease-in-out forwards;
 }

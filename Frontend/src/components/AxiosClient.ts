@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useAuthStore } from "../store/useAuthStore";
 
 const axiosClient = axios.create({
     baseURL: 'http://localhost:3000',
@@ -10,7 +11,7 @@ const axiosClient = axios.create({
 // Can thiệp trước khi gửi đi: gắn token vào header
 axiosClient.interceptors.request.use(
     config => {
-        const token = localStorage.getItem('access_token')
+        const token = useAuthStore.getState().access_token
         if (token) {
             config.headers['Authorization'] = `Bearer ${token}`
         }
@@ -28,10 +29,10 @@ axiosClient.interceptors.response.use(
             return response.data
     },
     error => {
-        if(error.response.status===401){
-            localStorage.removeItem('access_token')
-            localStorage.removeItem('user')
-            window.location.href = '/login'
+        if(error.response?.status===401){
+            useAuthStore.getState().logout()
+            window.location.href = '/'
+            console.log(error)
         }
         return Promise.reject(error)
     }

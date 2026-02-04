@@ -1,13 +1,15 @@
 import { Modal, Form, Input, InputNumber, Select, Row, Col, message } from 'antd';
 import { useState } from 'react';
+import { createCourseApi } from '../../api/courseApi';
 
 // Định nghĩa Props chỉ để nhận lệnh Đóng/Mở từ cha
 interface AddCourseModalProps {
   open: boolean;
   onCancel: () => void;
+  onRefresh: (id: number) => void;
 }
 
-interface Course {
+interface CreateCourse {
   code: string,
   name: string,
   level: string,
@@ -16,23 +18,26 @@ interface Course {
   description: string
 }
 
-const AddCourseModal = ({ open, onCancel }: AddCourseModalProps) => {
+const AddCourseModal = ({ open, onCancel, onRefresh }: AddCourseModalProps) => {
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
 
   const handleOK = async () => {
     try {
-      const values: Course = await form.validateFields()
+      const values: CreateCourse = await form.validateFields()
 
       const payload = { ...values, description: values.description || null }
       setLoading(true)
-      // call api thật thì bỏ dòng này
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-      console.log("Values: ", payload)
+
+      console.log("Payload: ", payload)
+      const res = await createCourseApi(payload)
 
       message.success('Thêm khóa học thành công!')
+      onRefresh(res.data.ID)
+      console.log(res.data)
       form.resetFields()
       onCancel()
+
     } catch (error) {
       console.log("error: ", error)
     } finally {
@@ -102,7 +107,7 @@ const AddCourseModal = ({ open, onCancel }: AddCourseModalProps) => {
 
           <Col span={12}>
             <Form.Item
-              label="Học phí (VNĐ)"
+              label="Học phí"
               name="courseFee"
               rules={[{ required: true, message: 'Nhập học phí!' }]}>
 

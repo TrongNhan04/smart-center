@@ -70,7 +70,8 @@ const SidebarComponent = () => {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sider collapsible collapsed={collapsed} trigger={null} theme={darkTheme ? 'dark' : 'light'} >
+      <Sider collapsible collapsed={collapsed}
+        trigger={null} theme={darkTheme ? 'dark' : 'light'} >
         <Logo />
         <Menu
           theme={darkTheme ? 'dark' : 'light'}

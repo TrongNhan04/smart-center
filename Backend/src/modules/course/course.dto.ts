@@ -28,6 +28,10 @@ export class CreateCourseDTO{
     @IsNumber()
     @IsPositive()
     courseFee: number
+
+    @IsOptional()
+    @IsString()
+    description?: string
 }
 
 export class CourseQueryDTO{

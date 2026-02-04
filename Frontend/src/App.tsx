@@ -5,6 +5,7 @@ import Login from "./components/Login";
 import PrivateRoute from "./components/PrivateRoute";
 import SidebarComponent from "./components/layout/Sidebar";
 import CourseList from "./components/course/CourseList";
+import HeaderCN from "./components/layout/Header";
 
 const router = createBrowserRouter([
   {
@@ -12,10 +13,14 @@ const router = createBrowserRouter([
     element: <Login />
   },
   {
+    path: 'teacher',
+    element: <div>Trang giáo viên vận hành<HeaderCN/></div>
+  },
+  {
     element: <PrivateRoute />,
     children: [
       {
-        path: '/admin',
+        path: 'admin',
         element: <SidebarComponent />,
         children: [
           { path: 'home', element: <div>Trang home</div>},
