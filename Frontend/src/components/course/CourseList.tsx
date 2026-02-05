@@ -1,35 +1,30 @@
 import { useEffect, useState } from 'react';
-import { Badge, Button, Card, Col, Input, message, Row, Select, Space, Table, Tag, Typography } from 'antd';
+import {
+  Badge, Button, Card, Col, Input, message, Row, Select,
+  Space, Table, Tag, Typography
+} from 'antd';
 import AddCourseModal from './CourseModal';
-import { listCoureApi } from '../../api/courseApi';
-import { ClockCircleOutlined, DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { deleteCourseApi, listCoureApi, updateCourseApi } from '../../api/courseApi';
+import { ClockCircleOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import CourseAction from './CourseAction';
+import type { CourseType } from './CourseInterface';
 
-interface CourseList {
-  ID: number,
-  MaKhoaHoc: string,
-  TenKhoaHoc: string,
-  TrinhDo: string,
-  HocPhi: number,
-  ThoiGian: number,
-  TongSoBuoi: number,
-  TrangThai: string,
-  MoTa?: string,
-}
-
-const CourseList = () => {
-  // lấy dữ liệu từ api
-  const [courses, setCourses] = useState<CourseList[]>([])
+const CourseType = () => {
+  const [courses, setCourses] = useState<CourseType[]>([])
   const [courseId, setCourseId] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)// mở modal
 
   const [searchText, setSearchText] = useState('')
   const [filterStatus, setFilterStatus] = useState<string | null>(null)
 
+  //lưu dòng dữ liệu đang được sửa
+  const [editCourse, setEditCourse] = useState<CourseType | null>()
+
   const fetchCourses = async () => {
     setLoading(true)
     try {
-
+      // lấy dữ liệu từ API
       const res = await listCoureApi()
       setCourses(res.data)
     }
@@ -42,7 +37,7 @@ const CourseList = () => {
     }
   }
 
-  const handelRefresh = (id: number) => {
+  const handelSaveModal = (id: number) => {
     setCourseId(id)
     fetchCourses()
     setTimeout(() => {
@@ -63,6 +58,38 @@ const CourseList = () => {
     return matchesKeyword && matchesStatus
   })
 
+  const handleModalAdd = () => {
+    setEditCourse(null)
+    setIsOpen(true)
+  }
+
+  const handleModalEdit = (value: CourseType) => {
+    setEditCourse(value)
+    setIsOpen(true)
+  }
+
+  const handleSoftDelete = async (id: number) => {
+    try {
+      const res = await deleteCourseApi(id)
+      console.log(res.data)
+      fetchCourses()
+      message.success('Xóa thành công!')
+    } catch (error) {
+      console.log("Có lỗi xảy ra", error)
+    }
+  }
+
+  const handleRestore = async (course: CourseType) => {
+    try {
+      const res = await updateCourseApi(course)
+      console.log(res.data)
+      fetchCourses()
+      message.success('Khôi phục thành công!')
+    } catch (error) {
+      console.log("Có lỗi xảy ra", error)
+    }
+  }
+
   const { Text } = Typography
   const columns = [
     {
@@ -74,7 +101,7 @@ const CourseList = () => {
       render: (code: string) => <Text code>{code}</Text>
     },
     {
-      title: 'Tên khóa học', dataIndex: 'TenKhoaHoc',
+      title: 'Tên khóa học', dataIndex: 'TenKhoaHoc', width: 220,
       key: 'TenKhoaHoc', ellipsis: true,
       render: (name: string) => <Text strong style={{ color: '#1890ff' }}>{name}</Text>
     },
@@ -100,14 +127,13 @@ const CourseList = () => {
         if (!fee) return <Text strong>0đ</Text>
         const amount = Number(fee)
         return (<Space>
-
           <Text strong>{amount.toLocaleString('vi-VN')}đ</Text>
         </Space>)
       }
     },
     {
       title: 'Thời gian', dataIndex: 'ThoiGian', key: 'ThoiGian', width: 170,
-      render: (month: number, course: CourseList) => (
+      render: (month: number, course: CourseType) => (
         <Space>
           <Text><ClockCircleOutlined /> {month} tháng</Text>
           <Text>({course.TongSoBuoi} buổi)</Text>
@@ -129,13 +155,14 @@ const CourseList = () => {
         return <Badge status={status.color as any} text={status.text} />;
       }
     },
-    {
-      title: 'Hành động', key: 'action', align: 'center' as const,
-      render: (data: CourseList) => (
-        <Space size="middle">
-          <Button icon={<EditOutlined/>}></Button>
-          <Button icon={<DeleteOutlined/>} danger></Button>
-        </Space>
+    {//data: CourseType
+      title: 'Hành động', key: 'action', align: 'center' as const, width: 150,
+      render: (course: any) => (
+        <CourseAction course={course}
+          onSoftDelete={(id) => handleSoftDelete(id)}
+          onRestore={() => handleRestore(course)}
+          onEdit={() => handleModalEdit(course)}
+        />
       )
     }
   ]
@@ -146,7 +173,7 @@ const CourseList = () => {
         extra={<Button
           type="primary"
           icon={<PlusOutlined />}
-          onClick={() => setIsOpen(true)}
+          onClick={handleModalAdd}
         >
           Thêm khóa học
         </Button>}
@@ -178,7 +205,7 @@ const CourseList = () => {
           </Col>
         </Row>
         {/* Bảng hiển thị dữ liệu */}
-        <Table <CourseList>
+        <Table <CourseType>
           dataSource={filteredData}
           columns={columns}
           loading={loading}
@@ -189,17 +216,19 @@ const CourseList = () => {
           }
           pagination={{ defaultPageSize: 7 }}
           rowKey="ID"
+          scroll={{ x: 1100, y: 426 }}
         />
 
         {/* Hiển thị Modal UI */}
         <AddCourseModal
           open={isOpen}
-          onCancel={() => setIsOpen(false)}
-          onRefresh={handelRefresh}
+          onCancel={() => { setEditCourse(null); setIsOpen(false) }}
+          onSave={handelSaveModal}
+          editCourse={editCourse!}
         />
       </Card>
     </>
-  );
-};
+  )
+}
 
-export default CourseList
+export default CourseType

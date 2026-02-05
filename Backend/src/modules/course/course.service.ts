@@ -11,24 +11,6 @@ export class CourseService {
         private classService: ClassService
     ) { }
 
-    //kiểm tra id khóa học
-    async CourseIdValidator(courseId: number) {
-        const courseDB = await this.prismaService.khoaHoc.findUnique({
-            where: { ID: courseId }
-        })
-        if (!courseDB) throw new NotFoundException('Course not found')
-        return courseDB
-    }
-
-    // kiểm tra trùng mã khóa học
-    async ValidateCourse(courseCode: string) {
-        const courseDB = await this.prismaService.khoaHoc.findUnique({
-            where: { MaKhoaHoc: courseCode }
-        })
-        if (courseDB)
-            throw new ConflictException('Course code is existed!')
-    }
-
     // tạo khóa học
     async CreateCourse(courseDTO: CreateCourseDTO) {
         // kiểm tra trùng mã khóa học
@@ -68,7 +50,6 @@ export class CourseService {
                 { TenKhoaHoc: { contains: q, mode: 'insensitive' } }
             ]
         }
-
         // tìm theo bộ lọc ở trên
         return await this.prismaService.khoaHoc.findMany({
             where,
@@ -76,7 +57,7 @@ export class CourseService {
                 CreatedAt: true,
                 UpdatedAt: true
             },
-            orderBy:{ID:'desc'}
+            orderBy: { ID: 'desc' }
         })
     }
 
@@ -94,33 +75,25 @@ export class CourseService {
     // cập nhật khóa học theo trạng thái
     async UpdateCourseById(courseId: number, courseUpdate: CourseUpdateDTO) {
         const courseDB = await this.CourseIdValidator(courseId)
-
+        const classes = await this.prismaService.lopHoc.count({ where: { KhoaHocID: courseId } })
         //tạo data cho update
         const data: Prisma.KhoaHocUpdateInput = {}
 
         // data update cho DRAFT
-        if (courseDB.TrangThai === 'DRAFT') {
-            data.TenKhoaHoc = courseUpdate.name,
-                data.TrinhDo = courseUpdate.level,
-                data.TongSoBuoi = courseUpdate.totalSession,
-                data.ThoiGian = courseUpdate.duration,
-                data.HocPhi = courseUpdate.courseFee,
-                data.MoTa = courseUpdate.description
-            data.TrangThai = courseUpdate.status
-        }
-
-        //data update cho ACTIVE
-        if (courseDB.TrangThai === 'ACTIVE') {
-            data.TenKhoaHoc = courseUpdate.name,
-                data.MoTa = courseUpdate.description
-            if (courseUpdate.status === 'INACTIVE')
-                data.TrangThai = courseUpdate.status
+        if (courseDB.TrangThai !== 'INACTIVE') {
+            data.TenKhoaHoc = courseUpdate.name
+            data.TrinhDo = courseUpdate.level
+            data.TongSoBuoi = courseUpdate.totalSession
+            data.ThoiGian = courseUpdate.duration
+            data.HocPhi = courseUpdate.courseFee
+            data.MoTa = courseUpdate.description
         }
 
         //data update cho INACTIVE
-        if (courseDB.TrangThai === 'INACTIVE' && courseUpdate.status === 'ACTIVE')
-            data.TrangThai = courseUpdate.status
-
+        if (courseDB.TrangThai === 'INACTIVE' && classes > 0)
+            data.TrangThai = 'ACTIVE'
+        else
+            data.TrangThai = 'DRAFT'
 
         return this.prismaService.khoaHoc.update({
             where: { ID: courseId },
@@ -143,5 +116,24 @@ export class CourseService {
     async GetClassesByCourseId(courseId: number) {
         await this.CourseIdValidator(courseId)
         return await this.classService.GetClassesByCourseId(courseId)
+    }
+
+    //kiểm tra id khóa học
+    private async CourseIdValidator(courseId: number) {
+        const courseDB = await this.prismaService.khoaHoc.findUnique({
+            where: { ID: courseId }
+        })
+        if (!courseDB) throw new NotFoundException('Course not found')
+        return courseDB
+    }
+
+    // kiểm tra trùng mã khóa học
+    private async ValidateCourse(courseCode: string) {
+        const courseDB = await this.prismaService.khoaHoc.findUnique({
+            where: { MaKhoaHoc: courseCode }
+        })
+        if (courseDB)
+            throw new ConflictException('Mã khóa học đã tồn tại!')
+        return courseDB
     }
 }

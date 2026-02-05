@@ -13,11 +13,13 @@ const HeaderCN = () => {
     navigate('/')
   }
 
-  return (
+  return (//style={{ background: "rgb(3, 37, 69)", color:'white'}}
+    //background: linear-gradient(135deg, #6253e1, #04befe)
     <>{user && (
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <span>Xin chào, <b>{user.full_name}</b> ({user.role})</span>
-        <Button onClick={handleLogout} type="primary" size='small'>Đăng xuất</Button>
+        <Button onClick={handleLogout} size='small'
+          type="primary">Đăng xuất</Button>
       </div>
     )}</>
   )

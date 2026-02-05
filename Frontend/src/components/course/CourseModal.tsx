@@ -1,45 +1,72 @@
 import { Modal, Form, Input, InputNumber, Select, Row, Col, message } from 'antd';
-import { useState } from 'react';
-import { createCourseApi } from '../../api/courseApi';
+import { useEffect, useState } from 'react';
+import { createCourseApi, updateCourseApi } from '../../api/courseApi';
+import type { CourseType, CreateCourse } from './CourseInterface';
 
 // Định nghĩa Props chỉ để nhận lệnh Đóng/Mở từ cha
 interface AddCourseModalProps {
-  open: boolean;
-  onCancel: () => void;
-  onRefresh: (id: number) => void;
+  open: boolean,
+  onCancel: () => void,
+  onSave: (id: number) => void,
+  editCourse: CourseType
 }
 
-interface CreateCourse {
-  code: string,
-  name: string,
-  level: string,
-  duration: number,
-  courseFee: number,
-  description: string
-}
-
-const AddCourseModal = ({ open, onCancel, onRefresh }: AddCourseModalProps) => {
+const AddCourseModal = ({ open, onCancel, onSave, editCourse }: AddCourseModalProps) => {
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
 
+  const isEdit = editCourse ? true : false
   const handleOK = async () => {
     try {
+      // dữ liệu từ form
       const values: CreateCourse = await form.validateFields()
-
-      const payload = { ...values, description: values.description || null }
       setLoading(true)
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      let courseDB
+      let payload
+      if (editCourse.ID) {
+        payload = {
+          ID: editCourse.ID,
+          MaKhoaHoc: values.code,
+          TenKhoaHoc: values.name,
+          TrinhDo: values.level,
+          HocPhi: values.courseFee,
+          ThoiGian: values.duration,
+          TongSoBuoi: values.totalSession,
+          TrangThai: editCourse.TrangThai,
+          MoTa: values.description,
+        }
+        const res = await updateCourseApi(payload)
+        message.success('Cập nhật khóa học thành công!')
+        courseDB = res
+      }
+      else {
+        payload = { ...values, description: values.description || "" }
 
-      console.log("Payload: ", payload)
-      const res = await createCourseApi(payload)
-
-      message.success('Thêm khóa học thành công!')
-      onRefresh(res.data.ID)
-      console.log(res.data)
+        console.log("Payload: ", payload)
+        const res = await createCourseApi(payload)
+        message.success('Thêm khóa học thành công!')
+        courseDB = res
+      }
+      onSave(courseDB.data.ID)
+      console.log(courseDB.data)
       form.resetFields()
       onCancel()
 
-    } catch (error) {
-      console.log("error: ", error)
+    } catch (error: any) {
+      // bắt lỗi từ backend
+      console.log("error: ", error.response.data.message)
+
+      if (error.response) {
+        const serverError = error.response.data
+        // nếu là mảng lỗi thì lấy cái đầu tiên
+        if (Array.isArray(serverError.message))
+          message.error(serverError.message[0])
+        else if (typeof serverError.message === 'string')
+          message.error(serverError.message)
+        else
+          message.error("Có lỗi xảy ra")
+      }
     } finally {
       setLoading(false)
     }
@@ -50,9 +77,27 @@ const AddCourseModal = ({ open, onCancel, onRefresh }: AddCourseModalProps) => {
     onCancel()
   }
 
+  useEffect(() => {
+    if (open)
+      if (editCourse) {
+        const payload: CreateCourse = {
+          code: editCourse.MaKhoaHoc,
+          name: editCourse.TenKhoaHoc,
+          level: editCourse.TrinhDo,
+          courseFee: editCourse.HocPhi,
+          duration: editCourse.ThoiGian,
+          totalSession: editCourse.TongSoBuoi,
+          description: editCourse.MoTa || ""
+        }
+        form.setFieldsValue(payload)
+      }
+      else
+        form.resetFields()
+  }, [editCourse, open, form])
+
   return (
     <Modal
-      title="Thêm khóa học mới"
+      title={isEdit ? 'Cập nhật khóa học' : 'Thêm khóa học'}
       open={open}
       onCancel={handleCancel}
       onOk={handleOK}
@@ -72,7 +117,7 @@ const AddCourseModal = ({ open, onCancel, onRefresh }: AddCourseModalProps) => {
               name="code"
               rules={[{ required: true, message: 'Vui lòng nhập mã khóa học!' }]}
             >
-              <Input placeholder="Vd: ENG-101..." />
+              <Input disabled={isEdit} placeholder="Vd: ENG-101..." />
             </Form.Item>
           </Col>
 

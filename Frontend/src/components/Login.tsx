@@ -15,11 +15,11 @@ const Login = () => {
       // lưu vào store
       login(response.data.user, response.data.access_token)
 
-      message.success('Login success')
+      message.success('Đăng nhập thành công')
       navigate('/admin/home')
     }
     catch (error: any) {
-      message.error('Wrong password or account')
+      message.error('Sai tài khoản hoặc mật khẩu')
     }
   }
 
