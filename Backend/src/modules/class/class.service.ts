@@ -106,14 +106,17 @@ export class ClassService {
 
     // lấy danh sách lớp theo id khóa học
     async GetClassesByCourseId(courseId: number) {
-        return await this.prismaService.lopHoc.findMany({
+        const classDB = await this.prismaService.lopHoc.findMany({
             where: { KhoaHocID: courseId },
-            omit: {
-                ID: true,
-                CreatedAt: true,
-                UpdatedAt: true
-            }
+            include: { giaovien: { include: { User: true } } }
         })
+        return classDB.map(lh => ({
+            ID: lh.ID, MaLopHoc: lh.MaLopHoc, TenLop: lh.TenLop,
+            GiaoVien: lh.giaovien.User.HoTen, PhongHoc: lh.PhongHoc,
+            TuNgay: lh.TuNgay, DenNgay: lh.DenNgay, LichHoc: lh.LichHoc,
+            GioHoc: lh.GioBatDau+'-'+lh.GioKetThuc, SiSo: lh.SiSo,
+            TrangThai: lh.TrangThai
+        }))
     }
 
     // cập nhật lớp theo trạng thái

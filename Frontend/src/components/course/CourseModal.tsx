@@ -1,59 +1,39 @@
 import { Modal, Form, Input, InputNumber, Select, Row, Col, message } from 'antd';
 import { useEffect, useState } from 'react';
-import { createCourseApi, updateCourseApi } from '../../api/courseApi';
-import type { CourseType, CreateCourse } from './CourseInterface';
+import courseApi, { } from '../../api/courseApi';
+import { mapRecordToForm, type CourseDB, type CourseDto } from './CourseInterface';
 
-// Định nghĩa Props chỉ để nhận lệnh Đóng/Mở từ cha
-interface AddCourseModalProps {
+interface CourseModalProps {
   open: boolean,
   onCancel: () => void,
   onSave: (id: number) => void,
-  editCourse: CourseType
+  editingCourse: CourseDB
 }
 
-const AddCourseModal = ({ open, onCancel, onSave, editCourse }: AddCourseModalProps) => {
+const CourseModal = ({ open, onCancel, onSave, editingCourse }: CourseModalProps) => {
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
 
-  const isEdit = editCourse ? true : false
+  const isEdit = editingCourse ? true : false
   const handleOK = async () => {
     try {
-      // dữ liệu từ form
-      const values: CreateCourse = await form.validateFields()
+      // dữ liệu từ form (tiếng anh)
+      const values: CourseDto = await form.validateFields()
       setLoading(true)
       await new Promise(resolve => setTimeout(resolve, 1000))
-      let courseDB
-      let payload
-      if (editCourse.ID) {
-        payload = {
-          ID: editCourse.ID,
-          MaKhoaHoc: values.code,
-          TenKhoaHoc: values.name,
-          TrinhDo: values.level,
-          HocPhi: values.courseFee,
-          ThoiGian: values.duration,
-          TongSoBuoi: values.totalSession,
-          TrangThai: editCourse.TrangThai,
-          MoTa: values.description,
-        }
-        const res = await updateCourseApi(payload)
-        message.success('Cập nhật khóa học thành công!')
-        courseDB = res
-      }
-      else {
-        payload = { ...values, description: values.description || "" }
 
-        console.log("Payload: ", payload)
-        const res = await createCourseApi(payload)
-        message.success('Thêm khóa học thành công!')
-        courseDB = res
-      }
-      onSave(courseDB.data.ID)
-      console.log(courseDB.data)
+      const payload = isEdit ? await courseApi.update(editingCourse.ID, values) :
+        await courseApi.create(values)
+
+      console.log("Khóa học được sửa hoặc thêm mới: ", payload.data)
+
+      message.success(isEdit?'Cập nhật thành công':'Thêm mới thành công')
+      onSave(payload.data.ID)
+      //console.log(res.data)
       form.resetFields()
       onCancel()
-
-    } catch (error: any) {
+    }
+    catch (error: any) {
       // bắt lỗi từ backend
       console.log("error: ", error.response.data.message)
 
@@ -78,22 +58,15 @@ const AddCourseModal = ({ open, onCancel, onSave, editCourse }: AddCourseModalPr
   }
 
   useEffect(() => {
-    if (open)
-      if (editCourse) {
-        const payload: CreateCourse = {
-          code: editCourse.MaKhoaHoc,
-          name: editCourse.TenKhoaHoc,
-          level: editCourse.TrinhDo,
-          courseFee: editCourse.HocPhi,
-          duration: editCourse.ThoiGian,
-          totalSession: editCourse.TongSoBuoi,
-          description: editCourse.MoTa || ""
-        }
-        form.setFieldsValue(payload)
+    if (open) {
+      if (editingCourse) {
+        const formData = mapRecordToForm(editingCourse)
+        form.setFieldsValue(formData)
       }
       else
         form.resetFields()
-  }, [editCourse, open, form])
+    }
+  }, [open, form, editingCourse])
 
   return (
     <Modal
@@ -159,7 +132,7 @@ const AddCourseModal = ({ open, onCancel, onSave, editCourse }: AddCourseModalPr
               <InputNumber
                 style={{ width: '100%' }}
                 placeholder="Nhập số tiền..."
-                // format phân các hàng nghìn
+                // format phân cách hàng nghìn
                 formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                 parser={(value) => value?.replace(/\$\s?|(,*)/g, '') as unknown as number}
                 suffix="VNĐ" // Ký hiệu tiền tệ ở đuôi
@@ -205,7 +178,7 @@ const AddCourseModal = ({ open, onCancel, onSave, editCourse }: AddCourseModalPr
         </Row>
 
         {/* Mô tả */}
-        <Form.Item label="Mô tả chi tiết" name="">
+        <Form.Item label="Mô tả chi tiết" name="description">
           <Input.TextArea
             rows={4}
             placeholder="Chi tiết khóa học, lộ trình, yêu cầu đầu vào..."
@@ -218,4 +191,4 @@ const AddCourseModal = ({ open, onCancel, onSave, editCourse }: AddCourseModalPr
   );
 };
 
-export default AddCourseModal;
+export default CourseModal;

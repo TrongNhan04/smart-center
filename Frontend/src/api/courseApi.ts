@@ -1,28 +1,37 @@
 import axiosClient from "../components/AxiosClient"
-import type {  CourseType, CreateCourse } from "../components/course/CourseInterface"
+import type { CourseDB, CourseDto } from "../components/course/CourseInterface"
 
-export const createCourseApi = (course: CreateCourse) => {
-    return axiosClient.post('/admin/courses', course)
+const courseApi = {
+    create: (course: Omit<CourseDto, 'id'>) => {
+        return axiosClient.post('/admin/courses', course)
+    },
+
+    findMany: () => {
+        return axiosClient.get('/admin/courses')
+    },
+
+    update: (id: number, course: Omit<CourseDto, 'id'>) => {
+        return axiosClient.patch(`/admin/courses/${id}`, course)
+    },
+
+    delete: (id: number) => {
+        return axiosClient.patch(`/admin/courses/${id}/inactive`)
+    },
+
+    findOne: (id: number)  =>{
+        return axiosClient.get(`/admin/courses/${id}`)
+    }
 }
 
-export const listCoureApi = () => {
-    return axiosClient.get('/admin/courses')
-}
+export default courseApi
 
-export const deleteCourseApi = (id: number) => {
-    return axiosClient.patch(`/admin/courses/${id}/inactive`)
-}
-
-export const updateCourseApi = (course: CourseType) => {
-    const payload: CreateCourse = {
-          code: course.MaKhoaHoc,
-          name: course.TenKhoaHoc,
-          level: course.TrinhDo,
-          courseFee: Number(course.HocPhi),
-          duration: course.ThoiGian,
-          totalSession: course.TongSoBuoi,
-          description: course.MoTa || ""
-        }
-    console.log(payload)
-    return axiosClient.patch(`/admin/courses/${course.ID}`, payload)
-}
+// const payload: CourseDto = {
+//       code: course.MaKhoaHoc,
+//       name: course.TenKhoaHoc,
+//       level: course.TrinhDo,
+//       courseFee: Number(course.HocPhi),
+//       duration: course.ThoiGian,
+//       totalSession: course.TongSoBuoi,
+//       description: course.MoTa || ""
+//     }
+// console.log(payload)

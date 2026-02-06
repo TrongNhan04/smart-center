@@ -38,17 +38,17 @@ function getItem(
 const items: MenuItem[] = [
   getItem('Trang chủ', 'home', <HomeOutlined />),
   getItem('Đào tạo', 'train', <BookOutlined />, [
-    getItem('Khóa học', 'course'),
-    getItem('Lớp học', 'class'),
+    getItem('Khóa học', 'courses'),
+    getItem('Lớp học', 'classes'),
   ]),
   getItem('Người dùng', 'users', <TeamOutlined />, [
-    getItem('Giáo viên', 'teacher'),
-    getItem('Học viên', 'student'),
+    getItem('Giáo viên', 'teachers'),
+    getItem('Học viên', 'students'),
   ]),
-  getItem('Ghi danh', 'enroll', <FormOutlined />),
+  getItem('Ghi danh', 'enrolls', <FormOutlined />),
   getItem('Tài chính', 'finance', <CreditCardOutlined />, [
-    getItem('Hóa đơn', 'invoice'),
-    getItem('Nợ xấu', 'debt')
+    getItem('Hóa đơn', 'invoices'),
+    getItem('Nợ xấu', 'debts')
   ]),
   getItem('Tài khoản', 'account', <UserOutlined />),
 ];

@@ -6,6 +6,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import SidebarComponent from "./components/layout/Sidebar";
 import CourseList from "./components/course/CourseList";
 import HeaderCN from "./components/layout/Header";
+import CourseDetail from "./components/course/CourseDetail";
 
 const router = createBrowserRouter([
   {
@@ -14,7 +15,7 @@ const router = createBrowserRouter([
   },
   {
     path: 'teacher',
-    element: <div>Trang giáo viên vận hành<HeaderCN/></div>
+    element: <div>Trang giáo viên vận hành<HeaderCN /></div>
   },
   {
     element: <PrivateRoute />,
@@ -23,14 +24,17 @@ const router = createBrowserRouter([
         path: 'admin',
         element: <SidebarComponent />,
         children: [
-          { path: 'home', element: <div>Trang home</div>},
-          { path: 'course', element: <CourseList/> },
-          { path: 'class', element: <div>Trang lớp học</div> },
-          { path: 'teacher', element: <div>Trang giáo viên</div> },
-          { path: 'student', element: <div>Trang học viên</div> },
-          { path: 'enroll', element: <div>Trang ghi danh</div> },
-          { path: 'invoice', element: <div>Trang hóa đơn</div> },
-          { path: 'debt', element: <div>Trang nợ xấu</div> },
+          { path: 'home', element: <div>Trang home</div> },
+          
+          { path: 'courses', element: <CourseList /> },
+          { path: 'courses/:id', element:<CourseDetail/> },
+          
+          { path: 'classes', element: <div>Trang lớp học</div> },
+          { path: 'teachers', element: <div>Trang giáo viên</div> },
+          { path: 'students', element: <div>Trang học viên</div> },
+          { path: 'enrolls', element: <div>Trang ghi danh</div> },
+          { path: 'invoices', element: <div>Trang hóa đơn</div> },
+          { path: 'debts', element: <div>Trang nợ xấu</div> },
           { path: 'account', element: <div>Trang tài khoản</div> }
         ]
       }

@@ -3,14 +3,15 @@ import {
   Badge, Button, Card, Col, Input, message, Row, Select,
   Space, Table, Tag, Typography
 } from 'antd';
-import AddCourseModal from './CourseModal';
-import { deleteCourseApi, listCoureApi, updateCourseApi } from '../../api/courseApi';
+import courseApi, { } from '../../api/courseApi';
 import { ClockCircleOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import CourseAction from './CourseAction';
-import type { CourseType } from './CourseInterface';
+import { mapRecordToForm, type CourseDB } from './CourseInterface';
+import CourseModal from './CourseModal';
+import { Link } from 'react-router-dom';
 
-const CourseType = () => {
-  const [courses, setCourses] = useState<CourseType[]>([])
+const CourseList = () => {
+  const [courses, setCourses] = useState<CourseDB[]>([])
   const [courseId, setCourseId] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
   const [isOpen, setIsOpen] = useState(false)// mở modal
@@ -18,19 +19,17 @@ const CourseType = () => {
   const [searchText, setSearchText] = useState('')
   const [filterStatus, setFilterStatus] = useState<string | null>(null)
 
-  //lưu dòng dữ liệu đang được sửa
-  const [editCourse, setEditCourse] = useState<CourseType | null>()
-
+  const [editingCourse, setEditingCourse] = useState<CourseDB | null>(null)
   const fetchCourses = async () => {
     setLoading(true)
     try {
       // lấy dữ liệu từ API
-      const res = await listCoureApi()
+      const res = await courseApi.findMany()
       setCourses(res.data)
     }
-    catch (error) {
+    catch (error: any) {
       message.error("Lỗi tải danh sách khóa học")
-      console.log(error)
+      console.log(error.response.data.message)
     }
     finally {
       setLoading(false)
@@ -59,34 +58,37 @@ const CourseType = () => {
   })
 
   const handleModalAdd = () => {
-    setEditCourse(null)
+    setEditingCourse(null)
     setIsOpen(true)
   }
 
-  const handleModalEdit = (value: CourseType) => {
-    setEditCourse(value)
+  const handleModalEdit = (course: CourseDB) => {
+    setEditingCourse(course)
     setIsOpen(true)
+  }
+
+  const handleRestore = async (course: CourseDB) => {
+    try {
+      const formData = mapRecordToForm(course)
+      await courseApi.update(course.ID, formData)
+      fetchCourses()
+      message.success('Khôi phục thành công')
+      // handelSaveModal(course.ID)
+    } catch (error: any) {
+      console.log("Có lỗi xảy ra", error.response.data.message)
+    }
   }
 
   const handleSoftDelete = async (id: number) => {
     try {
-      const res = await deleteCourseApi(id)
-      console.log(res.data)
+      await courseApi.delete(id)
       fetchCourses()
-      message.success('Xóa thành công!')
-    } catch (error) {
-      console.log("Có lỗi xảy ra", error)
+      message.success('Thao tác thành công')
+    } catch (error: any) {
+      console.log("Có lỗi xảy ra: ", error.response.data.message)
     }
-  }
-
-  const handleRestore = async (course: CourseType) => {
-    try {
-      const res = await updateCourseApi(course)
-      console.log(res.data)
-      fetchCourses()
-      message.success('Khôi phục thành công!')
-    } catch (error) {
-      console.log("Có lỗi xảy ra", error)
+    finally {
+      setLoading(false)
     }
   }
 
@@ -103,15 +105,18 @@ const CourseType = () => {
     {
       title: 'Tên khóa học', dataIndex: 'TenKhoaHoc', width: 220,
       key: 'TenKhoaHoc', ellipsis: true,
-      render: (name: string) => <Text strong style={{ color: '#1890ff' }}>{name}</Text>
+      render: (name: string, course: CourseDB) =>
+        <Link to={`/admin/courses/${course.ID}`}
+          style={{ fontWeight: 'bold' }}>{name}</Link>
+      // <Text strong style={{ color: '#1890ff' }}>{name}</Text>
     },
     {
       title: 'Trình độ', dataIndex: 'TrinhDo', key: 'TrinhDo', width: 100,
       render: (level: string) => {
         const levelMap = {
-          BEGINER: { color: 'cyan', text: 'Cơ bản' },
+          BEGINER: { color: 'green', text: 'Cơ bản' },
           INTERMEDIATE: { color: 'geekblue', text: 'Trung cấp' },
-          ADVANCED: { color: 'gold', text: 'Nâng cao' }
+          ADVANCED: { color: 'orange', text: 'Nâng cao' }
         };
 
         type levelKey = 'BEGINER' | 'INTERMEDIATE' | 'ADVANCED'
@@ -133,7 +138,7 @@ const CourseType = () => {
     },
     {
       title: 'Thời gian', dataIndex: 'ThoiGian', key: 'ThoiGian', width: 170,
-      render: (month: number, course: CourseType) => (
+      render: (month: number, course: CourseDB) => (
         <Space>
           <Text><ClockCircleOutlined /> {month} tháng</Text>
           <Text>({course.TongSoBuoi} buổi)</Text>
@@ -155,80 +160,79 @@ const CourseType = () => {
         return <Badge status={status.color as any} text={status.text} />;
       }
     },
-    {//data: CourseType
+    {//data: CourseDB
       title: 'Hành động', key: 'action', align: 'center' as const, width: 150,
-      render: (course: any) => (
-        <CourseAction course={course}
-          onSoftDelete={(id) => handleSoftDelete(id)}
-          onRestore={() => handleRestore(course)}
-          onEdit={() => handleModalEdit(course)}
+      render: (course: CourseDB) => (
+        <CourseAction
+          course={course}
+          onRestore={handleRestore}
+          onSoftDelete={handleSoftDelete}
+          onEdit={handleModalEdit}
         />
       )
     }
   ]
 
   return (
-    <>
-      <Card title="Danh sách khóa học"
-        extra={<Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={handleModalAdd}
-        >
-          Thêm khóa học
-        </Button>}
+    <Card title="Danh sách khóa học"
+      extra={<Button
+        type="primary"
+        icon={<PlusOutlined />}
+        onClick={handleModalAdd}
       >
-        {/* ô tìm kiếm và bộ lọc */}
-        <Row gutter={16} style={{ marginBottom: 20 }}>
-          <Col span={6}>
-            <Input
-              placeholder='Tìm theo tên hoặc mã...'
-              prefix={<SearchOutlined />}
-              allowClear
-              onChange={(e) => setSearchText(e.target.value)}
-            />
-          </Col>
+        Thêm khóa học
+      </Button>}
+    >
+      {/* ô tìm kiếm và bộ lọc */}
+      <Row gutter={16} style={{ marginBottom: 20 }}>
+        <Col span={6}>
+          <Input
+            placeholder='Tìm theo tên hoặc mã...'
+            prefix={<SearchOutlined />}
+            allowClear
+            onChange={(e) => setSearchText(e.target.value)}
+          />
+        </Col>
 
-          <Col span={3}>
-            <Select
-              placeholder='Trạng thái'
-              style={{ width: '100%' }}
-              allowClear
-              onChange={(e) => setFilterStatus(e)}
-              options={[
-                { label: 'Chưa mở lớp', value: 'DRAFT' },
-                { label: 'Đang hoạt động', value: 'ACTIVE' },
-                { label: 'Đã đóng', value: 'INACTIVE' },
-              ]}
-            >
-            </Select>
-          </Col>
-        </Row>
-        {/* Bảng hiển thị dữ liệu */}
-        <Table <CourseType>
-          dataSource={filteredData}
-          columns={columns}
-          loading={loading}
-          rowClassName={
-            (record) => {
-              return record.ID === courseId ? 'highlight-row' : ''
-            }
+        <Col span={3}>
+          <Select
+            placeholder='Trạng thái'
+            style={{ width: '100%' }}
+            allowClear
+            onChange={(e) => setFilterStatus(e)}
+            options={[
+              { label: 'Chưa mở lớp', value: 'DRAFT' },
+              { label: 'Đang hoạt động', value: 'ACTIVE' },
+              { label: 'Đã đóng', value: 'INACTIVE' },
+            ]}
+          >
+          </Select>
+        </Col>
+      </Row>
+      {/* Bảng hiển thị dữ liệu */}
+      <Table <CourseDB>
+        dataSource={filteredData}
+        columns={columns}
+        loading={loading}
+        rowClassName={
+          (record) => {
+            return record.ID === courseId ? 'highlight-row' : ''
           }
-          pagination={{ defaultPageSize: 7 }}
-          rowKey="ID"
-          scroll={{ x: 1100, y: 426 }}
-        />
+        }
+        pagination={{ defaultPageSize: 7 }}
+        rowKey="ID"
+        scroll={{ x: 1100, y: 426 }}
+      />
 
-        {/* Hiển thị Modal UI */}
-        <AddCourseModal
-          open={isOpen}
-          onCancel={() => { setEditCourse(null); setIsOpen(false) }}
-          onSave={handelSaveModal}
-          editCourse={editCourse!}
-        />
-      </Card>
-    </>
+      {/* Hiển thị Modal UI */}
+      <CourseModal
+        open={isOpen}
+        onCancel={() => { setIsOpen(false); setEditingCourse(null) }}
+        onSave={handelSaveModal}
+        editingCourse={editingCourse!}
+      />
+    </Card>
   )
 }
 
-export default CourseType
+export default CourseList

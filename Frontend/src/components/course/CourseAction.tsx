@@ -1,19 +1,19 @@
 import { DeleteOutlined, EditOutlined, UndoOutlined } from "@ant-design/icons"
 import { Button, Popconfirm, Space, Tooltip } from "antd"
-import type { CourseType } from "./CourseInterface"
+import type { CourseDB } from "./CourseInterface"
 
 interface Props {
-  course: CourseType,
-  onEdit: (data: CourseType) => void,
-  onSoftDelete: (id: number) => void,
-  onRestore: (id: number) => void
+  course: CourseDB,
+  onRestore: (course: CourseDB) => void
+  onSoftDelete: (id: number) => void
+  onEdit: (course: CourseDB) => void
 }
 
 const CourseAction = ({
   course,
-  onEdit,
+  onRestore,
   onSoftDelete,
-  onRestore
+  onEdit
 }: Props) => {
   if (course.TrangThai === 'INACTIVE')
     return (
@@ -23,7 +23,7 @@ const CourseAction = ({
             title="Khôi phục khóa học này?"
             okText="Khôi phục"
             cancelText="Hủy"
-            onConfirm={() => onRestore(course.ID)}
+            onConfirm={() => onRestore(course)}
           >
             <Button
               type="primary"
@@ -45,7 +45,7 @@ const CourseAction = ({
           size="small"
           type="primary"
           icon={<EditOutlined />}
-          onClick={(course:any) => onEdit(course)}
+          onClick={()=>onEdit(course)}
         >
         </Button>
       </Tooltip>
