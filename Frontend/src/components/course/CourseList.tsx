@@ -36,7 +36,7 @@ const CourseList = () => {
     }
   }
 
-  const handelSaveModal = (id: number) => {
+  const handleSaveModal = (id: number) => {
     setCourseId(id)
     fetchCourses()
     setTimeout(() => {
@@ -73,7 +73,7 @@ const CourseList = () => {
       await courseApi.update(course.ID, formData)
       fetchCourses()
       message.success('Khôi phục thành công')
-      // handelSaveModal(course.ID)
+      // handleSaveModal(course.ID)
     } catch (error: any) {
       console.log("Có lỗi xảy ra", error.response.data.message)
     }
@@ -113,16 +113,14 @@ const CourseList = () => {
     {
       title: 'Trình độ', dataIndex: 'TrinhDo', key: 'TrinhDo', width: 100,
       render: (level: string) => {
-        const levelMap = {
+        const levelMap: Record<string, { color: string, text: string }> = {
           BEGINER: { color: 'green', text: 'Cơ bản' },
           INTERMEDIATE: { color: 'geekblue', text: 'Trung cấp' },
           ADVANCED: { color: 'orange', text: 'Nâng cao' }
-        };
-
-        type levelKey = 'BEGINER' | 'INTERMEDIATE' | 'ADVANCED'
-        // value là 1 trong 3 key đó
-        const status = levelMap[level as levelKey] || { color: 'default', text: level }
-        return <Tag color={status.color}>{status.text}</Tag>;
+        }
+        // level là 1 trong 3 key đó
+        const status = levelMap[level] || { color: 'default', text: level }
+        return <Tag color={status.color}>{status.text}</Tag>
       }
     },
     {
@@ -132,36 +130,35 @@ const CourseList = () => {
         if (!fee) return <Text strong>0đ</Text>
         const amount = Number(fee)
         return (<Space>
-          <Text strong>{amount.toLocaleString('vi-VN')}đ</Text>
+          <Text strong>{amount.toLocaleString('vi-VN')} đ</Text>
         </Space>)
       }
     },
     {
       title: 'Thời gian', dataIndex: 'ThoiGian', key: 'ThoiGian', width: 170,
-      render: (month: number, course: CourseDB) => (
+      render: (month: number, courses: CourseDB) => (
         <Space>
           <Text><ClockCircleOutlined /> {month} tháng</Text>
-          <Text>({course.TongSoBuoi} buổi)</Text>
+          <Text>({courses.TongSoBuoi} buổi)</Text>
         </Space>
       )
     },
     {
       title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai', width: 160,
       render: (value: string) => {
-        const statusMap = {
+        const statusMap: Record<string, { color: string, text: string }> = {
           DRAFT: { color: 'default', text: 'Chưa mở lớp' },
           ACTIVE: { color: 'success', text: 'Đang hoạt động' },
           INACTIVE: { color: 'error', text: 'Đã đóng' }
-        };
-
-        type StatusKey = 'DRAFT' | 'ACTIVE' | 'INACTIVE'
-        const status = statusMap[value as StatusKey]// value là 1 trong 3 key đó
+        }
+        // value là 1 trong 3 key đó
+        const status = statusMap[value]
         //return <Tag color={status.color}>{status.text}</Tag>
-        return <Badge status={status.color as any} text={status.text} />;
+        return <Badge status={status.color as any} text={status.text} />
       }
     },
     {//data: CourseDB
-      title: 'Hành động', key: 'action', align: 'center' as const, width: 150,
+      title: 'Thao tác', key: 'action', align: 'center' as const, width: 150,
       render: (course: CourseDB) => (
         <CourseAction
           course={course}
@@ -221,14 +218,14 @@ const CourseList = () => {
         }
         pagination={{ defaultPageSize: 7 }}
         rowKey="ID"
-        scroll={{ x: 1100, y: 426 }}
+        // scroll={{ x: 1100, y: 426 }}
       />
 
       {/* Hiển thị Modal UI */}
       <CourseModal
         open={isOpen}
         onCancel={() => { setIsOpen(false); setEditingCourse(null) }}
-        onSave={handelSaveModal}
+        onSave={handleSaveModal}
         editingCourse={editingCourse!}
       />
     </Card>

@@ -1,5 +1,5 @@
 import axiosClient from "../components/AxiosClient"
-import type { CourseDB, CourseDto } from "../components/course/CourseInterface"
+import type { CourseDto } from "../components/course/CourseInterface"
 
 const courseApi = {
     create: (course: Omit<CourseDto, 'id'>) => {
@@ -18,7 +18,7 @@ const courseApi = {
         return axiosClient.patch(`/admin/courses/${id}/inactive`)
     },
 
-    findOne: (id: number)  =>{
+    findOne: (id: number) => {
         return axiosClient.get(`/admin/courses/${id}`)
     }
 }

@@ -1,4 +1,4 @@
-// cho table hiển thị 
+// cho modal, form gửi backend   
 export interface CourseDto { 
   id?: number
   code: string,
@@ -10,7 +10,7 @@ export interface CourseDto {
   description?: string|null
 }
 
-// cho modal, form gửi backend
+// cho table hiển thị
 export interface CourseDB {
   ID: number,
   MaKhoaHoc: string,
@@ -19,7 +19,7 @@ export interface CourseDB {
   HocPhi: number,
   ThoiGian: number,
   TongSoBuoi: number,
-  TrangThai?: string,
+  TrangThai: string,
   MoTa?: string,
 }
 

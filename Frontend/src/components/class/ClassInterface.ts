@@ -8,6 +8,7 @@ export interface ClassDB{
     LichHoc: number[],
     GioHoc: string,
     SiSo: number,
+    TongGhiDanh: number,
     TrangThai: string,
     PhongHoc?: string 
 }

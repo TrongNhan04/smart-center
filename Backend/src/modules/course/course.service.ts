@@ -87,13 +87,16 @@ export class CourseService {
             data.ThoiGian = courseUpdate.duration
             data.HocPhi = courseUpdate.courseFee
             data.MoTa = courseUpdate.description
+            // data. TrangThai = courseUpdate.status
         }
 
         //data update cho INACTIVE
-        if (courseDB.TrangThai === 'INACTIVE' && classes > 0)
-            data.TrangThai = 'ACTIVE'
-        else
-            data.TrangThai = 'DRAFT'
+        if (courseDB.TrangThai === 'INACTIVE') {
+            if (classes > 0)
+                data.TrangThai = 'ACTIVE'
+            else
+                data.TrangThai = 'DRAFT'
+        }
 
         return this.prismaService.khoaHoc.update({
             where: { ID: courseId },

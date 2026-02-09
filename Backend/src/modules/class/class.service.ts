@@ -33,17 +33,20 @@ export class ClassService {
 
     // thêm lớp mới
     async CreateClass(classDTO: CreateClassDTO) {
-        await this.ClassValidator(classDTO.code)
-        await this.CourseValidator(classDTO.courseId)
-        await this.TeacherValidator(classDTO.teacherId)
+        await Promise.all([
+            this.ClassValidator(classDTO.code),
+            this.CourseValidator(classDTO.courseId),
+            this.TeacherValidator(classDTO.teacherId),
+            this.DuplicateClass(classDTO.teacherId, classDTO.fromDate, 
+                classDTO.toDate, classDTO.timeTable, classDTO.startTime, 
+            classDTO.endTime)
+        ])
         DateHelper.ValidateTimeRange(classDTO.startTime, classDTO.endTime)
         DateHelper.FromDateToDateValidator(classDTO.fromDate, classDTO.toDate)
-        await this.DuplicateClass(classDTO.teacherId, classDTO.fromDate, classDTO.toDate,
-            classDTO.timeTable, classDTO.startTime, classDTO.endTime)
         const toDate = new Date(classDTO.toDate)
         toDate.setDate(toDate.getDate() + 1)
 
-        await this.prismaService.$transaction([
+        return await this.prismaService.$transaction([
             this.prismaService.lopHoc.create({
                 data: {
                     MaLopHoc: classDTO.code,
@@ -63,7 +66,7 @@ export class ClassService {
                 data: { TrangThai: 'ACTIVE' }
             })
         ])
-        return { mgs: "succesfull" }
+        // return { mgs: "succesfull" }
     }
 
     // lấy danh sách lớp mặc định hoặc query
@@ -108,14 +111,18 @@ export class ClassService {
     async GetClassesByCourseId(courseId: number) {
         const classDB = await this.prismaService.lopHoc.findMany({
             where: { KhoaHocID: courseId },
-            include: { giaovien: { include: { User: true } } }
+            include: {
+                giaovien: { include: { User: true } },
+                _count:{select:{ghidanh:{where:{TrangThai:'ACTIVE'}}}}
+            },
+            orderBy:{ID:'desc'}
         })
         return classDB.map(lh => ({
             ID: lh.ID, MaLopHoc: lh.MaLopHoc, TenLop: lh.TenLop,
             GiaoVien: lh.giaovien.User.HoTen, PhongHoc: lh.PhongHoc,
             TuNgay: lh.TuNgay, DenNgay: lh.DenNgay, LichHoc: lh.LichHoc,
-            GioHoc: lh.GioBatDau+'-'+lh.GioKetThuc, SiSo: lh.SiSo,
-            TrangThai: lh.TrangThai
+            GioHoc: lh.GioBatDau + '-' + lh.GioKetThuc, SiSo: lh.SiSo,
+            TrangThai: lh.TrangThai, TongGhiDanh:lh._count.ghidanh
         }))
     }
 

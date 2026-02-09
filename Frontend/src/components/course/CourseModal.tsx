@@ -19,6 +19,7 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: CourseModalProps
     try {
       // dữ liệu từ form (tiếng anh)
       const values: CourseDto = await form.validateFields()
+      console.log("value lấy từ form: ",values)
       setLoading(true)
       await new Promise(resolve => setTimeout(resolve, 1000))
 
@@ -26,8 +27,7 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: CourseModalProps
         await courseApi.create(values)
 
       console.log("Khóa học được sửa hoặc thêm mới: ", payload.data)
-
-      message.success(isEdit?'Cập nhật thành công':'Thêm mới thành công')
+      message.success(isEdit ? 'Cập nhật thành công' : 'Thêm mới thành công')
       onSave(payload.data.ID)
       //console.log(res.data)
       form.resetFields()
@@ -35,7 +35,7 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: CourseModalProps
     }
     catch (error: any) {
       // bắt lỗi từ backend
-      console.log("error: ", error.response.data.message)
+      console.log("Có lỗi xảy ra: ", error.response.data.message)
 
       if (error.response) {
         const serverError = error.response.data

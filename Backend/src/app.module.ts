@@ -11,6 +11,8 @@ import { EnrollModule } from './modules/enroll/enroll.module';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { AppParentModule } from './modules/app-parent/app-parent.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { TransformInterceptor } from './common/transform.interceptor';
 
 @Module({
   imports: [// thiếu NotifyModule
@@ -18,6 +20,12 @@ import { AppParentModule } from './modules/app-parent/app-parent.module';
     ConfigModule.forRoot({isGlobal:true}), CourseModule, 
     ClassModule, SessionModule, StudentModule, EnrollModule, 
     InvoiceModule, DashboardModule, AppParentModule
+  ],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TransformInterceptor,
+    },
   ]
 })
 export class AppModule {}
