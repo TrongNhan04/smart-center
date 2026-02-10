@@ -63,13 +63,7 @@ export class CourseService {
 
     // lấy chi tiết 1 khóa học
     async GetCourseById(id: number) {
-        return await this.prismaService.khoaHoc.findUnique({
-            where: { ID: id },
-            omit: {
-                CreatedAt: true,
-                UpdatedAt: true
-            }
-        })
+        return await this.CourseIdValidator(id)
     }
 
     // cập nhật khóa học theo trạng thái

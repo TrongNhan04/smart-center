@@ -1,3 +1,17 @@
+export interface ClassDto{
+    id?:number,
+    code: string,
+    courseId: number,
+    teacherId: number,
+    name: string,
+    fromDate: Date,
+    toDate: Date,
+    timeTable: number[],
+    startTime: string,
+    endTime: string,
+    classSize: number
+}
+
 export interface ClassDB{
     ID: number,
     MaLopHoc: string,

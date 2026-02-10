@@ -1,40 +1,49 @@
 import {
   Modal, Form, Input, Select, DatePicker, TimePicker,
   InputNumber, Row, Col,
+  message,
 } from 'antd';
+import { useEffect, useState } from 'react';
+import courseApi from '../../api/courseApi';
+import teacherApi from '../../api/teacherApi';
+import type { CourseDB } from '../course/CourseInterface';
+import type { TeacherDB } from '../teacher/TeacherInterface';
+import dayjs from 'dayjs';
+import classApi from '../../api/classApi';
+import type { ClassDto } from './ClassInterface';
 
 const { RangePicker } = DatePicker
 
-// Fake data
-const fakeCourses = [
-  { id: 1, name: 'Tiếng Anh Giao Tiếp Cơ Bản', code: 'ENG-001' },
-  { id: 2, name: 'Tiếng Anh Thương Mại', code: 'ENG-002' },
-  { id: 3, name: 'IELTS Foundation', code: 'IELTS-001' },
-]
-
-const courseOption = fakeCourses.map(item => ({
-  label: item.name,
-  value: item.id
-}))
-
-const fakeTeachers = [
-  { id: 1, name: 'Nguyễn Văn A', code: 'GV001' },
-  { id: 2, name: 'Trần Thị B', code: 'GV002' },
-  { id: 3, name: 'Lê Văn C', code: 'GV003' },
-  { id: 4, name: 'Phạm Thị D', code: 'GV004' },
-]
-
-const teacherOption = fakeTeachers.map(item => ({
-  label: item.name,
-  value: item.id
-}))
-
 type Props = {
-  open: boolean, onClose: () => void
+  open: boolean,
+  onClose: () => void
+  khoahocId: number
+  onSave: (id:number)=> void
 }
 
-const ClassModal = ({ open, onClose }: Props) => {
+const ClassModal = ({ open, onClose, khoahocId, onSave }: Props) => {
   const [form] = Form.useForm()
+  const [courses, setCourses] = useState<CourseDB[]>([])
+  const [teachers, setTeachers] = useState<TeacherDB[]>([])
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const fetchCoure_Teacher = async () => {
+      try {
+        const [courseRes, teacherRes] = await Promise.all([
+          courseApi.findMany(),
+          teacherApi.findMany()
+        ])
+        setCourses(courseRes.data)
+        setTeachers(teacherRes.data)
+      }
+      catch (error: any) {
+        message.error("Có lỗi xuất hiện")
+        console.log("Lỗi: ", error.response.data.message)
+      }
+    }
+    fetchCoure_Teacher()
+  }, [])
 
   const daysOfWeek = [
     { label: 'Chủ nhật', value: 0 },
@@ -46,30 +55,62 @@ const ClassModal = ({ open, onClose }: Props) => {
     { label: 'Thứ 7', value: 6 },
   ]
 
-  const handleSubmit = () => {
-    form.validateFields().then(values => {
-      // Xử lý dữ liệu
-      // const formData = {
-      //   ...values,
-      //   // TuNgay: values.NgayHoc?.[0]?.format('YYYY-MM-DD'),
-      //   // DenNgay: values.NgayHoc?.[1]?.format('YYYY-MM-DD'),
-      //   // GioBatDau: values.GioBatDau?.format('HH:mm'),
-      //   // GioKetThuc: values.GioKetThuc?.format('HH:mm'),
-      //   // LichHoc: selectedDays.join(','),
-      // }
+  const courseOption = courses.map(item => ({
+    label: item.TenKhoaHoc,
+    value: item.ID
+  }))
 
-      console.log('Form data:', values)
+  const teacherOption = teachers.map(item => ({
+    label: item.HoTen,
+    value: item.ID
+  }))
+  // const nowLocal = dayjs()
 
-      // Hiển thị thông báo thành công (fake)
-      Modal.success({
-        title: 'Thêm lớp học thành công!',
-        content: `Đã tạo lớp ${values.TenLop}`,
-      })
+  const handleSubmit = async () => {
+    setLoading(true)
+    try {
+      const values = await form.validateFields()
+      // tách riêng fromToDate => rest là phần còn lại
+      const { fromToDate, ...rest } = values
+
+      await new Promise(resolve => { setTimeout(resolve, 1000) })
+      // endTime, fromToDate, startTime
+      const payload: ClassDto = {
+        ...rest, // phần còn lại
+        fromDate: dayjs(values.fromToDate[0]).toISOString(),
+        toDate: dayjs(values.fromToDate[1]).toISOString(),
+        startTime: values.startTime.format('HH:mm'),
+        endTime: values.endTime.format('HH:mm'),
+      }
+      console.log("value của payload: ", payload)
+
+      const res = await classApi.create(payload)
+      message.success(`Tạo lớp ${payload.name} thành công`)
+      console.log("id lớp của res: ",res.data.ID)
+      onSave(res.data.ID)
       form.resetFields()
       onClose()
-    })
+    }
+    catch (error: any) {
+      console.log("Có lỗi xảy ra: ", error.response.data.message)
 
+      if (error.response) {
+        const serverError = error.response.data
+        // nếu là mảng lỗi thì lấy cái đầu tiên
+        if (Array.isArray(serverError.message))
+          message.error(serverError.message[0])
+        else if (typeof serverError.message === 'string')
+          message.error(serverError.message)
+        else
+          message.error("Có lỗi xảy ra")
+      }
+    }
+    finally {
+      setLoading(false)
+    }
   }
+
+  const handleCancel = () => { onClose(); form.resetFields() }
 
   return (
     <>
@@ -77,23 +118,27 @@ const ClassModal = ({ open, onClose }: Props) => {
       <Modal
         title="Thêm lớp học mới"
         open={open}
-        onCancel={() => { onClose(); form.resetFields() }}
+        onCancel={handleCancel}
         width={800}
         okText="Lưu lại"
         cancelText="Hủy bỏ"
         onOk={handleSubmit}
+        maskClosable={false}
+        confirmLoading={loading}
+        centered
       >
         <Form
           form={form}
           layout="vertical"
           autoComplete='true'
+          initialValues={{ courseId: khoahocId }}
         >
           <Row gutter={16}>
             {/* Cột trái */}
             <Col span={12}>
               <Form.Item
                 label="Mã lớp học"
-                name="MaLopHoc"
+                name="code"
                 rules={[{ required: true, message: 'Vui lòng nhập mã lớp!' }]}
               >
                 <Input placeholder="VD: ENG001-01" />
@@ -101,21 +146,19 @@ const ClassModal = ({ open, onClose }: Props) => {
 
               <Form.Item
                 label="Khóa học"
-                name="KhoaHocID"
+                name="courseId"
                 rules={[{ required: true, message: 'Vui lòng chọn khóa học!' }]}
               >
                 <Select
                   placeholder="Chọn khóa học"
-                  showSearch
+                  // showSearch
                   options={courseOption}
-                >
-
-                </Select>
+                />
               </Form.Item>
 
               <Form.Item
                 label="Tên lớp"
-                name="TenLop"
+                name="name"
                 rules={[{ required: true, message: 'Vui lòng nhập tên lớp!' }]}
               >
                 <Input placeholder="VD: Lớp Sáng T2-T4-T6" />
@@ -123,26 +166,14 @@ const ClassModal = ({ open, onClose }: Props) => {
 
               <Form.Item
                 label="Giáo viên"
-                name="GiaoVienID"
+                name="teacherId"
                 rules={[{ required: true, message: 'Vui lòng chọn giáo viên!' }]}
               >
                 <Select
                   placeholder="Chọn giáo viên"
-                  showSearch
+                  // showSearch
                   options={teacherOption}
-                >
-                </Select>
-              </Form.Item>
-
-              <Form.Item
-                label="Phòng học"
-                name="PhongHoc"
-              >
-                <Select
-                  placeholder="Chọn phòng học (tùy chọn)"
-                  allowClear
-                >
-                </Select>
+                />
               </Form.Item>
             </Col>
 
@@ -150,7 +181,7 @@ const ClassModal = ({ open, onClose }: Props) => {
             <Col span={12}>
               <Form.Item
                 label="Thời gian học"
-                name="NgayHoc"
+                name="fromToDate"
                 rules={[{ required: true, message: 'Vui lòng chọn thời gian!' }]}
               >
                 <RangePicker
@@ -161,21 +192,20 @@ const ClassModal = ({ open, onClose }: Props) => {
               </Form.Item>
 
               <Form.Item
-                name="LichHoc"
                 label="Lịch học trong tuần"
+                name="timeTable"
                 rules={[{ required: true, message: 'Chọn lịch học' }]}
               >
                 <Select placeholder="Chọn lịch học" mode="multiple"
                   options={daysOfWeek}
-                >
-                </Select>
+                />
               </Form.Item>
 
               <Row gutter={8}>
                 <Col span={12}>
                   <Form.Item
                     label="Giờ bắt đầu"
-                    name="GioBatDau"
+                    name="startTime"
                     rules={[{ required: true, message: 'Chọn giờ!' }]}
                   >
                     <TimePicker
@@ -183,13 +213,17 @@ const ClassModal = ({ open, onClose }: Props) => {
                       format="HH:mm"
                       placeholder="VD: 18:00"
                       minuteStep={15}
+                      disabledTime={() => ({
+                        disabledHours: () => [0, 1, 2, 3, 4, 5, 6, 22, 23]
+                      })}
+                      hideDisabledOptions={true}
                     />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
                   <Form.Item
                     label="Giờ kết thúc"
-                    name="GioKetThuc"
+                    name="endTime"
                     rules={[{ required: true, message: 'Chọn giờ!' }]}
                   >
                     <TimePicker
@@ -197,6 +231,10 @@ const ClassModal = ({ open, onClose }: Props) => {
                       format="HH:mm"
                       placeholder="VD: 20:00"
                       minuteStep={15}
+                      disabledTime={() => ({
+                        disabledHours: () => [0, 1, 2, 3, 4, 5, 6, 22, 23]
+                      })}
+                      hideDisabledOptions={true}
                     />
                   </Form.Item>
                 </Col>
@@ -204,7 +242,7 @@ const ClassModal = ({ open, onClose }: Props) => {
 
               <Form.Item
                 label="Sĩ số"
-                name="SiSo"
+                name="classSize"
                 rules={[
                   { required: true, message: 'Vui lòng nhập sĩ số!' },
                   { type: 'number', min: 1, max: 50, message: 'Sĩ số từ 1-50' }

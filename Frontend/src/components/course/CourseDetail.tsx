@@ -24,6 +24,7 @@ const CourseDetail = () => {
   const [classes, setClasses] = useState<ClassDB[]>([])
   const [openCourseModal, setOpenCourseModal] = useState(false)
   const [openClassDrawer, setClassDrawer] = useState(false)
+  const [classId, setClassId] = useState<number | null>(null)
 
   const fetchData = async (courseId: number) => {
     try {
@@ -32,7 +33,7 @@ const CourseDetail = () => {
         classApi.getClassesOfCourse(courseId)
       ])
       setCourse(courseRes.data)
-      console.log(courseRes)
+      //console.log(courseRes)
       setClasses(classesRes.data)
     }
     catch (error: any) {
@@ -41,10 +42,20 @@ const CourseDetail = () => {
     }
   }
 
+  const courseId = Number(id)
+
   useEffect(() => {
-    const courseId = Number(id)
     fetchData(courseId)
   }, [id])
+
+  const handleSaveModal = (id: number) => {
+    setClassId(id)
+    fetchData(courseId)
+    console.log("id lớp nè", classId)
+    setTimeout(() => {
+      setClassId(null)
+    }, 3000);
+  }
 
   if (!course) return <div>Không tìm thấy khóa học</div>
 
@@ -69,14 +80,13 @@ const CourseDetail = () => {
     return sum + classOfCourse.TongGhiDanh
   }, 0)
 
-
   const columns = [
     {
-      title: 'Mã lớp', dataIndex: 'MaLopHoc', key: 'MaLopHoc', width: 85,
+      title: 'Mã lớp', dataIndex: 'MaLopHoc', key: 'MaLopHoc', width: 100,
       render: (code: string) => <Text code>{code}</Text>
     },
     {
-      title: 'Tên lớp', dataIndex: 'TenLop', width: 120,
+      title: 'Tên lớp', dataIndex: 'TenLop', width: 140,
       key: 'TenLop', ellipsis: true,
       render: (name: string) =>
         <Text strong style={{ color: '#1890ff' }}>{name}</Text>
@@ -109,7 +119,7 @@ const CourseDetail = () => {
       title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai', width: 100,
       render: (value: string) => {
         const statusMap: Record<string, { color: string, text: string }> = {
-          OPEN: { color: 'default', text: 'Chưa mở lớp' },
+          OPEN: { color: 'default', text: 'Tuyển sinh' },
           RUNNING: { color: 'success', text: 'Đang hoạt động' },
           CLOSED: { color: 'error', text: 'Đã đóng' }
         }
@@ -195,8 +205,12 @@ const CourseDetail = () => {
                         pagination={{ defaultPageSize: 5 }}
                         rowKey="ID"
                         scroll={{ y: 290 }}
+                        rowClassName={
+                          (record) => {
+                            return record.ID === classId ? 'highlight-row' : ''
+                          }
+                        }
                       />
-
                     ),
                   },
                   {
@@ -212,7 +226,9 @@ const CourseDetail = () => {
             </Card>
             <ClassModal
               open={openClassDrawer}
-              onClose={() => setClassDrawer(false)} />
+              onClose={() => setClassDrawer(false)}
+              khoahocId={Number(id)}
+              onSave={handleSaveModal} />
           </Col>
 
           {/* Cột phải phụ chứa thông tin tổng quan */}

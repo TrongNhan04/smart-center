@@ -19,7 +19,8 @@ export class ClassService {
             where: { MaLopHoc: code }
         })
         if (classDB)
-            throw new ConflictException('Code class has existed')
+            throw new ConflictException('Mã lớp đã được sử dụng')
+        return classDB
     }
 
     // kiểm tra id lớp
@@ -27,7 +28,7 @@ export class ClassService {
         const classDB = await this.prismaService.lopHoc.findUnique({
             where: { ID: classId }
         })
-        if (!classDB) throw new NotFoundException('No English classes found')
+        if (!classDB) throw new NotFoundException('Không tìm thấy lớp học')
         return classDB
     }
 
@@ -37,17 +38,17 @@ export class ClassService {
             this.ClassValidator(classDTO.code),
             this.CourseValidator(classDTO.courseId),
             this.TeacherValidator(classDTO.teacherId),
-            this.DuplicateClass(classDTO.teacherId, classDTO.fromDate, 
-                classDTO.toDate, classDTO.timeTable, classDTO.startTime, 
-            classDTO.endTime)
+            this.DuplicateClass(classDTO.teacherId, classDTO.fromDate,
+                classDTO.toDate, classDTO.timeTable, classDTO.startTime,
+                classDTO.endTime)
         ])
         DateHelper.ValidateTimeRange(classDTO.startTime, classDTO.endTime)
         DateHelper.FromDateToDateValidator(classDTO.fromDate, classDTO.toDate)
         const toDate = new Date(classDTO.toDate)
         toDate.setDate(toDate.getDate() + 1)
 
-        return await this.prismaService.$transaction([
-            this.prismaService.lopHoc.create({
+        return await this.prismaService.$transaction(async (tx) => {
+            const newClass = await tx.lopHoc.create({
                 data: {
                     MaLopHoc: classDTO.code,
                     TenLop: classDTO.name,
@@ -60,12 +61,13 @@ export class ClassService {
                     GioKetThuc: classDTO.endTime,
                     SiSo: classDTO.classSize,
                 }
-            }),
-            this.prismaService.khoaHoc.updateMany({
+            })
+            tx.khoaHoc.updateMany({
                 where: { ID: classDTO.courseId, TrangThai: 'DRAFT' },
                 data: { TrangThai: 'ACTIVE' }
             })
-        ])
+            return newClass
+        })
         // return { mgs: "succesfull" }
     }
 
@@ -113,16 +115,16 @@ export class ClassService {
             where: { KhoaHocID: courseId },
             include: {
                 giaovien: { include: { User: true } },
-                _count:{select:{ghidanh:{where:{TrangThai:'ACTIVE'}}}}
+                _count: { select: { ghidanh: { where: { TrangThai: 'ACTIVE' } } } }
             },
-            orderBy:{ID:'desc'}
+            orderBy: { ID: 'desc' }
         })
         return classDB.map(lh => ({
             ID: lh.ID, MaLopHoc: lh.MaLopHoc, TenLop: lh.TenLop,
             GiaoVien: lh.giaovien.User.HoTen, PhongHoc: lh.PhongHoc,
             TuNgay: lh.TuNgay, DenNgay: lh.DenNgay, LichHoc: lh.LichHoc,
             GioHoc: lh.GioBatDau + '-' + lh.GioKetThuc, SiSo: lh.SiSo,
-            TrangThai: lh.TrangThai, TongGhiDanh:lh._count.ghidanh
+            TrangThai: lh.TrangThai, TongGhiDanh: lh._count.ghidanh
         }))
     }
 
@@ -137,9 +139,9 @@ export class ClassService {
         // Lớp RUNNING || OPEN có buổi học
         if (classDB.TrangThai === 'RUNNING' || (classDB.TrangThai === 'OPEN' && countSession > 0)) {
             if (up.fromDate || up.toDate || up.timeTable)
-                throw new BadRequestException('Cannot do it for this class')
+                throw new BadRequestException('Không được thay đổi thông tin ảnh hưởng đến lịch học')
             if (up.startTime || up.endTime)
-                throw new BadRequestException('Timetable is not change')
+                throw new BadRequestException('Không được thay đổi thông tin ảnh hưởng đến lịch học')
         }
 
         const name = up.name ?? classDB.TenLop
@@ -188,7 +190,7 @@ export class ClassService {
     async DeleteClassByID(classId: number) {
         const classDB = await this.ClassIDValidator(classId)
         if (classDB.TrangThai === 'CLOSED')
-            throw new BadRequestException('Class already closed')
+            throw new BadRequestException('Lớp đã đóng')
 
         await this.prismaService.$transaction(async tx => {
             const now = new Date()
@@ -217,9 +219,9 @@ export class ClassService {
         const teacherDB = await this.prismaService.giaoVien.findUnique({
             where: { UserID: userId }
         })
-        if (!teacherDB) throw new NotFoundException('Teacher not found')
+        if (!teacherDB) throw new NotFoundException('Không tìm thấy giáo viên')
         if (teacherDB.TrangThai === 'INACTIVE')
-            throw new ConflictException('Teacher is INACTIVE')
+            throw new ConflictException('Giáo viên đã nghỉ')
         const classes = await this.prismaService.lopHoc.findMany({
             where: { GiaoVienID: teacherDB.ID },
             select: {
@@ -243,9 +245,9 @@ export class ClassService {
             where: { ID: courseId }
         })
         if (!courseDB)// nếu không tồn tại khóa học
-            throw new NotFoundException('This course is not found')
+            throw new NotFoundException('Không tìm thấy khóa học')
         if (courseDB.TrangThai === 'INACTIVE')
-            throw new ConflictException('Course cannot create a new class')
+            throw new ConflictException('Khóa học này tạm thời không thể mở lớp')
         return courseDB
     }
 
@@ -255,9 +257,9 @@ export class ClassService {
             where: { ID: teacherId }
         })
         if (!teacherDB)
-            throw new NotFoundException('This teacher is not found')
+            throw new NotFoundException('Không tìm thấy giáo viên')
         if (teacherDB.TrangThai === 'INACTIVE')
-            throw new ConflictException('Teacher is retire')
+            throw new ConflictException('Giáo viên đã nghỉ')
         return teacherDB
     }
 
@@ -301,7 +303,8 @@ export class ClassService {
             // kiểm tra giờ học trùng
             const isTimeOverlap = DateHelper.TimeOverlap(lh.GioBatDau, lh.GioKetThuc, sHour, eHour, true)
             if (isTimeOverlap) {
-                throw new ConflictException(`Teacher schedule conflict with class '${lh.MaLopHoc}'`)
+                throw new ConflictException
+                    (`Giáo viên trùng lịch dạy với lớp ${lh.TenLop} - ${lh.MaLopHoc}`)
             }
         }
     }
@@ -338,7 +341,7 @@ export class ClassService {
 
             const dupTime = DateHelper.TimeOverlap(startTime, endTime, lh.GioBatDau, lh.GioKetThuc, true)
             if (dupTime)
-                throw new BadRequestException(`${room} is used by other class ${lh.MaLopHoc} `)
+                throw new BadRequestException(`${room} đã được sử dụng bởi lớp ${lh.TenLop} - ${lh.MaLopHoc} `)
         }
     }
 }

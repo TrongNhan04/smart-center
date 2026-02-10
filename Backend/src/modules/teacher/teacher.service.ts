@@ -80,10 +80,15 @@ export class TeacherService {
                 { ChuyenMon: { contains: q, mode: 'insensitive' } }
             ]
         }
-        return await this.prismaService.giaoVien.findMany({
+        const teacherDB = await this.prismaService.giaoVien.findMany({
             where,
-            omit: { UpdatedAt: true, CreatedAt: true }
+            include: { User: true }
         })
+        return teacherDB.map(item => ({
+            ID: item.ID, MaGiaoVien: item.MaGiaoVien, 
+            HoTen: item.User.HoTen, ChuyenMon: item.ChuyenMon,
+            TrangThai: item.TrangThai
+        }))
     }
 
     // lấy chi tiết 1 giáo viên - phần trên

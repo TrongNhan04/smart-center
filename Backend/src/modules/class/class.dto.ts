@@ -2,7 +2,6 @@ import { Type } from "class-transformer";
 import { ArrayNotEmpty, ArrayUnique, IsArray, IsDate, IsDateString, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, MaxLength, Min } from "class-validator";
 import { TrangThaiLH } from "src/generated/prisma/enums";
 
-
 export class CreateClassDTO {
     @IsNotEmpty()
     @IsString()
@@ -10,20 +9,16 @@ export class CreateClassDTO {
 
     @IsNotEmpty()
     @IsNumber()
-    @Min(1)
     courseId: number
 
     @IsNotEmpty()
     @IsNumber()
-    @Min(1)
     teacherId: number
 
     @IsNotEmpty()
     @IsString()
     @MaxLength(150)
     name: string
-
-    description?: string
 
     @IsNotEmpty()
     @Type(() => Date)

@@ -16,13 +16,13 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: CourseModalProps
 
   const isEdit = editingCourse ? true : false
   const handleOK = async () => {
+    setLoading(true)
     try {
       // dữ liệu từ form (tiếng anh)
       const values: CourseDto = await form.validateFields()
       console.log("value lấy từ form: ",values)
-      setLoading(true)
+      
       await new Promise(resolve => setTimeout(resolve, 1000))
-
       const payload = isEdit ? await courseApi.update(editingCourse.ID, values) :
         await courseApi.create(values)
 

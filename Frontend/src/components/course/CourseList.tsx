@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Badge, Button, Card, Col, Input, message, Row, Select,
   Space, Table, Tag, Typography
 } from 'antd';
-import courseApi, { } from '../../api/courseApi';
+import courseApi from '../../api/courseApi';
 import { ClockCircleOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import CourseAction from './CourseAction';
 import { mapRecordToForm, type CourseDB } from './CourseInterface';
@@ -20,7 +20,8 @@ const CourseList = () => {
   const [filterStatus, setFilterStatus] = useState<string | null>(null)
 
   const [editingCourse, setEditingCourse] = useState<CourseDB | null>(null)
-  const fetchCourses = async () => {
+  
+  const fetchCourses = useCallback(async () => {
     setLoading(true)
     try {
       // lấy dữ liệu từ API
@@ -34,7 +35,11 @@ const CourseList = () => {
     finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    fetchCourses()
+  }, [fetchCourses])
 
   const handleSaveModal = (id: number) => {
     setCourseId(id)
@@ -44,10 +49,6 @@ const CourseList = () => {
     }, 3000);
   }
 
-  useEffect(() => {
-    fetchCourses()
-  }, [])
-
   const filteredData = courses.filter(item => {
     const matchesKeyword = item.TenKhoaHoc.toLocaleLowerCase()
       .includes(searchText.toLocaleLowerCase()) ||
@@ -56,6 +57,19 @@ const CourseList = () => {
     const matchesStatus = filterStatus ? item.TrangThai === filterStatus : true
     return matchesKeyword && matchesStatus
   })
+
+//   // VÍ DỤ TƯƠNG LAI (Nếu đổi sang lọc Server)
+// const fetchCourses = useCallback(async () => {
+//     setLoading(true)
+//     try {
+//       const res = await courseApi.findMany({ q: searchText }) 
+//       setCourses(res.data)
+//     }
+//     // ...
+//     finally {
+//       setLoading(false)
+//     }
+// }, [searchText]) // thêm searchText vào đây
 
   const handleModalAdd = () => {
     setEditingCourse(null)
@@ -86,9 +100,6 @@ const CourseList = () => {
       message.success('Thao tác thành công')
     } catch (error: any) {
       console.log("Có lỗi xảy ra: ", error.response.data.message)
-    }
-    finally {
-      setLoading(false)
     }
   }
 
@@ -218,7 +229,7 @@ const CourseList = () => {
         }
         pagination={{ defaultPageSize: 7 }}
         rowKey="ID"
-        // scroll={{ x: 1100, y: 426 }}
+      // scroll={{ x: 1100, y: 426 }}
       />
 
       {/* Hiển thị Modal UI */}
