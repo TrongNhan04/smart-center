@@ -3,11 +3,12 @@ import type { ClassDto } from "../components/class/ClassInterface"
 
 const classApi = {
     getClassesOfCourse: (courseId: number) =>
-        axiosClient.get(`/admin/courses/${courseId}/classes`)
-    ,
+        axiosClient.get(`/admin/courses/${courseId}/classes`),
 
     create: (body: ClassDto) => 
-        axiosClient.post(`/admin/classes`,body)
+        axiosClient.post(`/admin/classes`,body),
+
+    findMany: () => axiosClient.get(`/admin/classes`)
 }
 
 export default classApi

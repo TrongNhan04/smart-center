@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Badge, Button, Card, Col, Input, message, Row, Select,
   Space, Table, Tag, Typography
@@ -9,6 +9,7 @@ import CourseAction from './CourseAction';
 import { mapRecordToForm, type CourseDB } from './CourseInterface';
 import CourseModal from './CourseModal';
 import { Link } from 'react-router-dom';
+const { Text } = Typography
 
 const CourseList = () => {
   const [courses, setCourses] = useState<CourseDB[]>([])
@@ -20,8 +21,8 @@ const CourseList = () => {
   const [filterStatus, setFilterStatus] = useState<string | null>(null)
 
   const [editingCourse, setEditingCourse] = useState<CourseDB | null>(null)
-  
-  const fetchCourses = useCallback(async () => {
+
+  const fetchCourses = async () => {
     setLoading(true)
     try {
       // lấy dữ liệu từ API
@@ -35,11 +36,11 @@ const CourseList = () => {
     finally {
       setLoading(false)
     }
-  }, [])
+  }
 
   useEffect(() => {
     fetchCourses()
-  }, [fetchCourses])
+  }, [])
 
   const handleSaveModal = (id: number) => {
     setCourseId(id)
@@ -50,26 +51,27 @@ const CourseList = () => {
   }
 
   const filteredData = courses.filter(item => {
-    const matchesKeyword = item.TenKhoaHoc.toLocaleLowerCase()
-      .includes(searchText.toLocaleLowerCase()) ||
-      item.MaKhoaHoc.toLocaleLowerCase().includes(searchText.toLocaleLowerCase())
+    const lowerCase = searchText.toLocaleLowerCase()
+    const matchesKeyword =
+      item.TenKhoaHoc.toLocaleLowerCase().includes(lowerCase) ||
+      item.MaKhoaHoc.toLocaleLowerCase().includes(lowerCase)
 
     const matchesStatus = filterStatus ? item.TrangThai === filterStatus : true
     return matchesKeyword && matchesStatus
   })
 
-//   // VÍ DỤ TƯƠNG LAI (Nếu đổi sang lọc Server)
-// const fetchCourses = useCallback(async () => {
-//     setLoading(true)
-//     try {
-//       const res = await courseApi.findMany({ q: searchText }) 
-//       setCourses(res.data)
-//     }
-//     // ...
-//     finally {
-//       setLoading(false)
-//     }
-// }, [searchText]) // thêm searchText vào đây
+  // (Nếu đổi sang lọc Server)
+  // const fetchCourses = useCallback(async () => {
+  //     setLoading(true)
+  //     try {
+  //       const res = await courseApi.findMany({ q: searchText }) 
+  //       setCourses(res.data)
+  //     }
+  //     // ...
+  //     finally {
+  //       setLoading(false)
+  //     }
+  // }, [searchText]) // thêm searchText vào đây
 
   const handleModalAdd = () => {
     setEditingCourse(null)
@@ -87,7 +89,6 @@ const CourseList = () => {
       await courseApi.update(course.ID, formData)
       fetchCourses()
       message.success('Khôi phục thành công')
-      // handleSaveModal(course.ID)
     } catch (error: any) {
       console.log("Có lỗi xảy ra", error.response.data.message)
     }
@@ -103,12 +104,7 @@ const CourseList = () => {
     }
   }
 
-  const { Text } = Typography
   const columns = [
-    {
-      title: 'ID', dataIndex: 'ID', key: 'ID', width: 60,
-      render: (id: number) => <Text type='secondary'>{id}</Text>
-    },
     {
       title: 'Mã khóa học', dataIndex: 'MaKhoaHoc', key: 'MaKhoaHoc', width: 120,
       render: (code: string) => <Text code>{code}</Text>
@@ -182,15 +178,7 @@ const CourseList = () => {
   ]
 
   return (
-    <Card title="Danh sách khóa học"
-      extra={<Button
-        type="primary"
-        icon={<PlusOutlined />}
-        onClick={handleModalAdd}
-      >
-        Thêm khóa học
-      </Button>}
-    >
+    <Card title={`Danh sách khóa học (${courses.length})`}>
       {/* ô tìm kiếm và bộ lọc */}
       <Row gutter={16} style={{ marginBottom: 20 }}>
         <Col span={6}>
@@ -216,6 +204,15 @@ const CourseList = () => {
           >
           </Select>
         </Col>
+        <Col style={{ marginLeft: 'auto' }}>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={handleModalAdd}
+          >
+            Thêm khóa học
+          </Button>
+        </Col>
       </Row>
       {/* Bảng hiển thị dữ liệu */}
       <Table <CourseDB>
@@ -227,9 +224,9 @@ const CourseList = () => {
             return record.ID === courseId ? 'highlight-row' : ''
           }
         }
-        pagination={{ defaultPageSize: 7 }}
+        pagination={{ defaultPageSize: 8 }}
         rowKey="ID"
-      // scroll={{ x: 1100, y: 426 }}
+        scroll={{ x: 1100, y: 426 }}
       />
 
       {/* Hiển thị Modal UI */}

@@ -1,5 +1,5 @@
 import {
-  Avatar, Badge, Breadcrumb, Button, Card, Col, Descriptions,
+  Avatar, Breadcrumb, Button, Card, Col, Descriptions,
   message, Row, Statistic, Table, Tabs, Tag, Tooltip, Typography
 } from "antd"
 import { useEffect, useState } from "react"
@@ -9,55 +9,73 @@ import type { ClassDB } from "../class/ClassInterface"
 import courseApi from "../../api/courseApi"
 import classApi from "../../api/classApi"
 import {
-  BookOutlined, CalendarOutlined, ClockCircleOutlined,
+  BookOutlined, ClockCircleOutlined,
   DollarCircleOutlined, EditOutlined, HomeOutlined,
   PlusOutlined, ReadOutlined, UserOutlined
 } from "@ant-design/icons"
 import CourseModal from "./CourseModal"
 import ClassModal from "../class/ClassModal"
+import ClassColumn from "../class/ClassColumn"
 
 const { Title, Text } = Typography
 
 const CourseDetail = () => {
   const { id } = useParams()
+  const courseId = Number(id)
   const [course, setCourse] = useState<CourseDB | null>(null)
   const [classes, setClasses] = useState<ClassDB[]>([])
   const [openCourseModal, setOpenCourseModal] = useState(false)
-  const [openClassDrawer, setClassDrawer] = useState(false)
+  const [openClassModal, setOpenClassModal] = useState(false)
   const [classId, setClassId] = useState<number | null>(null)
 
-  const fetchData = async (courseId: number) => {
+  const fetchCourse = async () => {
     try {
-      const [courseRes, classesRes] = await Promise.all([
-        courseApi.findOne(courseId),
-        classApi.getClassesOfCourse(courseId)
-      ])
-      setCourse(courseRes.data)
-      //console.log(courseRes)
-      setClasses(classesRes.data)
-    }
-    catch (error: any) {
+      const res = await courseApi.findOne(courseId)
+      setCourse(res.data)
+    } catch (error: any) {
       message.error("Có lỗi xảy ra!")
-      console.log(error.response.data.message)
+      console.log("Có lỗi hàm fetchCourse: ", error)
     }
   }
 
-  const courseId = Number(id)
+  const fetchClasses = async () => {
+    try {
+      const res = await classApi.getClassesOfCourse(courseId)
+      setClasses(res.data)
+    } catch (error) {
+      message.error("Có lỗi xảy ra!")
+      console.log("Có lỗi hàm fetchClasses: ", error)
+    }
+  }
 
   useEffect(() => {
-    fetchData(courseId)
-  }, [id])
+    const initData = async () => {
+      try {
+        await Promise.all([
+          fetchCourse(), fetchClasses()
+        ])
 
-  const handleSaveModal = (id: number) => {
+      } catch (error) {
+        console.log("lỗi chạy useEffect: ", error)
+      }
+    }
+    if (!courseId || isNaN(courseId)) {
+      console.log("id không phải số nên courseId lỗi!", courseId)
+      return
+    }
+    initData()
+  }, [courseId])
+
+  const SaveClassModal = (id: number) => {
     setClassId(id)
-    fetchData(courseId)
-    console.log("id lớp nè", classId)
+    fetchClasses()
     setTimeout(() => {
       setClassId(null)
     }, 3000);
   }
 
-  if (!course) return <div>Không tìm thấy khóa học</div>
+  if (!course)
+    return <div>Không tìm thấy khóa học</div>
 
   const levelColor: Record<string, { color: string, text: string }> = {
     BEGINER: { color: 'green', text: 'Sơ cấp' },
@@ -79,56 +97,6 @@ const CourseDetail = () => {
   const totalStudentOfCourse = classes.reduce((sum, classOfCourse) => {
     return sum + classOfCourse.TongGhiDanh
   }, 0)
-
-  const columns = [
-    {
-      title: 'Mã lớp', dataIndex: 'MaLopHoc', key: 'MaLopHoc', width: 100,
-      render: (code: string) => <Text code>{code}</Text>
-    },
-    {
-      title: 'Tên lớp', dataIndex: 'TenLop', width: 140,
-      key: 'TenLop', ellipsis: true,
-      render: (name: string) =>
-        <Text strong style={{ color: '#1890ff' }}>{name}</Text>
-    },
-    {
-      title: 'Giáo viên', dataIndex: 'GiaoVien',
-      key: 'GiaoVien', ellipsis: true
-    },
-    {
-      title: 'Khai giảng', dataIndex: 'TuNgay', key: 'TuNgay', width: 130,
-      render: (day: string) =>
-        <Text><CalendarOutlined /> {new Date(day).toLocaleDateString()}</Text>
-    },
-    {
-      title: 'Lịch học', dataIndex: 'LichHoc', key: 'LichHoc',
-      render: (schedule: number[], lophoc: ClassDB) => {
-        const dow = ['CN',
-          'T2', 'T3', 'T4',
-          'T5', 'T6', 'T7',
-        ]
-        const kq = schedule.map(m => dow[m])
-        return kq.join('-') + ` (${lophoc.GioHoc})`
-      }
-    },
-    {
-      title: 'Sĩ số', dataIndex: 'SiSo', key: 'SiSo', width: 70,
-      render: (value: number, lh: ClassDB) => `${lh.TongGhiDanh}/${value}`
-    },
-    {
-      title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai', width: 100,
-      render: (value: string) => {
-        const statusMap: Record<string, { color: string, text: string }> = {
-          OPEN: { color: 'default', text: 'Tuyển sinh' },
-          RUNNING: { color: 'success', text: 'Đang hoạt động' },
-          CLOSED: { color: 'error', text: 'Đã đóng' }
-        }
-        // value là 1 trong 3 key đó
-        const status = statusMap[value]
-        return <Badge status={status.color as any} text={status.text} />
-      }
-    },
-  ]
 
   return (
     // div này bọc toàn bộ nội dung trang chi tiết
@@ -174,7 +142,8 @@ const CourseDetail = () => {
         <CourseModal
           open={openCourseModal}
           onCancel={() => { setOpenCourseModal(false) }}
-          onSave={fetchData}
+          onSave={fetchCourse}//Nếu bên trong Modal gọi onSave(105), 
+          // thì hàm cha sẽ nhận được fetchCourse(105)
           editingCourse={course}
         />
       </div>{/*  div của header */}
@@ -190,18 +159,17 @@ const CourseDetail = () => {
                 tabBarExtraContent={
                   <Button type="dashed"
                     icon={<PlusOutlined />}
-                    onClick={() => setClassDrawer(true)}
+                    onClick={() => setOpenClassModal(true)}
                   >Mở lớp mới
                   </Button>}
                 items={[
                   {
                     key: '1',
-                    label: 'Danh sách lớp học',
+                    label: `Danh sách lớp học (${classes.length})`,
                     children: (
-
-                      <Table <ClassDB> style={{ marginTop: 8 }}
+                      <Table style={{ marginTop: 8 }}
                         dataSource={classes}
-                        columns={columns}
+                        columns={ClassColumn(true)}
                         pagination={{ defaultPageSize: 5 }}
                         rowKey="ID"
                         scroll={{ y: 290 }}
@@ -225,10 +193,10 @@ const CourseDetail = () => {
                 ]} /> {/* kết thúc tab */}
             </Card>
             <ClassModal
-              open={openClassDrawer}
-              onClose={() => setClassDrawer(false)}
+              open={openClassModal}
+              onClose={() => setOpenClassModal(false)}
               khoahocId={Number(id)}
-              onSave={handleSaveModal} />
+              onSave={SaveClassModal} />
           </Col>
 
           {/* Cột phải phụ chứa thông tin tổng quan */}

@@ -18,7 +18,7 @@ type Props = {
   open: boolean,
   onClose: () => void
   khoahocId: number
-  onSave: (id:number)=> void
+  onSave: (id: number) => void
 }
 
 const ClassModal = ({ open, onClose, khoahocId, onSave }: Props) => {
@@ -28,7 +28,8 @@ const ClassModal = ({ open, onClose, khoahocId, onSave }: Props) => {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    const fetchCoure_Teacher = async () => {
+    const fetchCourse_Teacher = async () => {
+      setLoading(true)
       try {
         const [courseRes, teacherRes] = await Promise.all([
           courseApi.findMany(),
@@ -41,8 +42,11 @@ const ClassModal = ({ open, onClose, khoahocId, onSave }: Props) => {
         message.error("Có lỗi xuất hiện")
         console.log("Lỗi: ", error.response.data.message)
       }
+      finally {
+        setLoading(false)
+      }
     }
-    fetchCoure_Teacher()
+    fetchCourse_Teacher()
   }, [])
 
   const daysOfWeek = [
@@ -86,7 +90,7 @@ const ClassModal = ({ open, onClose, khoahocId, onSave }: Props) => {
 
       const res = await classApi.create(payload)
       message.success(`Tạo lớp ${payload.name} thành công`)
-      console.log("id lớp của res: ",res.data.ID)
+      // console.log("id lớp của res: ",res.data.ID)
       onSave(res.data.ID)
       form.resetFields()
       onClose()
@@ -109,9 +113,9 @@ const ClassModal = ({ open, onClose, khoahocId, onSave }: Props) => {
       setLoading(false)
     }
   }
-
   const handleCancel = () => { onClose(); form.resetFields() }
 
+  const { value: initCourseId } = courseOption.find(f => f.value === khoahocId) || {}
   return (
     <>
       {/* Modal */}
@@ -131,7 +135,7 @@ const ClassModal = ({ open, onClose, khoahocId, onSave }: Props) => {
           form={form}
           layout="vertical"
           autoComplete='true'
-          initialValues={{ courseId: khoahocId }}
+          initialValues={{ courseId: initCourseId }}
         >
           <Row gutter={16}>
             {/* Cột trái */}

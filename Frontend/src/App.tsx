@@ -7,6 +7,7 @@ import SidebarComponent from "./components/layout/Sidebar";
 import CourseList from "./components/course/CourseList";
 import HeaderCN from "./components/layout/Header";
 import CourseDetail from "./components/course/CourseDetail";
+import ClassList from "./components/class/ClassList";
 
 const router = createBrowserRouter([
   {
@@ -29,7 +30,9 @@ const router = createBrowserRouter([
           { path: 'courses', element: <CourseList /> },
           { path: 'courses/:id', element:<CourseDetail/> },
           
-          { path: 'classes', element: <div>Trang lớp học</div> },
+          { path: 'classes', element: <ClassList/> },
+
+
           { path: 'teachers', element: <div>Trang giáo viên</div> },
           { path: 'students', element: <div>Trang học viên</div> },
           { path: 'enrolls', element: <div>Trang ghi danh</div> },

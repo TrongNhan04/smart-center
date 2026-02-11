@@ -13,25 +13,6 @@ export class ClassService {
         private sessionService: SessionService
     ) { }
 
-    //kiểm tra trùng mã lớp 
-    private async ClassValidator(code: string) {
-        const classDB = await this.prismaService.lopHoc.findUnique({
-            where: { MaLopHoc: code }
-        })
-        if (classDB)
-            throw new ConflictException('Mã lớp đã được sử dụng')
-        return classDB
-    }
-
-    // kiểm tra id lớp
-    private async ClassIDValidator(classId: number) {
-        const classDB = await this.prismaService.lopHoc.findUnique({
-            where: { ID: classId }
-        })
-        if (!classDB) throw new NotFoundException('Không tìm thấy lớp học')
-        return classDB
-    }
-
     // thêm lớp mới
     async CreateClass(classDTO: CreateClassDTO) {
         await Promise.all([
@@ -68,7 +49,6 @@ export class ClassService {
             })
             return newClass
         })
-        // return { mgs: "succesfull" }
     }
 
     // lấy danh sách lớp mặc định hoặc query
@@ -87,13 +67,29 @@ export class ClassService {
                 ]
             })
         }
-        return await this.prismaService.lopHoc.findMany({
+        const classDB = await this.prismaService.lopHoc.findMany({
             where: { AND: condition },
-            omit: {
-                CreatedAt: true,
-                UpdatedAt: true,
-            }
+            include: {
+                khoahoc: true, giaovien: { include: { User: true } },
+                _count: { select: { ghidanh: { where: { TrangThai: 'ACTIVE' } } } }
+            },
+            orderBy: { ID: 'desc' }
         })
+        return classDB.map(lh => ({
+            ID: lh.ID, MaLopHoc: lh.MaLopHoc, TenLop: lh.TenLop,
+            GiaoVien: {
+                ID: lh.GiaoVienID,
+                HoTen: lh.giaovien.User.HoTen
+            },
+            KhoaHoc: {
+                ID: lh.KhoaHocID,
+                TenKhoaHoc: lh.khoahoc.TenKhoaHoc
+            },
+            PhongHoc: lh.PhongHoc, KhoaHocID: lh.KhoaHocID,
+            TuNgay: lh.TuNgay, DenNgay: lh.DenNgay, LichHoc: lh.LichHoc,
+            GioHoc: lh.GioBatDau + ' - ' + lh.GioKetThuc, SiSo: lh.SiSo,
+            TrangThai: lh.TrangThai, TongGhiDanh: lh._count.ghidanh
+        }))
     }
 
     // lấy chi tiết lớp - phần trên
@@ -121,9 +117,13 @@ export class ClassService {
         })
         return classDB.map(lh => ({
             ID: lh.ID, MaLopHoc: lh.MaLopHoc, TenLop: lh.TenLop,
-            GiaoVien: lh.giaovien.User.HoTen, PhongHoc: lh.PhongHoc,
+            GiaoVien: {
+                ID: lh.GiaoVienID,
+                HoTen: lh.giaovien.User.HoTen
+            },
+            PhongHoc: lh.PhongHoc, KhoaHocID: lh.KhoaHocID,
             TuNgay: lh.TuNgay, DenNgay: lh.DenNgay, LichHoc: lh.LichHoc,
-            GioHoc: lh.GioBatDau + '-' + lh.GioKetThuc, SiSo: lh.SiSo,
+            GioHoc: lh.GioBatDau + ' - ' + lh.GioKetThuc, SiSo: lh.SiSo,
             TrangThai: lh.TrangThai, TongGhiDanh: lh._count.ghidanh
         }))
     }
@@ -237,6 +237,25 @@ export class ClassService {
             GioBatDau: x.GioBatDau, GioKetThuc: x.GioKetThuc,
             SiSo: x.SiSo, PhongHoc: x.PhongHoc
         }))
+    }
+
+    //kiểm tra trùng mã lớp 
+    private async ClassValidator(code: string) {
+        const classDB = await this.prismaService.lopHoc.findUnique({
+            where: { MaLopHoc: code }
+        })
+        if (classDB)
+            throw new ConflictException('Mã lớp đã được sử dụng')
+        return classDB
+    }
+
+    // kiểm tra id lớp
+    private async ClassIDValidator(classId: number) {
+        const classDB = await this.prismaService.lopHoc.findUnique({
+            where: { ID: classId }
+        })
+        if (!classDB) throw new NotFoundException('Không tìm thấy lớp học')
+        return classDB
     }
 
     //kiểm tra id khóa học 
