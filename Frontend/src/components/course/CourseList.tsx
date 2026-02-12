@@ -73,12 +73,12 @@ const CourseList = () => {
   //     }
   // }, [searchText]) // thêm searchText vào đây
 
-  const handleModalAdd = () => {
+  const OpenModalAdd = () => {
     setEditingCourse(null)
     setIsOpen(true)
   }
 
-  const handleModalEdit = (course: CourseDB) => {
+  const OpenModalEdit = (course: CourseDB) => {
     setEditingCourse(course)
     setIsOpen(true)
   }
@@ -105,11 +105,11 @@ const CourseList = () => {
   }
 
   const columns = [
-    {
+    { // mã khóa học
       title: 'Mã khóa học', dataIndex: 'MaKhoaHoc', key: 'MaKhoaHoc', width: 120,
       render: (code: string) => <Text code>{code}</Text>
     },
-    {
+    { // tên khóa học
       title: 'Tên khóa học', dataIndex: 'TenKhoaHoc', width: 220,
       key: 'TenKhoaHoc', ellipsis: true,
       render: (name: string, course: CourseDB) =>
@@ -117,7 +117,7 @@ const CourseList = () => {
           style={{ fontWeight: 'bold' }}>{name}</Link>
       // <Text strong style={{ color: '#1890ff' }}>{name}</Text>
     },
-    {
+    { // trình độ
       title: 'Trình độ', dataIndex: 'TrinhDo', key: 'TrinhDo', width: 100,
       render: (level: string) => {
         const levelMap: Record<string, { color: string, text: string }> = {
@@ -130,7 +130,7 @@ const CourseList = () => {
         return <Tag color={status.color}>{status.text}</Tag>
       }
     },
-    {
+    { // học phí
       title: 'Học phí', dataIndex: 'HocPhi', key: 'HocPhi', width: 120,
       align: 'right' as const,
       render: (fee: number) => {
@@ -141,7 +141,7 @@ const CourseList = () => {
         </Space>)
       }
     },
-    {
+    { // thời gian
       title: 'Thời gian', dataIndex: 'ThoiGian', key: 'ThoiGian', width: 170,
       render: (month: number, courses: CourseDB) => (
         <Space>
@@ -150,7 +150,7 @@ const CourseList = () => {
         </Space>
       )
     },
-    {
+    { // trạng thái
       title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai', width: 160,
       render: (value: string) => {
         const statusMap: Record<string, { color: string, text: string }> = {
@@ -164,14 +164,14 @@ const CourseList = () => {
         return <Badge status={status.color as any} text={status.text} />
       }
     },
-    {//data: CourseDB
+    {// thao tác
       title: 'Thao tác', key: 'action', align: 'center' as const, width: 150,
       render: (course: CourseDB) => (
         <CourseAction
           course={course}
           onRestore={handleRestore}
           onSoftDelete={handleSoftDelete}
-          onEdit={handleModalEdit}
+          onEdit={OpenModalEdit}
         />
       )
     }
@@ -208,7 +208,7 @@ const CourseList = () => {
           <Button
             type="primary"
             icon={<PlusOutlined />}
-            onClick={handleModalAdd}
+            onClick={OpenModalAdd}
           >
             Thêm khóa học
           </Button>

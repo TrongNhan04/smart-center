@@ -2,16 +2,11 @@ import { BadRequestException, ConflictException, Injectable, NotFoundException }
 import { PrismaService } from "src/prisma/prisma.service";
 import { QueryClassDTO, UpdateClassDTO, CreateClassDTO } from "./class.dto";
 import { Prisma } from "src/generated/prisma/client";
-import { SessionStatusDTO } from "../session/session.dto";
-import { SessionService } from "../session/session.service";
 import { DateHelper } from "src/common/date.helper";
 
 @Injectable()
 export class ClassService {
-    constructor(
-        private prismaService: PrismaService,
-        private sessionService: SessionService
-    ) { }
+    constructor(private prismaService: PrismaService) { }
 
     // thêm lớp mới
     async CreateClass(classDTO: CreateClassDTO) {
@@ -189,8 +184,8 @@ export class ClassService {
     // xóa mềm lớp học, hủy ghi danh và hủy các buổi học chưa diễn ra
     async DeleteClassByID(classId: number) {
         const classDB = await this.ClassIDValidator(classId)
-        if (classDB.TrangThai === 'CLOSED')
-            throw new BadRequestException('Lớp đã đóng')
+        if (classDB.TrangThai !== 'OPEN')
+            throw new BadRequestException('Không thể hủy lớp học này!')
 
         await this.prismaService.$transaction(async tx => {
             const now = new Date()
@@ -206,12 +201,12 @@ export class ClassService {
                 where: {
                     LopHocID: classId,
                     TrangThai: 'SCHEDULED',
-                    BatDauLuc: { gt: now }
+                    // BatDauLuc: { gt: now }
                 },
                 data: { TrangThai: 'CANCELLED' }
             })
         })
-        return { msg: "Class Closed" }
+        return { msg: "Hủy lớp học thành công" }
     }
 
     // lấy danh sách lớp theo giáo viên - userId

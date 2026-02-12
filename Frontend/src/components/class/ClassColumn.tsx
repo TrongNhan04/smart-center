@@ -5,6 +5,7 @@ import { CalendarOutlined, ClockCircleOutlined } from "@ant-design/icons"
 const { Text } = Typography
 
 const ClassColumn = (isHiden: boolean) => {
+  
   const columns = [
     {// mã lớp+tên lớp chung
       title: 'Lớp học', dataIndex: 'MaLopHoc', key: 'MaLopHoc',
@@ -17,7 +18,7 @@ const ClassColumn = (isHiden: boolean) => {
       )
     },
     ...(!isHiden ? [ // toán tử spread lấy phần ruột
-      { // nếu đúng lấy {}, sai trả về mảng rỗng -> ruột rỗng
+      { // nếu đúng lấy ruột {...}, sai trả về mảng rỗng -> ruột rỗng
         title: 'Khóa học', dataIndex: ['KhoaHoc', 'TenKhoaHoc'],
         key: 'TenKhoaHoc', ellipsis: true
       },
@@ -27,7 +28,7 @@ const ClassColumn = (isHiden: boolean) => {
       key: 'HoTen', ellipsis: true
     },
     {
-      title: 'Khai giảng', dataIndex: 'TuNgay', key: 'TuNgay',
+      title: 'Khai giảng', dataIndex: 'TuNgay', key: 'TuNgay', width: 130,
       render: (day: string) =>
         <Text><CalendarOutlined /> {new Date(day).toLocaleDateString()}</Text>
     },
@@ -50,7 +51,6 @@ const ClassColumn = (isHiden: boolean) => {
     {
       title: 'Sĩ số', dataIndex: 'SiSo', key: 'SiSo',
       render: (classSize: number, lophoc: ClassDB) => (
-        // <Space orientation="vertical" size={0}>
         <>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>{lophoc.TongGhiDanh}/{classSize}</span>
@@ -60,7 +60,7 @@ const ClassColumn = (isHiden: boolean) => {
             percent={(lophoc.TongGhiDanh / classSize) * 100}
             showInfo={false}
           />
-        </>// </Space>
+        </>
       )
     },
     {
@@ -78,7 +78,7 @@ const ClassColumn = (isHiden: boolean) => {
     },
     ...(!isHiden ? [
       {
-        title: 'Thao tác', key: 'action', align: 'center' as const
+        title: 'Thao tác', key: 'action', align: 'center' as const,
       }
     ] : [])
   ]

@@ -10,7 +10,8 @@ interface CourseModalProps {
   editingCourse: CourseDB
 }
 
-const CourseModal = ({ open, onCancel, onSave, editingCourse }: CourseModalProps) => {
+const CourseModal = ({ 
+  open, onCancel, onSave, editingCourse }: CourseModalProps) => {
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
 

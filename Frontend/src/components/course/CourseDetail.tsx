@@ -1,6 +1,6 @@
 import {
-  Avatar, Breadcrumb, Button, Card, Col, Descriptions,
-  message, Row, Statistic, Table, Tabs, Tag, Tooltip, Typography
+  Avatar, Badge, Breadcrumb, Button, Card, Col, Descriptions,
+  message, Progress, Row, Space, Statistic, Table, Tabs, Tag, Tooltip, Typography
 } from "antd"
 import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
@@ -9,13 +9,12 @@ import type { ClassDB } from "../class/ClassInterface"
 import courseApi from "../../api/courseApi"
 import classApi from "../../api/classApi"
 import {
-  BookOutlined, ClockCircleOutlined,
+  BookOutlined, CalendarOutlined, ClockCircleOutlined,
   DollarCircleOutlined, EditOutlined, HomeOutlined,
   PlusOutlined, ReadOutlined, UserOutlined
 } from "@ant-design/icons"
 import CourseModal from "./CourseModal"
 import ClassModal from "../class/ClassModal"
-import ClassColumn from "../class/ClassColumn"
 
 const { Title, Text } = Typography
 
@@ -98,6 +97,72 @@ const CourseDetail = () => {
     return sum + classOfCourse.TongGhiDanh
   }, 0)
 
+  const columns = [
+    {// mã lớp + tên lớp chung
+      title: 'Lớp học', dataIndex: 'MaLopHoc', key: 'MaLopHoc',
+      render: (code: string, lophoc: ClassDB) => (
+        <Space orientation="vertical">
+          <Text strong style={{ color: '#1890ff' }}>
+            {lophoc.TenLop}</Text>
+          <Text type="secondary" style={{ fontSize: 14 }}>{code}</Text>
+        </Space>
+      )
+    },
+    { // giáo viên
+      title: 'Giáo viên', dataIndex: ['GiaoVien', 'HoTen'],
+      key: 'HoTen', ellipsis: true
+    },
+    { // khai giảng = ngày bắt đầu
+      title: 'Khai giảng', dataIndex: 'TuNgay', key: 'TuNgay', width: 130,
+      render: (day: string) =>
+        <Text><CalendarOutlined /> {new Date(day).toLocaleDateString()}</Text>
+    },
+    { // lịch học
+      title: 'Lịch học', dataIndex: 'LichHoc', key: 'LichHoc',
+      render: (schedule: number[], lophoc: ClassDB) => {
+        const dow = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
+        const result = schedule.map(m => dow[m]).join('-')
+
+        {/* orientation="vertical" giúp xếp chồng lên nhau */ }
+        return <Space orientation="vertical" size={0}>
+          <Text strong><ClockCircleOutlined /> {lophoc.GioHoc}</Text>
+
+          <Text type="secondary" style={{ fontSize: '14px', display: 'block', textAlign: 'center' }}>
+            {result}
+          </Text>
+        </Space>
+      }
+    },
+    { // sĩ số
+      title: 'Sĩ số', dataIndex: 'SiSo', key: 'SiSo',
+      render: (classSize: number, lophoc: ClassDB) => (
+        <>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span>{lophoc.TongGhiDanh}/{classSize}</span>
+            <small style={{ color: '#999' }}>HV</small>
+          </div>
+          <Progress
+            percent={(lophoc.TongGhiDanh / classSize) * 100}
+            showInfo={false}
+          />
+        </>
+      )
+    },
+    { // trạng thái
+      title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai',
+      render: (value: string) => {
+        const statusMap: Record<string, { color: string, text: string }> = {
+          OPEN: { color: 'default', text: 'Tuyển sinh' },
+          RUNNING: { color: 'success', text: 'Đang hoạt động' },
+          CLOSED: { color: 'error', text: 'Đã đóng' }
+        }
+        // value là 1 trong 3 key đó
+        const status = statusMap[value]
+        return <Badge status={status.color as any} text={status.text} />
+      }
+    },
+  ]
+
   return (
     // div này bọc toàn bộ nội dung trang chi tiết
     <div style={{ minHeight: 'calc(100vh - 64px)', background: '#f0f2f5' }}>
@@ -110,7 +175,7 @@ const CourseDetail = () => {
           { title: `${course.TenKhoaHoc}` }
         ]} />
 
-        {/* Tiêu đề và thông tin chính */}
+        {/* Tiêu đề, avata */}
         <div style={{
           display: 'flex', justifyContent: 'space-between',
           alignItems: 'center', marginTop: 16
@@ -151,7 +216,7 @@ const CourseDetail = () => {
       {/* div của body */}
       <div style={{ padding: '24px' }}>
         <Row gutter={24}>
-          {/* cột trái chứa thông tin chi tiết */}
+          {/* cột trái: bảng lớp học và mô tả */}
           <Col span={19}>
             <Card>
               <Tabs
@@ -169,7 +234,7 @@ const CourseDetail = () => {
                     children: (
                       <Table style={{ marginTop: 8 }}
                         dataSource={classes}
-                        columns={ClassColumn(true)}
+                        columns={columns}
                         pagination={{ defaultPageSize: 5 }}
                         rowKey="ID"
                         scroll={{ y: 290 }}
@@ -196,10 +261,12 @@ const CourseDetail = () => {
               open={openClassModal}
               onClose={() => setOpenClassModal(false)}
               khoahocId={Number(id)}
-              onSave={SaveClassModal} />
+              onSave={SaveClassModal} 
+              editingClass={null!}
+            />
           </Col>
 
-          {/* Cột phải phụ chứa thông tin tổng quan */}
+          {/* Cột phải: chứa thông tin tổng quan */}
           <Col span={5}>
             {/* thông tin tổng quan  */}
             <Card title="Thông tin chung" style={{ marginBottom: 24 }}>

@@ -1,7 +1,6 @@
 import {
   Modal, Form, Input, Select, DatePicker, TimePicker,
-  InputNumber, Row, Col,
-  message,
+  InputNumber, Row, Col, message, Space,
 } from 'antd';
 import { useEffect, useState } from 'react';
 import courseApi from '../../api/courseApi';
@@ -10,18 +9,21 @@ import type { CourseDB } from '../course/CourseInterface';
 import type { TeacherDB } from '../teacher/TeacherInterface';
 import dayjs from 'dayjs';
 import classApi from '../../api/classApi';
-import type { ClassDto } from './ClassInterface';
+import { mapRecordToFormClass, type ClassDB, type ClassDto } from './ClassInterface';
 
 const { RangePicker } = DatePicker
 
 type Props = {
   open: boolean,
   onClose: () => void
-  khoahocId: number
+  khoahocId: number | null
   onSave: (id: number) => void
+  editingClass: ClassDB
 }
 
-const ClassModal = ({ open, onClose, khoahocId, onSave }: Props) => {
+const ClassModal = ({
+  open, onClose, khoahocId, onSave, editingClass }: Props) => {
+  const isEdit = editingClass ? true : false
   const [form] = Form.useForm()
   const [courses, setCourses] = useState<CourseDB[]>([])
   const [teachers, setTeachers] = useState<TeacherDB[]>([])
@@ -47,7 +49,17 @@ const ClassModal = ({ open, onClose, khoahocId, onSave }: Props) => {
       }
     }
     fetchCourse_Teacher()
-  }, [])
+
+    if (open) {
+      if (editingClass) {
+        const formData = mapRecordToFormClass(editingClass)
+        console.log("data của table truyền cho form: ", formData)
+        form.setFieldsValue(formData)
+      }
+      else
+        form.resetFields()
+    }
+  }, [open, form, editingClass])
 
   const daysOfWeek = [
     { label: 'Chủ nhật', value: 0 },
@@ -59,16 +71,24 @@ const ClassModal = ({ open, onClose, khoahocId, onSave }: Props) => {
     { label: 'Thứ 7', value: 6 },
   ]
 
-  const courseOption = courses.map(item => ({
-    label: item.TenKhoaHoc,
-    value: item.ID
-  }))
+  const courseOption = []
+  for (var item of courses) {
+    if (item.TrangThai !== 'INACTIVE')
+      courseOption.push({
+        label: item.TenKhoaHoc,
+        value: item.ID
+      })
+  }
 
-  const teacherOption = teachers.map(item => ({
-    label: item.HoTen,
-    value: item.ID
-  }))
-  // const nowLocal = dayjs()
+  const teacherOption = []
+  for (var i of teachers) {
+    if (i.TrangThai !== 'INACTIVE')
+      teacherOption.push({
+        label: i.HoTen,
+        value: i.ID,
+        desc: i.MaGiaoVien
+      })
+  }
 
   const handleSubmit = async () => {
     setLoading(true)
@@ -86,11 +106,11 @@ const ClassModal = ({ open, onClose, khoahocId, onSave }: Props) => {
         startTime: values.startTime.format('HH:mm'),
         endTime: values.endTime.format('HH:mm'),
       }
-      console.log("value của payload: ", payload)
+      console.log("value của payload trước khi call api: ", payload)
 
       const res = await classApi.create(payload)
       message.success(`Tạo lớp ${payload.name} thành công`)
-      // console.log("id lớp của res: ",res.data.ID)
+
       onSave(res.data.ID)
       form.resetFields()
       onClose()
@@ -113,14 +133,16 @@ const ClassModal = ({ open, onClose, khoahocId, onSave }: Props) => {
       setLoading(false)
     }
   }
-  const handleCancel = () => { onClose(); form.resetFields() }
 
-  const { value: initCourseId } = courseOption.find(f => f.value === khoahocId) || {}
+  const handleCancel = () => { onClose(); form.resetFields() }
+  const { value: initCourseId } = courseOption.find(
+    f => f.value === khoahocId) || {}
+
   return (
     <>
       {/* Modal */}
       <Modal
-        title="Thêm lớp học mới"
+        title={isEdit ? 'Cập nhật lớp học' : 'Thêm lớp học'}
         open={open}
         onCancel={handleCancel}
         width={800}
@@ -156,6 +178,7 @@ const ClassModal = ({ open, onClose, khoahocId, onSave }: Props) => {
                 <Select
                   placeholder="Chọn khóa học"
                   // showSearch
+                  //maxCount={3}
                   options={courseOption}
                 />
               </Form.Item>
@@ -177,6 +200,11 @@ const ClassModal = ({ open, onClose, khoahocId, onSave }: Props) => {
                   placeholder="Chọn giáo viên"
                   // showSearch
                   options={teacherOption}
+                  optionRender={(teacherOption) => (
+                    <Space>
+                      {`${teacherOption.data.label} (${teacherOption.data.desc})`}
+                    </Space>
+                  )}
                 />
               </Form.Item>
             </Col>
