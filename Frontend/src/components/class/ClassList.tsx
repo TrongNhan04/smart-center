@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import classApi from "../../api/classApi";
 import ClassModal from "./ClassModal";
 import ClassAction from "./ClassAction";
+import { Link } from "react-router-dom";
 const { Text } = Typography
 
 const ClassList = () => {
@@ -51,6 +52,7 @@ const ClassList = () => {
   })
 
   const OpenModalAdd = () => {
+    setEditingClass(null)
     setOpenClassModal(true)
   }
 
@@ -60,6 +62,7 @@ const ClassList = () => {
     setTimeout(() => {
       setClassId(null)
     }, 3000);
+
   }
 
   const handleSoftDelete = async (id: number) => {
@@ -92,7 +95,11 @@ const ClassList = () => {
     // ...(!isHiden ? [ // toán tử spread lấy phần ruột
     { // khóa học 
       title: 'Khóa học', dataIndex: ['KhoaHoc', 'TenKhoaHoc'],
-      key: 'TenKhoaHoc', ellipsis: true
+      key: 'TenKhoaHoc', ellipsis: true,
+      render: (name: string, lophoc: ClassDB) =>
+        <Link to={`/admin/courses/${lophoc.KhoaHoc.ID}`}
+          style={{ fontWeight: 'bold' }}
+        >{name}</Link>
     },
     // ] : []),
     { // giáo viên
@@ -213,7 +220,7 @@ const ClassList = () => {
       {/* Hiển thị Modal UI */}
       <ClassModal
         open={openClassModal}
-        onClose={() => setOpenClassModal(false)}
+        onCancel={() => setOpenClassModal(false)}
         khoahocId={null}
         onSave={handleSaveModal}
         editingClass={editingClass!}

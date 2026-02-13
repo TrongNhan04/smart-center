@@ -10,19 +10,20 @@ import type { TeacherDB } from '../teacher/TeacherInterface';
 import dayjs from 'dayjs';
 import classApi from '../../api/classApi';
 import { mapRecordToFormClass, type ClassDB, type ClassDto } from './ClassInterface';
+import { DateHelper } from './date.helper';
 
 const { RangePicker } = DatePicker
 
 type Props = {
   open: boolean,
-  onClose: () => void
+  onCancel: () => void
   khoahocId: number | null
   onSave: (id: number) => void
   editingClass: ClassDB
 }
 
 const ClassModal = ({
-  open, onClose, khoahocId, onSave, editingClass }: Props) => {
+  open, onCancel, khoahocId, onSave, editingClass }: Props) => {
   const isEdit = editingClass ? true : false
   const [form] = Form.useForm()
   const [courses, setCourses] = useState<CourseDB[]>([])
@@ -52,8 +53,19 @@ const ClassModal = ({
 
     if (open) {
       if (editingClass) {
-        const formData = mapRecordToFormClass(editingClass)
-        console.log("data của table truyền cho form: ", formData)
+        // từ tiếng việt thành tiếng anh
+        const record = mapRecordToFormClass(editingClass)
+        // tách fromDate, toDate, startTime, endTime ra riêng 
+        const { fromDate, toDate, startTime, endTime, ...rest } = record
+        const formData = {
+          ...rest,
+          // gộp thành fromToDate
+          fromToDate: [dayjs(fromDate), dayjs(toDate)],
+          // format từ string sthành dayjs để hiện lên form
+          startTime: DateHelper.ConvertHourStrToDayJS(startTime),
+          endTime: DateHelper.ConvertHourStrToDayJS(endTime),
+        }
+        // console.log("data của table truyền cho form: ", formData)
         form.setFieldsValue(formData)
       }
       else
@@ -94,10 +106,12 @@ const ClassModal = ({
     setLoading(true)
     try {
       const values = await form.validateFields()
-      // tách riêng fromToDate => rest là phần còn lại
-      const { fromToDate, ...rest } = values
+      console.log("values từ form: ", values)
 
       await new Promise(resolve => { setTimeout(resolve, 1000) })
+
+      // tách riêng fromToDate => rest là phần còn lại
+      const { fromToDate, ...rest } = values
       // endTime, fromToDate, startTime
       const payload: ClassDto = {
         ...rest, // phần còn lại
@@ -105,15 +119,21 @@ const ClassModal = ({
         toDate: dayjs(values.fromToDate[1]).toISOString(),
         startTime: values.startTime.format('HH:mm'),
         endTime: values.endTime.format('HH:mm'),
+        // room: values.room || null,
       }
-      console.log("value của payload trước khi call api: ", payload)
 
-      const res = await classApi.create(payload)
-      message.success(`Tạo lớp ${payload.name} thành công`)
+      let res = null
+      if (isEdit && editingClass.TrangThai === 'OPEN')
+        res = await classApi.updateOpen(editingClass.ID, payload)
+      else if (isEdit && editingClass.TrangThai === 'RUNNING')
+        res = await classApi.updateRunning(editingClass.ID, payload)
+      else
+        res = await classApi.create(payload)
 
+      message.success(`Thao tác thành công`)
       onSave(res.data.ID)
-      form.resetFields()
-      onClose()
+
+      handleCancel()
     }
     catch (error: any) {
       console.log("Có lỗi xảy ra: ", error.response.data.message)
@@ -134,7 +154,7 @@ const ClassModal = ({
     }
   }
 
-  const handleCancel = () => { onClose(); form.resetFields() }
+  const handleCancel = () => { form.resetFields(); onCancel() }
   const { value: initCourseId } = courseOption.find(
     f => f.value === khoahocId) || {}
 
@@ -152,6 +172,7 @@ const ClassModal = ({
         maskClosable={false}
         confirmLoading={loading}
         centered
+      //bodyStyle={{ maxHeight: '500px', overflowY: 'auto' }}
       >
         <Form
           form={form}
@@ -167,7 +188,12 @@ const ClassModal = ({
                 name="code"
                 rules={[{ required: true, message: 'Vui lòng nhập mã lớp!' }]}
               >
-                <Input placeholder="VD: ENG001-01" />
+                {isEdit ?
+                  <div style={{ padding: '4px 11px', color: '#000' }}>
+                    - {editingClass.MaLopHoc}
+                  </div>
+                  : (<Input readOnly={isEdit} placeholder="VD: ENG001-01" />)
+                }
               </Form.Item>
 
               <Form.Item
@@ -175,12 +201,15 @@ const ClassModal = ({
                 name="courseId"
                 rules={[{ required: true, message: 'Vui lòng chọn khóa học!' }]}
               >
-                <Select
-                  placeholder="Chọn khóa học"
-                  // showSearch
-                  //maxCount={3}
-                  options={courseOption}
-                />
+                {isEdit ?
+                  <div style={{ padding: '4px 11px', color: '#000' }}>
+                    - {editingClass.KhoaHoc.TenKhoaHoc}
+                  </div>
+                  : <Select
+                    placeholder="Chọn khóa học"
+                    options={courseOption}
+                    disabled={isEdit}
+                  />}
               </Form.Item>
 
               <Form.Item
@@ -216,11 +245,17 @@ const ClassModal = ({
                 name="fromToDate"
                 rules={[{ required: true, message: 'Vui lòng chọn thời gian!' }]}
               >
-                <RangePicker
-                  style={{ width: '100%' }}
-                  format="DD/MM/YYYY"
-                  placeholder={['Từ ngày', 'Đến ngày']}
-                />
+                {isEdit && editingClass.TrangThai === 'RUNNING' ?
+                  <div style={{ padding: '4px 11px', color: '#000' }}>
+                    {`- Từ ngày: ${editingClass.TuNgay.slice(0, 10)} đến ngày: ${editingClass.DenNgay.slice(0, 10)}`}
+                  </div>
+                  : <RangePicker
+                    style={{ width: '100%' }}
+                    format="DD/MM/YYYY"
+                    placeholder={['Từ ngày', 'Đến ngày']}
+                    disabled={isEdit && editingClass.TrangThai === 'RUNNING'}
+                  />
+                }
               </Form.Item>
 
               <Form.Item
@@ -228,9 +263,18 @@ const ClassModal = ({
                 name="timeTable"
                 rules={[{ required: true, message: 'Chọn lịch học' }]}
               >
-                <Select placeholder="Chọn lịch học" mode="multiple"
-                  options={daysOfWeek}
-                />
+                {isEdit && editingClass.TrangThai === 'RUNNING' ?
+                  <div style={{ padding: '4px 11px', color: '#000' }}>
+                    - {editingClass.LichHoc.map(
+                      // lấy thứ từ dow rồi ghép lại 
+                      item => daysOfWeek[item].label).join(', ')}
+                  </div>
+                  : <Select placeholder="Chọn lịch học" mode="multiple"
+                    options={daysOfWeek}
+                    maxCount={7}
+                    disabled={isEdit && editingClass.TrangThai === 'RUNNING'}
+                  />
+                }
               </Form.Item>
 
               <Row gutter={8}>
@@ -240,16 +284,22 @@ const ClassModal = ({
                     name="startTime"
                     rules={[{ required: true, message: 'Chọn giờ!' }]}
                   >
-                    <TimePicker
-                      style={{ width: '100%' }}
-                      format="HH:mm"
-                      placeholder="VD: 18:00"
-                      minuteStep={15}
-                      disabledTime={() => ({
-                        disabledHours: () => [0, 1, 2, 3, 4, 5, 6, 22, 23]
-                      })}
-                      hideDisabledOptions={true}
-                    />
+                    {isEdit && editingClass.TrangThai === 'RUNNING' ?
+                      <div style={{ padding: '4px 11px', color: '#000' }}>
+                        - {editingClass.GioHoc.slice(0, 5)}
+                      </div>
+                      : <TimePicker
+                        style={{ width: '100%' }}
+                        format="HH:mm"
+                        placeholder="VD: 18:00"
+                        minuteStep={15}
+                        disabledTime={() => ({
+                          disabledHours: () => [0, 1, 2, 3, 4, 5, 6, 22, 23]
+                        })}
+                        hideDisabledOptions={true}
+                        disabled={isEdit && editingClass.TrangThai === 'RUNNING'}
+                      />
+                    }
                   </Form.Item>
                 </Col>
                 <Col span={12}>
@@ -258,37 +308,78 @@ const ClassModal = ({
                     name="endTime"
                     rules={[{ required: true, message: 'Chọn giờ!' }]}
                   >
-                    <TimePicker
-                      style={{ width: '100%' }}
-                      format="HH:mm"
-                      placeholder="VD: 20:00"
-                      minuteStep={15}
-                      disabledTime={() => ({
-                        disabledHours: () => [0, 1, 2, 3, 4, 5, 6, 22, 23]
-                      })}
-                      hideDisabledOptions={true}
-                    />
+                    {isEdit && editingClass.TrangThai === 'RUNNING' ?
+                      <div style={{ padding: '4px 11px', color: '#000' }}>
+                        - {editingClass.GioHoc.slice(8, 13)} 
+                      </div>
+                      : <TimePicker
+                        style={{ width: '100%' }}
+                        format="HH:mm"
+                        placeholder="VD: 20:00"
+                        minuteStep={15}
+                        disabledTime={() => ({
+                          disabledHours: () => [0, 1, 2, 3, 4, 5, 6, 22, 23]
+                        })}
+                        hideDisabledOptions={true}
+                        disabled={isEdit && editingClass.TrangThai === 'RUNNING'}
+                      />
+                    }
                   </Form.Item>
                 </Col>
               </Row>
 
-              <Form.Item
-                label="Sĩ số"
-                name="classSize"
-                rules={[
-                  { required: true, message: 'Vui lòng nhập sĩ số!' },
-                  { type: 'number', min: 1, max: 50, message: 'Sĩ số từ 1-50' }
-                ]}
-              >
-                <InputNumber
-                  style={{ width: '100%' }}
-                  min={1}
-                  max={50}
-                  placeholder="VD: 20"
-                />
-              </Form.Item>
-            </Col>
+              {isEdit ? <Row gutter={8}>
+                <Col span={12}>
+                  <Form.Item
+                    label="Sĩ số"
+                    name="classSize"
+                    rules={[
+                      { required: true, message: 'Vui lòng nhập sĩ số!' },
+                      { type: 'number', min: 1, max: 50, message: 'Sĩ số từ 1-50' }
+                    ]}
+                  >
+                    <InputNumber
+                      style={{ width: '100%' }}
+                      min={1}
+                      max={50}
+                      placeholder="VD: 20"
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    label="Phòng học"
+                    name="room"
+                  >
+                    <Input placeholder="VD: phòng A101" />
+                  </Form.Item>
+                </Col>
+              </Row> : // không edit thì hiện mỗi ô sĩ số
+                <Form.Item
+                  label="Sĩ số"
+                  name="classSize"
+                  rules={[
+                    { required: true, message: 'Vui lòng nhập sĩ số!' },
+                    { type: 'number', min: 1, max: 50, message: 'Sĩ số từ 1-50' }
+                  ]}
+                >
+                  <InputNumber
+                    style={{ width: '100%' }}
+                    min={1}
+                    max={50}
+                    placeholder="VD: 20"
+                  />
+                </Form.Item>}
+            </Col>  
           </Row>
+          <Form.Item label="Mô tả chi tiết" name="description">
+          <Input.TextArea
+            rows={4}
+            placeholder="Chi tiết lớp, lộ trình, yêu cầu đầu vào..."
+            showCount
+            maxLength={500}
+          />
+        </Form.Item>
         </Form>
       </Modal>
     </>

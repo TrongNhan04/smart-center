@@ -4,22 +4,22 @@ import { addDays, addMonths, addWeeks, startOfDay, startOfMonth, startOfWeek } f
 export class DateHelper {
     // format giờ và phút, input "HH:mm" -> h = "HH", m = "mm"
     static parseHHmm(time: string) {
-        const [h, m] = time.split(':').map(Number);
-        return { h, m };
+        const [h, m] = time.split(':').map(Number)
+        return { h, m }
     }
 
     // ghép ngày và giờ
     static combineDateAndTime(dateOnly: Date, hhmm: string) {
-        const { h, m } = this.parseHHmm(hhmm);
-        const d = new Date(dateOnly);
-        d.setHours(h, m, 0, 0);
-        return d;
+        const { h, m } = this.parseHHmm(hhmm)
+        const d = new Date(dateOnly)
+        d.setHours(h, m, 0, 0)
+        return d
     }
 
     //kiểm tra khoảng ngày hợp lệ
     static FromDateToDateValidator(fromDate: Date, toDate: Date) {
         if (fromDate >= toDate)
-            throw new ConflictException('To date must greater than from date')
+            throw new ConflictException('Từ ngày phải nhỏ hơn đến ngày')
     }
 
     // kiểm tra thời gian trong lịch - hiện tại = bao nhiêu phút

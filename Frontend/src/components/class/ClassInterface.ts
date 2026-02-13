@@ -10,6 +10,8 @@ export interface ClassDto {
     startTime: string,
     endTime: string,
     classSize: number
+    description?: string
+    room?:string
 }
 
 export interface ClassDB {
@@ -32,6 +34,7 @@ export interface ClassDB {
     TongGhiDanh: number,
     TrangThai: string,
     PhongHoc?: string
+    MoTa?: string
 }
 
 export const mapRecordToFormClass = (lophoc: ClassDB): ClassDto => ({
@@ -43,8 +46,12 @@ export const mapRecordToFormClass = (lophoc: ClassDB): ClassDto => ({
     fromDate: lophoc.TuNgay,
     toDate: lophoc.DenNgay,
     timeTable: lophoc.LichHoc,
-    startTime: lophoc.GioHoc.slice(0,5),
-    endTime:lophoc.GioHoc.slice(8,13),
-    classSize: lophoc.SiSo
+    startTime: lophoc.GioHoc.slice(0, 5),
+    endTime: lophoc.GioHoc.slice(8, 13),
+    classSize: lophoc.SiSo,
+    room: lophoc.PhongHoc,
+    description: lophoc.MoTa
 })
+
+
 

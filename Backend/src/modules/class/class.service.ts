@@ -81,9 +81,10 @@ export class ClassService {
                 TenKhoaHoc: lh.khoahoc.TenKhoaHoc
             },
             PhongHoc: lh.PhongHoc, KhoaHocID: lh.KhoaHocID,
-            TuNgay: lh.TuNgay, DenNgay: lh.DenNgay, LichHoc: lh.LichHoc,
+            TuNgay: lh.TuNgay, DenNgay: lh.DenNgay,
+            LichHoc: lh.LichHoc, MoTa: lh.MoTa,
             GioHoc: lh.GioBatDau + ' - ' + lh.GioKetThuc, SiSo: lh.SiSo,
-            TrangThai: lh.TrangThai, TongGhiDanh: lh._count.ghidanh
+            TrangThai: lh.TrangThai, TongGhiDanh: lh._count.ghidanh,
         }))
     }
 
@@ -155,13 +156,20 @@ export class ClassService {
             await this.ChangeTeacher(classId, up, classId)// kiểm tra giáo viên có rảnh không
         }
 
-        if (up.room) await this.HasSameRoom(up.room, fromDate, toDate, timeTable, startTime, endTime, classDB.ID)
+        if (up.room) await this.HasSameRoom(up, classDB.ID)
 
         DateHelper.FromDateToDateValidator(fromDate, toDate)
         DateHelper.ValidateTimeRange(startTime, endTime)
 
         return await this.prismaService.$transaction(async (tx) => {
-            await tx.lopHoc.update({
+            if (up.room) {
+                await tx.buoiHoc.updateMany({
+                    where: { LopHocID: classId, TrangThai: 'SCHEDULED' },
+                    data: { PhongHoc: up.room }
+                })
+            }
+
+            return await tx.lopHoc.update({
                 where: { ID: classId },
                 data: {
                     TenLop: name, MoTa: description, SiSo: size,
@@ -170,14 +178,6 @@ export class ClassService {
                     GiaoVienID: up.teacherId, PhongHoc: up.room
                 }
             })
-
-            if (up.room) {
-                await tx.buoiHoc.updateMany({
-                    where: { LopHocID: classId, TrangThai: 'SCHEDULED' },
-                    data: { PhongHoc: up.room }
-                })
-            }
-            return { mgs: "Succesfull" }
         })
     }
 
@@ -337,25 +337,26 @@ export class ClassService {
     }
 
     // kiểm tra trùng phòng lớp
-    private async HasSameRoom(room: string, fromDate: Date, toDate: Date,
-        timeTable: number[], startTime: string, endTime: string, excludeClassId?: number) {
-        if (!room) return
+    private async HasSameRoom(body: UpdateClassDTO, excludeClassId?: number) {
+        if (!body.room) return
         const conflict = await this.prismaService.lopHoc.findMany({
             where: {
-                PhongHoc: room,// trùng phòng
+                PhongHoc: body.room,// trùng phòng
                 ID: excludeClassId ? { not: excludeClassId } : undefined
             }
         })
         for (var lh of conflict) {
-            const dupDate = DateHelper.TimeOverlap(fromDate, toDate, lh.TuNgay, lh.DenNgay, false)
+            const dupDate = DateHelper.TimeOverlap(body.fromDate,
+                body.toDate, lh.TuNgay, lh.DenNgay, false)
             if (!dupDate) continue
 
-            const dupSchedule = this.HasCommonDay(timeTable, lh.LichHoc)
+            const dupSchedule = this.HasCommonDay(body.timeTable!, lh.LichHoc)
             if (!dupSchedule) continue
 
-            const dupTime = DateHelper.TimeOverlap(startTime, endTime, lh.GioBatDau, lh.GioKetThuc, true)
+            const dupTime = DateHelper.TimeOverlap(body.startTime,
+                body.endTime, lh.GioBatDau, lh.GioKetThuc, true)
             if (dupTime)
-                throw new BadRequestException(`${room} đã được sử dụng bởi lớp ${lh.TenLop} - ${lh.MaLopHoc} `)
+                throw new BadRequestException(`${body.room} đã được sử dụng bởi lớp ${lh.TenLop} - ${lh.MaLopHoc} `)
         }
     }
 }
