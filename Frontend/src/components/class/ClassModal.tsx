@@ -5,11 +5,11 @@ import {
 import { useEffect, useState } from 'react';
 import courseApi from '../../api/courseApi';
 import teacherApi from '../../api/teacherApi';
-import type { CourseDB } from '../course/CourseInterface';
+import type { CourseDB } from '../course/CourseDTO';
 import type { TeacherDB } from '../teacher/TeacherInterface';
 import dayjs from 'dayjs';
 import classApi from '../../api/classApi';
-import { mapRecordToFormClass, type ClassDB, type ClassDto } from './ClassInterface';
+import { mapRecordToFormClass, type ClassDB, type ClassDto } from './ClassDTO';
 import { DateHelper } from './date.helper';
 
 const { RangePicker } = DatePicker
@@ -30,7 +30,8 @@ const ClassModal = ({
   const [teachers, setTeachers] = useState<TeacherDB[]>([])
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
+  // useEffect 1 chỉ tải data cho combobox
+  useEffect(()=>{
     const fetchCourse_Teacher = async () => {
       setLoading(true)
       try {
@@ -50,7 +51,10 @@ const ClassModal = ({
       }
     }
     fetchCourse_Teacher()
+  },[])
 
+  // useEffect 2 load dữ liệu khi mở form
+  useEffect(() => {
     if (open) {
       if (editingClass) {
         // từ tiếng việt thành tiếng anh
@@ -158,6 +162,8 @@ const ClassModal = ({
   const { value: initCourseId } = courseOption.find(
     f => f.value === khoahocId) || {}
 
+
+
   return (
     <>
       {/* Modal */}
@@ -247,7 +253,9 @@ const ClassModal = ({
               >
                 {isEdit && editingClass.TrangThai === 'RUNNING' ?
                   <div style={{ padding: '4px 11px', color: '#000' }}>
-                    {`- Từ ngày: ${editingClass.TuNgay.slice(0, 10)} đến ngày: ${editingClass.DenNgay.slice(0, 10)}`}
+                    {/* {`- Từ ngày: ${editingClass.TuNgay.slice(0, 10)} đến ngày: ${editingClass.DenNgay.slice(0, 10)}`} */}
+                    - Từ ngày: {new Date(editingClass.TuNgay).toLocaleDateString()}
+                    &nbsp; đến ngày: {new Date(editingClass.DenNgay).toLocaleDateString()}
                   </div>
                   : <RangePicker
                     style={{ width: '100%' }}
@@ -310,7 +318,7 @@ const ClassModal = ({
                   >
                     {isEdit && editingClass.TrangThai === 'RUNNING' ?
                       <div style={{ padding: '4px 11px', color: '#000' }}>
-                        - {editingClass.GioHoc.slice(8, 13)} 
+                        - {editingClass.GioHoc.slice(8, 13)}
                       </div>
                       : <TimePicker
                         style={{ width: '100%' }}
@@ -328,33 +336,34 @@ const ClassModal = ({
                 </Col>
               </Row>
 
-              {isEdit ? <Row gutter={8}>
-                <Col span={12}>
-                  <Form.Item
-                    label="Sĩ số"
-                    name="classSize"
-                    rules={[
-                      { required: true, message: 'Vui lòng nhập sĩ số!' },
-                      { type: 'number', min: 1, max: 50, message: 'Sĩ số từ 1-50' }
-                    ]}
-                  >
-                    <InputNumber
-                      style={{ width: '100%' }}
-                      min={1}
-                      max={50}
-                      placeholder="VD: 20"
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    label="Phòng học"
-                    name="room"
-                  >
-                    <Input placeholder="VD: phòng A101" />
-                  </Form.Item>
-                </Col>
-              </Row> : // không edit thì hiện mỗi ô sĩ số
+              {isEdit ?
+                <Row gutter={8}>
+                  <Col span={12}>
+                    <Form.Item
+                      label="Sĩ số"
+                      name="classSize"
+                      rules={[
+                        { required: true, message: 'Vui lòng nhập sĩ số!' },
+                        { type: 'number', min: 1, max: 50, message: 'Sĩ số từ 1-50' }
+                      ]}
+                    >
+                      <InputNumber
+                        style={{ width: '100%' }}
+                        min={1}
+                        max={50}
+                        placeholder="VD: 20"
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item
+                      label="Phòng học"
+                      name="room"
+                    >
+                      <Input placeholder="VD: phòng A101" />
+                    </Form.Item>
+                  </Col>
+                </Row> : // không edit thì hiện mỗi ô sĩ số
                 <Form.Item
                   label="Sĩ số"
                   name="classSize"
@@ -369,17 +378,18 @@ const ClassModal = ({
                     max={50}
                     placeholder="VD: 20"
                   />
-                </Form.Item>}
-            </Col>  
+                </Form.Item>
+              }
+            </Col>
           </Row>
           <Form.Item label="Mô tả chi tiết" name="description">
-          <Input.TextArea
-            rows={4}
-            placeholder="Chi tiết lớp, lộ trình, yêu cầu đầu vào..."
-            showCount
-            maxLength={500}
-          />
-        </Form.Item>
+            <Input.TextArea
+              rows={4}
+              placeholder="Chi tiết lớp, lộ trình, yêu cầu đầu vào..."
+              showCount
+              maxLength={500}
+            />
+          </Form.Item>
         </Form>
       </Modal>
     </>

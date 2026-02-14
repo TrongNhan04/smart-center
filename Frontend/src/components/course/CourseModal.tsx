@@ -1,7 +1,7 @@
 import { Modal, Form, Input, InputNumber, Select, Row, Col, message } from 'antd';
 import { useEffect, useState } from 'react';
 import courseApi, { } from '../../api/courseApi';
-import { mapRecordToForm, type CourseDB, type CourseDto } from './CourseInterface';
+import { mapRecordToForm, type CourseDB, type CourseDto } from './CourseDTO';
 
 interface CourseModalProps {
   open: boolean,

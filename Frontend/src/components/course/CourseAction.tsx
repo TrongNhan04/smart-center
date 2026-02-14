@@ -1,6 +1,6 @@
 import { DeleteOutlined, EditOutlined, UndoOutlined } from "@ant-design/icons"
 import { Button, Popconfirm, Space, Tooltip } from "antd"
-import type { CourseDB } from "./CourseInterface"
+import type { CourseDB } from "./CourseDTO"
 
 interface Props {
   course: CourseDB,

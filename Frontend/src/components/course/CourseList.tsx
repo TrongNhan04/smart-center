@@ -6,7 +6,7 @@ import {
 import courseApi from '../../api/courseApi';
 import { ClockCircleOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import CourseAction from './CourseAction';
-import { mapRecordToForm, type CourseDB } from './CourseInterface';
+import { mapRecordToForm, type CourseDB } from './CourseDTO';
 import CourseModal from './CourseModal';
 import { Link } from 'react-router-dom';
 const { Text } = Typography

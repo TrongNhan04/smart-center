@@ -1,5 +1,5 @@
 import axiosClient from "../components/AxiosClient"
-import type { CourseDto } from "../components/course/CourseInterface"
+import type { CourseDto } from "../components/course/CourseDTO"
 
 const courseApi = {
     create: (course: Omit<CourseDto, 'id'>) =>

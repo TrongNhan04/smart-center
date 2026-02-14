@@ -6,7 +6,7 @@ import {
   Row, Select, Space, Table,
   Typography
 } from "antd";
-import type { ClassDB } from "./ClassInterface";
+import type { ClassDB } from "./ClassDTO";
 import { useEffect, useState } from "react";
 import classApi from "../../api/classApi";
 import ClassModal from "./ClassModal";
@@ -86,8 +86,11 @@ const ClassList = () => {
       title: 'Lớp học', dataIndex: 'MaLopHoc', key: 'MaLopHoc',
       render: (code: string, lophoc: ClassDB) => (
         <Space orientation="vertical">
-          <Text strong style={{ color: '#1890ff' }}>
-            {lophoc.TenLop}</Text>
+          {/* <Text strong style={{ color: '#1890ff' }}>
+            {lophoc.TenLop}</Text> */}
+          <Link to={`/admin/classes/${lophoc.ID}`}
+            style={{ fontWeight: 'bold'}}>
+            {lophoc.TenLop}</Link>
           <Text type="secondary" style={{ fontSize: 14 }}>{code}</Text>
         </Space>
       )
@@ -98,7 +101,6 @@ const ClassList = () => {
       key: 'TenKhoaHoc', ellipsis: true,
       render: (name: string, lophoc: ClassDB) =>
         <Link to={`/admin/courses/${lophoc.KhoaHoc.ID}`}
-          style={{ fontWeight: 'bold' }}
         >{name}</Link>
     },
     // ] : []),

@@ -24,9 +24,12 @@ export class SessionService {
             where.TrangThai = query.status
         const sessions = await this.prisma.buoiHoc.findMany({
             where,
-            omit: { ID: true, CreatedAt: true, UpdatedAt: true }
+            omit: {CreatedAt: true, UpdatedAt: true },
+            orderBy:[
+                // {NgayYeuCau:'desc'},
+                {BatDauLuc:'asc'}
+            ]
         })
-        if (!sessions.length) return { mgs: "Class don't have any session scheduled" }
         return sessions
     }
 

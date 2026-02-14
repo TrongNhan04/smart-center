@@ -91,14 +91,30 @@ export class ClassService {
     // lấy chi tiết lớp - phần trên
     async GetClassById(classId: number) {
         await this.ClassIDValidator(+classId)
-        return await this.prismaService.lopHoc.findUnique({
+        const classDB = await this.prismaService.lopHoc.findUnique({
             where: { ID: classId },
-            omit: {
-                ID: true,
-                UpdatedAt: true,
-                CreatedAt: true
+            include: {
+                khoahoc: true, giaovien: { include: { User: true } },
+                _count: { select: { ghidanh: { where: { TrangThai: 'ACTIVE' } } } }
             }
         })
+        if(!classDB) throw new NotFoundException('Không tìm thấy lớp học')
+        return {
+            ID: classDB.ID, MaLopHoc: classDB.MaLopHoc, TenLop: classDB.TenLop,
+            GiaoVien: {
+                ID: classDB.GiaoVienID,
+                HoTen: classDB.giaovien.User.HoTen
+            },
+            KhoaHoc: {
+                ID: classDB.KhoaHocID,
+                TenKhoaHoc: classDB.khoahoc.TenKhoaHoc
+            },
+            PhongHoc: classDB.PhongHoc, KhoaHocID: classDB.KhoaHocID,
+            TuNgay: classDB.TuNgay, DenNgay: classDB.DenNgay,
+            LichHoc: classDB.LichHoc, MoTa: classDB.MoTa,
+            GioHoc: classDB.GioBatDau + ' - ' + classDB.GioKetThuc, SiSo: classDB.SiSo,
+            TrangThai: classDB.TrangThai, TongGhiDanh: classDB._count.ghidanh,
+        }
     }
 
     // lấy danh sách lớp theo id khóa học

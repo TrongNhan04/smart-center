@@ -4,8 +4,8 @@ import {
 } from "antd"
 import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
-import type { CourseDB } from "./CourseInterface"
-import type { ClassDB } from "../class/ClassInterface"
+import type { CourseDB } from "./CourseDTO"
+import type { ClassDB } from "../class/ClassDTO"
 import courseApi from "../../api/courseApi"
 import classApi from "../../api/classApi"
 import {
@@ -102,8 +102,7 @@ const CourseDetail = () => {
       title: 'Lớp học', dataIndex: 'MaLopHoc', key: 'MaLopHoc',
       render: (code: string, lophoc: ClassDB) => (
         <Space orientation="vertical">
-          <Text strong style={{ color: '#1890ff' }}>
-            {lophoc.TenLop}</Text>
+          <Link to={`/admin/classes/${lophoc.ID}`}>{lophoc.TenLop}</Link>
           <Text type="secondary" style={{ fontSize: 14 }}>{code}</Text>
         </Space>
       )
@@ -251,7 +250,7 @@ const CourseDetail = () => {
                     label: 'Nội dung mô tả',
                     children: (
                       <Typography.Paragraph>
-                        &nbsp;&nbsp;&nbsp;&nbsp;{course.MoTa}
+                        &nbsp;&nbsp;&nbsp;&nbsp;{course.MoTa??`Chưa cập nhật...`}
                       </Typography.Paragraph>
                     ),
                   }
@@ -259,9 +258,9 @@ const CourseDetail = () => {
             </Card>
             <ClassModal
               open={openClassModal}
-              onClose={() => setOpenClassModal(false)}
+              onCancel={() => setOpenClassModal(false)}
               khoahocId={Number(id)}
-              onSave={SaveClassModal} 
+              onSave={SaveClassModal}
               editingClass={null!}
             />
           </Col>

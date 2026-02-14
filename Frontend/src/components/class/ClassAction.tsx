@@ -1,5 +1,5 @@
 import { Button, Popconfirm, Space, Tooltip } from "antd"
-import type { ClassDB } from "./ClassInterface"
+import type { ClassDB } from "./ClassDTO"
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons"
 
 interface Props {

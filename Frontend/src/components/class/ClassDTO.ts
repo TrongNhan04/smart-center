@@ -1,5 +1,5 @@
 export interface ClassDto {
-    id?: number,
+    id?: number, 
     code: string,
     courseId: number,
     teacherId: number,
@@ -55,3 +55,16 @@ export const mapRecordToFormClass = (lophoc: ClassDB): ClassDto => ({
 
 
 
+// id?: number, 
+//     code: string,
+//     courseId: number, ok
+//     teacherId: number, ok
+//     name: string,
+//     fromDate: string, ok
+//     toDate: string,
+//     timeTable: number[], ok 
+//     startTime: string,
+//     endTime: string,
+//     classSize: number 
+//     description?: string
+//     room?:string
