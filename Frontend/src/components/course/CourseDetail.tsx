@@ -98,7 +98,7 @@ const CourseDetail = () => {
   }, 0)
 
   const columns = [
-    {// mã lớp + tên lớp chung
+    {// mã lớp + tên lớp 
       title: 'Lớp học', dataIndex: 'MaLopHoc', key: 'MaLopHoc',
       render: (code: string, lophoc: ClassDB) => (
         <Space orientation="vertical">
@@ -205,7 +205,7 @@ const CourseDetail = () => {
         </div>
         <CourseModal
           open={openCourseModal}
-          onCancel={() => { setOpenCourseModal(false) }}
+          onCancel={() => setOpenCourseModal(false) }
           onSave={fetchCourse}//Nếu bên trong Modal gọi onSave(105), 
           // thì hàm cha sẽ nhận được fetchCourse(105)
           editingCourse={course}

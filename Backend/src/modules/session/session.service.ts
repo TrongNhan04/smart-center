@@ -24,11 +24,8 @@ export class SessionService {
             where.TrangThai = query.status
         const sessions = await this.prisma.buoiHoc.findMany({
             where,
-            omit: {CreatedAt: true, UpdatedAt: true },
-            orderBy:[
-                // {NgayYeuCau:'desc'},
-                {BatDauLuc:'asc'}
-            ]
+            omit: { CreatedAt: true, UpdatedAt: true },
+            orderBy: { BatDauLuc: 'asc' }
         })
         return sessions
     }
@@ -93,8 +90,7 @@ export class SessionService {
                 khoahoc: { select: { TongSoBuoi: true, ThoiGian: true } }
             }
         })
-
-        if (!classDB) throw new NotFoundException('Class not found');
+        if (!classDB) throw new NotFoundException('Không tìm thấy lớp học');
 
         const totalSessions = classDB.khoahoc.TongSoBuoi;
         const durationMonths = classDB.khoahoc.ThoiGian;
@@ -105,7 +101,7 @@ export class SessionService {
         const currentCount = await this.prisma.buoiHoc.count({ where: { LopHocID: classId } })
 
         if (currentCount >= totalSessions)
-            return { mes: 'No sessions to generate (already full)' }
+            throw new ConflictException(`Đã đủ số buổi học của khóa (${totalSessions})`)
         //số buổi cần sinh = MIN của số buổi mỗi tháng và số buổi còn lại
         const need = Math.min(perChunk, totalSessions - currentCount)
 
@@ -120,17 +116,17 @@ export class SessionService {
         if (last) xday.setDate(xday.getDate() + 1)//dò từ ngày tiếp theo buổi cuối
 
         const endDate = classDB.DenNgay
-        if (xday > endDate) return { mes: 'No sessions to generate (out of date range)' }
+        if (xday > endDate) throw new ConflictException('Không thể tạo thêm buổi học!')
 
         // Mảng danh sách buổi học để đưa cho createMany()
         const data: Prisma.BuoiHocCreateManyInput[] = []
         let buoiSo = currentCount + 1
 
         while (xday <= endDate && data.length < need) {
-            const dow = xday.getDay(); // 0..6
+            const dow = xday.getDay() // 0..6
             if (classDB.LichHoc.includes(dow)) {
-                const startAt = DateHelper.combineDateAndTime(xday, classDB.GioBatDau);
-                const endAt = DateHelper.combineDateAndTime(xday, classDB.GioKetThuc);
+                const startAt = DateHelper.combineDateAndTime(xday, classDB.GioBatDau)
+                const endAt = DateHelper.combineDateAndTime(xday, classDB.GioKetThuc)
                 // tìm những buổi học của lớp khác có trùng phòng không
                 const conflict = await this.prisma.buoiHoc.findFirst({
                     where: {
@@ -151,32 +147,32 @@ export class SessionService {
             }
             xday.setDate(xday.getDate() + 1);
         }
-        if (data.length === 0) return { mes: 'No sessions matched timetable in range' };
+        if (data.length === 0) throw new BadRequestException
+            ('Không có buổi học mới nào phù hợp với lịch học')
 
-        await this.prisma.buoiHoc.createMany({
+        return await this.prisma.buoiHoc.createManyAndReturn({
             data, skipDuplicates: true
         })
-        return { msg: 'Create successfully', created: data.length }
     }
 
     // tạo buổi học thủ công 
-    async ManualGenerateSession(body: CreateSessionDTO) {
+    async ManualGenerateSession(classId: number, body: CreateSessionDTO) {
         const classDB = await this.prisma.lopHoc.findUnique({
-            where: { ID: body.classId }
+            where: { ID: classId }
         })
-        if (!classDB) throw new NotFoundException('Class not found')
+        if (!classDB) throw new NotFoundException('Không tìm thấy lớp học')
         if (classDB.TrangThai === 'CLOSED')
-            throw new ConflictException('Class already closed')
+            throw new ConflictException('Lớp đã đóng')
 
         DateHelper.ValidateTimeRange(body.startAt, body.endAt)
         const last = await this.prisma.buoiHoc.findFirst({
-            where: { LopHocID: body.classId, TrangThai: { not: 'CANCELLED' } },
+            where: { LopHocID: classId, TrangThai: { not: 'CANCELLED' } },
             orderBy: { BatDauLuc: 'desc' },
             select: { BatDauLuc: true },
         });
         const compareDate = last ? last.BatDauLuc : classDB.TuNgay
         if (body.date < compareDate)
-            throw new ConflictException(`New session must greater than or equals ${compareDate}`)
+            throw new ConflictException(`Buổi học mới phải bắt đầu từ ${compareDate}`)
 
         const startAt = DateHelper.combineDateAndTime(body.date, body.startAt)
         const endAt = DateHelper.combineDateAndTime(body.date, body.endAt)
@@ -184,20 +180,22 @@ export class SessionService {
         if (body.room) await this.HasSameRoom(body.room, startAt, endAt,)
 
         return await this.prisma.$transaction(async (tx) => {
-            // kiểm tra trùng buổi hoặc đè buổi trong cùng lớp
+            // kiểm tra trùng buổi hoặc đè buổi trong CÙNG LỚP
             const duplicate = await tx.buoiHoc.findFirst({
                 where: {
-                    LopHocID: body.classId,
+                    LopHocID: classId,
                     BatDauLuc: { lt: endAt },//lớn hơn
                     KetThucLuc: { gt: startAt },// nhỏ hơn
                 },
-                select: { ID: true }
+                select: { BuoiSo: true, lophoc: { select: { TenLop: true } } }
             })
-            if (duplicate) throw new ConflictException('Overlap session')
-            await this.CheckTeacherFree(body.classId, body)
+            if (duplicate) throw new ConflictException
+                (`Trùng lịch học với buổi số ${duplicate.BuoiSo} lớp ${duplicate.lophoc.TenLop}`)
+            // kiểm tra giáo viên lớp mình có trùng buổi học với LỚP KHÁC
+            await this.CheckTeacherFree(classId, body)
             // BuoiSo = max + 1 
             const max = await tx.buoiHoc.findFirst({
-                where: { LopHocID: body.classId },
+                where: { LopHocID: classId },
                 orderBy: { BuoiSo: 'desc' },
                 select: { BuoiSo: true }
             })
@@ -205,7 +203,7 @@ export class SessionService {
 
             return await tx.buoiHoc.create({
                 data: {
-                    BuoiSo: nextSs, LopHocID: body.classId, ChuDe: body.topic,
+                    BuoiSo: nextSs, LopHocID: classId, ChuDe: body.topic,
                     BatDauLuc: startAt, KetThucLuc: endAt, PhongHoc: body.room
                 },
                 omit: { CreatedAt: true, UpdatedAt: true }
@@ -214,7 +212,7 @@ export class SessionService {
     }
 
     // lấy lịch dạy 1 tuần cho giáo viên
-    async GetSessionsOneWeek(userId: number, start: string, end: string) { 
+    async GetSessionsOneWeek(userId: number, start: string, end: string) {
         let sod = new Date(start)
         sod = startOfDay(sod)
         let eod = new Date(end)
@@ -362,7 +360,7 @@ export class SessionService {
             const startAt = DateHelper.combineDateAndTime(body.date, body.startAt)
             const endAt = DateHelper.combineDateAndTime(body.date, body.endAt)
             if (session.BatDauLuc <= endAt && startAt <= session.KetThucLuc)
-                throw new ConflictException(`Teacher schedule conflict at this time `)
+                throw new ConflictException(`Giáo viên trùng lịch dạy buổi học đó`)
         }
     }
 

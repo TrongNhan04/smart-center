@@ -98,7 +98,7 @@ export class ClassService {
                 _count: { select: { ghidanh: { where: { TrangThai: 'ACTIVE' } } } }
             }
         })
-        if(!classDB) throw new NotFoundException('Không tìm thấy lớp học')
+        if (!classDB) throw new NotFoundException('Không tìm thấy lớp học')
         return {
             ID: classDB.ID, MaLopHoc: classDB.MaLopHoc, TenLop: classDB.TenLop,
             GiaoVien: {
@@ -152,9 +152,14 @@ export class ClassService {
         if (classDB.TrangThai === 'RUNNING' || (classDB.TrangThai === 'OPEN' && countSession > 0)) {
             if (up.fromDate || up.toDate || up.timeTable)
                 throw new BadRequestException('Không được thay đổi thông tin ảnh hưởng đến lịch học')
-            if (up.startTime || up.endTime)
+            if (up.startTime || up.endTime) {
+                console.log("time: ", up.endTime)
                 throw new BadRequestException('Không được thay đổi thông tin ảnh hưởng đến lịch học')
+            }
         }
+        console.log("Trang thai: ", classDB.TrangThai)
+        console.log('Số buổi học: ', countSession)
+        console.log('up: ', up)
 
         const name = up.name ?? classDB.TenLop
         const description = up.description ?? classDB.MoTa

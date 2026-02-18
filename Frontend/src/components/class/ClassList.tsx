@@ -86,12 +86,10 @@ const ClassList = () => {
       title: 'Lớp học', dataIndex: 'MaLopHoc', key: 'MaLopHoc',
       render: (code: string, lophoc: ClassDB) => (
         <Space orientation="vertical">
-          {/* <Text strong style={{ color: '#1890ff' }}>
-            {lophoc.TenLop}</Text> */}
           <Link to={`/admin/classes/${lophoc.ID}`}
             style={{ fontWeight: 'bold'}}>
             {lophoc.TenLop}</Link>
-          <Text type="secondary" style={{ fontSize: 14 }}>{code}</Text>
+          <Text code style={{ fontSize: 14 }}>{code}</Text>
         </Space>
       )
     },

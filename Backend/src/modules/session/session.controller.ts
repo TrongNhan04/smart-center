@@ -13,12 +13,22 @@ type RequestWithUser = Request & { user: { userId: number; role?: string } };
 export class SessionController {
     constructor(private sessionService: SessionService) { }
 
+    // tạo buổi học tự động
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADMIN')
+    @Post('admin/sessions-auto/classes/:id')
+    async AutoGenerateSession(@Param('id') classId: number) {
+        return await this.sessionService.AutoGenerateSession(+classId)
+    }
+
     //tạo buổi học thủ công
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
-    @Post('admin/sessions')
-    async ManualGenerateSession(@Body() body: CreateSessionDTO) {
-        return await this.sessionService.ManualGenerateSession(body)
+    @Post('admin/sessions-manual/classes/:id')
+    async ManualGenerateSession(
+        @Body() body: CreateSessionDTO,
+        @Param('id') classId: number) {
+        return await this.sessionService.ManualGenerateSession(+classId,body)
     }
 
     //sửa buổi học: chủ đề + phòng học
@@ -94,10 +104,10 @@ export class SessionController {
     @Roles('TEACHER')
     @Post('sessions/:id/request-unlock')
     async RequestUnlock(
-        @Req() req:RequestWithUser,
+        @Req() req: RequestWithUser,
         @Param('id') sessionId: number,
-        @Body() reason:RequestUnlock) {
+        @Body() reason: RequestUnlock) {
         const userId = req.user.userId
-        return await this.sessionService.RequestUnlock(+userId,+sessionId, reason.reason)
+        return await this.sessionService.RequestUnlock(+userId, +sessionId, reason.reason)
     }
 }

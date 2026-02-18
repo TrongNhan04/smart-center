@@ -68,13 +68,7 @@ export class ClassController {
         return await this.sessionService.GetSessionsByClassId(classId, query)
     }
 
-    // tạo buổi học tự động
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles('ADMIN')
-    @Post('admin/classes/:id/sessions-auto')
-    async AutoGenerateSession(@Param('id') classId: number) {
-        return await this.sessionService.AutoGenerateSession(+classId)
-    }
+    // tạo buổi học tự động - thủ công
 
     //======================== TEACHER ========================
     // danh sách lớp giáo viên A đang dạy - xong

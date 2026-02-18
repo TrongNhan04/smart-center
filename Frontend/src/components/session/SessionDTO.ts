@@ -10,10 +10,7 @@ export interface SessionDto{
 
 export interface SessionDB {
     ID: string,
-    LopHoc:{
-        ID: number, 
-        TenLop: string
-    }
+    LopHocID: number,
     BuoiSo: number,
     ChuDe: string,
     BatDauLuc: string,

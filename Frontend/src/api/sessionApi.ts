@@ -2,5 +2,8 @@ import axiosClient from "../components/AxiosClient";
 
 export const sessionApi = {
     getSessionOfClass: (classId:number) =>
-        axiosClient.get(`admin/classes/${classId}/sessions`)
+        axiosClient.get(`admin/classes/${classId}/sessions`),
+
+    autoGenerate: (classId:number) =>
+        axiosClient.post(`admin/sessions-auto/classes/${classId}`)
 }

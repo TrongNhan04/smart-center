@@ -43,8 +43,8 @@ const ClassModal = ({
         setTeachers(teacherRes.data)
       }
       catch (error: any) {
-        message.error("Có lỗi xuất hiện")
-        console.log("Lỗi: ", error.response.data.message)
+        // message.error("Có lỗi xuất hiện")
+        // console.log("Lỗi: ", error.response.data.message)
       }
       finally {
         setLoading(false)
@@ -110,7 +110,7 @@ const ClassModal = ({
     setLoading(true)
     try {
       const values = await form.validateFields()
-      console.log("values từ form: ", values)
+      // console.log("values từ form: ", values)
 
       await new Promise(resolve => { setTimeout(resolve, 1000) })
 
@@ -123,9 +123,8 @@ const ClassModal = ({
         toDate: dayjs(values.fromToDate[1]).toISOString(),
         startTime: values.startTime.format('HH:mm'),
         endTime: values.endTime.format('HH:mm'),
-        // room: values.room || null,
+        room: values.room || null,
       }
-
       let res = null
       if (isEdit && editingClass.TrangThai === 'OPEN')
         res = await classApi.updateOpen(editingClass.ID, payload)
@@ -134,9 +133,9 @@ const ClassModal = ({
       else
         res = await classApi.create(payload)
 
+      console.log("res sau khi call api: ", res.data)
       message.success(`Thao tác thành công`)
       onSave(res.data.ID)
-
       handleCancel()
     }
     catch (error: any) {
@@ -161,8 +160,6 @@ const ClassModal = ({
   const handleCancel = () => { form.resetFields(); onCancel() }
   const { value: initCourseId } = courseOption.find(
     f => f.value === khoahocId) || {}
-
-
 
   return (
     <>

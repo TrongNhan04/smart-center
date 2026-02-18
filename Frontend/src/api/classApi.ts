@@ -13,17 +13,18 @@ const classApi = {
     detele: (id: number) =>
         axiosClient.patch(`/admin/classes/${id}/closed`),
 
-    // tên lớp, giáo viên, sĩ số, phòng học, mô tả
+    // chỉ lấy tên lớp, giáo viên, sĩ số, phòng học, mô tả
     updateRunning: (id: number, body: ClassDto) => {
         const { name, teacherId, classSize, room, description } = body
         const payload = { name, teacherId, classSize, room, description }
         return axiosClient.patch(`/admin/classes/${id}`, payload)
     },
 
+    // bỏ code và courseId
     updateOpen: (id: number, body: ClassDto) => {
         const { code, courseId, ...rest } = body
-        const payload = { rest }
-        return axiosClient.patch(`/admin/classes/${id}`, payload)
+        console.log("payload update class open: ", rest)
+        return axiosClient.patch(`/admin/classes/${id}`, rest)
     },
         
     findOne: (id: number) => axiosClient.get(`/admin/classes/${id}`)

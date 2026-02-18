@@ -1,5 +1,8 @@
 import { Type } from "class-transformer";
-import { IsArray, IsBoolean, IsDate, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, Matches, Max, Min, ValidateNested } from "class-validator";
+import {
+    IsDate, IsEnum, IsNotEmpty, IsNumber, IsOptional,
+    IsString, Matches
+} from "class-validator";
 import { TrangThaiBH } from "src/generated/prisma/enums";
 
 export class SessionStatusDTO {
@@ -9,10 +12,6 @@ export class SessionStatusDTO {
 }
 
 export class CreateSessionDTO {
-    @IsNotEmpty()
-    @IsNumber()
-    classId: number
-
     @IsOptional()
     @IsString()
     topic?: string
@@ -43,17 +42,17 @@ export class CreateSessionDTO {
     room?: string
 }
 
-export class UpdateSessionDTO{
+export class UpdateSessionDTO {
     @IsOptional()
     @IsString()
-    topic?:string
+    topic?: string
 
     @IsOptional()
     @IsString()
     room?: string
 }
 
-export class Pagination{
-    page:number
-    limit:number
+export class Pagination {
+    page: number
+    limit: number
 }
