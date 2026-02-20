@@ -45,6 +45,39 @@ export class SessionResultService {
         return await this.ProcessSessionResult(sessionDB, teacherId, body, 'SUBMITTED')
     }
 
+    // lấy kết quả buổi học
+    async GetSSResult(sessionId: number) {
+        const sessionDB = await this.SessionIdValidator(sessionId)
+        const result = await this.prisma.ketQua_BuoiHoc.findFirst({
+            where: { BuoiHocID: sessionDB.ID },
+            include: { ketqua_chitiet: true }
+        })
+        if (!result) return 'Buổi học chưa có kết quả'
+        const enrolls = await this.prisma.ghiDanh.findMany({
+            where: { LopHocID: sessionDB.LopHocID },
+            include: { hocvien: { include: { Parent: true } } }
+        })
+        // tạo map key là ghi danh ID, value là dữ liệu
+        const newMapEnroll = new Map(enrolls.map(item => [item.ID, item]))
+        return result.ketqua_chitiet.map(value => {
+            
+            // map qua KQCT, lấy value của newMap = ghidanhid của KQCT
+            const data = newMapEnroll.get(value.GhiDanhID)
+            if (!data) return // không tồn tại data cho ghi danh id đó
+            
+            return {
+                MaHocVien: data?.hocvien.MaHocVien,
+                TenHocVien: data.hocvien.TenHocVien,
+                PhuHuynh: data.hocvien.Parent.HoTen,
+                DienThoai: data.hocvien.Parent.DienThoai,
+                Email: data.hocvien.Parent.Email,
+                DiemDanh: value.DiemDanh,
+                NhanXet: value.NhanXetRieng ?? result.NhanXetChung,
+                Diem: value.Diem
+            }
+        })
+    }
+
     // mở khóa lưu kết quả buổi học
     async UnlockSession(sessionId: number) {
         const sessionDB = await this.SessionIdValidator(sessionId)
@@ -54,7 +87,7 @@ export class SessionResultService {
         return await this.prisma.$transaction(async tx => {
             const now = new Date()
             if (now < sessionDB.KetThucLuc)
-                throw new ConflictException('Only previous sessions are unlocked')
+                throw new ConflictException('Chỉ được mở khóa những buổi học đã diễn ra')
 
             const sessionUp = await tx.buoiHoc.update({
                 where: { ID: sessionId },
@@ -62,8 +95,11 @@ export class SessionResultService {
                     AdminMoKhoa: true,
                     YeuCauMoKhoa: false
                 },
-                select: {ID: true, BatDauLuc: true,
-                    lophoc: {select: {TenLop: true,
+                select: {
+                    ID: true, BatDauLuc: true,
+                    lophoc: {
+                        select: {
+                            TenLop: true,
                             giaovien: { select: { UserID: true } }
                         }
                     }
@@ -71,7 +107,7 @@ export class SessionResultService {
             })
             await this.notisService.UnLockSSNotify(sessionUp.lophoc.giaovien.UserID, sessionUp)
 
-            return { msg: `Unlock session id ${sessionDB.ID} successfully` }
+            // return { msg: `Unlock session id ${sessionDB.ID} successfully` }
         })
     }
 
@@ -89,7 +125,7 @@ export class SessionResultService {
                 NgayYeuCau: new Date()
             }
         })
-        return {msg:"Send request successfully"}
+        return { msg: "Send request successfully" }
     }
 
     // xử lý Transaction lưu DB, Dùng chung cho cả Draft và Submit
@@ -121,15 +157,15 @@ export class SessionResultService {
                 }
             })
             // B. Chuẩn bị lệnh Upsert Chi Tiết
-            const upsertPromise = listEnroll.map(mx => {
-                // ghi danh DB lấy kết quả trong inputMap(key, value)
-                const details = inputMap.get(mx.ID)
+            const upsertPromise = listEnroll.map(item => {
+                // map qua listEnroll, lấy value của inputMap = id của listEnroll
+                const details = inputMap.get(item.ID)
 
                 // Nếu status là SUBMITTED -> Bắt buộc phải có dữ liệu input
                 if (status === 'SUBMITTED') {
-                    if (!details) throw new NotFoundException(`Student with enroll id ${mx.ID} is not found`)
+                    if (!details) throw new NotFoundException(`Student with enroll id ${item.ID} is not found`)
                     if (details.isAttend === null || details.isAttend === undefined)
-                        throw new BadRequestException(`Student with enroll id ${mx.ID} is missing Attendence`)
+                        throw new BadRequestException(`Student with enroll id ${item.ID} is missing Attendence`)
                 }
                 // Chuẩn bị data 
                 const payLoad = {
@@ -142,12 +178,12 @@ export class SessionResultService {
                     where: {
                         KetQuaID_GhiDanhID: {
                             KetQuaID: sessionResult.ID,
-                            GhiDanhID: mx.ID
+                            GhiDanhID: item.ID
                         }
                     },
                     create: {
                         KetQuaID: sessionResult.ID,
-                        GhiDanhID: mx.ID,
+                        GhiDanhID: item.ID,
                         DiemDanh: payLoad.DiemDanh,
                         NhanXetRieng: payLoad.NhanXetRieng,
                         Diem: payLoad.Diem
@@ -196,7 +232,7 @@ export class SessionResultService {
             where: { ID: sessionId }
         })
         if (!sessionDB)
-            throw new NotFoundException('Session is not existed')
+            throw new NotFoundException('Không tìm thấy buổi học')
         return sessionDB
     }
 

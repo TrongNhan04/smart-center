@@ -92,7 +92,7 @@ export class CourseService {
                 data.TrangThai = 'DRAFT'
         }
 
-        return this.prismaService.khoaHoc.update({
+        await this.prismaService.khoaHoc.update({
             where: { ID: courseId },
             data,
             omit: { CreatedAt: true, UpdatedAt: true }
@@ -102,7 +102,7 @@ export class CourseService {
     // xóa mềm khóa học
     async DeleteCouresByID(courseId: number) {
         await this.CourseIdValidator(courseId)
-        return await this.prismaService.khoaHoc.update({
+        await this.prismaService.khoaHoc.update({
             where: { ID: courseId },
             data: { TrangThai: 'INACTIVE' },
             omit: { CreatedAt: true, UpdatedAt: true }

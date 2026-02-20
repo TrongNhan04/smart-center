@@ -28,7 +28,7 @@ export class SessionController {
     async ManualGenerateSession(
         @Body() body: CreateSessionDTO,
         @Param('id') classId: number) {
-        return await this.sessionService.ManualGenerateSession(+classId,body)
+        return await this.sessionService.ManualGenerateSession(+classId, body)
     }
 
     //sửa buổi học: chủ đề + phòng học
@@ -53,16 +53,12 @@ export class SessionController {
         return await this.sessionService.CancelSessionById(+sessionId, reason)
     }
 
-    // thông tin buổi học + danh sách học viên ghi danh ACTIVE
+    // thông tin buổi học
     @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
     @Roles('ADMIN', 'TEACHER')
-    @Get('teacher/sessions/:id/operation')
-    async GetSession_Enrolls(
-        @Param('id') sessionId: number,
-        @Req() req: RequestWithUser) {
-        const userId = req.user.role === 'ADMIN' ? null : req.user.userId
-        if (!userId) throw new NotFoundException('Teacher not found')
-        return await this.sessionService.GetSession_Enrolls(+userId, +sessionId)
+    @Get('teacher/sessions/:id')
+    async GetSession(@Param('id') sessionId: number) {
+        return await this.sessionService.GetSession(+sessionId)
     }
 
     // lưu nháp kết quả buổi học - DRAFT
@@ -94,7 +90,7 @@ export class SessionController {
     // mở khóa lưu kết quả buổi học
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
-    @Post('admin/sessions/:id/unclock')
+    @Post('admin/sessions/:id/unlock')
     async UnlockSession(@Param('id') sessionId: number) {
         return await this.sessionService.UnlockSession(+sessionId)
     }
