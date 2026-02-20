@@ -83,7 +83,7 @@ const ClassList = () => {
 
   const columns = [
     {// mã lớp+tên lớp chung
-      title: 'Lớp học', dataIndex: 'MaLopHoc', key: 'MaLopHoc',
+      title: 'Lớp học', dataIndex: 'MaLopHoc', key: 'MaLopHoc', ellipsis: true,
       render: (code: string, lophoc: ClassDB) => (
         <Space orientation="vertical">
           <Link to={`/admin/classes/${lophoc.ID}`}

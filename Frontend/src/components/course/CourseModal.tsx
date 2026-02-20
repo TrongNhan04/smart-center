@@ -189,7 +189,7 @@ const CourseModal = ({
         </Form.Item>
       </Form>
     </Modal>
-  );
-};
+  )
+}
 
 export default CourseModal;

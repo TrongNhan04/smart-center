@@ -1,12 +1,12 @@
 import {
-  BookOutlined, CalendarOutlined, ClockCircleOutlined,
-  EditOutlined, HomeOutlined, InboxOutlined, LockOutlined,
-  PlusOutlined, TeamOutlined, UnlockOutlined, UserOutlined
+  BookOutlined, CalendarOutlined, ClockCircleOutlined, EditOutlined,
+  HomeOutlined, InboxOutlined, PlusOutlined, TeamOutlined, UnlockOutlined,
+  UserOutlined
 }
   from "@ant-design/icons"
 import {
   Avatar, Badge, Breadcrumb, Button, Card, Col, Descriptions,
-  message, Popconfirm, Row, Space, Statistic, Table, Tabs, Tag, Tooltip, Typography
+  message, Popconfirm, Progress, Row, Space, Statistic, Table, Tabs, Tag, Tooltip, Typography
 } from "antd"
 import { Link, useParams } from "react-router-dom"
 import type { ClassDB } from "./ClassDTO"
@@ -16,6 +16,9 @@ import { sessionApi } from "../../api/sessionApi"
 import type { SessionDB } from "../session/SessionDTO"
 import { DateHelper } from "./date.helper"
 import ClassModal from "./ClassModal"
+import SessionAction from "../session/SessionAction"
+import SessionsModal from "../session/SessionsModal"
+import SessionDetail from "../session/SessionDetail"
 
 const { Title, Text } = Typography
 
@@ -25,7 +28,8 @@ const ClassDetail = () => {
   const [lophoc, setLopHoc] = useState<ClassDB | null>(null)
   const [sessions, setSessions] = useState<SessionDB[]>([])
   const [openClassModal, setOpenClassModal] = useState(false)
-
+  const [openSessionModal, setOpenSessionModal] = useState(false)
+  const [openDrawer, setOpenDrawer] = useState(false)
   const fetchClass = async () => {
     try {
       const res = await classApi.findOne(classId)
@@ -109,8 +113,8 @@ const ClassDetail = () => {
       }
     },
     { // trạng thái
-      title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai', 
-      width: 130, align:'center' as const,
+      title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai',
+      width: 130, align: 'center' as const,
       filters: [
         { text: 'Sắp tới', value: 'SCHEDULED' },
         { text: 'Hoàn thành', value: 'COMPLETED' },
@@ -131,7 +135,7 @@ const ClassDetail = () => {
       }
     },
     {// tình trạng khóa
-      title: 'Tình trạng khóa', dataIndex: 'AdminMoKhoa',
+      title: 'Tình trạng khóa', dataIndex: 'AdminMoKhoa', width: 160,
       key: 'AdminMoKhoa', align: 'center' as const,
       filters: [// tạo bộ lọc giả
         { text: 'Yêu cầu mở', value: 'REQUEST' },
@@ -153,11 +157,17 @@ const ClassDetail = () => {
         if (adminMK)
           return <Tag color='green'><UnlockOutlined /> Đang mở</Tag>
         else
-          return <Tag color='default'><LockOutlined /> Đã khóa</Tag>
+          return <>-</>
       }
     },
     {// thao tác
-      title: 'Thao tác', key: 'action'
+      title: 'Thao tác', key: 'action', align: 'center' as const,
+      render: (value: SessionDB) => <SessionAction
+        session={value}
+        unlock={handleUnlock}
+        onCancel={handelCancel}
+        onOpenDrawer={()=>setOpenDrawer(true)}
+      />
     }
   ]
 
@@ -166,7 +176,7 @@ const ClassDetail = () => {
       const res = await sessionApi.autoGenerate(classId)
       console.log("Data của res auto gene:", res)
       // if(res.data)
-      //setSessions(res.data)
+      setSessions(res.data)
       fetchSessions()
       message.success(`Đã tạo thành công ${res.data.length} buổi học`)
     } catch (error: any) {
@@ -187,6 +197,29 @@ const ClassDetail = () => {
         else
           message.error("Có lỗi xảy ra")
       }
+    }
+  }
+
+  const handleUnlock = async (sessionId: number) => {
+    try {
+      const res = await sessionApi.unlockSession(sessionId)
+      console.log('res của unlock: ', res.data)
+      message.success('Thao tác thành công')
+      fetchSessions()
+    } catch (error) {
+      message.error('Có lỗi xảy ra')
+      console.log('Có lỗi xảy ra: ', error)
+    }
+  }
+
+  const handelCancel = async (sessionId: number, reason: string) => {
+    try {
+      await sessionApi.cancelSession(sessionId, reason)
+      message.success('Thao tác thành công')
+      fetchSessions()
+    } catch (error: any) {
+      message.error('Có lỗi xảy ra')
+      console.log('Có lỗi xảy ra: ', error.response.data.message)
     }
   }
 
@@ -220,12 +253,12 @@ const ClassDetail = () => {
                   style={{ marginLeft: 10, verticalAlign: 'middle' }}>
                   {lophoc.TrangThai}</Tag>
               </Title>
-
               <Text type="secondary">Mã: {lophoc.MaLopHoc}</Text>
             </div>
           </div>
           <Tooltip title='Sửa lớp học'>
             <Button type="primary" ghost icon={<EditOutlined />}
+              disabled={lophoc.TrangThai === 'CLOSED'}
               onClick={() => setOpenClassModal(true)}
             />
           </Tooltip>
@@ -233,7 +266,7 @@ const ClassDetail = () => {
         <ClassModal
           open={openClassModal}
           onCancel={() => setOpenClassModal(false)}
-          onSave={fetchClass}
+          onSave={(_) => { fetchClass(); fetchSessions() }}
           khoahocId={lophoc.KhoaHoc.ID}
           editingClass={lophoc}
         />
@@ -253,14 +286,21 @@ const ClassDetail = () => {
                       description='Tự động tạo buổi học trong 1 tháng'
                       onConfirm={() => AutoGenerate(lophoc.ID)}>
                       <Button type="primary" icon={<PlusOutlined />}
-                      // onClick={()=>AutoGenerate(lophoc.ID)}
+                        disabled={lophoc.TrangThai === 'CLOSED'}
                       >Tự động
                       </Button>
                     </Popconfirm>
+
                     <Button type="default" icon={<PlusOutlined />}
-                    //onClick={() => setOpenClassModal(true)}
-                    >Thủ công
-                    </Button>
+                      disabled={lophoc.TrangThai === 'CLOSED'}
+                      onClick={()=>setOpenSessionModal(true)}
+                    >Thủ công</Button>
+                    <SessionsModal
+                      lophoc={lophoc}
+                      open={openSessionModal}
+                      onCancel={()=>setOpenSessionModal(false)}
+                      onSave={fetchSessions}
+                    />
                   </Space>
                 }
                 items={[
@@ -288,13 +328,6 @@ const ClassDetail = () => {
                   }
                 ]} /> {/* kết thúc tab */}
             </Card>
-            {/* <ClassModal
-              open={openClassModal}
-              onCancel={() => setOpenClassModal(false)}
-              khoahocId={Number(id)}
-              onSave={SaveClassModal}
-              editingClass={null!}
-            /> */}
           </Col>
 
           {/* Cột phải: chứa thông tin tổng quan */}
@@ -342,28 +375,23 @@ const ClassDetail = () => {
 
             {/* thống kê nhanh */}
             <Card >
-              <Row gutter={16}>
-                {/* <Col span={12}>
-                  <Statistic
-                    title="Lớp đang mở"
-                    value={openningClass.length}
-                    prefix={<ReadOutlined />}
-                  />
-                </Col> */}
-
-                {/* <Col span={12}> */}
-                <Statistic
-                  title="Tống học viên ghi danh"
-                  value={`${lophoc.TongGhiDanh}/${lophoc.SiSo}`}
-                  prefix={<TeamOutlined />}
-                // valueStyle={{ color: '#3f8600' }}
-                />
-                {/* </Col> */}
-              </Row>
+              <Statistic
+                title="Tống học viên ghi danh"
+                value={`${lophoc.TongGhiDanh}/${lophoc.SiSo}`}
+                prefix={<TeamOutlined />}
+              />
+              <Progress
+                percent={(lophoc.TongGhiDanh / lophoc.SiSo) * 100}
+                showInfo={false}
+              />
             </Card>
           </Col>
         </Row>
       </div>
+      <SessionDetail
+      open={openDrawer}
+      onCancel={()=>setOpenDrawer(false)}
+      />
     </div>
   )
 }

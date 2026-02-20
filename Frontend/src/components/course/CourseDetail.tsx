@@ -199,13 +199,14 @@ const CourseDetail = () => {
           </div>
           <Tooltip title='Sửa khóa học'>
             <Button type="primary" ghost icon={<EditOutlined />}
+              disabled={course.TrangThai === 'INACTIVE'}
               onClick={() => { setOpenCourseModal(true) }}
             />
           </Tooltip>
         </div>
         <CourseModal
           open={openCourseModal}
-          onCancel={() => setOpenCourseModal(false) }
+          onCancel={() => setOpenCourseModal(false)}
           onSave={fetchCourse}//Nếu bên trong Modal gọi onSave(105), 
           // thì hàm cha sẽ nhận được fetchCourse(105)
           editingCourse={course}
@@ -221,8 +222,8 @@ const CourseDetail = () => {
               <Tabs
                 defaultActiveKey="1"
                 tabBarExtraContent={
-                  <Button type="dashed"
-                    icon={<PlusOutlined />}
+                  <Button type="primary" icon={<PlusOutlined />}
+                    disabled={course.TrangThai === 'INACTIVE'}
                     onClick={() => setOpenClassModal(true)}
                   >Mở lớp mới
                   </Button>}
@@ -250,7 +251,7 @@ const CourseDetail = () => {
                     label: 'Nội dung mô tả',
                     children: (
                       <Typography.Paragraph>
-                        &nbsp;&nbsp;&nbsp;&nbsp;{course.MoTa??`Chưa cập nhật...`}
+                        &nbsp;&nbsp;&nbsp;&nbsp;{course.MoTa ?? `Chưa cập nhật...`}
                       </Typography.Paragraph>
                     ),
                   }

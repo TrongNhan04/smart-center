@@ -10,7 +10,7 @@ const Login = () => {
     try {
       // gọi api login
       const response: any = await loginApi(value)
-      // console.log("login success: ", response)
+      console.log("login success: ", response)
 
       // lưu vào store
       login(response.data.user, response.data.access_token)

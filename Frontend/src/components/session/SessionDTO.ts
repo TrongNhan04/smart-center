@@ -1,7 +1,6 @@
 export interface SessionDto{
-    classId: number
     topic?: string
-    date: Date
+    date: string
     startAt: string
     endAt: string
     description?: string
@@ -9,7 +8,7 @@ export interface SessionDto{
 }
 
 export interface SessionDB {
-    ID: string,
+    ID: number,
     LopHocID: number,
     BuoiSo: number,
     ChuDe: string,

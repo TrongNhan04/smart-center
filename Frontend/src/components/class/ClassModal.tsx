@@ -31,7 +31,7 @@ const ClassModal = ({
   const [loading, setLoading] = useState(false)
 
   // useEffect 1 chỉ tải data cho combobox
-  useEffect(()=>{
+  useEffect(() => {
     const fetchCourse_Teacher = async () => {
       setLoading(true)
       try {
@@ -51,7 +51,7 @@ const ClassModal = ({
       }
     }
     fetchCourse_Teacher()
-  },[])
+  }, [])
 
   // useEffect 2 load dữ liệu khi mở form
   useEffect(() => {
@@ -133,13 +133,12 @@ const ClassModal = ({
       else
         res = await classApi.create(payload)
 
-      console.log("res sau khi call api: ", res.data)
       message.success(`Thao tác thành công`)
       onSave(res.data.ID)
       handleCancel()
     }
     catch (error: any) {
-      console.log("Có lỗi xảy ra: ", error.response.data.message)
+      console.log("Có lỗi xảy ra: ", error)
 
       if (error.response) {
         const serverError = error.response.data
@@ -168,14 +167,13 @@ const ClassModal = ({
         title={isEdit ? 'Cập nhật lớp học' : 'Thêm lớp học'}
         open={open}
         onCancel={handleCancel}
-        width={800}
+        width={700}
         okText="Lưu lại"
         cancelText="Hủy bỏ"
         onOk={handleSubmit}
         maskClosable={false}
         confirmLoading={loading}
         centered
-      //bodyStyle={{ maxHeight: '500px', overflowY: 'auto' }}
       >
         <Form
           form={form}
@@ -186,20 +184,7 @@ const ClassModal = ({
           <Row gutter={16}>
             {/* Cột trái */}
             <Col span={12}>
-              <Form.Item
-                label="Mã lớp học"
-                name="code"
-                rules={[{ required: true, message: 'Vui lòng nhập mã lớp!' }]}
-              >
-                {isEdit ?
-                  <div style={{ padding: '4px 11px', color: '#000' }}>
-                    - {editingClass.MaLopHoc}
-                  </div>
-                  : (<Input readOnly={isEdit} placeholder="VD: ENG001-01" />)
-                }
-              </Form.Item>
-
-              <Form.Item
+              <Form.Item // tên khóa học
                 label="Khóa học"
                 name="courseId"
                 rules={[{ required: true, message: 'Vui lòng chọn khóa học!' }]}
@@ -214,8 +199,21 @@ const ClassModal = ({
                     disabled={isEdit}
                   />}
               </Form.Item>
+              
+              <Form.Item // mã lớp học
+                label="Mã lớp học"
+                name="code"
+                rules={[{ required: true, message: 'Vui lòng nhập mã lớp!' }]}
+              >
+                {isEdit ?
+                  <div style={{ padding: '4px 11px', color: '#000' }}>
+                    - {editingClass.MaLopHoc}
+                  </div>
+                  : (<Input readOnly={isEdit} placeholder="VD: ENG001-01" />)
+                }
+              </Form.Item>
 
-              <Form.Item
+              <Form.Item // tên lớp
                 label="Tên lớp"
                 name="name"
                 rules={[{ required: true, message: 'Vui lòng nhập tên lớp!' }]}
@@ -223,7 +221,7 @@ const ClassModal = ({
                 <Input placeholder="VD: Lớp Sáng T2-T4-T6" />
               </Form.Item>
 
-              <Form.Item
+              <Form.Item // giáo viên
                 label="Giáo viên"
                 name="teacherId"
                 rules={[{ required: true, message: 'Vui lòng chọn giáo viên!' }]}
@@ -243,7 +241,7 @@ const ClassModal = ({
 
             {/* Cột phải */}
             <Col span={12}>
-              <Form.Item
+              <Form.Item // thời gian học
                 label="Thời gian học"
                 name="fromToDate"
                 rules={[{ required: true, message: 'Vui lòng chọn thời gian!' }]}
@@ -263,7 +261,7 @@ const ClassModal = ({
                 }
               </Form.Item>
 
-              <Form.Item
+              <Form.Item // lịch học
                 label="Lịch học trong tuần"
                 name="timeTable"
                 rules={[{ required: true, message: 'Chọn lịch học' }]}
@@ -284,7 +282,7 @@ const ClassModal = ({
 
               <Row gutter={8}>
                 <Col span={12}>
-                  <Form.Item
+                  <Form.Item // giờ bắt đầu
                     label="Giờ bắt đầu"
                     name="startTime"
                     rules={[{ required: true, message: 'Chọn giờ!' }]}
@@ -308,7 +306,7 @@ const ClassModal = ({
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  <Form.Item
+                  <Form.Item // giờ kết thúc
                     label="Giờ kết thúc"
                     name="endTime"
                     rules={[{ required: true, message: 'Chọn giờ!' }]}
@@ -336,7 +334,7 @@ const ClassModal = ({
               {isEdit ?
                 <Row gutter={8}>
                   <Col span={12}>
-                    <Form.Item
+                    <Form.Item // sĩ số
                       label="Sĩ số"
                       name="classSize"
                       rules={[
@@ -353,7 +351,7 @@ const ClassModal = ({
                     </Form.Item>
                   </Col>
                   <Col span={12}>
-                    <Form.Item
+                    <Form.Item // phòng học
                       label="Phòng học"
                       name="room"
                     >
