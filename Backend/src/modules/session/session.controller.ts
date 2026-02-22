@@ -57,8 +57,8 @@ export class SessionController {
     @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
     @Roles('ADMIN', 'TEACHER')
     @Get('teacher/sessions/:id')
-    async GetSession(@Param('id') sessionId: number) {
-        return await this.sessionService.GetSession(+sessionId)
+    async GetSession_Result(@Param('id') sessionId: number) {
+        return await this.sessionService.GetSession_Result(+sessionId)
     }
 
     // lưu nháp kết quả buổi học - DRAFT

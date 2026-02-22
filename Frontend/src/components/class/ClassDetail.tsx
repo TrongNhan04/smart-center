@@ -18,7 +18,8 @@ import { DateHelper } from "./date.helper"
 import ClassModal from "./ClassModal"
 import SessionAction from "../session/SessionAction"
 import SessionsModal from "../session/SessionsModal"
-import SessionDetail from "../session/SessionDetail"
+import SessionDrawer from "../session/SessionDrawer"
+
 
 const { Title, Text } = Typography
 
@@ -30,6 +31,8 @@ const ClassDetail = () => {
   const [openClassModal, setOpenClassModal] = useState(false)
   const [openSessionModal, setOpenSessionModal] = useState(false)
   const [openDrawer, setOpenDrawer] = useState(false)
+  const [sessionId, setSessionId] = useState(0)
+
   const fetchClass = async () => {
     try {
       const res = await classApi.findOne(classId)
@@ -94,8 +97,8 @@ const ClassDetail = () => {
             <CalendarOutlined /> {new Date(value).toLocaleDateString()}
           </Text>
           <Text type="secondary" style={{ fontSize: '14px' }}>
-            <ClockCircleOutlined /> {DateHelper.ISOToHHMM(new Date(value),
-              new Date(session.KetThucLuc))}
+            <ClockCircleOutlined /> {DateHelper.ISOToHHMM
+              (value, session.KetThucLuc)}
           </Text>
         </Space>
       }
@@ -165,8 +168,8 @@ const ClassDetail = () => {
       render: (value: SessionDB) => <SessionAction
         session={value}
         unlock={handleUnlock}
-        onCancel={handelCancel}
-        onOpenDrawer={()=>setOpenDrawer(true)}
+        onCancel={handleCancel}
+        onOpenDrawer={handleOpenDrawer}
       />
     }
   ]
@@ -212,7 +215,7 @@ const ClassDetail = () => {
     }
   }
 
-  const handelCancel = async (sessionId: number, reason: string) => {
+  const handleCancel = async (sessionId: number, reason: string) => {
     try {
       await sessionApi.cancelSession(sessionId, reason)
       message.success('Thao tác thành công')
@@ -221,6 +224,12 @@ const ClassDetail = () => {
       message.error('Có lỗi xảy ra')
       console.log('Có lỗi xảy ra: ', error.response.data.message)
     }
+  }
+
+  const handleOpenDrawer = (sessionId: number) => {
+    //console.log("session: ClassDetail", session)
+    setSessionId(sessionId)
+    setOpenDrawer(true)
   }
 
   return (
@@ -293,12 +302,12 @@ const ClassDetail = () => {
 
                     <Button type="default" icon={<PlusOutlined />}
                       disabled={lophoc.TrangThai === 'CLOSED'}
-                      onClick={()=>setOpenSessionModal(true)}
+                      onClick={() => setOpenSessionModal(true)}
                     >Thủ công</Button>
                     <SessionsModal
                       lophoc={lophoc}
                       open={openSessionModal}
-                      onCancel={()=>setOpenSessionModal(false)}
+                      onCancel={() => setOpenSessionModal(false)}
                       onSave={fetchSessions}
                     />
                   </Space>
@@ -328,6 +337,12 @@ const ClassDetail = () => {
                   }
                 ]} /> {/* kết thúc tab */}
             </Card>
+            {/* khi nào mở drawer thì render drawer */}
+            <SessionDrawer
+              open={openDrawer}
+              onCancel={() => setOpenDrawer(false)}
+              sessionId={sessionId}
+            />
           </Col>
 
           {/* Cột phải: chứa thông tin tổng quan */}
@@ -388,10 +403,6 @@ const ClassDetail = () => {
           </Col>
         </Row>
       </div>
-      <SessionDetail
-      open={openDrawer}
-      onCancel={()=>setOpenDrawer(false)}
-      />
     </div>
   )
 }

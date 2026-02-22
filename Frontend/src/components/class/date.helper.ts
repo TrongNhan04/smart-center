@@ -14,7 +14,9 @@ export class DateHelper {
         return result
     }
 
-    static ISOToHHMM(start: Date, end: Date) {
+    static ISOToHHMM(s: string, e: string) {
+        const start = new Date(s)
+        const end = new Date(e)
         return start.toLocaleTimeString('vi-VN',
             { hour: '2-digit', minute: '2-digit' })
             + '-' + end.toLocaleTimeString('vi-VN',

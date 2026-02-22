@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins&family=Monoton:wght@200; 300; 400; 500; 600; 700; 800&display=swap');
+
 * {
   margin: 0;
   padding: 0;
@@ -9,11 +10,11 @@
   font-family: 'Poppins', sans-serif;
 }
 
-.sidebar{
+.sidebar {
   color: #fff;
 }
 
-.logo{
+.logo {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -21,7 +22,7 @@
   padding: 15px;
 }
 
-.logo-icon{
+.logo-icon {
   width: 30px;
   height: 30px;
   display: flex;
@@ -30,10 +31,10 @@
   font-size: 1.5rem;
   border-radius: 50%;
   background: rgb(0, 21, 41)
-  /* background: blue; */
+    /* background: blue; */
 }
 
-.menu-bar{
+.menu-bar {
   height: 88vh;
   margin-top: 1rem;
   display: flex;
@@ -43,7 +44,7 @@
   position: relative;
 }
 
-.toggle-theme-btn{
+.toggle-theme-btn {
   /* position: absolute; */
   padding-top: 20px;
   bottom: 30px;
@@ -54,11 +55,20 @@
   font-size: 1rem;
 }
 
-@keyframes flashRow{
-  0%{background-color: #fff1b8;}
-  100%{background-color: transparent;}
+@keyframes flashRow {
+  0% {
+    background-color: #fff1b8;
+  }
+
+  100% {
+    background-color: transparent;
+  }
 }
 
-.highlight-row td{
+.highlight-row td {
   animation: flashRow 2s ease-in-out forwards;
+}
+
+.ant-drawer-header-title {
+  flex-direction: row-reverse;
 }

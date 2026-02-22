@@ -48,24 +48,35 @@ export class SessionResultService {
     // lấy kết quả buổi học
     async GetSSResult(sessionId: number) {
         const sessionDB = await this.SessionIdValidator(sessionId)
-        const result = await this.prisma.ketQua_BuoiHoc.findFirst({
-            where: { BuoiHocID: sessionDB.ID },
-            include: { ketqua_chitiet: true }
-        })
-        if (!result) return 'Buổi học chưa có kết quả'
-        const enrolls = await this.prisma.ghiDanh.findMany({
-            where: { LopHocID: sessionDB.LopHocID },
-            include: { hocvien: { include: { Parent: true } } }
-        })
+        const [result, enrolls] = await Promise.all([
+            this.prisma.ketQua_BuoiHoc.findFirst({
+                where: { BuoiHocID: sessionDB.ID },
+                include: { ketqua_chitiet: true }
+            }),
+            this.prisma.ghiDanh.findMany({
+                where: { LopHocID: sessionDB.LopHocID, TrangThai: 'ACTIVE' },
+                include: { hocvien: { include: { Parent: true } } }
+            })
+        ])
+        if (!result) 
+            return enrolls.map(item => ({
+            HocvienID: item.HocVienID,
+            MaHocVien: item.hocvien.MaHocVien,
+            TenHocVien: item.hocvien.TenHocVien,
+            PhuHuynh: item.hocvien.Parent.HoTen,
+            DienThoai: item.hocvien.Parent.DienThoai,
+            Email: item.hocvien.Parent.Email,
+        }))
+
         // tạo map key là ghi danh ID, value là dữ liệu
         const newMapEnroll = new Map(enrolls.map(item => [item.ID, item]))
         return result.ketqua_chitiet.map(value => {
-            
+
             // map qua KQCT, lấy value của newMap = ghidanhid của KQCT
             const data = newMapEnroll.get(value.GhiDanhID)
             if (!data) return // không tồn tại data cho ghi danh id đó
-            
             return {
+                HocvienID: data.HocVienID,
                 MaHocVien: data?.hocvien.MaHocVien,
                 TenHocVien: data.hocvien.TenHocVien,
                 PhuHuynh: data.hocvien.Parent.HoTen,
@@ -73,7 +84,7 @@ export class SessionResultService {
                 Email: data.hocvien.Parent.Email,
                 DiemDanh: value.DiemDanh,
                 NhanXet: value.NhanXetRieng ?? result.NhanXetChung,
-                Diem: value.Diem
+                Diem: value.Diem 
             }
         })
     }
@@ -173,7 +184,7 @@ export class SessionResultService {
                     NhanXetRieng: details?.privateComment ?? '',
                     Diem: details?.score ?? null
                 }
-
+                // không await để đưa cho promise.all
                 return tx.ketQua_ChiTiet.upsert({
                     where: {
                         KetQuaID_GhiDanhID: {

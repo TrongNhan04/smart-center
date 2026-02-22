@@ -244,34 +244,39 @@ export class SessionService {
     }
 
     // lấy thông tin buổi học
-    async GetSession(sessionId: number) {
-        //const teacherDB = await this.GetTeacherByUserId(userId)
-        //Buổi số, chủ đề, ngày, giờ, phòng, lớp, giáo viên,
-        const sessionDB = await this.prisma.buoiHoc.findFirst({
-            where: {
-                ID: sessionId,
-                //lophoc: { GiaoVienID: teacherDB.ID }
-            },
-            select: {
-                BuoiSo: true, ChuDe: true, BatDauLuc: true, KetThucLuc: true,
-                PhongHoc: true,
-                lophoc: {
-                    select: {
-                        TenLop: true,
-                        giaovien: { select: { User: { select: { HoTen: true } } } }
+    async GetSession_Result(sessionId: number) {
+        const [sessionDB, result] = await Promise.all([
+            this.prisma.buoiHoc.findFirst({
+                where: { ID: sessionId },
+                select: {
+                    ID: true, BuoiSo: true, ChuDe: true, PhongHoc: true,
+                    BatDauLuc: true, KetThucLuc: true, TrangThai:true,
+                    lophoc: {
+                        select: {
+                            TenLop: true,
+                            giaovien: {
+                                select: {
+                                    ID: true,
+                                    User: { select: { HoTen: true } }
+                                }
+                            }
+                        }
                     }
                 }
-            }
-        })
-        
-        if(!sessionDB) throw new NotFoundException('Không tìm thấy buổi học')
+            }),
+            this.resultService.GetSSResult(sessionId)
+        ])
+        if (!sessionDB) throw new NotFoundException('Không tìm thấy buổi học')
         return {
-            BuoiSo: sessionDB.BuoiSo, ChuDe: sessionDB.ChuDe, 
+            ID: sessionDB.ID, BuoiSo: sessionDB.BuoiSo, ChuDe: sessionDB.ChuDe,
             BatDauLuc: sessionDB.BatDauLuc, KetThucLuc: sessionDB.KetThucLuc,
-            PhongHoc: sessionDB.PhongHoc,
-            LopHoc: sessionDB.lophoc.TenLop,
-            GiaoVien: sessionDB.lophoc.giaovien.User.HoTen,
-            KetQua: await this.resultService.GetSSResult(sessionId)
+            PhongHoc: sessionDB.PhongHoc, LopHoc: sessionDB.lophoc.TenLop,
+            // GiaoVien: {
+            //     ID: sessionDB.lophoc.giaovien.ID,
+                GiaoVien: sessionDB.lophoc.giaovien.User.HoTen,
+            // },
+            TrangThai: sessionDB.TrangThai,
+            KetQua: result
         }
     }
 

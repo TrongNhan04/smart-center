@@ -8,13 +8,16 @@ export const sessionApi = {
     autoGenerate: (classId: number) =>
         axiosClient.post(`admin/sessions-auto/classes/${classId}`),
 
-    manualGenarate: (classId:number, body:SessionDto) => 
-        axiosClient.post(`admin/sessions-manual/classes/${classId}`,body),
+    manualGenarate: (classId: number, body: SessionDto) =>
+        axiosClient.post(`admin/sessions-manual/classes/${classId}`, body),
 
     unlockSession: (sessionId: number) =>
         axiosClient.post(`admin/sessions/${sessionId}/unlock`),
 
-    cancelSession: (sessionId: number, reason:string) =>
+    cancelSession: (sessionId: number, reason: string) =>
         // console.log("reason đưa cho api:",reason)
-        axiosClient.patch(`admin/sessions/${sessionId}/cancel`, reason)
+        axiosClient.patch(`admin/sessions/${sessionId}/cancel`, reason),
+
+    getSessionResult: (sessionId: number) => 
+        axiosClient.get(`teacher/sessions/${sessionId}`)
 }

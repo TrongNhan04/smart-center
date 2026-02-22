@@ -7,7 +7,7 @@ interface Props {
   session: SessionDB,
   unlock: (sessionId: number) => void,
   onCancel: (sessionId: number, reason:string) => void
-  onOpenDrawer: () => void
+  onOpenDrawer: (sessionId: number) => void
 }
 
 const SessionAction = ({ session, unlock, onCancel, onOpenDrawer }: Props) => {
@@ -20,7 +20,7 @@ const SessionAction = ({ session, unlock, onCancel, onOpenDrawer }: Props) => {
         size="small"
         type="primary"
         icon={<InfoCircleOutlined />}
-        onClick={() => onOpenDrawer()}
+        onClick={() => onOpenDrawer(session.ID)}
       >
       </Button>
     </Tooltip>
