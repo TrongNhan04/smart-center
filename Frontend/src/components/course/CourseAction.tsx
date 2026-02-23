@@ -51,11 +51,11 @@ const CourseAction = ({
       </Tooltip>
 
       {/* Nút xóa */}
-      <Tooltip title="Xóa khóa học">
+      <Tooltip title="Đóng khóa học">
         <Popconfirm
-          title="Xác nhận xóa?"
-          description="Hành động này sẽ xóa tạm hoặc đóng khóa học"
-          okText="Xóa"
+          title="Xác nhận đóng?"
+          description="Không thêm lớp học mới cho khóa học này"
+          okText="Đóng"
           cancelText="Hủy"
           onConfirm={() => onSoftDelete(course.ID)}
           okButtonProps={{ danger: true }}

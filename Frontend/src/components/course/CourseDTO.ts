@@ -23,7 +23,8 @@ export interface CourseDB {
   MoTa?: string,
 }
 
-export const mapRecordToForm = (record: CourseDB): CourseDto => {
+// để cho edit
+export const mapDataCourse = (record: CourseDB): CourseDto => {
   return {
     id: record.ID,
     code: record.MaKhoaHoc,
@@ -35,14 +36,3 @@ export const mapRecordToForm = (record: CourseDB): CourseDto => {
     description: record.MoTa
   }
 }
-
-/*Tóm tắt chiến thuật code:
-Tạo state editingRecord.
-
-Bấm Sửa -> setEditingRecord(record) -> Mở Modal.
-
-Modal mở -> Check có editingRecord không? -> Có thì điền vào Form via setFieldsValue.
-
-Bấm Lưu -> Check có editingRecord không? -> Có thì gọi API PUT, Không thì gọi POST.
-
-Xong việc -> Reset Form, Reset editingRecord.*/

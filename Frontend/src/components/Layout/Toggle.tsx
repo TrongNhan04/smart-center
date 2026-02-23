@@ -9,8 +9,8 @@ interface ToggleProps {
 const Toggle = ({ darkTheme, toggleTheme }: ToggleProps) => {
 	return (
 		<div className='toggle-theme-btn'>
-			<Button onClick={toggleTheme}>{
-				darkTheme ? <SunFilled /> : <MoonFilled />}</Button>
+			<Button onClick={toggleTheme}>
+				{darkTheme ? <SunFilled /> : <MoonFilled />}</Button>
 		</div>
 	)
 }

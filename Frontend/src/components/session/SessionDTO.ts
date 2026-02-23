@@ -34,7 +34,7 @@ export interface SessionDetail {
     KetQua: SessionResult[]
 }
 
-interface SessionResult {
+export interface SessionResult {
     HocVienID:number,
     MaHocVien: string,
     TenHocVien: string,

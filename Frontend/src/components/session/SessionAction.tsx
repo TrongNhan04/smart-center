@@ -91,7 +91,7 @@ const SessionAction = ({ session, unlock, onCancel, onOpenDrawer }: Props) => {
           onCancel={handleCancel}
           onOk={handleOK} 
           width={500}
-          okText="Hủy buổi học" // Thay vì "Xác nhận" chung chung, hãy ghi rõ hành động
+          okText="Hủy buổi học"
           okButtonProps={{ danger: true }}
           cancelText="Đóng"
           centered
@@ -99,18 +99,18 @@ const SessionAction = ({ session, unlock, onCancel, onOpenDrawer }: Props) => {
         >
           <Alert
             title="Lưu ý quan trọng"
-            description="Hành động này không thể hoàn tác, đồng thời sẽ tự động gửi thông báo đến phụ huynh!"
+            description="Hành động này không thể hoàn tác và
+            tự động gửi thông báo đến phụ huynh!"
             type="warning"
             showIcon
-            style={{ marginBottom: 20 }} // Tạo khoảng trống với Form bên dưới
+            style={{ marginBottom: 20 }} 
           />
 
           <Form form={form} layout="vertical">
             <Form.Item 
-              label={<b>Lý do hủy (Sẽ hiển thị trong thông báo)</b>} // In đậm và làm rõ mục đích của lý do
+              label={<b>Lý do hủy (Sẽ hiển thị trong thông báo)</b>}
               name="reason"
               rules={[{ required: true, message: 'Vui lòng nhập lý do hủy!' }]}
-              //style={{ marginBottom: 0 }} // Xóa margin thừa của Item cuối cùng để Modal gọn hơn
             >
               <Input.TextArea
                 rows={4}
@@ -127,45 +127,3 @@ const SessionAction = ({ session, unlock, onCancel, onOpenDrawer }: Props) => {
 }
 
 export default SessionAction
-
-// có yêu cầu mở -> info + mở khóa
-// ko yêu cầu + admin ko mở + chưa COMPLETED -> info + hủy
-// admin mở -> info
-// status = CANCELLED ->info
-
-          // <Popconfirm
-          //   title="Xác nhận hủy?"
-          //   description="Hành động này không thể hoàn tác và sẽ gửi thông báo 
-          //   đến phụ huynh!"
-          //   okText="Lưu"
-          //   cancelText="Hủy"
-          //   onConfirm={() => onCancel(session.ID)}
-          //   okButtonProps={{ danger: true }}
-          // >
-          //   <Button
-          //     size="small"
-          //     icon={<DeleteOutlined />}
-          //     type="primary" danger
-          //   />
-          // </Popconfirm>
-
-          // <Modal
-          //   open={open}
-          //   onCancel={handleCancel}
-          //   onOk={handleOK}
-          //   width={600}
-          //   okText="Lưu lại"
-          //   cancelText="Hủy bỏ"
-          //   centered // canh giữa màn hình
-          //   maskClosable={false}
-          // >
-          //   <Form form={form}>
-          //     <Form.Item
-          //     label="Lý do"
-          //     name="reason"
-          //     rules={[{ required: true, message: 'Vui lòng nhập lý do!' }]}
-          //   >
-          //     <Input placeholder="Vd: Nghỉ lễ..." />
-          //   </Form.Item>
-          //   </Form>
-          // </Modal>

@@ -6,7 +6,7 @@ import {
 import courseApi from '../../api/courseApi';
 import { ClockCircleOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import CourseAction from './CourseAction';
-import { mapRecordToForm, type CourseDB } from './CourseDTO';
+import { type CourseDB } from './CourseDTO';
 import CourseModal from './CourseModal';
 import { Link } from 'react-router-dom';
 const { Text } = Typography
@@ -51,10 +51,10 @@ const CourseList = () => {
   }
 
   const filteredData = courses.filter(item => {
-    const lowerCase = searchText.toLocaleLowerCase()
+    const lowerCase = searchText.toLowerCase()
     const matchesKeyword =
-      item.TenKhoaHoc.toLocaleLowerCase().includes(lowerCase) ||
-      item.MaKhoaHoc.toLocaleLowerCase().includes(lowerCase)
+      item.TenKhoaHoc.toLowerCase().includes(lowerCase) ||
+      item.MaKhoaHoc.toLowerCase().includes(lowerCase)
 
     const matchesStatus = filterStatus ? item.TrangThai === filterStatus : true
     return matchesKeyword && matchesStatus
@@ -85,10 +85,9 @@ const CourseList = () => {
 
   const handleRestore = async (course: CourseDB) => {
     try {
-      const formData = mapRecordToForm(course)
-      await courseApi.update(course.ID, formData)
-      fetchCourses()
+      await courseApi.restore(course.ID)
       message.success('Khôi phục thành công')
+      // handleSaveModal(course.ID)
     } catch (error: any) {
       console.log("Có lỗi xảy ra", error.response.data.message)
     }
@@ -97,8 +96,8 @@ const CourseList = () => {
   const handleSoftDelete = async (id: number) => {
     try {
       await courseApi.delete(id)
-      fetchCourses()
       message.success('Thao tác thành công')
+      // handleSaveModal(id)
     } catch (error: any) {
       console.log("Có lỗi xảy ra: ", error.response.data.message)
     }

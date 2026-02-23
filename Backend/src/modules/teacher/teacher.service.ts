@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateTeacherDTO, QueryTeacherDTO, UpdateTeacherDTO } from './teacher.dto';
 import * as bcrypt from 'bcrypt'
@@ -37,8 +37,10 @@ export class TeacherService {
 
     // thêm giáo viên + user
     async CreateTeacher(body: CreateTeacherDTO) {
-        await this.TeacherCodeValidator(body.code)
-        await this.UserValidator(body.email, body.phone)
+        await Promise.all([
+            this.TeacherCodeValidator(body.code),
+            this.UserValidator(body.email, body.phone)
+        ])
         const hashPW = await bcrypt.hash(body.phone, 10)
 
         return await this.prismaService.$transaction(async (tx) => {
@@ -53,17 +55,23 @@ export class TeacherService {
                 }
             })
             // thêm giáo viên 
-            return await tx.giaoVien.create({
+            const newTeacher = await tx.giaoVien.create({
                 data: {
                     MaGiaoVien: body.code,
                     ChuyenMon: body.major,
                     UserID: newUser.ID
                 },
-                omit: {
-                    CreatedAt: true,
-                    UpdatedAt: true
-                }
+                include: { User: true }
             })
+            return {
+                ID: newTeacher.ID,
+                MaGiaoVien: newTeacher.MaGiaoVien,
+                HoTen: newTeacher.User.HoTen,
+                DienThoai: newTeacher.User.DienThoai,
+                Email: newTeacher.User.Email,
+                ChuyenMon: newTeacher.ChuyenMon,
+                TrangThai: newTeacher.TrangThai
+            }
         })
     }
 
@@ -82,11 +90,15 @@ export class TeacherService {
         }
         const teacherDB = await this.prismaService.giaoVien.findMany({
             where,
-            include: { User: true }
+            include: { User: true }, orderBy: { CreatedAt: 'desc' }
         })
         return teacherDB.map(item => ({
-            ID: item.ID, MaGiaoVien: item.MaGiaoVien, 
-            HoTen: item.User.HoTen, ChuyenMon: item.ChuyenMon,
+            ID: item.ID,
+            MaGiaoVien: item.MaGiaoVien,
+            HoTen: item.User.HoTen,
+            Email: item.User.Email,
+            DienThoai: item.User.DienThoai,
+            ChuyenMon: item.ChuyenMon,
             TrangThai: item.TrangThai
         }))
     }
@@ -99,24 +111,27 @@ export class TeacherService {
 
     // sửa thông tin 1 giáo viên
     async UpdateTeacherByID(teacherId: number, body: UpdateTeacherDTO) {
-        await this.TeacherIdValidator(teacherId)
-        if (body.status === 'INACTIVE') {
-            await this.DelateTeacherByID(teacherId)
-            // data.TrangThai = body.status
-        }
-
-        return await this.prismaService.giaoVien.update({
-            where: { ID: teacherId },
-            data: {
-                ChuyenMon: body.major,
-                GhiChu: body.note
-            },
-            omit: { CreatedAt: true, UpdatedAt: true }
+        const teacherDB = await this.TeacherIdValidator(teacherId)
+        const userDB = await this.prismaService.user.findUnique({
+            where: { ID: teacherDB.ID }
         })
+        if (!userDB) throw new NotFoundException('Không tìm thấy người dùng')
+        const name = body.name ?? userDB?.HoTen
+        const major = body.major ?? teacherDB.ChuyenMon
+        await this.prismaService.$transaction([
+            this.prismaService.giaoVien.update({
+                where:{ID:teacherDB.ID},
+                data:{ChuyenMon:major}
+            }),
+            this.prismaService.user.update({
+                where:{ID: userDB.ID},
+                data:{HoTen: name}
+            })
+        ])
     }
 
     //xóa mềm giáo viên
-    async DelateTeacherByID(teacherId: number) {
+    async DeleteTeacherByID(teacherId: number) {
         const teacherDB = await this.TeacherIdValidator(teacherId)
         const hasClass = await this.prismaService.lopHoc.findMany({
             where: {
@@ -129,6 +144,16 @@ export class TeacherService {
             throw new BadRequestException(`Teacher ${teacherDB.User.HoTen} is busy with another class. Please change the teacher.`)
         return await this.prismaService.giaoVien.update({
             where: { ID: teacherId }, data: { TrangThai: 'INACTIVE' },
+            omit: { CreatedAt: true, UpdatedAt: true }
+        })
+    }
+
+    // khôi phục giáo viên
+    async RestoreTeacherById(teacherId: number) {
+        const teacherDB = await this.TeacherIdValidator(teacherId)
+        return await this.prismaService.giaoVien.update({
+            where: { ID: teacherDB.ID, TrangThai: 'INACTIVE' },
+            data: { TrangThai: 'ACTIVE' },
             omit: { CreatedAt: true, UpdatedAt: true }
         })
     }

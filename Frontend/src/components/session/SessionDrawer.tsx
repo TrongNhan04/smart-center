@@ -1,8 +1,9 @@
-import { Drawer, Descriptions, Table, Tag, message } from 'antd';
+import { Drawer, Descriptions, Table, Tag, message, Popover } from 'antd';
 import { sessionApi } from '../../api/sessionApi';
 import { useEffect, useState } from 'react';
-import type { SessionDetail } from './SessionDTO';
+import type { SessionDetail, SessionResult } from './SessionDTO';
 import { DateHelper } from '../class/date.helper';
+import { PhoneFilled, UserOutlined } from '@ant-design/icons';
 
 interface Props {
   open: boolean,
@@ -42,11 +43,10 @@ const SessionDrawer = ({ open, onCancel, sessionId }: Props) => {
     CANCELLED: { color: 'error', text: 'Đã hủy' },
   } // status cho tiêu đề
   const status = sessionDetail ? statusColor[sessionDetail!.TrangThai]
-  : {color:'default', text:''}
+    : { color: 'default', text: '' }
 
   useEffect(() => {
     if (open) {
-      console.log('chạy useEffect')
       if (sessionId)
         fetchSessionDetail()
     }
@@ -54,7 +54,20 @@ const SessionDrawer = ({ open, onCancel, sessionId }: Props) => {
   // Cột cho bảng điểm danh
   const columns = [
     { title: 'Mã HV', dataIndex: 'MaHocVien', key: 'MaHocVien', width: 80 },
-    { title: 'Tên học viên', dataIndex: 'TenHocVien', key: 'TenHocVien' },
+    {
+      title: 'Tên học viên', dataIndex: 'TenHocVien', key: 'TenHocVien',
+      render: (value: string, result: SessionResult) =>
+        <Popover
+          content={(
+            <div>
+              <p><UserOutlined/> Phụ huynh: {result.PhuHuynh}</p>
+              <p><PhoneFilled/> Điện thoại: {result.DienThoai}</p>
+            </div>
+          )}
+          title="Thông tin liên lạc">
+          {value}
+        </Popover>
+    },
     {
       title: 'Điểm danh',
       dataIndex: 'DiemDanh',
@@ -67,7 +80,7 @@ const SessionDrawer = ({ open, onCancel, sessionId }: Props) => {
     },
     { title: 'Nhận xét', dataIndex: 'NhanXet', key: 'NhanXet' },
     {
-      title: 'Diem', dataIndex: 'Diem', key: 'Diem',
+      title: 'Điểm', dataIndex: 'Diem', key: 'Diem', align:'center' as const,
       render: (value: number) => value ?? '-'
     }
   ];
@@ -77,7 +90,7 @@ const SessionDrawer = ({ open, onCancel, sessionId }: Props) => {
       {/* 2. KHUNG DRAWER CHÍNH */}
       <Drawer
         title="Chi tiết buổi học"
-        size={800}
+        size={700}
         placement="right"
         onClose={() => onCancel()}
         open={open}

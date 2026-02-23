@@ -18,6 +18,9 @@ const courseApi = {
         axiosClient.patch(`/admin/courses/${id}/inactive`)
     ,
 
+    restore: (id: number) =>
+        axiosClient.patch(`/admin/courses/${id}/restore`),
+
     findOne: (id: number) =>
         axiosClient.get(`/admin/courses/${id}`)
 

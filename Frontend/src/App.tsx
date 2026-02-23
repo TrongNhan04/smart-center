@@ -9,6 +9,7 @@ import HeaderCN from "./components/layout/Header";
 import CourseDetail from "./components/course/CourseDetail";
 import ClassList from "./components/class/ClassList";
 import ClassDetail from "./components/class/ClassDetail";
+import TeacherList from "./components/teacher/TeacherList";
 
 const router = createBrowserRouter([
   {
@@ -34,7 +35,8 @@ const router = createBrowserRouter([
           { path: 'classes', element: <ClassList/> },
           { path: 'classes/:id', element: <ClassDetail/>},
 
-          { path: 'teachers', element: <div>Trang giáo viên</div> },
+          { path: 'teachers', element: <TeacherList/> },
+
           { path: 'students', element: <div>Trang học viên</div> },
           { path: 'enrolls', element: <div>Trang ghi danh</div> },
           { path: 'invoices', element: <div>Trang hóa đơn</div> },

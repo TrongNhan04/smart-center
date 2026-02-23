@@ -1,15 +1,15 @@
 import {
-  Modal, Form, Input, Select, DatePicker, TimePicker,
-  InputNumber, Row, Col, message, Space,
+  Modal, Form, Input, Select, DatePicker, TimePicker, InputNumber,
+  Row, Col, message,
 } from 'antd';
 import { useEffect, useState } from 'react';
 import courseApi from '../../api/courseApi';
 import teacherApi from '../../api/teacherApi';
 import type { CourseDB } from '../course/CourseDTO';
-import type { TeacherDB } from '../teacher/TeacherInterface';
+import type { TeacherDB } from '../teacher/TeacherDTO';
 import dayjs from 'dayjs';
 import classApi from '../../api/classApi';
-import { mapRecordToFormClass, type ClassDB, type ClassDto } from './ClassDTO';
+import { mapDataClass, type ClassDB, type ClassDto } from './ClassDTO';
 import { DateHelper } from './date.helper';
 
 const { RangePicker } = DatePicker
@@ -58,14 +58,14 @@ const ClassModal = ({
     if (open) {
       if (editingClass) {
         // từ tiếng việt thành tiếng anh
-        const record = mapRecordToFormClass(editingClass)
+        const record = mapDataClass(editingClass)
         // tách fromDate, toDate, startTime, endTime ra riêng 
         const { fromDate, toDate, startTime, endTime, ...rest } = record
         const formData = {
           ...rest,
           // gộp thành fromToDate
           fromToDate: [dayjs(fromDate), dayjs(toDate)],
-          // format từ string sthành dayjs để hiện lên form
+          // format từ string thành dayjs để hiện lên form
           startTime: DateHelper.ConvertHourStrToDayJS(startTime),
           endTime: DateHelper.ConvertHourStrToDayJS(endTime),
         }
@@ -91,8 +91,8 @@ const ClassModal = ({
   for (var item of courses) {
     if (item.TrangThai !== 'INACTIVE')
       courseOption.push({
-        label: item.TenKhoaHoc,
-        value: item.ID
+        label: item.TenKhoaHoc + ` (${item.ThoiGian} tháng)`,
+        value: item.ID,
       })
   }
 
@@ -100,9 +100,8 @@ const ClassModal = ({
   for (var i of teachers) {
     if (i.TrangThai !== 'INACTIVE')
       teacherOption.push({
-        label: i.HoTen,
+        label: i.HoTen + ` (${i.MaGiaoVien})`,
         value: i.ID,
-        desc: i.MaGiaoVien
       })
   }
 
@@ -197,9 +196,14 @@ const ClassModal = ({
                     placeholder="Chọn khóa học"
                     options={courseOption}
                     disabled={isEdit}
+                    showSearch={{
+                      filterOption: (input, option) =>
+                        (option?.label ?? '').toLowerCase()
+                          .includes(input.toLowerCase()),
+                    }}
                   />}
               </Form.Item>
-              
+
               <Form.Item // mã lớp học
                 label="Mã lớp học"
                 name="code"
@@ -228,13 +232,12 @@ const ClassModal = ({
               >
                 <Select
                   placeholder="Chọn giáo viên"
-                  // showSearch
+                  showSearch={{
+                    filterOption: (input, option) =>
+                      (option?.label ?? '').toLowerCase()
+                        .includes(input.toLowerCase()),
+                  }}
                   options={teacherOption}
-                  optionRender={(teacherOption) => (
-                    <Space>
-                      {`${teacherOption.data.label} (${teacherOption.data.desc})`}
-                    </Space>
-                  )}
                 />
               </Form.Item>
             </Col>

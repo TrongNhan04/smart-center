@@ -48,8 +48,16 @@ export class CourseController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Patch(':id/inactive')
-    async DeleteCourseById(@Param('id') id: number) {
+    async DeleteCourseByID(@Param('id') id: number) {
         return await this.courseService.DeleteCouresByID(+id)
+    }
+
+    // khôi phục khóa học
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADMIN')
+    @Patch(':id/restore')
+    async RestoreCourseById(@Param('id') id: number) {
+        return await this.courseService.RestoreCourseById(+id)
     }
 
     // lấy danh sách lớp thuộc khóa học 

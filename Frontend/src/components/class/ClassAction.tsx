@@ -27,11 +27,11 @@ const ClassAction = ({ lophoc, onEdit, onSoftDelete }: Props) => {
         </Tooltip>
 
         {/* Nút xóa */}
-        <Tooltip title="Xóa lớp học">
+        <Tooltip title="Đóng lớp lớp học">
           <Popconfirm
-            title="Xác nhận xóa?"
+            title="Xác nhận đóng?"
             description="Hành động này sẽ không thể hoàn tác!"
-            okText="Xóa"
+            okText="Đóng"
             cancelText="Hủy"
             onConfirm={() => onSoftDelete(lophoc.ID)}
             okButtonProps={{ danger: true }}

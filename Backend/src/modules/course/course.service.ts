@@ -69,11 +69,9 @@ export class CourseService {
     // cập nhật khóa học theo trạng thái
     async UpdateCourseById(courseId: number, courseUpdate: CourseUpdateDTO) {
         const courseDB = await this.CourseIdValidator(courseId)
-        const classes = await this.prismaService.lopHoc.count({ where: { KhoaHocID: courseId } })
         //tạo data cho update
         const data: Prisma.KhoaHocUpdateInput = {}
 
-        // data update cho DRAFT
         if (courseDB.TrangThai !== 'INACTIVE') {
             data.TenKhoaHoc = courseUpdate.name
             data.TrinhDo = courseUpdate.level
@@ -81,15 +79,6 @@ export class CourseService {
             data.ThoiGian = courseUpdate.duration
             data.HocPhi = courseUpdate.courseFee
             data.MoTa = courseUpdate.description
-            // data. TrangThai = courseUpdate.status
-        }
-
-        //data update cho INACTIVE
-        if (courseDB.TrangThai === 'INACTIVE') {
-            if (classes > 0)
-                data.TrangThai = 'ACTIVE'
-            else
-                data.TrangThai = 'DRAFT'
         }
 
         await this.prismaService.khoaHoc.update({
@@ -101,10 +90,20 @@ export class CourseService {
 
     // xóa mềm khóa học
     async DeleteCouresByID(courseId: number) {
-        await this.CourseIdValidator(courseId)
-        await this.prismaService.khoaHoc.update({
-            where: { ID: courseId },
+        const courseDB = await this.CourseIdValidator(courseId)
+        return await this.prismaService.khoaHoc.update({
+            where: { ID: courseDB.ID },
             data: { TrangThai: 'INACTIVE' },
+            omit: { CreatedAt: true, UpdatedAt: true }
+        })
+    }
+
+    // khôi phục khóa học
+    async RestoreCourseById(courseId: number) {
+        const courseDB = await this.CourseIdValidator(courseId)
+        return await this.prismaService.khoaHoc.update({
+            where: { ID: courseDB.ID, TrangThai:'INACTIVE' },
+            data: { TrangThai: 'ACTIVE' },
             omit: { CreatedAt: true, UpdatedAt: true }
         })
     }

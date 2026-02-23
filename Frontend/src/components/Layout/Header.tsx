@@ -13,7 +13,8 @@ const HeaderCN = () => {
     navigate('/')
   }
 
-  return (//style={{ background: "rgb(3, 37, 69)", color:'white'}}
+  return (
+    //style={{ background: "rgb(3, 37, 69)", color:'white'}}
     //background: linear-gradient(135deg, #6253e1, #04befe)
     <>{user && (
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

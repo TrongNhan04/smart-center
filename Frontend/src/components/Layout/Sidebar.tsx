@@ -60,9 +60,7 @@ const SidebarComponent = () => {
     setDarkTheme(!darkTheme)
   }
   const [collapsed, setCollapsed] = useState(false);
-  const {
-    token: { colorBgContainer },
-  } = theme.useToken();
+  const { token: { colorBgContainer } } = theme.useToken();
 
   const handleMenuclick = (e: { key: string }) => {
     navigate(`${e.key}`)

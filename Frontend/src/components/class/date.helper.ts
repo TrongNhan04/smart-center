@@ -10,8 +10,7 @@ export class DateHelper {
         const { h, m } = this.PraseHHmm(time)
         const d = new Date()
         d.setHours(h, m, 0, 0)
-        const result = dayjs(d)
-        return result
+        return dayjs(d)
     }
 
     static ISOToHHMM(s: string, e: string) {
@@ -19,7 +18,7 @@ export class DateHelper {
         const end = new Date(e)
         return start.toLocaleTimeString('vi-VN',
             { hour: '2-digit', minute: '2-digit' })
-            + '-' + end.toLocaleTimeString('vi-VN',
+            + ' - ' + end.toLocaleTimeString('vi-VN',
                 { hour: '2-digit', minute: '2-digit' })
     }
 }

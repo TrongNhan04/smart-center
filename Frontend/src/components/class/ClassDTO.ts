@@ -37,7 +37,8 @@ export interface ClassDB {
     MoTa?: string
 }
 
-export const mapRecordToFormClass = (lophoc: ClassDB): ClassDto => ({
+// để cho edit
+export const mapDataClass = (lophoc: ClassDB): ClassDto => ({
     id: lophoc.ID,
     code: lophoc.MaLopHoc,
     courseId: lophoc.KhoaHoc.ID,

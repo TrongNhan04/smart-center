@@ -17,7 +17,8 @@ export class StudentService {
     ) { }
 
     // thêm học viên + ghi danh + hóa đơn 
-    async AddRecord_3Table(userId: number, body: CreateStudentDTO, tx?: Prisma.TransactionClient) {
+    async AddRecord_3Table(userId: number, body: CreateStudentDTO,
+        tx?: Prisma.TransactionClient) {
         const classDB = await this.prismaService.lopHoc.findUnique({
             where: { ID: body.classId },
             select: {
@@ -25,7 +26,7 @@ export class StudentService {
                 khoahoc: { select: { HocPhi: true } }
             }
         })
-        if (!classDB) throw new NotFoundException('Class not found')
+        if (!classDB) throw new NotFoundException('Không tìm thấy lớp học')
         const fee = body.fee ?? classDB.khoahoc.HocPhi
 
         const runLogic = async (client: Prisma.TransactionClient) => {
@@ -40,14 +41,16 @@ export class StudentService {
             })
 
             //thêm ghi danh
-            const newEnroll = await this.enrollService.CreateEnrollAuto(newStudent.ID, body.classId, client)
+            const newEnroll = await this.enrollService.CreateEnrollAuto
+                (newStudent.ID, body.classId, client)
 
             // thêm hóa đơn
-            const newInvoice = await this.invoiceService.CreateInvoice(newEnroll.ID, classDB?.DenNgay, fee, client)
+            const newInvoice = await this.invoiceService.CreateInvoice
+                (newEnroll.ID, classDB?.DenNgay, fee, client)
 
             // thêm thông báo
-            await this.notisService.InvoiceNotify(userId, newInvoice, tx)
-            return { msg: "succesfull" }
+            await this.notisService.InvoiceNotify(userId, newInvoice, client)
+            return newStudent
         }
         // nếu có user
         if (tx) return await runLogic(tx)
@@ -89,7 +92,8 @@ export class StudentService {
             return await this.AddRecord_3Table(oldUser.ID, body)
         }
         else// tìm được nhiều hơn 1 user => trùng Email hoặc phone
-            throw new ConflictException("The email and phone number are used by different user")
+            throw new ConflictException
+                ("Email và số điện thoại được dùng bởi 2 người khác nhau")
     }
 
     // lấy danh sách + tìm kiếm + lọc theo điều kiện
@@ -146,7 +150,6 @@ export class StudentService {
                 data: { TrangThai: 'INACTIVE' }
             })
         ])
-        return { msg: "Succesfull" }
     }
 
     //lấy danh sách lớp học viên học - phần dưới
@@ -187,14 +190,5 @@ export class StudentService {
         })
         if (!StudentDB) throw new BadRequestException('Student is not existed')
         return StudentDB
-    }
-
-    // kiểm tra lớp 
-    private async ClassIdValidator(classId: number) {
-        const classDB = await this.prismaService.lopHoc.findUnique({
-            where: { ID: classId },
-        })
-        if (!classDB) throw new NotFoundException('Class not found')
-        return classDB
     }
 }

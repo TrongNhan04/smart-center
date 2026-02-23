@@ -178,8 +178,6 @@ const ClassDetail = () => {
     try {
       const res = await sessionApi.autoGenerate(classId)
       console.log("Data của res auto gene:", res)
-      // if(res.data)
-      setSessions(res.data)
       fetchSessions()
       message.success(`Đã tạo thành công ${res.data.length} buổi học`)
     } catch (error: any) {

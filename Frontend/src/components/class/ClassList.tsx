@@ -62,7 +62,6 @@ const ClassList = () => {
     setTimeout(() => {
       setClassId(null)
     }, 3000);
-
   }
 
   const handleSoftDelete = async (id: number) => {

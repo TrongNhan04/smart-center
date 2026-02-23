@@ -10,6 +10,7 @@ import { CreateTeacherDTO, QueryTeacherDTO, UpdateTeacherDTO } from './teacher.d
 export class TeacherController {
   constructor(private teacherService: TeacherService) { }
 
+  // thêm giáo viên
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @Post()
@@ -17,6 +18,7 @@ export class TeacherController {
     return await this.teacherService.CreateTeacher(body)
   }
 
+  // lấy danh sách giáo viên
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @Get()
@@ -24,6 +26,7 @@ export class TeacherController {
     return await this.teacherService.GetTeachers(query)
   }
 
+  // lấy chi tiết giáo viên
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @Get(':id')
@@ -31,6 +34,7 @@ export class TeacherController {
     return await this.teacherService.GetTeacherByID(+teacherId)
   }
 
+  // cập nhật thông tin giáo viên
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @Patch(':id')
@@ -39,17 +43,27 @@ export class TeacherController {
     return await this.teacherService.UpdateTeacherByID(+teacherId, body)
   }
 
+  // xóa mềm giáo viên
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @Patch(':id/inactive')
-  async DelateTeacherByID(@Param('id') teacherId: number) {
-    return await this.teacherService.DelateTeacherByID(+teacherId)
+  async DeleteTeacherByID(@Param('id') teacherId: number) {
+    return await this.teacherService.DeleteTeacherByID(+teacherId)
   }
 
+  // khôi phục giáo viên
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADMIN')
+    @Patch(':id/restore')
+    async RestoreCourseById(@Param('id') id: number) {
+        return await this.teacherService.RestoreTeacherById(+id)
+    }
+
+  // danh sách lớp của 1 giáo viên 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @Get(':id/classes')
   async GetClassesByTeacherID(@Param('id') teacherId: number) {
     return await this.teacherService.GetClassesByTeacherID(+teacherId)
-  }  
+  }
 }

@@ -1,17 +1,16 @@
 import { Modal, Form, Input, InputNumber, Select, Row, Col, message } from 'antd';
 import { useEffect, useState } from 'react';
 import courseApi, { } from '../../api/courseApi';
-import { mapRecordToForm, type CourseDB, type CourseDto } from './CourseDTO';
+import {mapDataCourse, type CourseDB, type CourseDto } from './CourseDTO';
 
-interface CourseModalProps {
+interface Props {
   open: boolean,
   onCancel: () => void,
   onSave: (id: number) => void,
   editingCourse: CourseDB
 }
 
-const CourseModal = ({ 
-  open, onCancel, onSave, editingCourse }: CourseModalProps) => {
+const CourseModal = ({ open, onCancel, onSave, editingCourse }: Props) => {
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
 
@@ -21,8 +20,8 @@ const CourseModal = ({
     try {
       // dữ liệu từ form (tiếng anh)
       const values: CourseDto = await form.validateFields()
-      console.log("value lấy từ form: ",values)
-      
+      console.log("value lấy từ form: ", values)
+
       await new Promise(resolve => setTimeout(resolve, 1000))
       const payload = isEdit ? await courseApi.update(editingCourse.ID, values) :
         await courseApi.create(values)
@@ -31,8 +30,7 @@ const CourseModal = ({
       message.success(isEdit ? 'Cập nhật thành công' : 'Thêm mới thành công')
       onSave(payload.data.ID)
       //console.log(res.data)
-      form.resetFields()
-      onCancel()
+      handleCancel()
     }
     catch (error: any) {
       // bắt lỗi từ backend
@@ -61,7 +59,7 @@ const CourseModal = ({
   useEffect(() => {
     if (open) {
       if (editingCourse) {
-        const formData = mapRecordToForm(editingCourse)
+        const formData = mapDataCourse(editingCourse)
         form.setFieldsValue(formData)
       }
       else
@@ -192,4 +190,4 @@ const CourseModal = ({
   )
 }
 
-export default CourseModal;
+export default CourseModal
