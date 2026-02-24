@@ -66,4 +66,12 @@ export class TeacherController {
   async GetClassesByTeacherID(@Param('id') teacherId: number) {
     return await this.teacherService.GetClassesByTeacherID(+teacherId)
   }
+
+  //danh sách buổi học đã dạy của giáo viên
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Get(':id/sessions-completed')
+  async GetCompletedSS(@Param('id') teacherId: number) {
+    return await this.teacherService.GetCompletedSS(+teacherId)
+  }
 }

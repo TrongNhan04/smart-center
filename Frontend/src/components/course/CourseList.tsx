@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
-  Badge, Button, Card, Col, Input, message, Row, Select,
+  Badge, Button, Card, Col, Input, message, notification, Row, Select,
   Space, Table, Tag, Typography
 } from 'antd';
 import courseApi from '../../api/courseApi';
@@ -30,7 +30,12 @@ const CourseList = () => {
       setCourses(res.data)
     }
     catch (error: any) {
-      message.error("Lỗi tải danh sách khóa học")
+      notification.error({
+        title: 'Có lỗi xảy ra',
+        description: error.response.data.message,
+        showProgress: true,
+        pauseOnHover: true
+      })
       console.log(error.response.data.message)
     }
     finally {
@@ -87,8 +92,14 @@ const CourseList = () => {
     try {
       await courseApi.restore(course.ID)
       message.success('Khôi phục thành công')
-      // handleSaveModal(course.ID)
+      handleSaveModal(course.ID)
     } catch (error: any) {
+      notification.error({
+        title: 'Có lỗi xảy ra',
+        description: error.response.data.message,
+        showProgress: true,
+        pauseOnHover: true
+      })
       console.log("Có lỗi xảy ra", error.response.data.message)
     }
   }
@@ -97,8 +108,14 @@ const CourseList = () => {
     try {
       await courseApi.delete(id)
       message.success('Thao tác thành công')
-      // handleSaveModal(id)
+      handleSaveModal(id)
     } catch (error: any) {
+      notification.error({
+        title: 'Có lỗi xảy ra',
+        description: error.response.data.message,
+        showProgress: true,
+        pauseOnHover: true
+      })
       console.log("Có lỗi xảy ra: ", error.response.data.message)
     }
   }
@@ -223,7 +240,7 @@ const CourseList = () => {
             return record.ID === courseId ? 'highlight-row' : ''
           }
         }
-        pagination={{ defaultPageSize: 8 }}
+        pagination={{ defaultPageSize: 7 }}
         rowKey="ID"
         scroll={{ x: 1100, y: 426 }}
       />

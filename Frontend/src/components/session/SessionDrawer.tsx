@@ -16,11 +16,8 @@ const SessionDrawer = ({ open, onCancel, sessionId }: Props) => {
 
   const fetchSessionDetail = async () => {
     try {
-      //console.log("sessionId", sessionId)
       const res = await sessionApi.getSessionResult(sessionId)
       setSessionDetail(res.data)
-      // console.log(res.data)
-      // message.success()
     } catch (error: any) {
       console.log("Có lỗi xảy ra: ", error)
 
@@ -116,11 +113,10 @@ const SessionDrawer = ({ open, onCancel, sessionId }: Props) => {
           Kết quả buổi học
         </div>
         <Table
-          dataSource={sessionDetail?.KetQua?.filter(Boolean) ?? []}
-          //dataSource={FakeData}
+          dataSource={sessionDetail?.KetQua?.filter(Boolean) || []}
           columns={columns}
           rowKey="MaHocVien"
-          pagination={false} // Thường 1 lớp < 30 người nên tắt phân trang cho gọn
+          pagination={false}
           bordered
         />
       </Drawer>

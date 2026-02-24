@@ -23,13 +23,11 @@ const TeacherModal = ({ open, onCancel, onSave, editing }: Props) => {
       console.log("value lấy từ form teacher: ", values)
 
       await new Promise(resolve => setTimeout(resolve, 1000))
-      // const payload = isEdit ? await courseApi.update(editingCourse.ID, values) :
-      //   await courseApi.create(values)
 
-      const res = await teacherApi.create(values)
+      const res = isEdit ? await teacherApi.update(editing.ID, values)
+        : await teacherApi.create(values)
       message.success(isEdit ? 'Cập nhật thành công' : 'Thêm mới thành công')
       onSave(res.data.ID)
-      //console.log(res.data)
       handleCancel()
     }
     catch (error: any) {
@@ -56,16 +54,16 @@ const TeacherModal = ({ open, onCancel, onSave, editing }: Props) => {
     onCancel()
   }
 
-  useEffect(()=>{
-    if(open){
-      if(editing){
+  useEffect(() => {
+    if (open) {
+      if (editing) {
         const formData = mapDataTeacher(editing)
         form.setFieldsValue(formData)
       }
-      else 
+      else
         form.resetFields()
     }
-  },[open, editing, form])
+  }, [open, editing, form])
 
   return (
     <Modal
@@ -89,7 +87,7 @@ const TeacherModal = ({ open, onCancel, onSave, editing }: Props) => {
               name="code"
               rules={[{ required: true, message: 'Vui lòng nhập mã giáo viên!' }]}
             >
-              <Input //disabled={isEdit} 
+              <Input disabled={isEdit}
                 placeholder="Vd: GV-101..." />
             </Form.Item>
           </Col>
@@ -116,7 +114,7 @@ const TeacherModal = ({ open, onCancel, onSave, editing }: Props) => {
                 { type: 'email', message: 'Nhập đúng định dạnh email!' }
               ]}
             >
-              <Input type='email' placeholder="VD: vidu@gmail.com" />
+              <Input disabled={isEdit} type='email' placeholder="VD: vidu@gmail.com" />
             </Form.Item>
           </Col>
 
@@ -127,13 +125,12 @@ const TeacherModal = ({ open, onCancel, onSave, editing }: Props) => {
               rules={[
                 { required: true, message: 'Nhập số điện thoại!' },
                 {
-                  //type: 'regexp', pattern: new RegExp(/\d+/g),
-                  type: 'tel',
-                  message: 'Nhập đúng số điện thoại có 10 chữ số'
+                  pattern: /^0\d{9}$/,
+                  message: 'Số điện thoại là số có 10 chữ số'
                 }
               ]}>
 
-              <Input placeholder='...' />
+              <Input disabled={isEdit} placeholder='VD: 0123456789' />
             </Form.Item>
           </Col>
         </Row>

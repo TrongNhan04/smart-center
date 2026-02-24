@@ -87,7 +87,7 @@ export class ClassController {
         @Param('id') classId: number,
         @Req() req: RequestWithUser) {
         const userId = req.user.role === 'ADMIN' ? null : req.user.userId
-        if (!userId) throw new NotFoundException('Teacher not found')
+        if (!userId) throw new NotFoundException('Không tìm thấy giáo viên')
         return await this.sessionService.GetSessionsByTeacherId(+userId, +classId)
     }
     

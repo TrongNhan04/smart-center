@@ -2,7 +2,7 @@ import {
   MailOutlined, PhoneOutlined, PlusOutlined, SearchOutlined
 } from "@ant-design/icons"
 import {
-  Badge, Button, Card, Col, Input, message, Row, Select, Table, Typography
+  Badge, Button, Card, Col, Input, notification, Row, Select, Table, Typography
 } from "antd"
 import type { TeacherDB } from "./TeacherDTO"
 import { Link } from "react-router-dom"
@@ -27,7 +27,12 @@ const TeacherList = () => {
       const res = await teacherApi.findMany()
       setTeachers(res.data)
     } catch (error: any) {
-      message.error('Có lỗi xảy ra!')
+      notification.error({
+        title: 'Có lỗi xảy ra',
+        description: error.response.data.message,
+        showProgress: true,
+        pauseOnHover: true
+      })
       console.log('Có lỗi xảy ra: ', error)
     }
     finally {

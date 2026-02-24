@@ -2,7 +2,7 @@ import axiosClient from "../components/AxiosClient"
 import type { ClassDto } from "../components/class/ClassDTO"
 
 const classApi = {
-    getClassesOfCourse: (courseId: number) =>
+    getByCourseId: (courseId: number) =>
         axiosClient.get(`/admin/courses/${courseId}/classes`),
 
     create: (body: ClassDto) =>
@@ -27,7 +27,10 @@ const classApi = {
         return axiosClient.patch(`/admin/classes/${id}`, rest)
     },
         
-    findOne: (id: number) => axiosClient.get(`/admin/classes/${id}`)
+    findOne: (id: number) => axiosClient.get(`/admin/classes/${id}`),
+
+    getClassesOfTeacher: (teacherId: number) =>
+        axiosClient.get(`/admin/teachers/${teacherId}/classes`),
 }
 
 export default classApi

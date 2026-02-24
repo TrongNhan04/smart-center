@@ -15,6 +15,7 @@ export interface TeacherDB {
     Email: string
     ChuyenMon: string,
     TrangThai: string
+    SoBuoiDaDay: number
 }
 
 export const mapDataTeacher = (value: TeacherDB): TeacherDto => ({

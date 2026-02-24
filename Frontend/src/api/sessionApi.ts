@@ -2,22 +2,26 @@ import axiosClient from "../components/AxiosClient";
 import type { SessionDto } from "../components/session/SessionDTO";
 
 export const sessionApi = {
-    getSessionOfClass: (classId: number) =>
+    getByClassId: (classId: number) =>
         axiosClient.get(`admin/classes/${classId}/sessions`),
+    
+    getDetailsById: (sessionId: number) =>
+        axiosClient.get(`teacher/sessions/${sessionId}`),
 
-    autoGenerate: (classId: number) =>
+    getCompletedByTeacherId: (teacherId: number) =>
+        axiosClient.get(`admin/teachers/${teacherId}/sessions-completed`),
+
+    generateAuto: (classId: number) =>
         axiosClient.post(`admin/sessions-auto/classes/${classId}`),
 
-    manualGenarate: (classId: number, body: SessionDto) =>
+    generateManual: (classId: number, body: SessionDto) =>
         axiosClient.post(`admin/sessions-manual/classes/${classId}`, body),
 
-    unlockSession: (sessionId: number) =>
+    unlock: (sessionId: number) =>
         axiosClient.post(`admin/sessions/${sessionId}/unlock`),
 
-    cancelSession: (sessionId: number, reason: string) =>
-        // console.log("reason đưa cho api:",reason)
+    cancel: (sessionId: number, reason: string) =>
         axiosClient.patch(`admin/sessions/${sessionId}/cancel`, reason),
 
-    getSessionResult: (sessionId: number) => 
-        axiosClient.get(`teacher/sessions/${sessionId}`)
+
 }

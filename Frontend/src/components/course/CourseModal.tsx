@@ -29,12 +29,11 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: Props) => {
       console.log("Khóa học được sửa hoặc thêm mới: ", payload.data)
       message.success(isEdit ? 'Cập nhật thành công' : 'Thêm mới thành công')
       onSave(payload.data.ID)
-      //console.log(res.data)
       handleCancel()
     }
     catch (error: any) {
       // bắt lỗi từ backend
-      console.log("Có lỗi xảy ra: ", error.response.data.message)
+      console.log("Có lỗi xảy ra: ", error)
 
       if (error.response) {
         const serverError = error.response.data

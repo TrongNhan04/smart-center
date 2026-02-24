@@ -36,7 +36,6 @@ export class AuthService {
                 DienThoai: registerDTO.phone,
                 MatKhauHash: passwordHash,
                 VaiTro: registerDTO.role,
-                CreatedAt: undefined
             },
             // hiện ra những trường nào
             select: {
@@ -60,7 +59,6 @@ export class AuthService {
         const ok = await bcrypt.compare(loginDTO.password, userDB.MatKhauHash)
         if (!ok)
             throw new UnauthorizedException("Incorrect password!")
-
         return userDB
     }
 
@@ -81,7 +79,7 @@ export class AuthService {
             user: {
                 id: userDB.ID,
                 email: userDB.Email,
-                full_name:userDB.HoTen,
+                full_name: userDB.HoTen,
                 phone: userDB.DienThoai,
                 role: userDB.VaiTro
             }
@@ -91,7 +89,8 @@ export class AuthService {
     // đăng xuất: tăng token version lên 1
     async Logout(userId: number) {
         await this.prismaService.user.update({
-            where: { ID: userId }, data: { ToKenVerSion: { increment: 1 } }
+            where: { ID: userId },
+            data: { ToKenVerSion: { increment: 1 } }
         })
         return { msg: "Logout succesfully" }
     }
@@ -101,7 +100,7 @@ export class AuthService {
             where: { ID: userId },
             select: {
                 ID: true, HoTen: true, Email: true,
-                DienThoai: true, VaiTro: true,PhaiDoiMK: true
+                DienThoai: true, VaiTro: true, PhaiDoiMK: true
             }
         })
         if (!userDB)
@@ -138,6 +137,6 @@ export class AuthService {
         await this.prismaService.user.update({
             where: { ID: userID }, data
         })
-        return { mgs: "Update succesfully" }
+        // return { mgs: "Update succesfully" }
     }
 }

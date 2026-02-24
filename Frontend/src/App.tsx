@@ -10,6 +10,7 @@ import CourseDetail from "./components/course/CourseDetail";
 import ClassList from "./components/class/ClassList";
 import ClassDetail from "./components/class/ClassDetail";
 import TeacherList from "./components/teacher/TeacherList";
+import TeacherDetail from "./components/teacher/TeacherDetail";
 
 const router = createBrowserRouter([
   {
@@ -36,6 +37,7 @@ const router = createBrowserRouter([
           { path: 'classes/:id', element: <ClassDetail/>},
 
           { path: 'teachers', element: <TeacherList/> },
+          { path: 'teachers/:id', element: <TeacherDetail/>},
 
           { path: 'students', element: <div>Trang học viên</div> },
           { path: 'enrolls', element: <div>Trang ghi danh</div> },

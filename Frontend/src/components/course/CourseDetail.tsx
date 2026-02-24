@@ -39,7 +39,7 @@ const CourseDetail = () => {
 
   const fetchClasses = async () => {
     try {
-      const res = await classApi.getClassesOfCourse(courseId)
+      const res = await classApi.getByCourseId(courseId)
       setClasses(res.data)
     } catch (error) {
       message.error("Có lỗi xảy ra!")

@@ -81,10 +81,10 @@ export class CourseService {
             data.MoTa = courseUpdate.description
         }
 
-        await this.prismaService.khoaHoc.update({
+        return await this.prismaService.khoaHoc.update({
             where: { ID: courseId },
             data,
-            omit: { CreatedAt: true, UpdatedAt: true }
+            select:{ID:true}
         })
     }
 

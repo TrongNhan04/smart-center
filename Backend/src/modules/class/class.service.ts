@@ -190,7 +190,7 @@ export class ClassService {
                 })
             }
 
-            return await tx.lopHoc.update({
+            await tx.lopHoc.update({
                 where: { ID: classId },
                 data: {
                     TenLop: name, MoTa: description, SiSo: size,
@@ -199,6 +199,8 @@ export class ClassService {
                     GiaoVienID: up.teacherId, PhongHoc: up.room
                 }
             })
+
+            return { ID: classId }
         })
     }
 

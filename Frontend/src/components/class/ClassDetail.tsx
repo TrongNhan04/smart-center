@@ -45,7 +45,7 @@ const ClassDetail = () => {
 
   const fetchSessions = async () => {
     try {
-      const res = await sessionApi.getSessionOfClass(classId)
+      const res = await sessionApi.getByClassId(classId)
       setSessions(res.data)
     } catch (error) {
       message.error("Có lỗi xảy ra!")
@@ -176,7 +176,7 @@ const ClassDetail = () => {
 
   const AutoGenerate = async (classId: number) => {
     try {
-      const res = await sessionApi.autoGenerate(classId)
+      const res = await sessionApi.generateAuto(classId)
       console.log("Data của res auto gene:", res)
       fetchSessions()
       message.success(`Đã tạo thành công ${res.data.length} buổi học`)
@@ -203,7 +203,7 @@ const ClassDetail = () => {
 
   const handleUnlock = async (sessionId: number) => {
     try {
-      const res = await sessionApi.unlockSession(sessionId)
+      const res = await sessionApi.unlock(sessionId)
       console.log('res của unlock: ', res.data)
       message.success('Thao tác thành công')
       fetchSessions()
@@ -215,7 +215,7 @@ const ClassDetail = () => {
 
   const handleCancel = async (sessionId: number, reason: string) => {
     try {
-      await sessionApi.cancelSession(sessionId, reason)
+      await sessionApi.cancel(sessionId, reason)
       message.success('Thao tác thành công')
       fetchSessions()
     } catch (error: any) {

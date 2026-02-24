@@ -29,9 +29,19 @@ export class TeacherService {
     private async TeacherIdValidator(teacherId: number) {
         const teacherDB = await this.prismaService.giaoVien.findUnique({
             where: { ID: teacherId },
-            include: { User: true }
+            select: {
+                ID: true, MaGiaoVien: true, UserID: true,
+                ChuyenMon: true, TrangThai: true,
+                User: {
+                    select: {
+                        HoTen: true,
+                        Email: true,
+                        DienThoai: true
+                    }
+                }
+            }
         })
-        if (!teacherDB) throw new BadRequestException('Teacher is not existed')
+        if (!teacherDB) throw new NotFoundException('Không tìm thấy giáo viên')
         return teacherDB
     }
 
@@ -106,7 +116,22 @@ export class TeacherService {
     // lấy chi tiết 1 giáo viên - phần trên
     async GetTeacherByID(teacherId: number) {
         const teacherDB = await this.TeacherIdValidator(teacherId)
-        if (teacherDB) return teacherDB
+        const total = await this.prismaService.buoiHoc.count({
+            where: {
+                lophoc: { GiaoVienID: teacherDB.ID },
+                TrangThai: 'COMPLETED'
+            }
+        })
+        return {
+            ID: teacherDB.ID,
+            MaGiaoVien: teacherDB.MaGiaoVien,
+            HoTen: teacherDB.User.HoTen,
+            Email: teacherDB.User.Email,
+            DienThoai: teacherDB.User.DienThoai,
+            ChuyenMon: teacherDB.ChuyenMon,
+            TrangThai: teacherDB.TrangThai,
+            SoBuoiDaDay: total
+        }
     }
 
     // sửa thông tin 1 giáo viên
@@ -116,18 +141,20 @@ export class TeacherService {
             where: { ID: teacherDB.ID }
         })
         if (!userDB) throw new NotFoundException('Không tìm thấy người dùng')
-        const name = body.name ?? userDB?.HoTen
+
+        const name = body.name ?? userDB.HoTen
         const major = body.major ?? teacherDB.ChuyenMon
         await this.prismaService.$transaction([
             this.prismaService.giaoVien.update({
-                where:{ID:teacherDB.ID},
-                data:{ChuyenMon:major}
+                where: { ID: teacherDB.ID },
+                data: { ChuyenMon: major }
             }),
             this.prismaService.user.update({
-                where:{ID: userDB.ID},
-                data:{HoTen: name}
+                where: { ID: teacherDB.UserID },
+                data: { HoTen: name }
             })
         ])
+        return { ID: teacherId }
     }
 
     //xóa mềm giáo viên
@@ -141,10 +168,11 @@ export class TeacherService {
             select: { TenLop: true }
         })
         if (hasClass.length > 0)
-            throw new BadRequestException(`Teacher ${teacherDB.User.HoTen} is busy with another class. Please change the teacher.`)
+            throw new BadRequestException
+                (`GV ${teacherDB.User.HoTen} đang dạy các lớp học khác. Hãy đổi giáo viên cho lớp trước khi thao tác.`)
         return await this.prismaService.giaoVien.update({
             where: { ID: teacherId }, data: { TrangThai: 'INACTIVE' },
-            omit: { CreatedAt: true, UpdatedAt: true }
+            select: { ID: true }
         })
     }
 
@@ -158,14 +186,49 @@ export class TeacherService {
         })
     }
 
-    //lấy danh sách lớp giáo viên dạy - phần dưới
+    //lấy danh sách lớp giáo viên đang dạy - phần dưới tab 1
     async GetClassesByTeacherID(teacherId: number) {
         await this.TeacherIdValidator(teacherId)
         const classDB = await this.prismaService.lopHoc.findMany({
             where: { GiaoVienID: teacherId },
-            omit: { CreatedAt: true, UpdatedAt: true }
+            include: {
+                khoahoc: true,
+                _count: {
+                    select:
+                        { ghidanh: { where: { TrangThai: 'ACTIVE' } } }
+                }
+            }
         })
-        if (classDB.length == 0) return { msg: "This teacher doesn't teach any classes." }
-        return classDB
+        if (classDB.length == 0) return []
+        return classDB.map(lh => ({
+            ID: lh.ID, MaLopHoc: lh.MaLopHoc, TenLop: lh.TenLop,
+            KhoaHoc: {
+                ID: lh.KhoaHocID,
+                TenKhoaHoc: lh.khoahoc.TenKhoaHoc
+            },
+            PhongHoc: lh.PhongHoc, LichHoc: lh.LichHoc,
+            TuNgay: lh.TuNgay, DenNgay: lh.DenNgay, SiSo: lh.SiSo,
+            GioHoc: lh.GioBatDau + ' - ' + lh.GioKetThuc,
+            TrangThai: lh.TrangThai, TongGhiDanh: lh._count.ghidanh
+        }))
+    }
+
+    // lấy danh sách buổi học giáo viên đã dạy - tab 2
+    async GetCompletedSS(teacherId: number) {
+        const teacherDB = await this.TeacherIdValidator(teacherId)
+        const sessionDB = await this.prismaService.buoiHoc.findMany({
+            where: {
+                lophoc: { GiaoVienID: teacherDB.ID },
+                TrangThai: 'COMPLETED'
+            },
+            omit: {
+                CreatedAt: true, UpdatedAt: true,
+                AdminMoKhoa:true, LyDoMoKhoa:true,
+                YeuCauMoKhoa:true, NgayYeuCau:true
+            },
+            orderBy: { BatDauLuc: 'asc' }
+        })
+        if (!sessionDB) return []
+        return sessionDB
     }
 }

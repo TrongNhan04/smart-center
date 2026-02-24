@@ -1,4 +1,4 @@
-import { Button, message, Popconfirm, Space, Tooltip } from "antd"
+import { Button, message, notification, Popconfirm, Space, Tooltip } from "antd"
 import type { TeacherDB } from "./TeacherDTO"
 import { DeleteOutlined, EditOutlined, UndoOutlined } from "@ant-design/icons"
 import teacherApi from "../../api/teacherApi"
@@ -16,8 +16,13 @@ const TeacherAction = ({ teacher, onReload, onEdit }: Props) => {
       message.success('Thao tác thành công')
       onReload(teacherId)
     } catch (error: any) {
-      message.error('Có lỗi xảy ra')
-      console.log('Có lỗi xảy ra: ', error.response)
+      notification.error({
+        title: 'Có lỗi xảy ra',
+        description: error.response.data.message,
+        showProgress: true,
+        pauseOnHover: true
+      })
+      console.log('Có lỗi xảy ra: ', error.response.data.message)
     }
   }
 
@@ -27,8 +32,13 @@ const TeacherAction = ({ teacher, onReload, onEdit }: Props) => {
       message.success('Thao tác thành công')
       onReload(teacherId)
     } catch (error: any) {
-      message.error('Có lỗi xảy ra')
-      console.log('Có lỗi xảy ra: ', error.response)
+      notification.error({
+        title: 'Có lỗi xảy ra',
+        description: error.response.data.message,
+        showProgress: true,
+        pauseOnHover: true
+      })
+      console.log('Có lỗi xảy ra: ', error.response.data.message)
     }
   }
 
@@ -57,7 +67,7 @@ const TeacherAction = ({ teacher, onReload, onEdit }: Props) => {
   return (
     <Space size="small">
       {/* Nút sửa  */}
-      <Tooltip title="Sửa & xem chi tiết">
+      <Tooltip title="Sửa thông tin">
         <Button
           size="small"
           type="primary"

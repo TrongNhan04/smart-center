@@ -30,17 +30,17 @@ export interface SessionDetail {
     PhongHoc: string,
     LopHoc: string,
     GiaoVien: string,
-    TrangThai:string,
+    TrangThai: string,
     KetQua: SessionResult[]
 }
 
 export interface SessionResult {
-    HocVienID:number,
+    HocVienID: number,
     MaHocVien: string,
     TenHocVien: string,
     PhuHuynh: string,
     DienThoai: string,
-    Email:string
+    Email: string
     DiemDanh: boolean,
     NhanXet: string
     Diem: number

@@ -34,7 +34,7 @@ const SessionsModal = ({ lophoc, open, onCancel, onSave }: Props) => {
         startAt: dayjs(values.startAt).format('HH:mm'),
         endAt: dayjs(values.endAt).format('HH:mm')
       }
-      await sessionApi.manualGenarate(lophoc.ID, payload)
+      await sessionApi.generateManual(lophoc.ID, payload)
       message.success('Thao tác thành công')
       // console.log('res.data manualGenarate: ', res.data)
       onSave()

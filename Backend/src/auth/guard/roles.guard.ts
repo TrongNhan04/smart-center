@@ -13,11 +13,11 @@ export class RolesGuard implements CanActivate {
         );
 
         // không khai báo @Role thì bỏ qua
-        if (!allowedRoles || allowedRoles.length === 0) return true;
+        if (!allowedRoles || allowedRoles.length === 0) return true
 
         //Lấy user từ request đã được JwtAuthGuard gắn vào
-        const req = context.switchToHttp().getRequest();
-        const user = req.user;
+        const req = context.switchToHttp().getRequest()
+        const user = req.user
 
         //không có role: chưa đăng nhập, guard không chạy,.. --> chặn
         if(!user?.role) throw new ForbiddenException("Forbidden nhé bạn ơi")

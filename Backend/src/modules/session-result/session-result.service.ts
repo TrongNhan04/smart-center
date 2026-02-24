@@ -58,15 +58,15 @@ export class SessionResultService {
                 include: { hocvien: { include: { Parent: true } } }
             })
         ])
-        if (!result) 
+        if (!result)
             return enrolls.map(item => ({
-            HocvienID: item.HocVienID,
-            MaHocVien: item.hocvien.MaHocVien,
-            TenHocVien: item.hocvien.TenHocVien,
-            PhuHuynh: item.hocvien.Parent.HoTen,
-            DienThoai: item.hocvien.Parent.DienThoai,
-            Email: item.hocvien.Parent.Email,
-        }))
+                HocvienID: item.HocVienID,
+                MaHocVien: item.hocvien.MaHocVien,
+                TenHocVien: item.hocvien.TenHocVien,
+                PhuHuynh: item.hocvien.Parent.HoTen,
+                DienThoai: item.hocvien.Parent.DienThoai,
+                Email: item.hocvien.Parent.Email,
+            }))
 
         // tạo map key là ghi danh ID, value là dữ liệu
         const newMapEnroll = new Map(enrolls.map(item => [item.ID, item]))
@@ -84,7 +84,7 @@ export class SessionResultService {
                 Email: data.hocvien.Parent.Email,
                 DiemDanh: value.DiemDanh,
                 NhanXet: value.NhanXetRieng ?? result.NhanXetChung,
-                Diem: value.Diem 
+                Diem: value.Diem
             }
         })
     }
@@ -231,9 +231,10 @@ export class SessionResultService {
         const sessionDB = await this.prisma.buoiHoc.findUnique({
             where: { ID: sessionId, lophoc: { GiaoVienID: teacherDB.ID } }
         })
-        if (!sessionDB) throw new NotFoundException('Session not found or Access denied')
+        if (!sessionDB) throw new NotFoundException
+            ('Không tìm thấy buổi học hoặc từ chối truy cập')
         if (sessionDB.TrangThai === 'CANCELLED')
-            throw new ConflictException(`Session ID ${sessionDB.ID} is ${sessionDB.TrangThai}`)
+            throw new ConflictException(`Buổi học đã hủy`)
         return { sessionDB, teacherId: teacherDB.ID }
     }
 
@@ -252,9 +253,9 @@ export class SessionResultService {
         const teacherDB = await this.prisma.giaoVien.findUnique({
             where: { UserID: userId }
         })
-        if (!teacherDB) throw new NotFoundException('Teacher not found')
+        if (!teacherDB) throw new NotFoundException('Không tìm thấy giáo viên')
         if (teacherDB.TrangThai === 'INACTIVE')
-            throw new ConflictException('Teacher was INACTIVE')
+            throw new ConflictException('Giáo viên đã ngừng hoạt động')
         return teacherDB
     }
 }
