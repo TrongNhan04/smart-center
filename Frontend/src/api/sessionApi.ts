@@ -11,6 +11,9 @@ export const sessionApi = {
     getCompletedByTeacherId: (teacherId: number) =>
         axiosClient.get(`admin/teachers/${teacherId}/sessions-completed`),
 
+    getCompletedByStudentId: (studentId: number) =>
+        axiosClient.get(`admin/students/${studentId}/sessions-completed`),
+
     generateAuto: (classId: number) =>
         axiosClient.post(`admin/sessions-auto/classes/${classId}`),
 

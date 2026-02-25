@@ -5,10 +5,18 @@ const classApi = {
     getByCourseId: (courseId: number) =>
         axiosClient.get(`/admin/courses/${courseId}/classes`),
 
+    getByTeacherId: (teacherId: number) =>
+        axiosClient.get(`/admin/teachers/${teacherId}/classes`),
+
+    getByStudentId: (studentId: number) =>
+        axiosClient.get(`admin/students/${studentId}/classes`),
+
     create: (body: ClassDto) =>
         axiosClient.post(`/admin/classes`, body),
 
     findMany: () => axiosClient.get(`/admin/classes`),
+
+    findOne: (id: number) => axiosClient.get(`/admin/classes/${id}`),
 
     detele: (id: number) =>
         axiosClient.patch(`/admin/classes/${id}/closed`),
@@ -26,11 +34,6 @@ const classApi = {
         console.log("payload update class open: ", rest)
         return axiosClient.patch(`/admin/classes/${id}`, rest)
     },
-        
-    findOne: (id: number) => axiosClient.get(`/admin/classes/${id}`),
-
-    getClassesOfTeacher: (teacherId: number) =>
-        axiosClient.get(`/admin/teachers/${teacherId}/classes`),
 }
 
 export default classApi

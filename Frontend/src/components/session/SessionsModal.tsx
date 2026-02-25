@@ -30,7 +30,6 @@ const SessionsModal = ({ lophoc, open, onCancel, onSave }: Props) => {
 
       const payload: SessionDto = {
         ...values,
-        date: dayjs(values.date).toISOString(),
         startAt: dayjs(values.startAt).format('HH:mm'),
         endAt: dayjs(values.endAt).format('HH:mm')
       }

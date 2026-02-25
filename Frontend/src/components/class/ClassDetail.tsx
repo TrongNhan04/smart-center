@@ -14,7 +14,7 @@ import { useEffect, useState } from "react"
 import classApi from "../../api/classApi"
 import { sessionApi } from "../../api/sessionApi"
 import type { SessionDB } from "../session/SessionDTO"
-import { DateHelper } from "./date.helper"
+import { DateHelper } from "../common/date.helper"
 import ClassModal from "./ClassModal"
 import SessionAction from "../session/SessionAction"
 import SessionsModal from "../session/SessionsModal"
@@ -203,8 +203,8 @@ const ClassDetail = () => {
 
   const handleUnlock = async (sessionId: number) => {
     try {
-      const res = await sessionApi.unlock(sessionId)
-      console.log('res của unlock: ', res.data)
+      await sessionApi.unlock(sessionId)
+      // console.log('res của unlock: ', res.data)
       message.success('Thao tác thành công')
       fetchSessions()
     } catch (error) {
@@ -260,7 +260,7 @@ const ClassDetail = () => {
                   style={{ marginLeft: 10, verticalAlign: 'middle' }}>
                   {lophoc.TrangThai}</Tag>
               </Title>
-              <Text type="secondary">Mã: {lophoc.MaLopHoc}</Text>
+              <Text type="secondary">Mã LH: {lophoc.MaLopHoc}</Text>
             </div>
           </div>
           <Tooltip title='Sửa lớp học'>

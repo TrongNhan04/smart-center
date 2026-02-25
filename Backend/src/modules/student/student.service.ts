@@ -17,7 +17,7 @@ export class StudentService {
     ) { }
 
     // thêm học viên + ghi danh + hóa đơn 
-    async AddRecord_3Table(userId: number, body: CreateStudentDTO,
+    private async AddRecord_3Table(userId: number, body: CreateStudentDTO,
         tx?: Prisma.TransactionClient) {
         const classDB = await this.prismaService.lopHoc.findUnique({
             where: { ID: body.classId },
@@ -110,18 +110,40 @@ export class StudentService {
                 { Parent: { HoTen: { contains: q, mode: 'insensitive' } } }
             ]
         }
-        return await this.prismaService.hocVien.findMany({
+        const studentDB = await this.prismaService.hocVien.findMany({
             where,
-            omit: { UpdatedAt: true, CreatedAt: true }
+            orderBy: { CreatedAt: 'desc' },
+            include: { Parent: true }
         })
+        return studentDB.map(item => ({
+            ID: item.ID,
+            MaHocVien: item.MaHocVien,
+            TenHocVien: item.TenHocVien,
+            NgaySinh: item.NgaySinh,
+            DiaChi: item.DiaChi,
+            PhuHuynh: item.Parent.HoTen,
+            DienThoai: item.Parent.DienThoai,
+            Email: item.Parent.Email,
+            TrangThai: item.TrangThai
+        }))
     }
 
     // lấy chi tiết 1 học viên - phần trên
     async GetStudentByID(studentId: number) {
         const studentDB = await this.StudentIdValidator(studentId)
         if (!studentDB)
-            throw new NotFoundException('Student not found')
-        return studentDB
+            throw new NotFoundException('Không tìm thấy học viên')
+        return {
+            ID: studentDB.ID,
+            MaHocVien: studentDB.MaHocVien,
+            TenHocVien: studentDB.TenHocVien,
+            NgaySinh: studentDB.NgaySinh,
+            DiaChi: studentDB.DiaChi,
+            PhuHuynh: studentDB.Parent.HoTen,
+            DienThoai: studentDB.Parent.DienThoai,
+            Email: studentDB.Parent.Email,
+            TrangThai: studentDB.TrangThai
+        }
     }
 
     // sửa thông tin 1 học viên
@@ -174,6 +196,39 @@ export class StudentService {
         }))
     }
 
+    async GetCompletedSS(studentId: number) {
+        const studentDB = await this.StudentIdValidator(studentId)
+        const result = await this.prismaService.ketQua_ChiTiet.findMany({
+            where: {
+                ghidanh: { HocVienID: studentDB.ID }
+            },
+            select: {
+                ID: true, NhanXetRieng:true, DiemDanh:true, Diem:true,
+                ketqua_buoihoc: {
+                    select: {
+                        NhanXetChung:true,
+                        buoihoc: true,
+                        giaovien: {
+                            select: { User: { select: { HoTen: true } } }
+                        }
+                    }
+                }
+            }
+        })
+        return result.map(item => ({
+            ID: item.ID, // id kết quả chi tiết
+            BuoiSo: item.ketqua_buoihoc.buoihoc.BuoiSo,
+            ChuDe: item.ketqua_buoihoc.buoihoc.ChuDe,
+            BatDauLuc: item.ketqua_buoihoc.buoihoc.BatDauLuc,
+            KetThucLuc: item.ketqua_buoihoc.buoihoc.KetThucLuc,
+            PhongHoc: item.ketqua_buoihoc.buoihoc.PhongHoc,
+            GiaoVien: item.ketqua_buoihoc?.giaovien.User.HoTen,
+            NhanXet: item.NhanXetRieng || item.ketqua_buoihoc.NhanXetChung,
+            DiemDanh: item.DiemDanh,
+            Diem: item.Diem
+        }))
+    }
+
     //kiểm tra trùng mã học viên
     private async StudentCodeValidator(code: string) {
         const StudentDB = await this.prismaService.hocVien.findUnique({
@@ -186,7 +241,8 @@ export class StudentService {
     private async StudentIdValidator(studentId: number) {
         const StudentDB = await this.prismaService.hocVien.findUnique({
             where: { ID: studentId },
-            omit: { UpdatedAt: true, CreatedAt: true }
+            omit: { UpdatedAt: true, CreatedAt: true },
+            include: { Parent: true }
         })
         if (!StudentDB) throw new BadRequestException('Student is not existed')
         return StudentDB

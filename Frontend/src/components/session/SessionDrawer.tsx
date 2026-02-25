@@ -2,7 +2,7 @@ import { Drawer, Descriptions, Table, Tag, message, Popover } from 'antd';
 import { sessionApi } from '../../api/sessionApi';
 import { useEffect, useState } from 'react';
 import type { SessionDetail, SessionResult } from './SessionDTO';
-import { DateHelper } from '../class/date.helper';
+import { DateHelper } from '../common/date.helper';
 import { PhoneFilled, UserOutlined } from '@ant-design/icons';
 
 interface Props {
@@ -16,7 +16,7 @@ const SessionDrawer = ({ open, onCancel, sessionId }: Props) => {
 
   const fetchSessionDetail = async () => {
     try {
-      const res = await sessionApi.getSessionResult(sessionId)
+      const res = await sessionApi.getDetailsById(sessionId)
       setSessionDetail(res.data)
     } catch (error: any) {
       console.log("Có lỗi xảy ra: ", error)
@@ -115,7 +115,7 @@ const SessionDrawer = ({ open, onCancel, sessionId }: Props) => {
         <Table
           dataSource={sessionDetail?.KetQua?.filter(Boolean) || []}
           columns={columns}
-          rowKey="MaHocVien"
+          rowKey="HocVienID"
           pagination={false}
           bordered
         />

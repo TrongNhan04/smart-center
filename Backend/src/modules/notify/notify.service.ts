@@ -128,7 +128,7 @@ export class NotifyService {
         })
     }
 
-    // thông báo thu tiền
+    // thông báo đã thu tiền
     async PaymentNotify(userId: number, receipt: any) {
         // userId, title, body, tpye, data, isRead
         return await this.prisma.thongBao.create({

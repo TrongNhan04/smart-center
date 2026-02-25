@@ -11,6 +11,8 @@ import ClassList from "./components/class/ClassList";
 import ClassDetail from "./components/class/ClassDetail";
 import TeacherList from "./components/teacher/TeacherList";
 import TeacherDetail from "./components/teacher/TeacherDetail";
+import StudentList from "./components/student/StudentList";
+import StudentDetail from "./components/student/StudentDetail";
 
 const router = createBrowserRouter([
   {
@@ -39,7 +41,9 @@ const router = createBrowserRouter([
           { path: 'teachers', element: <TeacherList/> },
           { path: 'teachers/:id', element: <TeacherDetail/>},
 
-          { path: 'students', element: <div>Trang học viên</div> },
+          { path: 'students', element: <StudentList/> },
+          { path: 'students/:id', element: <StudentDetail/>},
+
           { path: 'enrolls', element: <div>Trang ghi danh</div> },
           { path: 'invoices', element: <div>Trang hóa đơn</div> },
           { path: 'debts', element: <div>Trang nợ xấu</div> },

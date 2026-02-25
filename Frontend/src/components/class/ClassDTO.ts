@@ -25,6 +25,7 @@ export interface ClassDB {
     KhoaHoc: {
         ID: number,
         TenKhoaHoc: string
+        HocPhi: number
     }
     TuNgay: string,
     DenNgay: string,

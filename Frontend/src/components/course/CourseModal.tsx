@@ -125,7 +125,10 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: Props) => {
             <Form.Item
               label="Học phí"
               name="courseFee"
-              rules={[{ required: true, message: 'Nhập học phí!' }]}>
+              rules={[
+                { required: true, message: 'Nhập học phí!' },
+                { type:'number', min:0, message:'Học phí là số dương'}
+              ]}>
 
               <InputNumber
                 style={{ width: '100%' }}

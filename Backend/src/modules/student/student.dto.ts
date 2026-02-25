@@ -9,7 +9,6 @@ export class CreateStudentDTO {
 
     @IsNotEmpty()
     @IsInt()
-    @Min(1)
     classId: number
 
     @IsNotEmpty()
@@ -64,7 +63,7 @@ export class UpdateStudentDTO {
     @IsOptional()
     @Type(() => Date)
     @IsDate()
-    dob = Date
+    dob: Date
 
     @IsOptional()
     @IsString()

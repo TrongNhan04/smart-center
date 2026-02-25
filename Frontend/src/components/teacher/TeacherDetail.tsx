@@ -15,7 +15,7 @@ import {
 import TeacherModal from "./TeacherModal"
 import { sessionApi } from "../../api/sessionApi"
 import type { SessionDB } from "../session/SessionDTO"
-import { DateHelper } from "../class/date.helper"
+import { DateHelper } from "../common/date.helper"
 import SessionAction from "../session/SessionAction"
 import SessionDrawer from "../session/SessionDrawer"
 
@@ -43,7 +43,7 @@ const TeacherDetail = () => {
 
   const fetchClasses = async () => {
     try {
-      const res = await classApi.getClassesOfTeacher(teacherId)
+      const res = await classApi.getByTeacherId(teacherId)
       setClasses(res.data)
     } catch (error: any) {
       handleError(error)
@@ -76,7 +76,7 @@ const TeacherDetail = () => {
         await Promise.all([
           fetchTeacher(), fetchClasses(), fetchCompletedSS()
         ])
-        console.log('Data: ', teacher)
+        // console.log('Data: ', teacher)
 
       } catch (error) {
         console.log("lỗi chạy useEffect: ", error)
@@ -178,6 +178,17 @@ const TeacherDetail = () => {
     { // Thời gian
       title: 'Thời gian', dataIndex: 'BatDauLuc',
       key: 'BatDauLuc', //ellipsis: 
+      filters: [
+        { text: "Tháng 1", value: 0 }, { text: "Tháng 2", value: 1 }, 
+        { text: "Tháng 3", value: 2 }, { text: "Tháng 4", value: 3 }, 
+        { text: "Tháng 5", value: 4 }, { text: "Tháng 6", value: 5 },
+        { text: "Tháng 7", value: 6 }, { text: "Tháng 8", value: 7 }, 
+        { text: "Tháng 9", value: 8 }, { text: "Tháng 10", value: 9 }, 
+        { text: "Tháng 11", value: 10 }, { text: "Tháng 12", value: 11 },
+      ],
+      onFilter: (value: any, session: SessionDB) => {
+        return new Date(session.BatDauLuc).getMonth() === value
+      },
       render: (value: string, session: SessionDB) => {
         return <Space orientation="vertical" size={0}>
           <Text strong>
@@ -210,7 +221,7 @@ const TeacherDetail = () => {
       }
     },
     {// thao tác
-      title: 'Thao tác', key: 'action', align: 'center' as const, width:90,
+      title: 'Thao tác', key: 'action', align: 'center' as const, width: 90,
       render: (value: SessionDB) => <SessionAction
         session={value}
         unlock={() => { }}
@@ -252,7 +263,7 @@ const TeacherDetail = () => {
                   {teacher.TrangThai}</Tag>
               </Title>
 
-              <Text type="secondary">Mã: {teacher.MaGiaoVien}</Text>
+              <Text type="secondary">Mã GV: {teacher.MaGiaoVien}</Text>
             </div>
           </div>
           <Tooltip title='Sửa thông tin'>

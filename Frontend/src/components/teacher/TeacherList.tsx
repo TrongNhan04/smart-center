@@ -79,7 +79,8 @@ const TeacherList = () => {
     },
     { // Chuyên môn
       title: 'Chuyên môn', dataIndex: 'ChuyenMon', key: 'ChuyenMon', //width: 170,
-      render: (value: string) => !value || "" ?
+      render: (value: string) => !value || "" ? 
+      // nếu rỗng hoạc false thì chưa cập nhật
         <Text type="secondary">Chưa cập nhật...</Text> : value
     },
     { // trạng thái

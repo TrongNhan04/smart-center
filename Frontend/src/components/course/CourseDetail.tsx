@@ -194,7 +194,7 @@ const CourseDetail = () => {
                   {course.TrangThai}</Tag>
               </Title>
 
-              <Text type="secondary">Mã: {course.MaKhoaHoc}</Text>
+              <Text type="secondary">Mã KH: {course.MaKhoaHoc}</Text>
             </div>
           </div>
           <Tooltip title='Sửa khóa học'>

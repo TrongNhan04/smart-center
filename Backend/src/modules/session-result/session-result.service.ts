@@ -76,7 +76,7 @@ export class SessionResultService {
             const data = newMapEnroll.get(value.GhiDanhID)
             if (!data) return // không tồn tại data cho ghi danh id đó
             return {
-                HocvienID: data.HocVienID,
+                HocVienID: data.HocVienID,
                 MaHocVien: data?.hocvien.MaHocVien,
                 TenHocVien: data.hocvien.TenHocVien,
                 PhuHuynh: data.hocvien.Parent.HoTen,

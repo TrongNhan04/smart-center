@@ -78,7 +78,8 @@ export class ClassService {
             },
             KhoaHoc: {
                 ID: lh.KhoaHocID,
-                TenKhoaHoc: lh.khoahoc.TenKhoaHoc
+                TenKhoaHoc: lh.khoahoc.TenKhoaHoc,
+                HocPhi: lh.khoahoc.HocPhi
             },
             PhongHoc: lh.PhongHoc, KhoaHocID: lh.KhoaHocID,
             TuNgay: lh.TuNgay, DenNgay: lh.DenNgay,

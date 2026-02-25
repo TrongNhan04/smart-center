@@ -10,7 +10,7 @@ import type { TeacherDB } from '../teacher/TeacherDTO';
 import dayjs from 'dayjs';
 import classApi from '../../api/classApi';
 import { mapDataClass, type ClassDB, type ClassDto } from './ClassDTO';
-import { DateHelper } from './date.helper';
+import { DateHelper } from '../common/date.helper';
 
 const { RangePicker } = DatePicker
 
@@ -43,8 +43,8 @@ const ClassModal = ({
         setTeachers(teacherRes.data)
       }
       catch (error: any) {
-        // message.error("Có lỗi xuất hiện")
-        // console.log("Lỗi: ", error.response.data.message)
+        message.error("Có lỗi xuất hiện")
+        console.log("Lỗi: ", error.response.data.message)
       }
       finally {
         setLoading(false)

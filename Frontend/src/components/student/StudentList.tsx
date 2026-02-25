@@ -1,0 +1,180 @@
+import { Badge, Button, Card, Col, Input, notification, Row, Select, Table, Typography } from "antd"
+import { useEffect, useState } from "react"
+import type { StudentDB } from "./StudentDTO"
+import { studentApi } from "../../api/studentApi"
+import { Link } from "react-router-dom"
+import { CalendarOutlined, EnvironmentOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons"
+import StudentModal from "./StudentModal"
+import StudentAction from "./StudentAction"
+
+
+const { Text } = Typography
+const StudentList = () => {
+  const [students, setStudents] = useState<StudentDB[]>([])
+  const [studentId, setStudentId] = useState<number | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [isOpen, setIsOpen] = useState(false) // open modal
+  const [editing, setEditing] = useState<StudentDB | null>(null)
+  const [searchText, setSearchText] = useState('')
+  const [filterStatus, setFilterStatus] = useState<string | null>(null)
+
+  const fetchStudents = async () => {
+    setLoading(true)
+    try {
+      const res = await studentApi.findMany()
+      setStudents(res.data)
+    } catch (error: any) {
+      notification.error({
+        title: 'Có lỗi xảy ra',
+        description: error.response.data.message,
+        showProgress: true,
+        pauseOnHover: true
+      })
+      console.log('Có lỗi xảy ra: ', error)
+    }
+    finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchStudents()
+  }, [])
+
+  const filteredData = students.filter(item => {
+    const lowerCase = searchText.toLowerCase()
+    const matchesKeyword = item.TenHocVien.toLowerCase().includes(lowerCase) ||
+      item.MaHocVien.toLowerCase().includes(lowerCase)
+    const matchesStatus = filterStatus ? item.TrangThai === filterStatus : true
+    return matchesKeyword && matchesStatus
+  })
+
+  const columns = [
+    { // mã học viên
+      title: 'Mã học viên', dataIndex: 'MaHocVien',
+      key: 'MaHocVien', width: 120, align: 'center' as const,
+      render: (code: string) => <Text code>{code}</Text>
+    },
+    { // tên học viên
+      title: 'Tên học viên', dataIndex: 'TenHocVien', //width: 220,
+      key: 'TenHocVien', ellipsis: true,
+      render: (name: string, student: StudentDB) =>
+        <Link to={`/admin/students/${student.ID}`}
+          style={{ fontWeight: 'bold' }}>{name}</Link>
+    },
+    { // ngày sinh
+      title: 'Ngày sinh', dataIndex: 'NgaySinh', key: 'NgaySinh', //width: 100,
+      render: (dob: string) => <Text>
+        <CalendarOutlined /> {new Date(dob).toLocaleDateString()}
+      </Text>
+    },
+    { // địa chỉ
+      title: 'Địa chỉ', dataIndex: 'DiaChi', key: 'DiaChi', ellipsis: true,
+      render: (address: string) => !address || "" ?
+        "Chưa cập nhật ..." : <Text>
+          <EnvironmentOutlined /> {address}
+        </Text>
+    },
+    { // trạng thái
+      title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai', //width: 160,
+      render: (value: string) => {
+        const statusMap: Record<string, { color: string, text: string }> = {
+          ACTIVE: { color: 'success', text: 'Đang hoạt động' },
+          INACTIVE: { color: 'error', text: 'Ngừng hoạt động' }
+        }
+        // value là 1 trong 3 key đó
+        const status = statusMap[value]
+        return <Badge status={status.color as any} text={status.text} />
+      }
+    },
+    {// thao tác
+      title: 'Thao tác', key: 'action', align: 'center' as const, //width: 150,
+      render: (value: StudentDB) =>
+        <StudentAction
+          student={value}
+          onEdit={OpenModalEdit}
+          onReload={fetchStudents}
+        />
+    }
+  ]
+
+  const handleOnSave = (studentId: number) => {
+    setStudentId(studentId)
+    fetchStudents()
+    setTimeout(() => {
+      setStudentId(null)
+    }, 3000)
+  }
+
+  const OpenModalAdd = () => {
+    setEditing(null)
+    setIsOpen(true)
+  }
+
+  const OpenModalEdit = (student: StudentDB) => {
+    setEditing(student)
+    setIsOpen(true)
+  }
+
+  return (
+    <Card title={`Danh sách học viên (${students.length})`}>
+      {/* ô tìm kiếm và bộ lọc */}
+      <Row gutter={16} style={{ marginBottom: 20 }}>
+        <Col span={6}>
+          <Input // ô tìm kiếm
+            placeholder='Tìm theo tên hoặc mã...'
+            prefix={<SearchOutlined />}
+            allowClear
+            onChange={(e) => setSearchText(e.target.value)}
+          />
+        </Col>
+
+        <Col span={4}>
+          <Select // bộ lọc
+            placeholder='Trạng thái'
+            style={{ width: '100%' }}
+            allowClear
+            onChange={(e) => setFilterStatus(e)}
+            options={[
+              { label: 'Đang hoạt động', value: 'ACTIVE' },
+              { label: 'Ngừng hoạt động', value: 'INACTIVE' },
+            ]}
+          >
+          </Select>
+        </Col>
+        <Col style={{ marginLeft: 'auto' }}>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={OpenModalAdd}
+          > Thêm học viên
+          </Button>
+        </Col>
+      </Row>
+      {/* Bảng hiển thị dữ liệu */}
+      <Table
+        dataSource={filteredData}
+        columns={columns}
+        loading={loading}
+        rowClassName={
+          (record) => {
+            return record.ID === studentId ? 'highlight-row' : ''
+          }
+        }
+        pagination={{ defaultPageSize: 10 }}
+        rowKey="ID"
+        scroll={{ x: 1100, y: 426 }}
+      />
+
+      {/* Hiển thị Modal UI */}
+      <StudentModal
+        open={isOpen}
+        onCancel={() => setIsOpen(false)}
+        onSave={handleOnSave}
+        editing={editing!}
+      />
+    </Card>
+  )
+}
+
+export default StudentList

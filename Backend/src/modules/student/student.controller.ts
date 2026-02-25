@@ -29,32 +29,40 @@ export class StudentController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Get(':id')
-    async GetStudentByID(@Param('id') StudentId: number) {
-        return await this.studentService.GetStudentByID(+StudentId)
+    async GetStudentByID(@Param('id') studentId: number) {
+        return await this.studentService.GetStudentByID(+studentId)
     }
 
     // sửa thông tin học viên
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Patch(':id')
-    async UpdateStudentByID(@Param('id') StudentId: number,
+    async UpdateStudentByID(@Param('id') studentId: number,
         @Body() body: UpdateStudentDTO) {
-        return await this.studentService.UpdateStudentByID(+StudentId, body)
+        return await this.studentService.UpdateStudentByID(+studentId, body)
     }
 
     // xóa mềm học viên
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Patch(':id/inactive')
-    async DelateStudentByID(@Param('id') StudentId: number) {
-        return await this.studentService.DeleteStudentByID(+StudentId)
+    async DelateStudentByID(@Param('id') studentId: number) {
+        return await this.studentService.DeleteStudentByID(+studentId)
     }
 
     // lấy danh sách lớp học viên đang học
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Get(':id/classes')
-    async GetClassesByStudentID(@Param('id') StudentId: number) {
-        return await this.studentService.GetClassesByStudentID(+StudentId)
+    async GetClassesByStudentId(@Param('id') studentId: number) {
+        return await this.studentService.GetClassesByStudentID(+studentId)
+    }
+
+    // lấy danh sách buổi học đã học 
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADMIN')
+    @Get(':id/sessions-completed')
+    async GetCompletedSS(@Param('id') studentId: number) {
+        return await this.studentService.GetCompletedSS(+studentId)
     }
 }
