@@ -128,6 +128,16 @@ export class StudentService {
         }))
     }
 
+    // lấy dang sách học viên cho combobox
+    async GetDataForCmb() {
+        return await this.prismaService.hocVien.findMany({
+            where: { TrangThai: 'ACTIVE' },
+            select: {
+                ID: true, MaHocVien: true, TenHocVien: true
+            }
+        })
+    }
+
     // lấy chi tiết 1 học viên - phần trên
     async GetStudentByID(studentId: number) {
         const studentDB = await this.StudentIdValidator(studentId)
@@ -148,15 +158,27 @@ export class StudentService {
 
     // sửa thông tin 1 học viên
     async UpdateStudentByID(studentId: number, body: UpdateStudentDTO) {
-        await this.StudentIdValidator(studentId)
-        const data: Prisma.HocVienUpdateInput = {}
+        const studentDB = await this.StudentIdValidator(studentId)
 
-        data.TenHocVien = body.student?.trim()
-        data.GhiChu = body.note?.trim()
-        return await this.prismaService.hocVien.update({
-            where: { ID: studentId },
-            data, omit: { CreatedAt: true, UpdatedAt: true }
-        })
+        const dob = body.dob ?? studentDB.NgaySinh
+        const student = body.student ?? studentDB.TenHocVien
+        const parent = body.parent ?? studentDB.Parent.HoTen
+        const address = body.address ?? studentDB.DiaChi
+        await Promise.all([
+            this.prismaService.hocVien.update({
+                where: { ID: studentDB.ID },
+                data: {
+                    NgaySinh: dob,
+                    TenHocVien: student,
+                    DiaChi: address
+                }
+            }),
+            this.prismaService.user.update({
+                where: { ID: studentDB.UserID },
+                data: { HoTen: parent }
+            })
+        ])
+        return { ID: studentDB.ID }
     }
 
     //xóa mềm học viên + hủy ghi danh
@@ -176,38 +198,51 @@ export class StudentService {
 
     //lấy danh sách lớp học viên học - phần dưới
     async GetClassesByStudentID(studentId: number) {
-        await this.StudentIdValidator(studentId)
-        const enrollDB = await this.prismaService.ghiDanh.findMany({
-            where: { HocVienID: studentId },
-            select: {
-                lophoc: {
-                    select: {
-                        MaLopHoc: true,
-                        TenLop: true,
-                        giaovien: { select: { User: { select: { HoTen: true } } } }
+        const studentDB = await this.StudentIdValidator(studentId)
+        const classDB = await this.prismaService.lopHoc.findMany({
+            where: {
+                ghidanh: {
+                    some: {
+                        HocVienID: studentDB.ID
                     }
-                },
+                }
+            },
+            select: {
+                ID: true, MaLopHoc: true, TenLop: true,
+                LichHoc: true, TrangThai: true,
+                TuNgay: true, DenNgay: true,
+                GioBatDau: true, GioKetThuc: true,
+                GiaoVienID: true,
+                giaovien: { select: { User: { select: { HoTen: true } } } }
             }
         })
-        return enrollDB.map(x => ({
-            MaLopHoc: x.lophoc.MaLopHoc,
-            TenLop: x.lophoc.TenLop,
-            GiaoVien: x.lophoc.giaovien.User.HoTen
+        if (!classDB) return []
+        return classDB.map(lh => ({
+            ID: lh.ID, MaLopHoc: lh.MaLopHoc, TenLop: lh.TenLop,
+            GiaoVien: {
+                ID: lh.GiaoVienID,
+                TenGiaoVien: lh.giaovien.User.HoTen
+            },
+            LichHoc: lh.LichHoc, TrangThai: lh.TrangThai,
+            TuNgay: lh.TuNgay, DenNgay: lh.DenNgay,
+            GioHoc: lh.GioBatDau + ' - ' + lh.GioKetThuc,
         }))
     }
 
+    // lấy danh sách kết quả buổi học 
     async GetCompletedSS(studentId: number) {
         const studentDB = await this.StudentIdValidator(studentId)
         const result = await this.prismaService.ketQua_ChiTiet.findMany({
             where: {
                 ghidanh: { HocVienID: studentDB.ID }
             },
+            orderBy: { ketqua_buoihoc: { buoihoc: { BatDauLuc: 'asc' } } },
             select: {
-                ID: true, NhanXetRieng:true, DiemDanh:true, Diem:true,
+                ID: true, NhanXetRieng: true, DiemDanh: true, Diem: true,
                 ketqua_buoihoc: {
                     select: {
-                        NhanXetChung:true,
-                        buoihoc: true,
+                        NhanXetChung: true,
+                        buoihoc: true, GiaoVienID: true,
                         giaovien: {
                             select: { User: { select: { HoTen: true } } }
                         }
@@ -222,7 +257,9 @@ export class StudentService {
             BatDauLuc: item.ketqua_buoihoc.buoihoc.BatDauLuc,
             KetThucLuc: item.ketqua_buoihoc.buoihoc.KetThucLuc,
             PhongHoc: item.ketqua_buoihoc.buoihoc.PhongHoc,
-            GiaoVien: item.ketqua_buoihoc?.giaovien.User.HoTen,
+            LopHocID: item.ketqua_buoihoc.buoihoc.LopHocID,
+            GiaoVienID: item.ketqua_buoihoc.GiaoVienID,
+            TenGiaoVien: item.ketqua_buoihoc?.giaovien.User.HoTen,
             NhanXet: item.NhanXetRieng || item.ketqua_buoihoc.NhanXetChung,
             DiemDanh: item.DiemDanh,
             Diem: item.Diem

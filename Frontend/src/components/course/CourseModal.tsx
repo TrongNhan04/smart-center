@@ -20,13 +20,11 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: Props) => {
     try {
       // dữ liệu từ form (tiếng anh)
       const values: CourseDto = await form.validateFields()
-      console.log("value lấy từ form: ", values)
 
       await new Promise(resolve => setTimeout(resolve, 1000))
       const payload = isEdit ? await courseApi.update(editingCourse.ID, values) :
         await courseApi.create(values)
 
-      console.log("Khóa học được sửa hoặc thêm mới: ", payload.data)
       message.success(isEdit ? 'Cập nhật thành công' : 'Thêm mới thành công')
       onSave(payload.data.ID)
       handleCancel()
@@ -125,10 +123,7 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: Props) => {
             <Form.Item
               label="Học phí"
               name="courseFee"
-              rules={[
-                { required: true, message: 'Nhập học phí!' },
-                { type:'number', min:0, message:'Học phí là số dương'}
-              ]}>
+              rules={[{ required: true, message: 'Nhập học phí!' }]}>
 
               <InputNumber
                 style={{ width: '100%' }}

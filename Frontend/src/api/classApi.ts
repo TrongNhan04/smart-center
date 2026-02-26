@@ -15,6 +15,8 @@ const classApi = {
         axiosClient.post(`/admin/classes`, body),
 
     findMany: () => axiosClient.get(`/admin/classes`),
+ 
+    findManyForCmb: () => axiosClient.get(`admin/classes-combobox`),
 
     findOne: (id: number) => axiosClient.get(`/admin/classes/${id}`),
 

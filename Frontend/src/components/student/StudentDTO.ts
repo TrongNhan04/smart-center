@@ -8,7 +8,7 @@ export interface StudentDto {
     phone: string,
     dob: string,
     address?: string//
-    fee: number // học phí
+    fee?: number // học phí
 }
 
 export interface StudentDB {
@@ -21,6 +21,12 @@ export interface StudentDB {
     DienThoai: string,
     Email: string,
     TrangThai: string
+}
+
+export interface StudentForCmb{
+    ID: number,
+    MaHocVien: string,
+    TenHocVien: string
 }
 
 export const mapDataStudent = (record: StudentDB):

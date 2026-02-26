@@ -25,6 +25,14 @@ export class StudentController {
         return await this.studentService.GetStudents(query)
     }
 
+    // lấy danh sách học viên cho cmb
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADMIN')
+    @Get('combobox')
+    async GetDataForCmb() {
+        return await this.studentService.GetDataForCmb()
+    }
+
     // lấy chi tiết học viên - phần trên
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')

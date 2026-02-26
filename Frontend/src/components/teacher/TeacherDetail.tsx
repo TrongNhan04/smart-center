@@ -327,7 +327,7 @@ const TeacherDetail = () => {
 
           {/* Cột phải: chứa thông tin tổng quan */}
           <Col span={5}>
-            <Card title="Thông tin chung" style={{ marginBottom: 24 }}>
+            <Card title="Thông tin giáo viên" style={{ marginBottom: 24 }}>
               <Descriptions
                 column={1}
                 size="small"

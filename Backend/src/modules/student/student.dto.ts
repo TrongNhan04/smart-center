@@ -63,7 +63,7 @@ export class UpdateStudentDTO {
     @IsOptional()
     @Type(() => Date)
     @IsDate()
-    dob: Date
+    dob?: Date
 
     @IsOptional()
     @IsString()

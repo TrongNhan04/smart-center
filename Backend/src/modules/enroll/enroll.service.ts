@@ -48,7 +48,7 @@ export class EnrollService {
             const newInvoice = await this.invoiceService.CreateInvoice(newEnroll.ID, classDB.DenNgay, body.fee, tx)
             // thêm thông báo
             await this.notisService.InvoiceNotify(studentDB.UserID, newInvoice, tx)
-            return { mgs: "Create enroll, invoice and notify succesfully" }
+            return {ID: newEnroll.ID}
         })
     }
 
@@ -67,10 +67,32 @@ export class EnrollService {
                 { hocvien: { MaHocVien: { contains: q, mode: 'insensitive' } } }
             ]
         }
-        return await this.prismaService.ghiDanh.findMany({
+        const enrollDB = await this.prismaService.ghiDanh.findMany({
             where,
-            omit: { CreatedAt: true, UpdatedAt: true }
+            select: {
+                ID: true, NgayGhiDanh: true, TrangThai: true, GhiChu: true,
+                lophoc: { select: { ID: true, TenLop: true } },
+                hocvien: {
+                    select: {
+                        ID: true,
+                        TenHocVien: true,
+                        MaHocVien: true
+                    }
+                }
+            },
+            orderBy: { NgayGhiDanh: 'desc' }
         })
+        return enrollDB.map(e => ({
+            ID: e.ID,
+            LopHocID: e.lophoc.ID,
+            TenLop: e.lophoc.TenLop,
+            HocVienID: e.hocvien.ID,
+            MaHocVien: e.hocvien.MaHocVien,
+            TenHocVien: e.hocvien.TenHocVien,
+            NgayGhiDanh: e.NgayGhiDanh,
+            GhiChu: e.GhiChu,
+            TrangThai: e.TrangThai
+        }))
     }
 
     // xóa mềm 
@@ -80,9 +102,9 @@ export class EnrollService {
                 where: { ID: enrollId },
                 include: { hoadon: true }
             })
-            if (!enrollDB) throw new NotFoundException('Enroll not found')
+            if (!enrollDB) throw new NotFoundException('Không tìm thấy ghi danh')
             if (!enrollDB.hoadon)
-                throw new ConflictException('Enroll don\'t have any invoice')
+                throw new ConflictException('Không tìm thấy hóa đơn của ghi danh')
 
             await tx.ghiDanh.update({
                 where: { ID: enrollId },
@@ -90,7 +112,7 @@ export class EnrollService {
             })
 
             await this.invoiceService.DeleteInvoiceByID(enrollDB.hoadon?.ID, tx)
-            return { mgs: 'Soft delete enroll and invoice succesfully' }
+            return 'Hủy ghi danh và hóa đơn thành công'
         })
     }
 
@@ -133,9 +155,14 @@ export class EnrollService {
     // kiểm tra 1 học viên ghi danh 1 lớp 1 lần
     private async EnrollValidator(studentId: number, classId: number) {
         const existed = await this.prismaService.ghiDanh.findFirst({
-            where: { LopHocID: classId, HocVienID: studentId }
+            where: {
+                LopHocID: classId,
+                HocVienID: studentId,
+                TrangThai: 'ACTIVE'
+            }
         })
-        if (existed) throw new ConflictException('Student has enrolled class')
+        if (existed) throw new ConflictException
+            (`Học viên đã ghi danh vào lớp ngày ${existed.NgayGhiDanh.toLocaleDateString()}`)
     }
 
     // kiểm tra id lớp
@@ -143,7 +170,7 @@ export class EnrollService {
         const classDB = await this.prismaService.lopHoc.findUnique({
             where: { ID: classId }
         })
-        if (!classDB) throw new ConflictException('Class is not found')
+        if (!classDB) throw new ConflictException('Không tìm thấy lớp học')
         return classDB
     }
 

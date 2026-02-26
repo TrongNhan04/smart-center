@@ -48,7 +48,6 @@ const StudentModal = ({ open, onSave, onCancel, editing }: Props) => {
     if (open) {
       if (editing) {
         const formData = mapDataStudent(editing)
-        console.log("formData: ", formData)
         const payload = {
           ...formData, dob: dayjs(formData.dob)
         }
@@ -80,7 +79,6 @@ const StudentModal = ({ open, onSave, onCancel, editing }: Props) => {
         fee: Number(values.fee)
       }
       await new Promise(resolve => setTimeout(resolve, 1000))
-      console.log("value lấy từ form student: ", payload)
 
       const res = isEdit ? await studentApi.update(editing.ID, payload)
         : await studentApi.create(payload)

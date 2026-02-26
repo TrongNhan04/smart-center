@@ -80,8 +80,7 @@ const TeacherList = () => {
     { // Chuyên môn
       title: 'Chuyên môn', dataIndex: 'ChuyenMon', key: 'ChuyenMon', //width: 170,
       render: (value: string) => !value || "" ? 
-      // nếu rỗng hoạc false thì chưa cập nhật
-        <Text type="secondary">Chưa cập nhật...</Text> : value
+        <Text type="secondary">-</Text> : value
     },
     { // trạng thái
       title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai', //width: 160,

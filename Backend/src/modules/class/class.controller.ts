@@ -34,6 +34,14 @@ export class ClassController {
         return await this.classService.GetClasses(query)
     }
 
+    // lấy danh sách lớp cho combobox
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADMIN')
+    @Get('admin/classes-combobox')
+    async GetDataForCmb() {
+        return await this.classService.GetDataForCmb()
+    }
+
     // lấy chi tiết lớp - phần trên 
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')

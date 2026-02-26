@@ -71,7 +71,7 @@ const StudentList = () => {
     { // địa chỉ
       title: 'Địa chỉ', dataIndex: 'DiaChi', key: 'DiaChi', ellipsis: true,
       render: (address: string) => !address || "" ?
-        "Chưa cập nhật ..." : <Text>
+        "-" : <Text>
           <EnvironmentOutlined /> {address}
         </Text>
     },

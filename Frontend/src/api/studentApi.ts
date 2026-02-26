@@ -14,5 +14,7 @@ export const studentApi = {
     findOne: (studentId: number) =>
         axiosClient.get(`admin/students/${studentId}`),
 
-    findMany: () => axiosClient.get(`admin/students`)
+    findMany: () => axiosClient.get(`admin/students`),
+
+    findManyForCmb: () => axiosClient.get(`admin/students/combobox`)
 }

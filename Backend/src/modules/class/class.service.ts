@@ -89,6 +89,21 @@ export class ClassService {
         }))
     }
 
+    // lấy danh sách lớp cho combobox
+    async GetDataForCmb() {
+        const classDB = await this.prismaService.lopHoc.findMany({
+            where: { TrangThai: { not: 'CLOSED' } },
+            select: {
+                ID: true, TenLop: true, MaLopHoc: true,
+                khoahoc: { select: { HocPhi: true } }
+            }
+        })
+        return classDB.map(m => ({
+            ID: m.ID, TenLop: m.TenLop, MaLopHoc: m.MaLopHoc,
+            HocPhi: m.khoahoc.HocPhi
+        }))
+    }
+
     // lấy chi tiết lớp - phần trên
     async GetClassById(classId: number) {
         await this.ClassIDValidator(+classId)

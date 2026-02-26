@@ -1,5 +1,5 @@
 export interface ClassDto {
-    id?: number, 
+    id?: number,
     code: string,
     courseId: number,
     teacherId: number,
@@ -11,7 +11,7 @@ export interface ClassDto {
     endTime: string,
     classSize: number
     description?: string
-    room?:string
+    room?: string
 }
 
 export interface ClassDB {
@@ -36,6 +36,13 @@ export interface ClassDB {
     TrangThai: string,
     PhongHoc?: string
     MoTa?: string
+}
+
+export interface ClassForCmb {
+    ID: number,
+    MaLopHoc: string,
+    TenLop: string,
+    HocPhi:number
 }
 
 // để cho edit

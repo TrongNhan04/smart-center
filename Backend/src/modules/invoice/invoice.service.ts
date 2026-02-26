@@ -16,7 +16,7 @@ export class InvoiceService {
         const invoiceDB = this.prismaService.hoaDon.findUnique({
             where: { ID: invoiceId }
         })
-        if (!invoiceDB) throw new NotFoundException('Invoice not found')
+        if (!invoiceDB) throw new NotFoundException('Không tìm thấy hóa đơn')
         return invoiceDB
     }
 
@@ -100,9 +100,9 @@ export class InvoiceService {
         let client: Prisma.TransactionClient | null = null
         if (tx) client = tx
         else client = this.prismaService
-        await this.InvoiceValidator(invoiceId)
+        const invoiceDB = await this.InvoiceValidator(invoiceId)
         return await client.hoaDon.update({
-            where: { ID: invoiceId },
+            where: { ID: invoiceDB?.ID },
             data: { TrangThai: 'CANCELLED' }
         })
     }
