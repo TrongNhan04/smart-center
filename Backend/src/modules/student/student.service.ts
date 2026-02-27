@@ -134,7 +134,8 @@ export class StudentService {
             where: { TrangThai: 'ACTIVE' },
             select: {
                 ID: true, MaHocVien: true, TenHocVien: true
-            }
+            },
+            orderBy:{MaHocVien:'asc'}
         })
     }
 

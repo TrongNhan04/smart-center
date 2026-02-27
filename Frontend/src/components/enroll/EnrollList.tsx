@@ -78,8 +78,7 @@ const EnrollList = () => {
       title: 'Lớp học', dataIndex: 'LopHocID', //width: 220,
       key: 'LopHocID', ellipsis: true,
       render: (classId: number, enroll: EnrollDB) =>
-        <Link to={`/admin/classes/${classId}`}
-          style={{ fontWeight: 'bold' }}>{enroll.TenLop}</Link>
+        <Link to={`/admin/classes/${classId}`}>{enroll.TenLop}</Link>
     },
     { // ngày ghi danh
       title: 'Ngày ghi danh', dataIndex: 'NgayGhiDanh',
@@ -116,7 +115,7 @@ const EnrollList = () => {
           return <Tooltip title="Hủy ghi danh">
             <Popconfirm
               title="Xác nhận hủy?"
-              description="Học viên sẽ không có trong danh sách lớp"
+              description="Hành động này không thể hoàn tác"
               okText="Hủy ghi danh"
               cancelText="Quay lại"
               onConfirm={() => handleInactive(enroll.ID)}

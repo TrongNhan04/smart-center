@@ -1846,6 +1846,20 @@ export type ListEnumTrangThai_GDFieldRefInput<$PrismaModel> = FieldRefInputType<
 
 
 /**
+ * Reference to a field of type 'TrangThai_HD'
+ */
+export type EnumTrangThai_HDFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TrangThai_HD'>
+    
+
+
+/**
+ * Reference to a field of type 'TrangThai_HD[]'
+ */
+export type ListEnumTrangThai_HDFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TrangThai_HD[]'>
+    
+
+
+/**
  * Reference to a field of type 'Json'
  */
 export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>

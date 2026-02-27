@@ -61,6 +61,20 @@ export class CourseService {
         })
     }
 
+    async GetDataForCmb() {
+        return await this.prismaService.khoaHoc.findMany({
+            where: { TrangThai: { not: 'INACTIVE' } },
+            select: {
+                ID: true,
+                MaKhoaHoc:true,
+                TenKhoaHoc: true,
+                ThoiGian:true,
+                HocPhi:true
+            },
+            orderBy:{MaKhoaHoc:'asc'}
+        })
+    }
+
     // lấy chi tiết 1 khóa học
     async GetCourseById(id: number) {
         return await this.CourseIdValidator(id)
@@ -84,7 +98,7 @@ export class CourseService {
         return await this.prismaService.khoaHoc.update({
             where: { ID: courseId },
             data,
-            select:{ID:true}
+            select: { ID: true }
         })
     }
 
@@ -102,7 +116,7 @@ export class CourseService {
     async RestoreCourseById(courseId: number) {
         const courseDB = await this.CourseIdValidator(courseId)
         return await this.prismaService.khoaHoc.update({
-            where: { ID: courseDB.ID, TrangThai:'INACTIVE' },
+            where: { ID: courseDB.ID, TrangThai: 'INACTIVE' },
             data: { TrangThai: 'ACTIVE' },
             omit: { CreatedAt: true, UpdatedAt: true }
         })

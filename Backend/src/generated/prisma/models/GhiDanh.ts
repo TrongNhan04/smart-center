@@ -271,7 +271,6 @@ export type GhiDanhOrderByWithRelationInput = {
 
 export type GhiDanhWhereUniqueInput = Prisma.AtLeast<{
   ID?: number
-  HocVienID_LopHocID?: Prisma.GhiDanhHocVienIDLopHocIDCompoundUniqueInput
   AND?: Prisma.GhiDanhWhereInput | Prisma.GhiDanhWhereInput[]
   OR?: Prisma.GhiDanhWhereInput[]
   NOT?: Prisma.GhiDanhWhereInput | Prisma.GhiDanhWhereInput[]
@@ -286,7 +285,7 @@ export type GhiDanhWhereUniqueInput = Prisma.AtLeast<{
   lophoc?: Prisma.XOR<Prisma.LopHocScalarRelationFilter, Prisma.LopHocWhereInput>
   ketqua_chitiet?: Prisma.KetQua_ChiTietListRelationFilter
   hoadon?: Prisma.XOR<Prisma.HoaDonNullableScalarRelationFilter, Prisma.HoaDonWhereInput> | null
-}, "ID" | "HocVienID_LopHocID">
+}, "ID">
 
 export type GhiDanhOrderByWithAggregationInput = {
   ID?: Prisma.SortOrder
@@ -411,11 +410,6 @@ export type GhiDanhOrderByRelationAggregateInput = {
 export type GhiDanhScalarRelationFilter = {
   is?: Prisma.GhiDanhWhereInput
   isNot?: Prisma.GhiDanhWhereInput
-}
-
-export type GhiDanhHocVienIDLopHocIDCompoundUniqueInput = {
-  HocVienID: number
-  LopHocID: number
 }
 
 export type GhiDanhCountOrderByAggregateInput = {

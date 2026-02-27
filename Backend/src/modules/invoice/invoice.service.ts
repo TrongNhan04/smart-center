@@ -12,7 +12,7 @@ export class InvoiceService {
     ) { }
 
     //kiểm tra id hóa đơn
-    async InvoiceValidator(invoiceId: number) {
+    private async InvoiceValidator(invoiceId: number) {
         const invoiceDB = this.prismaService.hoaDon.findUnique({
             where: { ID: invoiceId }
         })
@@ -20,7 +20,7 @@ export class InvoiceService {
         return invoiceDB
     }
 
-    // tạo hóa đơn
+    // tạo hóa đơn tự động
     async CreateInvoice(enrollId: number, dueDate: Date, toTal: number, tx: Prisma.TransactionClient) {
         let count = await this.prismaService.hoaDon.count()
         const code = count < 9 ? "HD0" + (count + 1) : "HD" + (count + 1)
@@ -61,6 +61,8 @@ export class InvoiceService {
     async GetInvoices(query: QueryInvoiceDTO) {
         const where: Prisma.HoaDonWhereInput = {}
         const q = query.q?.trim()
+        if (query.status)
+            where.TrangThai = query.status
         if (q) {
             where.OR = [
                 { MaHoaDon: { contains: q, mode: 'insensitive' } },
@@ -70,28 +72,37 @@ export class InvoiceService {
         const invoiceDB = await this.prismaService.hoaDon.findMany({
             where,
             select: {
-                MaHoaDon: true,
+                ID: true, MaHoaDon: true,
                 ghidanh: {
                     select: {
-                        hocvien: { select: { TenHocVien: true } },
-                        lophoc: { select: { TenLop: true } }
+                        hocvien: {
+                            select: {
+                                TenHocVien: true,
+                                ID: true, Parent: { select: { DienThoai: true } }
+                            }
+                        },
+                        lophoc: { select: { TenLop: true, ID: true } }
                     }
                 },
                 TongTien: true,
                 DaTra: true,
                 CreatedAt: true,//ngày phát hành
-                ThoiHan: true
-            }
+                ThoiHan: true,
+                TrangThai: true
+            },
+            orderBy: { MaHoaDon: 'desc' }
         })
-        // x=>({}) tương đương với (x) => { return {} }
-        return invoiceDB.map(invoice => ({
-            MaHoaDon: invoice.MaHoaDon,
-            TenHocVien: invoice.ghidanh.hocvien.TenHocVien,
-            TenLop: invoice.ghidanh.lophoc.TenLop,
-            TongTien: invoice.TongTien,
-            DaTra: invoice.DaTra,
-            NgayPhatHanh: invoice.CreatedAt.toLocaleDateString('vi-VN'),
-            NgayHetHan: invoice.ThoiHan.toLocaleDateString('vi-VN')
+        return invoiceDB.map(item => ({
+            ID: item.ID,
+            MaHoaDon: item.MaHoaDon,
+            HocVienID: item.ghidanh.hocvien.ID,
+            TenHocVien: item.ghidanh.hocvien.TenHocVien,
+            DienThoai: item.ghidanh.hocvien.Parent.DienThoai,
+            TongTien: item.TongTien,
+            DaTra: item.DaTra,
+            NgayPhatHanh: item.CreatedAt,
+            NgayHetHan: item.ThoiHan,
+            TrangThai: item.TrangThai
         }))
     }
 
@@ -115,12 +126,12 @@ export class InvoiceService {
             const invoiceDB = await this.prismaService.hoaDon.findUnique({
                 where: { ID: invoiceId },
                 select: {
-                    TongTien: true, DaTra: true, TrangThai:true,
+                    TongTien: true, DaTra: true, TrangThai: true,
                     ghidanh: { select: { hocvien: { select: { UserID: true } } } }
                 }
             })
             if (!invoiceDB) throw new ConflictException('Invoice not existed')
-            if(invoiceDB.TrangThai === 'CANCELLED')
+            if (invoiceDB.TrangThai === 'CANCELLED')
                 throw new BadRequestException('Invoice is CANCELLED')
 
             const remain = invoiceDB.TongTien.toNumber() - invoiceDB.DaTra.toNumber()
@@ -163,14 +174,14 @@ export class InvoiceService {
     }
 
     // lấy danh sách phiếu chi theo hóa đơn
-    async GetPaymentByInvoiceID(invoiceId:number){
+    async GetPaymentByInvoiceID(invoiceId: number) {
         const invoiceDB = await this.prismaService.hoaDon.findUnique({
-            where:{ID:invoiceId}
+            where: { ID: invoiceId }
         })
-        if(!invoiceDB) throw new NotFoundException('Invoice not found')
+        if (!invoiceDB) throw new NotFoundException('Invoice not found')
         return await this.prismaService.phieuChi.findMany({
-            where:{HoaDonID:invoiceId},
-            omit:{HoaDonID:true}
+            where: { HoaDonID: invoiceId },
+            omit: { HoaDonID: true }
         })
     }
 
@@ -183,7 +194,7 @@ export class InvoiceService {
             })
             if (!invoiceDB) throw new NotFoundException('Invoice not found')
 
-            if(body.amount>invoiceDB.DaTra.toNumber())
+            if (body.amount > invoiceDB.DaTra.toNumber())
                 throw new BadRequestException('Payment must less than or equal to paidment')
             // tạo phiếu chi
             await tx.phieuChi.create({
@@ -203,7 +214,7 @@ export class InvoiceService {
                 }
             })
 
-            return {mgs:"Succesfull"}
+            return { mgs: "Succesfull" }
         })
     }
 

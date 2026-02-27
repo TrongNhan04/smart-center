@@ -1,4 +1,4 @@
-import { Col, Form, Input, InputNumber, message, Modal, notification, Select } from "antd"
+import { Form, Input, InputNumber, message, Modal, notification, Select } from "antd"
 import { useEffect, useState } from "react"
 import type { ClassForCmb } from "../class/ClassDTO"
 import type { StudentForCmb } from "../student/StudentDTO"
@@ -41,16 +41,21 @@ const EnrollModal = ({ open, onCancel, onSave }: Props) => {
     }
   }
   useEffect(() => {
-    fetchClasses_Students()
-  }, [])
-
-  const classOption = classes.map(item => ({
-    label: item.TenLop + ` (${item.MaLopHoc})`,
-    value: item.ID
-  }))
+    if(open)
+      fetchClasses_Students()
+  }, [open])
+  //JPN-N3-01 - Thứ 3,5,7 (19:00-21:00) - 12/15 HV
+  const dow = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
+  const classOption = classes.map(item => {
+    const timetable = item.LichHoc.map(m => dow[m]).join(',')
+    return {
+      label: `${item.MaLopHoc} - ${timetable} (${item.GioHoc}) - ${item.TongGhiDanh}/${item.SiSo} HV`,
+      value: item.ID
+    }
+  })
 
   const studentOption = students.map(item => ({
-    label: item.TenHocVien + `(${item.MaHocVien})`,
+    label: item.MaHocVien + ' - ' + item.TenHocVien,
     value: item.ID
   }))
 
@@ -106,71 +111,71 @@ const EnrollModal = ({ open, onCancel, onSave }: Props) => {
       open={open}
       onCancel={handleCancel}
       onOk={handleOK}
-      width={600}
+      width={400}
       okText="Lưu lại"
       cancelText="Hủy bỏ"
       centered // canh giữa màn hình
       maskClosable={false}
       confirmLoading={loading}
     >
-      <Form form={form} layout="vertical">
+      <Form form={form} layout="vertical" size="middle">
         {/* Mã học viên, ngày sinh*/}
         {/* <Row gutter={16}> */}
-        <Col span={12}>
-          <Form.Item // chọn lớp học
-            label="Lớp học"
-            name="classId"
-            rules={[{ required: true, message: 'Vui lòng chọn lớp học' }]}
-          >
-            <Select
-              placeholder="Chọn lớp học"
-              options={classOption}
-              showSearch={{
-                filterOption: (input, option) =>
-                  (option?.label ?? '').toLowerCase()
-                    .includes(input.toLowerCase())
-              }}
-              onChange={handleClassChange}
-            />
-          </Form.Item>
-        </Col>
+        {/* <Col span={14}> */}
+        <Form.Item // chọn lớp học
+          label="Lớp học"
+          name="classId"
+          rules={[{ required: true, message: 'Vui lòng chọn lớp học' }]}
+        >
+          <Select
+            placeholder="Chọn lớp học"
+            options={classOption}
+            showSearch={{
+              filterOption: (input, option) =>
+                (option?.label ?? '').toLowerCase()
+                  .includes(input.toLowerCase())
+            }}
+            onChange={handleClassChange}
+          />
+        </Form.Item>
+        {/* </Col> */}
 
-        <Col span={12}>
-          <Form.Item // chọn học viên
-            label="Học viên"
-            name="studentId"
-            rules={[{ required: true, message: 'Vui lòng chọn học viên' }]}
-          >
-            <Select
-              placeholder="Chọn học viên"
-              options={studentOption}
-              showSearch={{
-                filterOption: (input, option) =>
-                  (option?.label ?? '').toLowerCase()
-                    .includes(input.toLowerCase())
-              }}
-              onChange={handleClassChange}
-            />
-          </Form.Item>
-        </Col>
+        {/* <Col span={12}> */}
+        <Form.Item // chọn học viên
+          label="Học viên"
+          name="studentId"
+          rules={[{ required: true, message: 'Vui lòng chọn học viên' }]}
+        >
+          <Select
+            placeholder="Chọn học viên"
+            options={studentOption}
+            showSearch={{
+              filterOption: (input, option) =>
+                (option?.label ?? '').toLowerCase()
+                  .includes(input.toLowerCase())
+            }}
+            onChange={handleClassChange}
+          />
+        </Form.Item>
+        {/* </Col> */}
 
-        <Col span={12}>
-          <Form.Item
-            label="Học phí"
-            name="fee"
-            rules={[{ required: true, message: 'Nhập học phí!' }]}>
+        {/* <Col span={12}> */}
+        <Form.Item
+          label="Học phí"
+          name="fee"
+          rules={[{ required: true, message: 'Nhập học phí!' }]}>
 
-            <InputNumber
-              style={{ width: '100%' }}
-              placeholder="Nhập số tiền..."
-              // format phân cách hàng nghìn
-              formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',') || ""}
-              parser={(value) => value!.replace(/\$\s?|(,*)/g, '')}
-              suffix="VNĐ" // Ký hiệu tiền tệ ở đuôi
-              step={1000}
-            />
-          </Form.Item>
-        </Col>
+          <InputNumber
+            style={{ width: '100%' }}
+            placeholder="Nhập số tiền..."
+            // format phân cách hàng nghìn
+            formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',') || ""}
+            parser={(value) => value!.replace(/\$\s?|(,*)/g, '')}
+            suffix="VNĐ" // Ký hiệu tiền tệ ở đuôi
+            step={1000}
+          />
+        </Form.Item>
+        {/* </Col> */}
         {/* </Row> */}
 
         {/* Lớp học - học phí chỉ hiện khi thêm học viên*/}

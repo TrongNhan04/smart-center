@@ -250,13 +250,12 @@ export class SessionService {
                 where: { ID: sessionId },
                 select: {
                     ID: true, BuoiSo: true, ChuDe: true, PhongHoc: true,
-                    BatDauLuc: true, KetThucLuc: true, TrangThai:true,
+                    BatDauLuc: true, KetThucLuc: true, TrangThai: true,
                     lophoc: {
                         select: {
                             TenLop: true,
                             giaovien: {
                                 select: {
-                                    ID: true,
                                     User: { select: { HoTen: true } }
                                 }
                             }
@@ -271,10 +270,7 @@ export class SessionService {
             ID: sessionDB.ID, BuoiSo: sessionDB.BuoiSo, ChuDe: sessionDB.ChuDe,
             BatDauLuc: sessionDB.BatDauLuc, KetThucLuc: sessionDB.KetThucLuc,
             PhongHoc: sessionDB.PhongHoc, LopHoc: sessionDB.lophoc.TenLop,
-            // GiaoVien: {
-            //     ID: sessionDB.lophoc.giaovien.ID,
-                GiaoVien: sessionDB.lophoc.giaovien.User.HoTen,
-            // },
+            GiaoVien: sessionDB.lophoc.giaovien.User.HoTen,
             TrangThai: sessionDB.TrangThai,
             KetQua: result
         }

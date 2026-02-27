@@ -68,7 +68,7 @@ export class SessionResultService {
                 Email: item.hocvien.Parent.Email,
             }))
 
-        // tạo map key là ghi danh ID, value là dữ liệu
+        // tạo map key là ghi danh ID, value là tt của học viên, phụ huynh
         const newMapEnroll = new Map(enrolls.map(item => [item.ID, item]))
         return result.ketqua_chitiet.map(value => {
 
@@ -77,7 +77,7 @@ export class SessionResultService {
             if (!data) return // không tồn tại data cho ghi danh id đó
             return {
                 HocVienID: data.HocVienID,
-                MaHocVien: data?.hocvien.MaHocVien,
+                MaHocVien: data.hocvien.MaHocVien,
                 TenHocVien: data.hocvien.TenHocVien,
                 PhuHuynh: data.hocvien.Parent.HoTen,
                 DienThoai: data.hocvien.Parent.DienThoai,
@@ -142,13 +142,13 @@ export class SessionResultService {
     // xử lý Transaction lưu DB, Dùng chung cho cả Draft và Submit
     private async ProcessSessionResult(session: any, teacherId: number,
         body: SessionsResultDTO, status: 'DRAFT' | 'SUBMITTED') {
-        // lấy danh sách học viên Active
+        // lấy danh sách học viên Active của lớp có buổi học id đó
         const listEnroll = await this.prisma.ghiDanh.findMany({
             where: { LopHocID: session.LopHocID, TrangThai: 'ACTIVE' },
             select: { ID: true, hocvien: { select: { UserID: true } } }
         })
         // chuyển mảng input thành Map để tìm kiếm O(1)
-        // key: enrollmentId, value: Data
+        // key: enrollmentId, value: dữ liệu của body gửi lên 
         const inputMap = new Map(body.details.map(m => [m.enrollmentId, m]))
         const listParent = listEnroll.map(e => e.hocvien.UserID)
 
@@ -168,7 +168,7 @@ export class SessionResultService {
                 }
             })
             // B. Chuẩn bị lệnh Upsert Chi Tiết
-            const upsertPromise = listEnroll.map(item => {
+            const upsertResultDetail = listEnroll.map(item => {
                 // map qua listEnroll, lấy value của inputMap = id của listEnroll
                 const details = inputMap.get(item.ID)
 
@@ -207,7 +207,7 @@ export class SessionResultService {
                 })
             })
             // C. Kích hoạt song song
-            await Promise.all(upsertPromise)
+            await Promise.all(upsertResultDetail)
             // D. Nếu là SUBMITTED -> Cập nhật trạng thái buổi học
             if (status === 'SUBMITTED') {
                 const bh = await tx.buoiHoc.update({

@@ -13,16 +13,18 @@ const teacherApi = {
         console.log("payload call api", payload)
         return axiosClient.patch(`admin/teachers/${teacherId}`, payload)
     },
-    
+
     delete: (teacherId: number) =>
         axiosClient.patch(`admin/teachers/${teacherId}/inactive`),
 
     restore: (teacherId: number) =>
         axiosClient.patch(`admin/teachers/${teacherId}/restore`),
 
-    findMany: () => axiosClient.get('/admin/teachers'),
+    findMany: () => axiosClient.get('admin/teachers'),
 
-    findOne: (teacherId: number) => 
+    findManyForCmb: () => axiosClient.get('admin/teachers/combobox'),
+
+    findOne: (teacherId: number) =>
         axiosClient.get(`admin/teachers/${teacherId}`)
 }
 export default teacherApi

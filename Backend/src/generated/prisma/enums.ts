@@ -75,3 +75,11 @@ export const TrangThai_GD = {
 } as const
 
 export type TrangThai_GD = (typeof TrangThai_GD)[keyof typeof TrangThai_GD]
+
+
+export const TrangThai_HD = {
+  ACTIVE: 'ACTIVE',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type TrangThai_HD = (typeof TrangThai_HD)[keyof typeof TrangThai_HD]

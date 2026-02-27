@@ -1,14 +1,14 @@
 export interface StudentDto {
     id?: number,
-    code: string,//
-    classId: number,//
-    student: string,//
+    code: string,
+    classId: number,
+    student: string,
     parent: string,
     email: string,
     phone: string,
     dob: string,
-    address?: string//
-    fee?: number // học phí
+    address?: string
+    fee?: number 
 }
 
 export interface StudentDB {

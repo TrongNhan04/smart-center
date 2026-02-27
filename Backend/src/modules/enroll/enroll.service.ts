@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { Prisma } from "src/generated/prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import { CreateEnrollDTO, QueryEnrollDTO } from "./enroll.dto";
@@ -31,16 +31,15 @@ export class EnrollService {
 
     //tạo ghi danh thủ công + hóa đơn + thông báo
     async CreateEnroll(body: CreateEnrollDTO) {
+        const classDB = await this.ClassIdValidator(body.classId)
+        const studentDB = await this.StudentIdValidator(body.studentId)
+        await this.EnrollValidator(studentDB.ID, classDB.ID)
+        await this.TotalSlot(classDB.ID)
         return await this.prismaService.$transaction(async (tx) => {
-            const classDB = await this.ClassIdValidator(body.classId)
-            const studentDB = await this.StudentIdValidator(body.studentId)
-            await this.EnrollValidator(body.studentId, body.classId)
-            await this.TotalSlot(body.classId)
-
             const newEnroll = await tx.ghiDanh.create({
                 data: {
-                    HocVienID: body.studentId,
-                    LopHocID: body.classId,
+                    HocVienID: studentDB.ID,
+                    LopHocID: classDB.ID,
                     NgayGhiDanh: new Date()
                 }
             })
@@ -48,7 +47,7 @@ export class EnrollService {
             const newInvoice = await this.invoiceService.CreateInvoice(newEnroll.ID, classDB.DenNgay, body.fee, tx)
             // thêm thông báo
             await this.notisService.InvoiceNotify(studentDB.UserID, newInvoice, tx)
-            return {ID: newEnroll.ID}
+            return { ID: newEnroll.ID }
         })
     }
 
@@ -112,7 +111,7 @@ export class EnrollService {
             })
 
             await this.invoiceService.DeleteInvoiceByID(enrollDB.hoadon?.ID, tx)
-            return 'Hủy ghi danh và hóa đơn thành công'
+            return { ID: enrollDB.ID }
         })
     }
 
@@ -145,11 +144,11 @@ export class EnrollService {
         const classDB = await this.ClassIdValidator(classId)
 
         const totolEnroll = await this.prismaService.ghiDanh.count({
-            where: { LopHocID: classId, TrangThai: 'ACTIVE' }
+            where: { LopHocID: classDB.ID, TrangThai: 'ACTIVE' }
         })
 
         if (totolEnroll == classDB.SiSo)
-            throw new ConflictException('Class was full')
+            throw new ConflictException('Lớp đã đầy')
     }
 
     // kiểm tra 1 học viên ghi danh 1 lớp 1 lần
@@ -171,6 +170,8 @@ export class EnrollService {
             where: { ID: classId }
         })
         if (!classDB) throw new ConflictException('Không tìm thấy lớp học')
+        if (classDB.TrangThai === 'CLOSED')
+            throw new ConflictException('Lớp đã đóng!')
         return classDB
     }
 
@@ -179,9 +180,9 @@ export class EnrollService {
         const studentDB = await this.prismaService.hocVien.findUnique({
             where: { ID: studentId }
         })
-        if (!studentDB) throw new NotFoundException('Student is not existed')
+        if (!studentDB) throw new NotFoundException('Không tìm thấy học viên')
         if (studentDB.TrangThai === 'INACTIVE')
-            throw new ConflictException('Student is inactive')
+            throw new ConflictException('Học viên đã nghỉ học')
         return studentDB
     }
 }

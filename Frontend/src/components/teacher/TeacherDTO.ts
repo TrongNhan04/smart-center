@@ -18,6 +18,8 @@ export interface TeacherDB {
     SoBuoiDaDay: number
 }
 
+export type TeacherForCmb = Pick<TeacherDB,'ID'|'HoTen'|'MaGiaoVien'>
+
 export const mapDataTeacher = (value: TeacherDB): TeacherDto => ({
     id: value.ID,
     code: value.MaGiaoVien,

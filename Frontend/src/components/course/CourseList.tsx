@@ -65,19 +65,6 @@ const CourseList = () => {
     return matchesKeyword && matchesStatus
   })
 
-  // (Nếu đổi sang lọc Server)
-  // const fetchCourses = useCallback(async () => {
-  //     setLoading(true)
-  //     try {
-  //       const res = await courseApi.findMany({ q: searchText }) 
-  //       setCourses(res.data)
-  //     }
-  //     // ...
-  //     finally {
-  //       setLoading(false)
-  //     }
-  // }, [searchText]) // thêm searchText vào đây
-
   const OpenModalAdd = () => {
     setEditingCourse(null)
     setIsOpen(true)

@@ -27,6 +27,13 @@ export class CourseController {
         return await this.courseService.GetCourses(query)
     }
 
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADMIN')
+    @Get('/combobox')
+    async GetDataForCmb() {
+        return await this.courseService.GetDataForCmb()
+    }
+
     // lấy chi tiết 1 khóa học
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')

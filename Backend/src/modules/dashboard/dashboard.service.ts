@@ -49,7 +49,7 @@ export class DashboardService {
                     }
                 }),
                 this.prisma.hoaDon.findMany({
-                    where: { TrangThai: null, ThoiHan: { lt: now } }
+                    where: { TrangThai: 'ACTIVE', ThoiHan: { lt: now } }
                 }),
                 this.prisma.phieuThu.aggregate({
                     _sum: { SoTien: true },
@@ -137,7 +137,7 @@ export class DashboardService {
     async GetOverdueInvoices() {
         const invoiceDB = await this.prisma.hoaDon.findMany({
             where: {
-                TrangThai: null,
+                TrangThai: 'ACTIVE',
                 ThoiHan: { lt: new Date() }
             },
             select: {

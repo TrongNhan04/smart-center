@@ -76,11 +76,11 @@ model HocVien {
   MaHocVien String @unique
   UserID    Int //id phụ huynh
 
-  TenHocVien  String
-  NgaySinh    DateTime    @db.Timestamptz(3)
-  DiaChi      String?
-  GhiChu      String?
-  TrangThai   TrangThaiHV @default(ACTIVE) //thêm mới là ACTIVE
+  TenHocVien String
+  NgaySinh   DateTime    @db.Timestamptz(3)
+  DiaChi     String?
+  GhiChu     String?
+  TrangThai  TrangThaiHV @default(ACTIVE) //thêm mới là ACTIVE
 
   CreatedAt DateTime @default(dbgenerated("now()")) @db.Timestamptz(3)
   UpdatedAt DateTime @updatedAt @db.Timestamptz(3)
@@ -183,10 +183,6 @@ model BuoiHoc {
 
   //Quan hệ
   @@unique([LopHocID, BatDauLuc]) //một lớp học không có hai buổi học cùng ngày + giờ bắt đầu
-  //index
-  @@index([LopHocID])
-  @@index([BatDauLuc])
-  @@index([PhongHoc, BatDauLuc])
 }
 
 // ============ 7. KETQUA_BUOIHOC ============//
@@ -250,24 +246,23 @@ model GhiDanh {
   lophoc         LopHoc           @relation(fields: [LopHocID], references: [ID])
   ketqua_chitiet KetQua_ChiTiet[] //ghi danh có nhiều kết quả chi tiết
   hoadon         HoaDon? //1 ghi danh có 1 hóa đơn
-
-  //Quan hệ
-  @@unique([HocVienID, LopHocID]) //một học viên chỉ được ghi danh một lần vào một lớp học
-  //index
-  @@index([HocVienID])
-  @@index([LopHocID, TrangThai])
 }
 
 // ============ 10. HOADON  ============//
+enum TrangThai_HD {
+  ACTIVE
+  CANCELLED
+}
+
 model HoaDon {
-  ID        Int      @id @default(autoincrement())
-  MaHoaDon  String   @unique
-  GhiDanhID Int      @unique
-  TongTien  Decimal  @db.Decimal(10, 2)
-  DaTra     Decimal  @default(0) @db.Decimal(10, 2)
-  ThoiHan   DateTime @db.Timestamptz(3)
+  ID        Int          @id @default(autoincrement())
+  MaHoaDon  String       @unique
+  GhiDanhID Int          @unique
+  TongTien  Decimal      @db.Decimal(10, 2)
+  DaTra     Decimal      @default(0) @db.Decimal(10, 2)
+  ThoiHan   DateTime     @db.Timestamptz(3)
   GhiChu    String?
-  TrangThai String?
+  TrangThai TrangThai_HD @default(ACTIVE)
 
   CreatedAt DateTime @default(dbgenerated("now()")) @db.Timestamptz(3)
   UpdatedAt DateTime @updatedAt @db.Timestamptz(3)
@@ -276,9 +271,6 @@ model HoaDon {
   ghidanh  GhiDanh    @relation(fields: [GhiDanhID], references: [ID])
   phieuthu PhieuThu[] //hóa đơn có nhiều phiếu thu
   phieuchi PhieuChi?
-
-  //index
-  @@index([ThoiHan])
 }
 
 // ============ 11. PHIEUTHU  ============//
@@ -298,9 +290,6 @@ model PhieuThu {
   //Quan hệ
   hoadon HoaDon @relation(fields: [HoaDonID], references: [ID])
   user   User   @relation(fields: [UserID], references: [ID])
-
-  //index
-  @@index([NgayThu])
 }
 
 // ============ 12. THONGBAO  ============//
@@ -336,7 +325,4 @@ model PhieuChi {
   //quan hệ
   hoadon HoaDon? @relation(fields: [HoaDonID], references: [ID])
   user   User    @relation(fields: [NguoiLapID], references: [ID])
-
-  // index
-  @@index([NgayChi])
 }

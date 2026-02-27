@@ -79,11 +79,9 @@ export class ClassService {
             KhoaHoc: {
                 ID: lh.KhoaHocID,
                 TenKhoaHoc: lh.khoahoc.TenKhoaHoc,
-                HocPhi: lh.khoahoc.HocPhi
             },
-            PhongHoc: lh.PhongHoc, KhoaHocID: lh.KhoaHocID,
             TuNgay: lh.TuNgay, DenNgay: lh.DenNgay,
-            LichHoc: lh.LichHoc, MoTa: lh.MoTa,
+            LichHoc: lh.LichHoc, MoTa: lh.MoTa, PhongHoc: lh.PhongHoc,
             GioHoc: lh.GioBatDau + ' - ' + lh.GioKetThuc, SiSo: lh.SiSo,
             TrangThai: lh.TrangThai, TongGhiDanh: lh._count.ghidanh,
         }))
@@ -95,12 +93,17 @@ export class ClassService {
             where: { TrangThai: { not: 'CLOSED' } },
             select: {
                 ID: true, TenLop: true, MaLopHoc: true,
-                khoahoc: { select: { HocPhi: true } }
-            }
+                LichHoc: true, GioBatDau: true, GioKetThuc: true, SiSo: true,
+                khoahoc: { select: { HocPhi: true } },
+                _count: { select: { ghidanh: { where: { TrangThai: 'ACTIVE' } } } }
+            },
+            orderBy: { MaLopHoc: 'asc' }
         })
         return classDB.map(m => ({
             ID: m.ID, TenLop: m.TenLop, MaLopHoc: m.MaLopHoc,
-            HocPhi: m.khoahoc.HocPhi
+            LichHoc: m.LichHoc, HocPhi: m.khoahoc.HocPhi,
+            GioHoc: m.GioBatDau + " - " + m.GioKetThuc,
+            TongGhiDanh: m._count.ghidanh, SiSo: m.SiSo
         }))
     }
 

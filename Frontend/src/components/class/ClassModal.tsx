@@ -5,12 +5,12 @@ import {
 import { useEffect, useState } from 'react';
 import courseApi from '../../api/courseApi';
 import teacherApi from '../../api/teacherApi';
-import type { CourseDB } from '../course/CourseDTO';
-import type { TeacherDB } from '../teacher/TeacherDTO';
+import type { CourseForCmb } from '../course/CourseDTO';
 import dayjs from 'dayjs';
 import classApi from '../../api/classApi';
 import { mapDataClass, type ClassDB, type ClassDto } from './ClassDTO';
 import { DateHelper } from '../common/date.helper';
+import type { TeacherForCmb } from '../teacher/TeacherDTO';
 
 const { RangePicker } = DatePicker
 
@@ -26,18 +26,17 @@ const ClassModal = ({
   open, onCancel, khoahocId, onSave, editingClass }: Props) => {
   const isEdit = editingClass ? true : false
   const [form] = Form.useForm()
-  const [courses, setCourses] = useState<CourseDB[]>([])
-  const [teachers, setTeachers] = useState<TeacherDB[]>([])
+  const [courses, setCourses] = useState<CourseForCmb[]>([])
+  const [teachers, setTeachers] = useState<TeacherForCmb[]>([])
   const [loading, setLoading] = useState(false)
 
   // useEffect 1 chỉ tải data cho combobox
   useEffect(() => {
     const fetchCourse_Teacher = async () => {
-      setLoading(true)
       try {
         const [courseRes, teacherRes] = await Promise.all([
-          courseApi.findMany(),
-          teacherApi.findMany()
+          courseApi.findManyForCmb(),
+          teacherApi.findManyForCmb()
         ])
         setCourses(courseRes.data)
         setTeachers(teacherRes.data)
@@ -45,9 +44,6 @@ const ClassModal = ({
       catch (error: any) {
         message.error("Có lỗi xuất hiện")
         console.log("Lỗi: ", error.response.data.message)
-      }
-      finally {
-        setLoading(false)
       }
     }
     fetchCourse_Teacher()
@@ -69,7 +65,7 @@ const ClassModal = ({
           startTime: DateHelper.ConvertHourStrToDayJS(startTime),
           endTime: DateHelper.ConvertHourStrToDayJS(endTime),
         }
-        // console.log("data của table truyền cho form: ", formData)
+        
         form.setFieldsValue(formData)
       }
       else
@@ -79,37 +75,25 @@ const ClassModal = ({
 
   const daysOfWeek = [
     { label: 'Chủ nhật', value: 0 },
-    { label: 'Thứ 2', value: 1 },
-    { label: 'Thứ 3', value: 2 },
-    { label: 'Thứ 4', value: 3 },
-    { label: 'Thứ 5', value: 4 },
-    { label: 'Thứ 6', value: 5 },
-    { label: 'Thứ 7', value: 6 },
+    { label: 'Thứ 2', value: 1 }, { label: 'Thứ 3', value: 2 },
+    { label: 'Thứ 4', value: 3 }, { label: 'Thứ 5', value: 4 },
+    { label: 'Thứ 6', value: 5 }, { label: 'Thứ 7', value: 6 },
   ]
+// mã + thời gian + học phí
+  const courseOption = courses.map(item => ({
+    label: `${item.MaKhoaHoc} (${item.ThoiGian} tháng - ${item.HocPhi})`,
+    value: item.ID,
+  }))
 
-  const courseOption = []
-  for (var item of courses) {
-    if (item.TrangThai !== 'INACTIVE')
-      courseOption.push({
-        label: item.TenKhoaHoc + ` (${item.ThoiGian} tháng)`,
-        value: item.ID,
-      })
-  }
-
-  const teacherOption = []
-  for (var i of teachers) {
-    if (i.TrangThai !== 'INACTIVE')
-      teacherOption.push({
-        label: i.HoTen + ` (${i.MaGiaoVien})`,
-        value: i.ID,
-      })
-  }
+  const teacherOption = teachers.map(item => ({
+    label: `${item.MaGiaoVien} - `+item.HoTen,
+    value: item.ID,
+  }))
 
   const handleSubmit = async () => {
     setLoading(true)
     try {
       const values = await form.validateFields()
-      // console.log("values từ form: ", values)
 
       await new Promise(resolve => { setTimeout(resolve, 1000) })
 

@@ -365,6 +365,23 @@ export type EnumTrangThai_GDWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumTrangThai_GDFilter<$PrismaModel>
 }
 
+export type EnumTrangThai_HDFilter<$PrismaModel = never> = {
+  equals?: $Enums.TrangThai_HD | Prisma.EnumTrangThai_HDFieldRefInput<$PrismaModel>
+  in?: $Enums.TrangThai_HD[] | Prisma.ListEnumTrangThai_HDFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TrangThai_HD[] | Prisma.ListEnumTrangThai_HDFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTrangThai_HDFilter<$PrismaModel> | $Enums.TrangThai_HD
+}
+
+export type EnumTrangThai_HDWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.TrangThai_HD | Prisma.EnumTrangThai_HDFieldRefInput<$PrismaModel>
+  in?: $Enums.TrangThai_HD[] | Prisma.ListEnumTrangThai_HDFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TrangThai_HD[] | Prisma.ListEnumTrangThai_HDFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTrangThai_HDWithAggregatesFilter<$PrismaModel> | $Enums.TrangThai_HD
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumTrangThai_HDFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumTrangThai_HDFilter<$PrismaModel>
+}
+
 export type JsonFilter<$PrismaModel = never> =
 | Prisma.PatchUndefined<
     Prisma.Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
@@ -805,6 +822,23 @@ export type NestedEnumTrangThai_GDWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumTrangThai_GDFilter<$PrismaModel>
   _max?: Prisma.NestedEnumTrangThai_GDFilter<$PrismaModel>
+}
+
+export type NestedEnumTrangThai_HDFilter<$PrismaModel = never> = {
+  equals?: $Enums.TrangThai_HD | Prisma.EnumTrangThai_HDFieldRefInput<$PrismaModel>
+  in?: $Enums.TrangThai_HD[] | Prisma.ListEnumTrangThai_HDFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TrangThai_HD[] | Prisma.ListEnumTrangThai_HDFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTrangThai_HDFilter<$PrismaModel> | $Enums.TrangThai_HD
+}
+
+export type NestedEnumTrangThai_HDWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.TrangThai_HD | Prisma.EnumTrangThai_HDFieldRefInput<$PrismaModel>
+  in?: $Enums.TrangThai_HD[] | Prisma.ListEnumTrangThai_HDFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TrangThai_HD[] | Prisma.ListEnumTrangThai_HDFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTrangThai_HDWithAggregatesFilter<$PrismaModel> | $Enums.TrangThai_HD
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumTrangThai_HDFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumTrangThai_HDFilter<$PrismaModel>
 }
 
 export type NestedJsonFilter<$PrismaModel = never> =

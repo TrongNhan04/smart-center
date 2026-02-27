@@ -113,6 +113,24 @@ export class TeacherService {
         }))
     }
 
+    // lấy danh sách giáo viên cho combobox
+    async GetDataForCmb() {
+        const teacherDB = await this.prismaService.giaoVien.findMany({
+            where: { TrangThai: 'ACTIVE' },
+            select: {
+                ID: true,
+                MaGiaoVien: true,
+                User: { select: { HoTen: true } }
+            },
+            orderBy:{MaGiaoVien:'asc'}
+        })
+        return teacherDB.map(m=>({
+            ID: m.ID, 
+            MaGiaoVien: m.MaGiaoVien,
+            HoTen: m.User.HoTen
+        }))
+    }
+
     // lấy chi tiết 1 giáo viên - phần trên
     async GetTeacherByID(teacherId: number) {
         const teacherDB = await this.TeacherIdValidator(teacherId)
@@ -223,8 +241,8 @@ export class TeacherService {
             },
             omit: {
                 CreatedAt: true, UpdatedAt: true,
-                AdminMoKhoa:true, LyDoMoKhoa:true,
-                YeuCauMoKhoa:true, NgayYeuCau:true
+                AdminMoKhoa: true, LyDoMoKhoa: true,
+                YeuCauMoKhoa: true, NgayYeuCau: true
             },
             orderBy: { BatDauLuc: 'asc' }
         })

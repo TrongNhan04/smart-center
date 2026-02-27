@@ -1,6 +1,11 @@
-import { IsNotEmpty, IsOptional, IsPositive, IsString } from "class-validator";
+import { IsEnum, IsNotEmpty, IsOptional, IsPositive, IsString } from "class-validator";
+import { TrangThai_HD } from "src/generated/prisma/enums";
 
 export class QueryInvoiceDTO{
+    @IsOptional()
+    @IsEnum(TrangThai_HD)
+    status?:TrangThai_HD
+
     @IsOptional()
     q?:string
 }

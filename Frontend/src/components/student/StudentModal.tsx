@@ -2,7 +2,7 @@ import { Col, DatePicker, Form, Input, InputNumber, message, Modal, notification
 import { useEffect, useState } from "react"
 import { mapDataStudent, type StudentDB, type StudentDto } from "./StudentDTO"
 import { studentApi } from "../../api/studentApi"
-import type { ClassDB } from "../class/ClassDTO"
+import type { ClassForCmb } from "../class/ClassDTO"
 import classApi from "../../api/classApi"
 import dayjs from "dayjs"
 
@@ -16,7 +16,7 @@ interface Props {
 const StudentModal = ({ open, onSave, onCancel, editing }: Props) => {
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
-  const [classes, setClasses] = useState<ClassDB[]>([])
+  const [classes, setClasses] = useState<ClassForCmb[]>([])
   const isEdit = editing ? true : false
 
   const handleError = (error: any) => {
@@ -32,7 +32,7 @@ const StudentModal = ({ open, onSave, onCancel, editing }: Props) => {
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        const res = await classApi.findMany()
+        const res = await classApi.findManyForCmb()
         setClasses(res.data)
       } catch (error: any) {
         handleError(error)
@@ -58,15 +58,19 @@ const StudentModal = ({ open, onSave, onCancel, editing }: Props) => {
     }
   }, [open, editing, form])
 
-  const classOption = classes.map(item => ({
-    label: item.TenLop + ` (${item.MaLopHoc})`,
-    value: item.ID
-  }))
+  const dow = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
+  const classOption = classes.map(item => {
+    const timetable = item.LichHoc.map(m => dow[m]).join(',')
+    return {
+      label: `${item.MaLopHoc} - ${timetable} (${item.GioHoc}) - ${item.TongGhiDanh}/${item.SiSo} HV`,
+      value: item.ID
+    }
+  })
 
   const handleClassChange = (classId: number) => {
     const lophoc = classes.find(f => f.ID === classId)
     if (lophoc)
-      form.setFieldValue('fee', lophoc.KhoaHoc.HocPhi)
+      form.setFieldValue('fee', lophoc.HocPhi)
   }
 
   const handleOK = async () => {
@@ -116,7 +120,7 @@ const StudentModal = ({ open, onSave, onCancel, editing }: Props) => {
       open={open}
       onCancel={handleCancel}
       onOk={handleOK}
-      width={600}
+      width={700}
       okText="Lưu lại"
       cancelText="Hủy bỏ"
       centered // canh giữa màn hình

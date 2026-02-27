@@ -86,24 +86,23 @@ const ClassList = () => {
       render: (code: string, lophoc: ClassDB) => (
         <Space orientation="vertical">
           <Link to={`/admin/classes/${lophoc.ID}`}
-            style={{ fontWeight: 'bold'}}>
+            style={{ fontWeight: 'bold' }}>
             {lophoc.TenLop}</Link>
           <Text code style={{ fontSize: 14 }}>{code}</Text>
         </Space>
       )
     },
-    // ...(!isHiden ? [ // toán tử spread lấy phần ruột
     { // khóa học 
       title: 'Khóa học', dataIndex: ['KhoaHoc', 'TenKhoaHoc'],
       key: 'TenKhoaHoc', ellipsis: true,
       render: (name: string, lophoc: ClassDB) =>
-        <Link to={`/admin/courses/${lophoc.KhoaHoc.ID}`}
-        >{name}</Link>
+        <Link to={`/admin/courses/${lophoc.KhoaHoc.ID}`}>{name}</Link>
     },
-    // ] : []),
     { // giáo viên
       title: 'Giáo viên', dataIndex: ['GiaoVien', 'HoTen'],
-      key: 'HoTen', ellipsis: true
+      key: 'HoTen', ellipsis: true,
+      render: (name: string, lophoc: ClassDB) => 
+        <Link to={`/admin/teachers/${lophoc.GiaoVien.ID}`}>{name}</Link>
     },
     { // khai giảng = ngày bắt đầu
       title: 'Khai giảng', dataIndex: 'TuNgay', key: 'TuNgay', width: 130,

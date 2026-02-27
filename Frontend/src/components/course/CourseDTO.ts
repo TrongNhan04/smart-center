@@ -1,5 +1,5 @@
 // cho modal, form gửi backend   
-export interface CourseDto { 
+export interface CourseDto {
   id?: number
   code: string,
   name: string,
@@ -7,7 +7,7 @@ export interface CourseDto {
   duration: number,
   courseFee: number,
   totalSession: number,
-  description?: string|null
+  description?: string | null
 }
 
 // cho table hiển thị
@@ -23,7 +23,10 @@ export interface CourseDB {
   MoTa?: string,
 }
 
-// để cho edit
+export type CourseForCmb = Pick<CourseDB,
+  'ID' | 'MaKhoaHoc' | 'TenKhoaHoc' | 'HocPhi' | 'ThoiGian'>
+
+// từ table tiếng việt thành form tiếng anh
 export const mapDataCourse = (record: CourseDB): CourseDto => {
   return {
     id: record.ID,

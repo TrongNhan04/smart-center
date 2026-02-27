@@ -5,8 +5,9 @@ import {
 }
   from "@ant-design/icons"
 import {
-  Avatar, Badge, Breadcrumb, Button, Card, Col, Descriptions,
-  message, Popconfirm, Progress, Row, Space, Statistic, Table, Tabs, Tag, Tooltip, Typography
+  Avatar, Badge, Breadcrumb, Button, Card, Col, Descriptions, message, 
+  Popconfirm, Progress, Row, Space, Statistic, Table, Tabs, Tag, Tooltip, 
+  Typography
 } from "antd"
 import { Link, useParams } from "react-router-dom"
 import type { ClassDB } from "./ClassDTO"
@@ -19,7 +20,6 @@ import ClassModal from "./ClassModal"
 import SessionAction from "../session/SessionAction"
 import SessionsModal from "../session/SessionsModal"
 import SessionDrawer from "../session/SessionDrawer"
-
 
 const { Title, Text } = Typography
 
@@ -56,9 +56,7 @@ const ClassDetail = () => {
   useEffect(() => {
     const initData = async () => {
       try {
-        await Promise.all([
-          fetchClass(), fetchSessions()
-        ])
+        await Promise.all([ fetchClass(), fetchSessions()])
       } catch (error) {
         console.log("lỗi chạy useEffect: ", error)
       }
@@ -359,7 +357,9 @@ const ClassDetail = () => {
                 { // giáo viên
                   label: <><span style={{ color: '#888' }}>
                     <UserOutlined /> Giáo viên: &nbsp;</span>
-                    <Text strong>{lophoc.GiaoVien.HoTen}</Text>
+                    <Link to={`/admin/teachers/${lophoc.GiaoVien.ID}`}
+                      style={{ fontWeight: 'bold' }}>
+                      {lophoc.GiaoVien.HoTen}</Link>
                   </>
                 },
                 { // khai giảng

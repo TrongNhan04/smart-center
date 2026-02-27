@@ -25,7 +25,6 @@ export interface ClassDB {
     KhoaHoc: {
         ID: number,
         TenKhoaHoc: string
-        HocPhi: number
     }
     TuNgay: string,
     DenNgay: string,
@@ -43,6 +42,10 @@ export interface ClassForCmb {
     MaLopHoc: string,
     TenLop: string,
     HocPhi:number
+    LichHoc: number[],
+    GioHoc: string,
+    SiSo: number,
+    TongGhiDanh: number
 }
 
 // để cho edit

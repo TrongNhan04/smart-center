@@ -26,6 +26,14 @@ export class TeacherController {
     return await this.teacherService.GetTeachers(query)
   }
 
+  // lấy danh sách giáo viên cho combobox
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Get('/combobox')
+  async GetDataForCmb() {
+    return await this.teacherService.GetDataForCmb()
+  }
+
   // lấy chi tiết giáo viên
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
