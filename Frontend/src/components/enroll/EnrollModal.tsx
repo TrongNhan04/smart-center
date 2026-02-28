@@ -1,4 +1,4 @@
-import { Form, Input, InputNumber, message, Modal, notification, Select } from "antd"
+import { Alert, Form, Input, InputNumber, message, Modal, notification, Select } from "antd"
 import { useEffect, useState } from "react"
 import type { ClassForCmb } from "../class/ClassDTO"
 import type { StudentForCmb } from "../student/StudentDTO"
@@ -41,9 +41,10 @@ const EnrollModal = ({ open, onCancel, onSave }: Props) => {
     }
   }
   useEffect(() => {
-    if(open)
+    if (open)
       fetchClasses_Students()
   }, [open])
+  
   //JPN-N3-01 - Thứ 3,5,7 (19:00-21:00) - 12/15 HV
   const dow = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
   const classOption = classes.map(item => {
@@ -111,17 +112,22 @@ const EnrollModal = ({ open, onCancel, onSave }: Props) => {
       open={open}
       onCancel={handleCancel}
       onOk={handleOK}
-      width={400}
+      width={500}
       okText="Lưu lại"
       cancelText="Hủy bỏ"
       centered // canh giữa màn hình
       maskClosable={false}
       confirmLoading={loading}
     >
+      <Alert
+        title="Lưu ý"
+        description="Ghi danh thành công sẽ tạo HÓA ĐƠN và gửi thông báo"
+        type="info"
+        showIcon
+        style={{ marginBottom: 20 }}
+      />
+
       <Form form={form} layout="vertical" size="middle">
-        {/* Mã học viên, ngày sinh*/}
-        {/* <Row gutter={16}> */}
-        {/* <Col span={14}> */}
         <Form.Item // chọn lớp học
           label="Lớp học"
           name="classId"

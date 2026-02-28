@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react"
 import type { InvoiceDB } from "./InvoiceDTO"
-import { Card, Col, Input, notification, Progress, Row, Select, Space, Table, Tag, Typography } from "antd"
+import {
+  Badge, Card, Col, Input, notification, Row, Select, Space, Table, Tag, Typography
+} from "antd"
 import { invoiceApi } from "../../api/invoiceApi"
 import { Link } from "react-router-dom"
-import { CalendarOutlined, CheckCircleOutlined, CloseCircleOutlined, ExclamationOutlined, PhoneOutlined, SearchOutlined } from "@ant-design/icons"
+import { CalendarOutlined, CheckCircleOutlined, PhoneOutlined, SearchOutlined } from "@ant-design/icons"
+import InvoiceAction from "./InvoiceAction"
+import InvoiceModal from "./InvoiceModal"
 
 const { Text } = Typography
 
@@ -11,8 +15,10 @@ const InvoiceList = () => {
   const [invoices, setInvoices] = useState<InvoiceDB[]>([])
   const [invoiceId, setInvoiceId] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
-  //const [isOpen, setIsOpen] = useState(false) // open modal
+  const [isOpen, setIsOpen] = useState(false) // open modal
   const [filterStatus, setFilterStatus] = useState('')
+  const [invoice, setInvoice] = useState<InvoiceDB | null>(null)
+  const [isReceipt, setIsReceipt] = useState(false)
 
   const handelError = (error: any) => {
     notification.error({
@@ -42,12 +48,23 @@ const InvoiceList = () => {
   }, [filterStatus])
 
   const handleSaveModal = (invoiceId: number) => {
-    console.log('invoiceId: ', invoiceId)
     setInvoiceId(invoiceId)
     fetchInvoices('')
     setTimeout(() => {
       setInvoiceId(null)
     }, 3000)
+  }
+
+  const handleOpenReceipt = (invoice: InvoiceDB) => {
+    setIsReceipt(true)
+    setIsOpen(true)
+    setInvoice(invoice)
+  }
+
+  const handleOpenPayment = (invoice: InvoiceDB) => {
+    setIsReceipt(false)
+    setIsOpen(true)
+    setInvoice(invoice)
   }
 
   const months = [
@@ -59,6 +76,7 @@ const InvoiceList = () => {
     { text: "Tháng 11", value: 10 }, { text: "Tháng 12", value: 11 },
   ]
 
+  const now = new Date().getTime()
   const columns = [
     { // mã hóa đơn + Ngày phát hành
       title: 'Hóa đơn', dataIndex: 'MaHoaDon',
@@ -82,35 +100,57 @@ const InvoiceList = () => {
         </Space>
     },
     { // tổng tiền + còn nợ 
-      title: 'Số tiền', dataIndex: 'TongTien', key: 'TongTien',
+      title: 'Số tiền (VNĐ)', dataIndex: 'TongTien', key: 'TongTien',
       render: (total: number, invoice: InvoiceDB) => {
-        if (!total) return <Text >0 đ</Text>
-        const value = Number(total).toLocaleString('vi-VN')
-        const debt = (total - invoice.DaTra).toLocaleString('vi-VN')
-        return <Space orientation="vertical" size={0}>
-          <span><Text strong>Tổng: </Text>{value} đ</span>
-          <span><Text strong>Nợ: </Text> {debt} đ</span>
-        </Space>
+        if (!total) return <Text >0đ</Text>
+        const tongTien = Number(total || 0)
+        const daTra = Number(invoice.DaTra || 0)
+        const conNo = total - daTra
+        const isCancelled = invoice.TrangThai === 'CANCELLED'
+        let subContent
+        let status = 'DEBT'
+
+        if (isCancelled && daTra == 0) status = 'NO_COST' // chưa phát sinh
+        if (isCancelled && daTra > 0) status = 'REFUND' // hoàn tiền
+        if (conNo == 0) status = 'PAID' // hoàn tất
+
+        switch (status) {
+          case 'NO_COST':
+            subContent = <Text  >Chưa phát sinh</Text>
+            break
+
+          case 'REFUND':
+            subContent = <Text strong style={{ color: 'blue' }} >
+              Cần hoàn: {daTra.toLocaleString()}đ</Text>
+            break
+
+          case 'PAID':
+            subContent = <Text strong type="success" >
+              Đã thu đủ <CheckCircleOutlined /></Text>
+            break
+
+          case 'DEBT':
+            subContent = <Text strong type="warning" >
+              Còn nợ: {conNo.toLocaleString()}đ</Text>
+        }
+
+        return (
+          <Space orientation="vertical" size={0}>
+            <Text strong={!isCancelled}>
+              Tổng: {tongTien.toLocaleString()}đ
+            </Text>
+            {subContent}
+          </Space>
+        )
       }
     },
     { // ngày hết hạn
       title: 'Hạn thanh toán', dataIndex: 'NgayHetHan',
       key: 'NgayHetHan', width: 160, align: 'center' as const,
-      filters: [
-        { text: 'Còn hạn', value: 'ConHan' },
-        { text: 'Quá hạn', value: 'QuaHan' }
-      ],
-      onFilter: (value: any, invoice: InvoiceDB) => {
-        const now = new Date().getTime()
-        const dueDate = new Date(invoice.NgayHetHan).getTime()
-        if (value === 'ConHan')
-          return dueDate > now
-        if (value === 'QuaHan')
-          return dueDate <= now
-        return false
-      },
+      filters: months, // value là value của months
+      onFilter: (value: any, invoice: InvoiceDB) =>
+        new Date(invoice.NgayHetHan).getMonth() == value,
       render: (invoiceDate: string, invoice: InvoiceDB) => {
-        const now = new Date().getTime()
         const dueDate = new Date(invoiceDate).getTime()
         const overTime = now - dueDate
         const overDate = Math.floor(overTime / (24 * 60 * 60 * 1000))
@@ -118,15 +158,59 @@ const InvoiceList = () => {
           return <Space orientation="vertical">
             <Text > <CalendarOutlined />
               {new Date(invoiceDate).toLocaleDateString()}</Text>
+            {/* <Badge status={'error'} text={`Trễ ${overDate} ngày`}/> */}
             <Tag color='red'>Trễ {overDate} ngày</Tag>
           </Space>
         else
-          return <Text >
-            <CalendarOutlined /> {new Date(invoiceDate).toLocaleDateString()}</Text>
+          return <Text > <CalendarOutlined />
+            {new Date(invoiceDate).toLocaleDateString()}</Text>
       }
     },
-    {
-
+    {// trạng thái
+      title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai',
+      filters: [
+        { text: 'Đã hoàn thành', value: 'Paid' },
+        { text: 'Thanh toán 1 phần', value: 'Part' },
+        { text: 'Chưa thanh toán', value: 'Unpaid' },
+        { text: 'Quá hạn', value: 'OverDate' },
+      ],
+      onFilter: (value: any, invoice: InvoiceDB) => {
+        const { DaTra, TongTien, NgayHetHan, TrangThai } = invoice
+        const ConNo = TongTien - DaTra > 0
+        const HetHan = new Date(NgayHetHan).getTime()
+        switch (value) {
+          case 'Paid': return TongTien == DaTra
+          case 'Part': return DaTra > 0 && ConNo && TrangThai == 'ACTIVE'
+          case 'Unpaid': return DaTra == 0 && TrangThai == 'ACTIVE'
+          case 'OverDate': return now > HetHan && ConNo
+          default:
+            return false
+        }
+      },
+      render: (status: string, invoice: InvoiceDB) => {
+        const { DaTra, TongTien, NgayHetHan } = invoice
+        const ConNo = TongTien - DaTra > 0
+        const dueDate = new Date(NgayHetHan).getTime()
+        if (status == 'CANCELLED')
+          return <Text delete> Đã hủy</Text>
+        if (now > dueDate && ConNo)
+          return <Badge status="error" text='Quá hạn' />
+        if (DaTra == TongTien)
+          return <Badge status="success" text='Đã hoàn thành' />
+        if (DaTra == 0)
+          return <Badge status="default" text='Chưa thanh toán' />
+        return <Badge status="processing" text="Thanh toán 1 phần" />
+      }
+    },
+    {// thao tác
+      title: 'Thao tác', dataIndex: 'action', key: 'action',
+      align: 'center' as const,
+      render: (_: any, invoice: InvoiceDB) =>
+        <InvoiceAction
+          invoice={invoice}
+          onAddReceipt={handleOpenReceipt}
+          onAddPayment={handleOpenPayment}
+        />
     }
   ]
 
@@ -145,16 +229,19 @@ const InvoiceList = () => {
 
         <Col span={3}>
           <Select // bộ lọc
-            placeholder='Trạng thái'
+            placeholder='Trạng thái HĐ'
             style={{ width: '100%' }}
             allowClear
             onChange={(e) => setFilterStatus(e)}
             options={[
-              { label: 'Thành công', value: 'ACTIVE' },
+              { label: 'Còn hiệu lục', value: 'ACTIVE' },
               { label: 'Đã hủy', value: 'CANCELLED' },
             ]}
           >
           </Select>
+        </Col>
+        <Col style={{ marginLeft: 'auto' }}>
+          Tổng cộng:<Text strong> {invoices.length} hóa đơn</Text>
         </Col>
       </Row>
       {/* Bảng hiển thị dữ liệu */}
@@ -173,11 +260,13 @@ const InvoiceList = () => {
       />
 
       {/* Hiển thị Modal UI */}
-      {/* <invoiceModal
+      <InvoiceModal
         open={isOpen}
         onCancel={() => setIsOpen(false)}
         onSave={handleSaveModal}
-      /> */}
+        invoice={invoice!}
+        isReceipt={isReceipt}
+      />
     </Card>
   )
 }

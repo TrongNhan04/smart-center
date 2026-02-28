@@ -316,7 +316,7 @@ model PhieuChi {
 
   SoTien     Decimal  @db.Decimal(10, 2)
   LyDo       String
-  NguoiLapID Int
+  UserID Int
   NgayChi    DateTime @db.Timestamptz(3)
 
   CreatedAt DateTime @default(now()) @db.Timestamptz(3)
@@ -324,5 +324,5 @@ model PhieuChi {
 
   //quan hệ
   hoadon HoaDon? @relation(fields: [HoaDonID], references: [ID])
-  user   User    @relation(fields: [NguoiLapID], references: [ID])
+  user   User    @relation(fields: [UserID], references: [ID])
 }

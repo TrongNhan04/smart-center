@@ -106,7 +106,7 @@ export class InvoiceService {
         }))
     }
 
-    // xóa mềm hóa đơn()
+    // xóa mềm hóa đơn theo hủy ghi danh
     async DeleteInvoiceByID(invoiceId: number, tx: Prisma.TransactionClient) {
         let client: Prisma.TransactionClient | null = null
         if (tx) client = tx
@@ -120,7 +120,7 @@ export class InvoiceService {
 
     //thêm phiếu thu
     async CreateReceipt(userId: number, invoiceId: number, amount: number) {
-        if (amount <= 0) throw new ConflictException('Paymount must greater than 0')
+        if (amount <= 0) throw new ConflictException('Số tiền thu phải lớn hơn 0')
 
         return await this.prismaService.$transaction(async tx => {
             const invoiceDB = await this.prismaService.hoaDon.findUnique({
@@ -130,18 +130,18 @@ export class InvoiceService {
                     ghidanh: { select: { hocvien: { select: { UserID: true } } } }
                 }
             })
-            if (!invoiceDB) throw new ConflictException('Invoice not existed')
+            if (!invoiceDB) throw new NotFoundException('Không tìm thấy hóa đơn')
             if (invoiceDB.TrangThai === 'CANCELLED')
-                throw new BadRequestException('Invoice is CANCELLED')
+                throw new BadRequestException('Hóa đơn đã hủy, không thể thu tiền!')
 
             const remain = invoiceDB.TongTien.toNumber() - invoiceDB.DaTra.toNumber()
             if (amount > remain)
-                throw new BadRequestException('Amount must less than or equal Remain')
+                throw new BadRequestException(`Số tiền thu không được vượt quá ${remain} đ`)
 
             let count = await this.prismaService.phieuThu.count()
             const code = count < 9 ? "PT0" + (count + 1) : "PT" + (count + 1)
 
-            await this.ReceiptCodeValidator(code)
+            //await this.ReceiptCodeValidator(code)
             const receipt = await tx.phieuThu.create({
                 data: {
                     UserID: userId,
@@ -158,7 +158,7 @@ export class InvoiceService {
             })
 
             await this.notisService.PaymentNotify(+invoiceDB.ghidanh.hocvien.UserID, receipt)
-            return { mgs: "Create receipt and notisy successfully" }
+            return { ID: invoiceId }
         })
     }
 
@@ -192,18 +192,28 @@ export class InvoiceService {
             const invoiceDB = await tx.hoaDon.findUnique({
                 where: { ID: invoiceId }
             })
-            if (!invoiceDB) throw new NotFoundException('Invoice not found')
+            if (!invoiceDB) throw new NotFoundException 
+                ('Không tìm thấy hóa đơn')
 
-            if (body.amount > invoiceDB.DaTra.toNumber())
-                throw new BadRequestException('Payment must less than or equal to paidment')
+            if (invoiceDB.TrangThai !== 'CANCELLED')
+                throw new ConflictException
+                    ('Hóa đơn vẫn còn hiệu thực, không thể tạo phiếu hoàn tiền')
+
+            if (Number(invoiceDB.DaTra) == 0)
+                throw new BadRequestException
+                    ('Hóa đơn chưa thanh toán, không cần tạo phiếu hoàn tiền')
+
+            if (body.amount > Number(invoiceDB.DaTra))
+                throw new BadRequestException
+                    ('Số tiền chi phải nhỏ hơn hoặc bằng số tiền đã trả')
             // tạo phiếu chi
             await tx.phieuChi.create({
                 data: {
+                    UserID: userId,
                     HoaDonID: invoiceDB.ID,
                     SoTien: body.amount,
                     LyDo: reason,
                     NgayChi: new Date(),
-                    NguoiLapID: userId
                 }
             })
             // cập nhật đã trả
@@ -214,15 +224,15 @@ export class InvoiceService {
                 }
             })
 
-            return { mgs: "Succesfull" }
+            return { ID: invoiceId }
         })
     }
 
     // kiểm tra trùng mã phiếu thu
-    private async ReceiptCodeValidator(code: string) {
-        const receiptDB = await this.prismaService.phieuThu.findUnique({
-            where: { MaPhieuThu: code }
-        })
-        if (receiptDB) throw new ConflictException("Receipt code was duplicate")
-    }
+    // private async ReceiptCodeValidator(code: string) {
+    //     const receiptDB = await this.prismaService.phieuThu.findUnique({
+    //         where: { MaPhieuThu: code }
+    //     })
+    //     if (receiptDB) throw new ConflictException("Receipt code was duplicate")
+    // }
 }

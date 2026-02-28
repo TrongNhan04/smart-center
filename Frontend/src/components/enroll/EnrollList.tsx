@@ -115,7 +115,7 @@ const EnrollList = () => {
           return <Tooltip title="Hủy ghi danh">
             <Popconfirm
               title="Xác nhận hủy?"
-              description="Hành động này không thể hoàn tác"
+              description="Hủy ghi danh sẽ đồng thời hủy HÓA ĐƠN"
               okText="Hủy ghi danh"
               cancelText="Quay lại"
               onConfirm={() => handleInactive(enroll.ID)}

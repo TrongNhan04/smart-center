@@ -46,10 +46,7 @@ const items: MenuItem[] = [
     getItem('Học viên', 'students'),
   ]),
   getItem('Ghi danh', 'enrolls', <FormOutlined />),
-  getItem('Tài chính', 'finance', <CreditCardOutlined />, [
-    getItem('Hóa đơn', 'invoices'),
-    getItem('Nợ xấu', 'debts')
-  ]),
+  getItem('Hóa đơn', 'invoices', <CreditCardOutlined />),
   getItem('Tài khoản', 'account', <UserOutlined />),
 ];
 

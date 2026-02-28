@@ -280,7 +280,7 @@ export const PhieuChiScalarFieldEnum = {
   HoaDonID: 'HoaDonID',
   SoTien: 'SoTien',
   LyDo: 'LyDo',
-  NguoiLapID: 'NguoiLapID',
+  UserID: 'UserID',
   NgayChi: 'NgayChi',
   CreatedAt: 'CreatedAt',
   UpdatedAt: 'UpdatedAt'

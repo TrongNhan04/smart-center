@@ -15,6 +15,7 @@ import StudentList from "./components/student/StudentList";
 import StudentDetail from "./components/student/StudentDetail";
 import EnrollList from "./components/enroll/EnrollList";
 import InvoiceList from "./components/invoice/InvoiceList";
+import InvoiceDetail from "./components/invoice/InvoiceDetail";
 
 const router = createBrowserRouter([
   {
@@ -49,7 +50,9 @@ const router = createBrowserRouter([
           { path: 'enrolls', element: <EnrollList/> },
 
           { path: 'invoices', element: <InvoiceList/> },
-          { path: 'debts', element: <div>Trang nợ xấu</div> },
+          
+
+          { path: 'debts', element: <InvoiceDetail/> },
           { path: 'account', element: <div>Trang tài khoản</div> }
         ]
       }

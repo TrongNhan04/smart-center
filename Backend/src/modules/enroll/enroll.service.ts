@@ -94,7 +94,7 @@ export class EnrollService {
         }))
     }
 
-    // xóa mềm 
+    // xóa mềm ghi danh + xóa mềm hóa đơn
     async DeleteEnrollByID(enrollId: number) {
         return this.prismaService.$transaction(async tx => {
             const enrollDB = await tx.ghiDanh.findUnique({
@@ -110,7 +110,7 @@ export class EnrollService {
                 data: { TrangThai: 'INACTIVE' }
             })
 
-            await this.invoiceService.DeleteInvoiceByID(enrollDB.hoadon?.ID, tx)
+            await this.invoiceService.DeleteInvoiceByID(enrollDB.hoadon.ID, tx)
             return { ID: enrollDB.ID }
         })
     }

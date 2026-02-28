@@ -54,6 +54,8 @@ const SessionsModal = ({ lophoc, open, onCancel, onSave }: Props) => {
     } finally { setLoading(false) }
   }
 
+  if(!lophoc) return 
+
   return (<>
     {/* Modal */}
     <Modal
