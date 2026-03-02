@@ -282,6 +282,7 @@ model PhieuThu {
   HoaDonID   Int
   SoTien     Decimal  @db.Decimal(10, 2)
   NgayThu    DateTime @db.Timestamptz(3)
+  PhuongThuc String?
   GhiChu     String?
 
   CreatedAt DateTime @default(dbgenerated("now()")) @db.Timestamptz(3)
@@ -314,10 +315,12 @@ model PhieuChi {
   ID       Int  @id @default(autoincrement())
   HoaDonID Int? @unique
 
+  MaPhieuChi String @unique
   SoTien     Decimal  @db.Decimal(10, 2)
   LyDo       String
   UserID Int
   NgayChi    DateTime @db.Timestamptz(3)
+  PhuongThuc String?
 
   CreatedAt DateTime @default(now()) @db.Timestamptz(3)
   UpdatedAt DateTime @updatedAt()
