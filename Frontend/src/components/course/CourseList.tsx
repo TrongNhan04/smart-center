@@ -8,7 +8,7 @@ import { ClockCircleOutlined, PlusOutlined, SearchOutlined } from '@ant-design/i
 import CourseAction from './CourseAction';
 import { type CourseDB } from './CourseDTO';
 import CourseModal from './CourseModal';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 const { Text } = Typography
 
 const CourseList = () => {
@@ -16,11 +16,11 @@ const CourseList = () => {
   const [courseId, setCourseId] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
   const [isOpen, setIsOpen] = useState(false)// mở modal
-
   const [searchText, setSearchText] = useState('')
   const [filterStatus, setFilterStatus] = useState<string | null>(null)
-
   const [editingCourse, setEditingCourse] = useState<CourseDB | null>(null)
+  const [searchParam, setSearchParam] = useSearchParams()
+  const currentPage = Number(searchParam.get('page')) || 1
 
   const fetchCourses = async () => {
     setLoading(true)
@@ -106,6 +106,9 @@ const CourseList = () => {
       console.log("Có lỗi xảy ra: ", error.response.data.message)
     }
   }
+
+  const handleBack = (pagination: any) =>
+    setSearchParam({ page: pagination.current })
 
   const columns = [
     { // mã khóa học
@@ -227,7 +230,12 @@ const CourseList = () => {
             return record.ID === courseId ? 'highlight-row' : ''
           }
         }
-        pagination={{ defaultPageSize: 7 }}
+        // pagination={{ defaultPageSize: 10 }}
+        pagination={{
+          current: currentPage,
+          pageSize: 10
+        }}
+        onChange={handleBack}
         rowKey="ID"
         scroll={{ x: 1100, y: 426 }}
       />

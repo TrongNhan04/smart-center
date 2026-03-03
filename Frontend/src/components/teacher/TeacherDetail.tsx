@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react"
-import { Link, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import type { TeacherDB } from "./TeacherDTO"
 import type { ClassDB } from "../class/ClassDTO"
 import teacherApi from "../../api/teacherApi"
 import {
-  Avatar, Badge, Breadcrumb, Button, Card, Col, Descriptions,
-  notification, Progress, Row, Space, Statistic, Table, Tabs, Tag, Tooltip, Typography
+  Avatar, Badge, Button, Card, Col, Descriptions, notification, Progress,
+  Row, Space, Statistic, Table, Tabs, Tag, Tooltip, Typography
 } from "antd"
 import classApi from "../../api/classApi"
 import {
-  BookOutlined, CalendarOutlined, ClockCircleOutlined, EditOutlined,
-  HomeOutlined, MailOutlined, PhoneOutlined, ReadOutlined
+  ArrowLeftOutlined, BookOutlined, CalendarOutlined, ClockCircleOutlined,
+  EditOutlined, MailOutlined, PhoneOutlined, ReadOutlined
 } from "@ant-design/icons"
 import TeacherModal from "./TeacherModal"
 import { sessionApi } from "../../api/sessionApi"
@@ -23,13 +23,14 @@ const { Text, Title } = Typography
 
 const TeacherDetail = () => {
   const { id } = useParams()
-  const teacherId = Number(id)
   const [teacher, setteacher] = useState<TeacherDB | null>(null)
   const [classes, setClasses] = useState<ClassDB[]>([])
   const [sessions, setSessions] = useState<SessionDB[]>([])
   const [openTeacherModal, setOpenTeacherModal] = useState(false)
   const [openSsDrawer, setOpenSsDrawer] = useState(false)
   const [sessionId, setSessionId] = useState<number | null>(null)
+  const teacherId = Number(id)
+  const navigate = useNavigate() // làm nút quay lại
 
   const fetchTeacher = async () => {
     try {
@@ -179,11 +180,11 @@ const TeacherDetail = () => {
       title: 'Thời gian', dataIndex: 'BatDauLuc',
       key: 'BatDauLuc', //ellipsis: 
       filters: [
-        { text: "Tháng 1", value: 0 }, { text: "Tháng 2", value: 1 }, 
-        { text: "Tháng 3", value: 2 }, { text: "Tháng 4", value: 3 }, 
+        { text: "Tháng 1", value: 0 }, { text: "Tháng 2", value: 1 },
+        { text: "Tháng 3", value: 2 }, { text: "Tháng 4", value: 3 },
         { text: "Tháng 5", value: 4 }, { text: "Tháng 6", value: 5 },
-        { text: "Tháng 7", value: 6 }, { text: "Tháng 8", value: 7 }, 
-        { text: "Tháng 9", value: 8 }, { text: "Tháng 10", value: 9 }, 
+        { text: "Tháng 7", value: 6 }, { text: "Tháng 8", value: 7 },
+        { text: "Tháng 9", value: 8 }, { text: "Tháng 10", value: 9 },
         { text: "Tháng 11", value: 10 }, { text: "Tháng 12", value: 11 },
       ],
       onFilter: (value: any, session: SessionDB) => {
@@ -236,12 +237,11 @@ const TeacherDetail = () => {
     <div style={{ minHeight: 'calc(100vh - 64px)', background: '#f0f2f5' }}>
       {/* Phần HEADER */}
       <div style={{ background: '#fff', padding: '16px 24px', borderBlock: '1px solid #e8e8e8' }}>
-        {/* Thanh bánh mì */}
-        <Breadcrumb items={[
-          { title: <Link to='/admin/home'><HomeOutlined /></Link> },
-          { title: <Link to='/admin/teachers'>Giáo viên</Link> },
-          { title: `GV. ${teacher.HoTen}` }
-        ]} />
+
+        {/* Nút quay lại */}
+        <Button icon={<ArrowLeftOutlined />}
+          onClick={() => navigate(-1)}>  Quay lại
+        </Button>
 
         {/* Tiêu đề, avata */}
         <div style={{
@@ -249,9 +249,7 @@ const TeacherDetail = () => {
           alignItems: 'center', marginTop: 16
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <Avatar shape="square" size={49}
-              style={{ background: `#0d6efd` }}
-            >
+            <Avatar shape="square" size={49} style={{ background: `#0d6efd` }}>
               {teacher.MaGiaoVien}
             </Avatar>
 
@@ -297,22 +295,22 @@ const TeacherDetail = () => {
                       <Table style={{ marginTop: 8 }}
                         dataSource={classes}
                         columns={columnsOfClass}
-                        pagination={{ defaultPageSize: 5 }}
+                        pagination={{ defaultPageSize: 6 }}
                         rowKey="ID"
-                        scroll={{ y: 290 }}
+                        scroll={{ y: 280 }}
                       />
                     ),
                   },
                   {
                     key: '2',
-                    label: `Số buổi đã dạy (${sessions.length})`,
+                    label: `Các buổi đã dạy (${sessions.length})`,
                     children: (
                       <Table style={{ marginTop: 8 }}
                         dataSource={sessions}
                         columns={columnsOfSS}
                         pagination={{ defaultPageSize: 8 }}
                         rowKey="ID"
-                        scroll={{ y: 290 }}
+                        scroll={{ y: 280 }}
                       />
                     ),
                   }

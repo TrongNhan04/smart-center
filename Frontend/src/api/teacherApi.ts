@@ -5,7 +5,7 @@ const teacherApi = {
     create: (body: TeacherDto) =>
         axiosClient.post(`admin/teachers`, body),
 
-    update: (teacherId: number, body: TeacherDto) => {
+    update: (teacherId: number, body: Partial<TeacherDto>) => {
         const payload = {
             name: body.name,
             major: body.major

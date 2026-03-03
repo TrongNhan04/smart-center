@@ -1,15 +1,14 @@
 import {
-  BookOutlined, CalendarOutlined, ClockCircleOutlined, EditOutlined,
-  HomeOutlined, InboxOutlined, PlusOutlined, TeamOutlined, UnlockOutlined,
+  ArrowLeftOutlined, BookOutlined, CalendarOutlined, ClockCircleOutlined,
+  EditOutlined, InboxOutlined, PlusOutlined, TeamOutlined, UnlockOutlined,
   UserOutlined
 }
   from "@ant-design/icons"
 import {
-  Avatar, Badge, Breadcrumb, Button, Card, Col, Descriptions, message, 
-  Popconfirm, Progress, Row, Space, Statistic, Table, Tabs, Tag, Tooltip, 
-  Typography
+  Avatar, Badge, Button, Card, Col, Descriptions, message, Popconfirm,
+  Progress, Row, Space, Statistic, Table, Tabs, Tag, Tooltip, Typography
 } from "antd"
-import { Link, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import type { ClassDB } from "./ClassDTO"
 import { useEffect, useState } from "react"
 import classApi from "../../api/classApi"
@@ -32,6 +31,7 @@ const ClassDetail = () => {
   const [openSessionModal, setOpenSessionModal] = useState(false)
   const [openDrawer, setOpenDrawer] = useState(false)
   const [sessionId, setSessionId] = useState(0)
+  const navigate = useNavigate()
 
   const fetchClass = async () => {
     try {
@@ -56,7 +56,7 @@ const ClassDetail = () => {
   useEffect(() => {
     const initData = async () => {
       try {
-        await Promise.all([ fetchClass(), fetchSessions()])
+        await Promise.all([fetchClass(), fetchSessions()])
       } catch (error) {
         console.log("lỗi chạy useEffect: ", error)
       }
@@ -68,10 +68,10 @@ const ClassDetail = () => {
     initData()
   }, [classId])
 
-  const dow = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
-  const result = lophoc?.LichHoc.map(m => dow[m]).join('-')
-
   if (!lophoc) return <div>Không tìm thấy lớp học</div>
+
+  const dow = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
+  const result = lophoc.LichHoc.map(m => dow[m]).join('-')
 
   const statusColor: Record<string, string> = {
     OPEN: 'default',
@@ -233,12 +233,9 @@ const ClassDetail = () => {
     <div style={{ minHeight: 'calc(100vh - 64px)', background: '#f0f2f5' }}>
       {/* Phần HEADER */}
       <div style={{ background: '#fff', padding: '16px 24px', borderBlock: '1px solid #e8e8e8' }}>
-        {/* Thanh bánh mì */}
-        <Breadcrumb items={[
-          { title: <Link to='/admin/home'><HomeOutlined /></Link> },
-          { title: <Link to='/admin/classes'>Lớp học</Link> },
-          { title: `${lophoc.TenLop}` }
-        ]} />
+        {/* nút quay lại */}
+        <Button icon={<ArrowLeftOutlined />}
+          onClick={() => navigate(-1)}> Quay lại</Button>
 
         {/* Tiêu đề, avatar */}
         <div style={{
@@ -316,9 +313,9 @@ const ClassDetail = () => {
                       <Table style={{ marginTop: 8 }}
                         dataSource={sessions}
                         columns={columns}
-                        pagination={{ defaultPageSize: 8 }}
+                        pagination={{ defaultPageSize: 6 }}
                         rowKey="ID"
-                        scroll={{ y: 294 }}
+                        scroll={{ y: 280 }}
                       />
                     ),
                   },

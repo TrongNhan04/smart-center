@@ -8,7 +8,7 @@ import {
 import { useEffect, useState } from "react";
 import type { InvoiceDB, PaymentDB, ReceiptDB } from "./InvoiceDTO";
 import { invoiceApi } from "../../api/invoiceApi";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import InvoiceModal from "./InvoiceModal";
 
 const { Title, Text } = Typography
@@ -16,7 +16,6 @@ const { Title, Text } = Typography
 const InvoiceDetail = () => {
   const { id } = useParams()
   const navigate = useNavigate()
-  const location = useLocation()
   const [invoice, setInvoice] = useState<InvoiceDB | null>(null)
   const [receipts, setReceipts] = useState<ReceiptDB[]>([])
   const [payments, setPayments] = useState<PaymentDB[]>([])
@@ -28,7 +27,7 @@ const InvoiceDetail = () => {
     try {
       const [invoiceRes, receiptRes, paymentRes] = await Promise.all([
         invoiceApi.findOne(invoiceId),
-        invoiceApi.getReceipById(invoiceId),
+        invoiceApi.getReceiptById(invoiceId),
         invoiceApi.getPaymentById(invoiceId)
       ])
       setInvoice(invoiceRes.data)
@@ -65,7 +64,6 @@ const InvoiceDetail = () => {
 
   const handleBack = () => {
     navigate(-1)
-    console.log("hello")
   }
 
   if (!invoice) return
@@ -91,6 +89,12 @@ const InvoiceDetail = () => {
     return <Tag color={'processing'}>Thanh toán 1 phần</Tag>
   }
 
+  const method: Record<string, string> = {
+    CASH: 'Tiền mặt',
+    TRANSFER: 'Chuyển khoản',
+    CARD: 'Thẻ'
+  }
+
   const receiptColumns = [
     {
       title: 'Mã phiếu', dataIndex: 'MaPhieuThu', key: 'MaPhieuThu',
@@ -113,7 +117,7 @@ const InvoiceDetail = () => {
     {
       title: 'Phương thức', dataIndex: 'PhuongThuc', key: 'PhuongThuc',
       width: 190,
-      // render: () => <Text>Chuyển khoản</Text>
+      render: (value: string) => method[value]
     },
     { title: 'Thu ngân', dataIndex: 'ThuNgan', key: 'ThuNgan', width: 220, },
     {
@@ -143,7 +147,7 @@ const InvoiceDetail = () => {
     },
     {
       title: 'Phương thức', dataIndex: 'PhuongThuc', key: 'PhuongThuc',
-      width: 190,
+      width: 190, render: (value: string) => method[value]
     },
     { title: 'Thu ngân', dataIndex: 'ThuNgan', key: 'ThuNgan', width: 220, },
     { title: 'Lý do', dataIndex: 'LyDo', key: 'LyDo', ellipsis: true },

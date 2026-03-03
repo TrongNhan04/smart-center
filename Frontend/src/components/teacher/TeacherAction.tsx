@@ -10,6 +10,7 @@ interface Props {
 }
 
 const TeacherAction = ({ teacher, onReload, onEdit }: Props) => {
+
   const handleOnRestore = async (teacherId: number) => {
     try {
       await teacherApi.restore(teacherId)

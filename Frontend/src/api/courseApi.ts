@@ -2,11 +2,11 @@ import axiosClient from "../components/AxiosClient"
 import type { CourseDto } from "../components/course/CourseDTO"
 
 const courseApi = {
-    create: (course: Omit<CourseDto, 'id'>) =>
+    create: (course: Partial<CourseDto>) =>
         axiosClient.post('admin/courses', course)
     ,
 
-    update: (id: number, course: Omit<CourseDto, 'id'>) =>
+    update: (id: number, course: Partial<CourseDto>) =>
         axiosClient.patch(`admin/courses/${id}`, course)
     ,
 

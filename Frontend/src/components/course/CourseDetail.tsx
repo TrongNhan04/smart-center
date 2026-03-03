@@ -1,17 +1,16 @@
 import {
-  Avatar, Badge, Breadcrumb, Button, Card, Col, Descriptions,
-  message, Progress, Row, Space, Statistic, Table, Tabs, Tag, Tooltip, Typography
+  Avatar, Badge, Button, Card, Col, Descriptions, message, Progress, Row,
+  Space, Statistic, Table, Tabs, Tag, Tooltip, Typography
 } from "antd"
 import { useEffect, useState } from "react"
-import { Link, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import type { CourseDB } from "./CourseDTO"
 import type { ClassDB } from "../class/ClassDTO"
 import courseApi from "../../api/courseApi"
 import classApi from "../../api/classApi"
 import {
-  BookOutlined, CalendarOutlined, ClockCircleOutlined,
-  DollarCircleOutlined, EditOutlined, HomeOutlined,
-  PlusOutlined, ReadOutlined, UserOutlined
+  ArrowLeftOutlined, BookOutlined, CalendarOutlined, ClockCircleOutlined, 
+  DollarCircleOutlined, EditOutlined, PlusOutlined, ReadOutlined, UserOutlined
 } from "@ant-design/icons"
 import CourseModal from "./CourseModal"
 import ClassModal from "../class/ClassModal"
@@ -26,6 +25,7 @@ const CourseDetail = () => {
   const [openCourseModal, setOpenCourseModal] = useState(false)
   const [openClassModal, setOpenClassModal] = useState(false)
   const [classId, setClassId] = useState<number | null>(null)
+  const navigate = useNavigate()
 
   const fetchCourse = async () => {
     try {
@@ -167,12 +167,10 @@ const CourseDetail = () => {
     <div style={{ minHeight: 'calc(100vh - 64px)', background: '#f0f2f5' }}>
       {/* Phần HEADER */}
       <div style={{ background: '#fff', padding: '16px 24px', borderBlock: '1px solid #e8e8e8' }}>
-        {/* Thanh bánh mì */}
-        <Breadcrumb items={[
-          { title: <Link to='/admin/home'><HomeOutlined /></Link> },
-          { title: <Link to='/admin/courses'>Khóa học</Link> },
-          { title: `${course.TenKhoaHoc}` }
-        ]} />
+        {/* Nút quay lại */}
+        <Button icon={<ArrowLeftOutlined />}
+          onClick={() => navigate(-1)}> Quay lại
+        </Button>
 
         {/* Tiêu đề, avata */}
         <div style={{
@@ -235,13 +233,12 @@ const CourseDetail = () => {
                       <Table style={{ marginTop: 8 }}
                         dataSource={classes}
                         columns={columns}
-                        pagination={{ defaultPageSize: 5 }}
+                        pagination={{ defaultPageSize: 6 }}
                         rowKey="ID"
-                        scroll={{ y: 290 }}
+                        scroll={{ y: 280 }}
                         rowClassName={
-                          (record) => {
-                            return record.ID === classId ? 'highlight-row' : ''
-                          }
+                          (record) =>
+                            record.ID === classId ? 'highlight-row' : ''
                         }
                       />
                     ),

@@ -19,11 +19,11 @@ type OverdueInvoice = {
     overdue: number
 }
 
-type Notis = 'CREATE_MORE'|'ENDING_CLASS'
+type Notis = 'CREATE_MORE' | 'ENDING_CLASS'
 
 export interface lophoc {
     class_id: number, class_name: string,
-    type: Notis, mgs:string
+    type: Notis, mgs: string
 }
 
 @Injectable()
@@ -59,19 +59,20 @@ export class DashboardService {
                 })
             ])
 
-        let sum = 0
+        let sumBadDebt = 0
         for (var inv of invoiceOverdue) {
             const total = Number(inv.TongTien)
             const paid = Number(inv.DaTra)
-            const debt = total - paid
-            if (debt > 0)
-                sum += debt
+            const badDebt = total - paid
+            if (badDebt > 0)
+                sumBadDebt += badDebt
         }
-
+        // nợ xấu = những hóa đơn còn hiệu lực, quá hạn và còn nợ
         return {
-            activeStudents, newEnrollments,
-            receiptThisMonth: Number(receiptThisMonth._sum.SoTien), // tổng thu theo tháng
-            totalDebt: sum
+            TongHVMoi: activeStudents,
+            GhiDanhMoiThang: newEnrollments,
+            TongThuTrongThang: Number(receiptThisMonth._sum.SoTien), // tổng thu theo tháng
+            TongNoXauHienTai: sumBadDebt
         }
     }
 
@@ -154,7 +155,7 @@ export class DashboardService {
                         lophoc: { select: { TenLop: true } }
                     }
                 }
-            }, orderBy: { ThoiHan: 'asc' }, take:5
+            }, orderBy: { ThoiHan: 'asc' }, take: 5
         })
 
         const debts: OverdueInvoice[] = []
@@ -163,7 +164,6 @@ export class DashboardService {
             const paid = Number(inv.DaTra)
             if (paid < total) {
                 const debt = total - paid
-
                 const overTime = Math.abs(new Date().getTime() - inv.ThoiHan.getTime())
                 const overDay = Math.floor(overTime / (24 * 60 * 60 * 1000))
 
@@ -193,31 +193,31 @@ export class DashboardService {
             }
         })
 
-        const alert:lophoc[] = []
+        const alert: lophoc[] = []
 
-        for(var lh of classDB){
+        for (var lh of classDB) {
             const future = await this.prisma.buoiHoc.count({
-                where:{LopHocID:lh.ID, TrangThai:'SCHEDULED'}
+                where: { LopHocID: lh.ID, TrangThai: 'SCHEDULED' }
             })
 
             const total = lh.khoahoc.TongSoBuoi
             const created = lh._count.buoihoc
 
-            if(future<=3){
-                if(created<total){
+            if (future <= 3) {
+                if (created < total) {
                     alert.push({
                         class_id: lh.ID,
                         class_name: lh.TenLop,
-                        type:'CREATE_MORE',
-                        mgs:`The class schedule is almost finished. Created ${created}/${total} sessions`
+                        type: 'CREATE_MORE',
+                        mgs: `The class schedule is almost finished. Created ${created}/${total} sessions`
                     })
                 }
-                else{
+                else {
                     alert.push({
                         class_id: lh.ID,
                         class_name: lh.TenLop,
-                        type:'ENDING_CLASS',
-                        mgs:`The class is about to end. Please check the unpaid tuition fees`
+                        type: 'ENDING_CLASS',
+                        mgs: `The class is about to end. Please check the unpaid tuition fees`
                     })
                 }
             }
@@ -294,11 +294,11 @@ export class DashboardService {
             const p = listPayment.get(m) ?? 0
             const e = listEnroll.get(m) ?? 0
             return {
-                month: m,
-                totalReceipt: r,
-                totalPayment: p,
-                totalRevenue: r - p,
-                newEnrolls: e
+                Thang: m,
+                TongThu: r,
+                TongChi: p,
+                DoanhThu: r - p,
+                GhiDanhMoi: e
             }
         })
     }

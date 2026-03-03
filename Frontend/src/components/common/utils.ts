@@ -1,6 +1,14 @@
+/**
+ *  T extends Record<string, any>: T là 1 object bất kỳ
+ *  originData: T originData là 1 object kiểu T
+ *  newData: T là 1 object kiểu T
+ *  trả về changes cũng là 1 object
+ */
+
+
 import { isEqual } from 'lodash';
 
-//T extends Record<string, any>: T là 1 object bất kỳ
+
 export const getChangedValue = <T extends Record<string, any>>
     (originData: T, newData: T) => {
 

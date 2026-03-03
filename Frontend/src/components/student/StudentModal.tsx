@@ -5,6 +5,7 @@ import { studentApi } from "../../api/studentApi"
 import type { ClassForCmb } from "../class/ClassDTO"
 import classApi from "../../api/classApi"
 import dayjs from "dayjs"
+import { getChangedValue } from "../common/utils"
 
 interface Props {
   open: boolean,
@@ -83,8 +84,10 @@ const StudentModal = ({ open, onSave, onCancel, editing }: Props) => {
         fee: Number(values.fee)
       }
       await new Promise(resolve => setTimeout(resolve, 1000))
+      const originData = mapDataStudent(editing)
+      const updateData = getChangedValue(originData, payload)
 
-      const res = isEdit ? await studentApi.update(editing.ID, payload)
+      const res = isEdit ? await studentApi.update(editing.ID, updateData)
         : await studentApi.create(payload)
       message.success(isEdit ? 'Cập nhật thành công' : 'Thêm mới thành công')
       onSave(res.data.ID)

@@ -23,14 +23,15 @@ type Props = {
   editingClass: ClassDB
 }
 
-const ClassModal = ({
-  open, onCancel, khoahocId, onSave, editingClass }: Props) => {
-  const isEdit = editingClass ? true : false
+const ClassModal = ({ open, onCancel, khoahocId, onSave,
+  editingClass }: Props) => {
+
   const [form] = Form.useForm()
   const [courses, setCourses] = useState<CourseForCmb[]>([])
   const [teachers, setTeachers] = useState<TeacherForCmb[]>([])
   const [loading, setLoading] = useState(false)
-
+  const isEdit = editingClass ? true : false
+  
   // useEffect 1 chỉ tải data cho combobox
   useEffect(() => {
     const fetchCourse_Teacher = async () => {

@@ -16,6 +16,7 @@ import StudentDetail from "./components/student/StudentDetail";
 import EnrollList from "./components/enroll/EnrollList";
 import InvoiceList from "./components/invoice/InvoiceList";
 import InvoiceDetail from "./components/invoice/InvoiceDetail";
+import TongHopThuChi from "./components/invoice/TongHopThuChi";
 
 const router = createBrowserRouter([
   {
@@ -52,7 +53,7 @@ const router = createBrowserRouter([
           { path: 'invoices', element: <InvoiceList/> },   
           { path: 'invoices/:id', element: <InvoiceDetail/> },
 
-          { path: 'account', element: <div>Trang tài khoản</div> }
+          { path: 'account', element: <TongHopThuChi/> }
         ]
       }
     ]

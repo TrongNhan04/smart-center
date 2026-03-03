@@ -6,7 +6,8 @@ import { DeleteOutlined, EditOutlined } from "@ant-design/icons"
 interface Props {
   student: StudentDB,
   onEdit: (student: StudentDB) => void,
-  onReload: (studentId: number) => void
+  // onReload: (studentId: number) => void
+  onReload: (q:string) => void
 }
 
 const StudentAction = ({ student, onEdit, onReload }: Props) => {
@@ -14,7 +15,7 @@ const StudentAction = ({ student, onEdit, onReload }: Props) => {
     try {
       await studentApi.delete(studentId)
       message.success('Thao tác thành công')
-      onReload(studentId)
+      onReload('')
     } catch (error: any) {
       notification.error({
         title: 'Có lỗi xảy ra',

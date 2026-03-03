@@ -5,7 +5,7 @@ import {
   Button, Card, Col, Input, message, notification, Popconfirm, Row,
   Select, Table, Tag, Tooltip, Typography
 } from "antd"
-import { Link, useLocation } from "react-router-dom"
+import { Link, useSearchParams } from "react-router-dom"
 import {
   CalendarOutlined, CheckCircleOutlined, CloseCircleOutlined,
   DeleteOutlined, PlusOutlined, SearchOutlined
@@ -20,17 +20,8 @@ const EnrollList = () => {
   const [loading, setLoading] = useState(false)
   const [isOpen, setIsOpen] = useState(false) // open modal
   const [filterStatus, setFilterStatus] = useState('')
-  const location = useLocation()
-
-  const handelError = (error: any) => {
-    notification.error({
-      title: 'Có lỗi xảy ra',
-      description: error.response.data.message,
-      showProgress: true,
-      pauseOnHover: true
-    })
-    console.log('Có lỗi xảy ra: ', error.response.data.message)
-  }
+  const [searchParam, setSearchParam] = useSearchParams()
+  const currentPage = Number(searchParam.get('page')) || 1
 
   const fetchEnrolls = async (keyword: string) => {
     setLoading(true)
@@ -66,6 +57,20 @@ const EnrollList = () => {
     setTimeout(() => {
       setEnrollId(null)
     }, 3000)
+  }
+
+  const handelError = (error: any) => {
+    notification.error({
+      title: 'Có lỗi xảy ra',
+      description: error.response.data.message,
+      showProgress: true,
+      pauseOnHover: true
+    })
+    console.log('Có lỗi xảy ra: ', error.response.data.message)
+  }
+
+  const handleBack = (pagination: any) => {
+    setSearchParam({ page: pagination.current })
   }
 
   const columns = [
@@ -149,7 +154,6 @@ const EnrollList = () => {
             placeholder='Tìm theo tên hoặc mã...'
             prefix={<SearchOutlined />}
             allowClear
-
             onSearch={fetchEnrolls}
           />
         </Col>
@@ -186,7 +190,12 @@ const EnrollList = () => {
             return record.ID === enrollId ? 'highlight-row' : ''
           }
         }
-        pagination={{ defaultPageSize: 10 }}
+        // pagination={{ defaultPageSize: 10 }}
+        pagination={{
+          current: currentPage,
+          pageSize: 10
+        }}
+        onChange={handleBack}
         rowKey="ID"
         scroll={{ x: 1100, y: 426 }}
       />

@@ -186,12 +186,10 @@ export class ClassService {
         const startTime = up.startTime ?? classDB.GioBatDau
         const endTime = up.endTime ?? classDB.GioKetThuc
 
-        // đổi giáo viên
-        if (up.teacherId) {
-            await this.TeacherValidator(up.teacherId)
-            await this.ChangeTeacher(classId, up, classId)// kiểm tra giáo viên có rảnh không
-        }
-
+        // nếu đổi giáo viên thì kiểm tra gv có rảnh không
+        if (up.teacherId) await this.ChangeTeacher(classId, up, classId)
+        
+        // nếu đổi phòng thì kiểm tra phòng có trống không
         if (up.room) await this.HasSameRoom(up, classDB.ID)
 
         DateHelper.FromDateToDateValidator(fromDate, toDate)
@@ -324,15 +322,15 @@ export class ClassService {
     //kiểm tra giáo viên có trùng lịch dạy lớp học
     private async DuplicateClass(teacherId: number, startDate: Date, endDate: Date,
         dow: number[], sHour: string, eHour: string, excludeClassId?: number) {
-
+        const teacherDB = await this.TeacherValidator(teacherId)
         const where: Prisma.LopHocWhereInput = {
-            GiaoVienID: teacherId,
+            GiaoVienID: teacherDB.ID,
             TrangThai: { in: ['OPEN', 'RUNNING'] }
         }
         if (excludeClassId) where.ID = { not: excludeClassId }
-
+        // giả sử giáo viên A đang dạy lớp A
         const classDB = await this.prismaService.lopHoc.findMany({
-            where,
+            where, // tìm lớp khác lớp A mà giáo viên A dạy
             select: {
                 MaLopHoc: true, TenLop: true, TuNgay: true, DenNgay: true,
                 LichHoc: true, GioBatDau: true, GioKetThuc: true, PhongHoc: true

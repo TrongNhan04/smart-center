@@ -1,7 +1,8 @@
 import axiosClient from "../components/AxiosClient"
+import type { PaymentDto, ReceiptDto } from "../components/invoice/InvoiceDTO"
 
 export const invoiceApi = {
-    findOne: (invoiceId:number) => 
+    findOne: (invoiceId: number) =>
         axiosClient.get(`admin/invoices/${invoiceId}`),
 
     findMany: (q: string, status: string) => {
@@ -13,19 +14,22 @@ export const invoiceApi = {
         })
     },
 
-    createReceipt: (invoiceId: number, amount: number) => {
-        const payload = { amount: amount }
-        return axiosClient.post(`admin/invoices/${invoiceId}/receipts`, payload)
-    },
+    createReceipt: (invoiceId: number, body: ReceiptDto) =>
+        axiosClient.post(`admin/invoices/${invoiceId}/receipts`, body),
 
-    createPayment: (invoiceId: number, amount: number, reason: string) => {
-        const payload = { amount: amount, reason: reason }
-        return axiosClient.post(`admin/invoices/${invoiceId}/payments`, payload)
-    },
+    createPayment: (invoiceId: number, body: PaymentDto) =>
+        axiosClient.post(`admin/invoices/${invoiceId}/payments`, body),
 
-    getReceipById: (invoiceId: number) => 
+    getReceiptById: (invoiceId: number) =>
         axiosClient.get(`admin/invoices/${invoiceId}/receipts`),
 
-    getPaymentById: (invoiceId:number) => 
-        axiosClient.get(`admin/invoices/${invoiceId}/payments`)
+    getPaymentById: (invoiceId: number) =>
+        axiosClient.get(`admin/invoices/${invoiceId}/payments`),
+
+    getAllReceipt_Payment: (page: number) =>
+        axiosClient.get(`admin/invoices/receipts-payments`, {
+            params: {
+                page: page
+            }
+        })
 }

@@ -12,6 +12,18 @@ export interface InvoiceDB {
     TrangThai: string
 }
 
+export interface ReceiptDto{
+    amount: number,
+    method: string,
+    note: string
+}
+
+export interface PaymentDto{
+    amount: number,
+    method: string,
+    reason: string
+}
+
 export interface ReceiptDB {
     ID: number,
     MaPhieuThu: string,

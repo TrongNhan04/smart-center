@@ -26,11 +26,6 @@ const InvoiceList = () => {
 
   const [searchParam, setSearchParam] = useSearchParams()
   const currentPage = Number(searchParam.get('page')) || 1
-  // const [pagination, setPagination] = useState({
-  //   page: 1,
-  //   pageSize: 12
-  // })
-  // const location = useLocation()
 
   const handelError = (error: any) => {
     notification.error({
@@ -59,11 +54,6 @@ const InvoiceList = () => {
     fetchInvoices('')
   }, [filterStatus, currentPage])
 
-  // useEffect(() => {
-  // if(location.state?.pagination)
-  //   setPagination(location.state.pagination)
-  //  }, [])
-
   const handleSaveModal = (invoiceId: number) => {
     setInvoiceId(invoiceId)
     fetchInvoices('')
@@ -82,6 +72,11 @@ const InvoiceList = () => {
     setIsReceipt(false)
     setIsOpen(true)
     setInvoice(invoice)
+  }
+
+  const handleChange = (pagination: any) => {
+    setSearchParam({ page: pagination.current })
+    console.log('page: ', pagination.current)
   }
 
   const months = [
@@ -234,10 +229,6 @@ const InvoiceList = () => {
         />
     }
   ]
-  const handleChange = (pagination: any) => {
-    setSearchParam({ page: pagination.current })
-    console.log('page: ', pagination.current)
-  }
 
   return (
     <Card title={`Danh sách hóa đơn`}>

@@ -31,7 +31,7 @@ export interface StudentForCmb{
 
 export const mapDataStudent = (record: StudentDB):
     Omit<StudentDto, 'classId' | 'fee'> => ({
-        id: record.ID,
+        // id: record.ID,
         code: record.MaHocVien,
         student: record.TenHocVien,
         parent: record.PhuHuynh,

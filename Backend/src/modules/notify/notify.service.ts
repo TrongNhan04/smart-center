@@ -23,7 +23,7 @@ export class NotifyService {
         })
     }
 
-    // tạo NHIỀU thông báo cùng lúc
+    // tạo NHIỀU thông báo cùng lúc tx?
     async CreateManyNotis(listParentID: number[], session: any) {
         const notionData = listParentID.map(id => ({
             UserID: id,
@@ -83,7 +83,7 @@ export class NotifyService {
         return { msg: "successful" }
     }
 
-    // thông báo hủy buổi học 
+    // thông báo hủy buổi học tx?
     async SSCancelledNotify(userId: number[], session: any, reason: string) {
         const title = "Thông báo hủy buổi học"
         const dateStr = session.BatDauLuc.toLocaleDateString('vi-VN')
@@ -105,7 +105,7 @@ export class NotifyService {
             return this.prisma.thongBao.createMany({ data: notisData })
     }
 
-    // thông báo học phí
+    // thông báo học phí có tx
     async InvoiceNotify(userId: number, invoice: any, tx?: Prisma.TransactionClient) {
         let client: Prisma.TransactionClient | null = null
         if (tx) client = tx
@@ -128,10 +128,14 @@ export class NotifyService {
         })
     }
 
-    // thông báo đã thu tiền
-    async PaymentNotify(userId: number, receipt: any) {
+    // thông báo đã thu tiền có tx
+    async PaymentNotify(userId: number, receipt: any,
+        tx?: Prisma.TransactionClient) {
+        let client: Prisma.TransactionClient | null = null
+        if (tx) client = tx
+        else client = this.prisma
         // userId, title, body, tpye, data, isRead
-        return await this.prisma.thongBao.create({
+        return await client.thongBao.create({
             data: {
                 UserID: userId,
                 TieuDe: 'Thanh toán học phí thành công',
@@ -145,7 +149,7 @@ export class NotifyService {
         })
     }
 
-    // thông báo mở khóa buổi học
+    // thông báo mở khóa buổi học tx?
     async UnLockSSNotify(userId: number, session: any) {
         const dateStr = session.BatDauLuc.toLocaleDateString('vi-VN')
         return await this.prisma.thongBao.create({

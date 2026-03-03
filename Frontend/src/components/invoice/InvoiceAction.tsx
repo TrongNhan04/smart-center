@@ -18,6 +18,7 @@ const InvoiceAction = ({
   const navigate = useNavigate()
 
   const daTra = Number(invoice.DaTra)
+  const conNo = Number(invoice.TongTien) - daTra
   const btnInfo = () =>
     <Tooltip title="Xem chi tiết">
       <Button
@@ -33,7 +34,7 @@ const InvoiceAction = ({
     return <Space size='small'>
       {btnInfo()}
 
-      {/* nút thêm phiếu chi chỉ có khi đk trên đúng và đã trả > 0 */}
+      {/* nút thêm phiếu chi chỉ có khi CANCELLED và ĐÃ TRẢ > 0 */}
       {daTra > 0 &&
         <Tooltip title="Thêm phiếu chi">
           <Button
@@ -55,16 +56,18 @@ const InvoiceAction = ({
       {/* Nút xem chi tiết  */}
       {btnInfo()}
 
-      {/* nút thêm phiếu thu */}
-      <Tooltip title="Thêm phiếu thu">
-        <Button
-          // size="small"
-          type="primary"
-          icon={<DollarCircleOutlined />}
-          onClick={() => onAddReceipt(invoice)}
-        >
-        </Button>
-      </Tooltip>
+      {/* nút thêm phiếu thu chỉ có khi CÒN NỢ > 0*/}
+      {conNo > 0 &&
+        <Tooltip title="Thêm phiếu thu">
+          <Button
+            // size="small"
+            type="primary"
+            icon={<DollarCircleOutlined />}
+            onClick={() => onAddReceipt(invoice)}
+          >
+          </Button>
+        </Tooltip>
+        }
     </Space>
   )
 }

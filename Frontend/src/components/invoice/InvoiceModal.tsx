@@ -30,13 +30,13 @@ const InvoiceModal = ({ open, onCancel, invoice, onSave, isReceipt }: Props) => 
     setLoading(true)
     try {
       const values = await form.validateFields()
-      const { amount, reason } = values
-      console.log("values: ", amount)
+      // const { amount, reason } = values
+      console.log("values: ", values)
       await new Promise(resolve => setTimeout(resolve, 1000))
-
+      
       const res = isReceipt ?
-        await invoiceApi.createReceipt(invoice.ID, Number(amount))
-        : await invoiceApi.createPayment(invoice.ID, amount, reason)
+        await invoiceApi.createReceipt(invoice.ID, values)
+        : await invoiceApi.createPayment(invoice.ID, values)
       message.success('Thao tác thành công')
       onSave(res.data.ID)
       handleCancel()
@@ -95,9 +95,12 @@ const InvoiceModal = ({ open, onCancel, invoice, onSave, isReceipt }: Props) => 
 
       {/* form thông tin */}
       <Form
-        form={form} layout="vertical"
-        initialValues={{ PhuongThuc: 'CASH' }}>
-        <Form.Item //số tiền thu
+        form={form}
+        layout="vertical"
+        initialValues={{ mothod: 'CASH' }}
+      >
+
+        <Form.Item //số tiền thu/hoàn
           label={isReceipt ? "Số tiền thu (VNĐ):" : 'Số tiền hoàn (VNĐ):'}
           name="amount"
           rules={[
@@ -126,7 +129,8 @@ const InvoiceModal = ({ open, onCancel, invoice, onSave, isReceipt }: Props) => 
         </div>
 
         <Form.Item // phương thức
-          label="Phương thức" name="PhuongThuc"
+          label="Phương thức" name="method"
+          rules={[{required:true, message:'Chọn phương thức thanh toán!'}]}
         >
           <Select
             options={[

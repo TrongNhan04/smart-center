@@ -5,7 +5,7 @@ import {
   Badge, Button, Card, Col, Input, notification, Row, Select, Table, Typography
 } from "antd"
 import type { TeacherDB } from "./TeacherDTO"
-import { Link } from "react-router-dom"
+import { Link, useSearchParams } from "react-router-dom"
 import { useEffect, useState } from "react"
 import teacherApi from "../../api/teacherApi"
 import TeacherAction from "./TeacherAction"
@@ -20,6 +20,8 @@ const TeacherList = () => {
   const [editing, setEditing] = useState<TeacherDB | null>(null)
   const [searchText, setSearchText] = useState('')
   const [filterStatus, setFilterStatus] = useState<string | null>(null)
+  const [searchParam, setSearchParam] = useSearchParams()
+  const currentPage = Number(searchParam.get('page')) || 1
 
   const fetchTeachers = async () => {
     setLoading(true)
@@ -79,7 +81,7 @@ const TeacherList = () => {
     },
     { // Chuyên môn
       title: 'Chuyên môn', dataIndex: 'ChuyenMon', key: 'ChuyenMon', //width: 170,
-      render: (value: string) => !value || "" ? 
+      render: (value: string) => !value || "" ?
         <Text type="secondary">-</Text> : value
     },
     { // trạng thái
@@ -118,10 +120,13 @@ const TeacherList = () => {
     setIsOpen(true)
   }
 
-  const OpenModalEdit = (teacher: TeacherDB) => { 
+  const OpenModalEdit = (teacher: TeacherDB) => {
     setEditing(teacher)
     setIsOpen(true)
   }
+
+  const handleBack = (pagination: any) =>
+    setSearchParam({ page: pagination.current })
 
   return (
     <Card title={`Danh sách giáo viên (${teachers.length})`}>
@@ -164,11 +169,14 @@ const TeacherList = () => {
         columns={columns}
         loading={loading}
         rowClassName={
-          (record) => {
-            return record.ID === teacherId ? 'highlight-row' : ''
-          }
+          (record) => record.ID === teacherId ? 'highlight-row' : ''
         }
-        pagination={{ defaultPageSize: 10 }}
+        //pagination={{ defaultPageSize: 10 }}
+        pagination = {{
+          current: currentPage,
+          pageSize: 10
+        }}
+        onChange={handleBack}
         rowKey="ID"
         scroll={{ x: 1100, y: 426 }}
       />

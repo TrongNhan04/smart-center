@@ -25,6 +25,10 @@ export class CreateReceiptDTO{
     @IsPositive()
     amount: number
 
+    @IsNotEmpty()
+    @IsString()
+    method: string
+
     @IsOptional()
     @IsString()
     note?: string

@@ -30,7 +30,7 @@ export class DashboardController {
     }
 
     // danh sách việc cần làm: các hóa đơn hết hạn, 
-    // các lớp sắp hết hạn, 
+    // các lớp sắp hết buổi học cần tạo thêm, 
     // yêu cầu mở khóa buổi học, các buổi học đã kết thúc 
     // > 48h chưa SUBMITTED
     @Get('tasks')

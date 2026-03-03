@@ -2,7 +2,7 @@ import { Badge, Button, Card, Col, Input, notification, Row, Select, Table, Typo
 import { useEffect, useState } from "react"
 import type { StudentDB } from "./StudentDTO"
 import { studentApi } from "../../api/studentApi"
-import { Link } from "react-router-dom"
+import { Link, useSearchParams } from "react-router-dom"
 import { CalendarOutlined, EnvironmentOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons"
 import StudentModal from "./StudentModal"
 import StudentAction from "./StudentAction"
@@ -15,13 +15,15 @@ const StudentList = () => {
   const [loading, setLoading] = useState(false)
   const [isOpen, setIsOpen] = useState(false) // open modal
   const [editing, setEditing] = useState<StudentDB | null>(null)
-  const [searchText, setSearchText] = useState('')
-  const [filterStatus, setFilterStatus] = useState<string | null>(null)
+  // const [searchText, setSearchText] = useState('')
+  const [filterStatus, setFilterStatus] = useState('')
+  const [searchParam, setSearchParam] = useSearchParams()
+  const currentPage = Number(searchParam.get('page')) || 1
 
-  const fetchStudents = async () => {
+  const fetchStudents = async (keyword: string) => {
     setLoading(true)
     try {
-      const res = await studentApi.findMany()
+      const res = await studentApi.findMany(keyword, filterStatus)
       setStudents(res.data)
     } catch (error: any) {
       notification.error({
@@ -38,16 +40,8 @@ const StudentList = () => {
   }
 
   useEffect(() => {
-    fetchStudents()
-  }, [])
-
-  const filteredData = students.filter(item => {
-    const lowerCase = searchText.toLowerCase()
-    const matchesKeyword = item.TenHocVien.toLowerCase().includes(lowerCase) ||
-      item.MaHocVien.toLowerCase().includes(lowerCase)
-    const matchesStatus = filterStatus ? item.TrangThai === filterStatus : true
-    return matchesKeyword && matchesStatus
-  })
+    fetchStudents('')
+  }, [filterStatus])
 
   const columns = [
     { // mã học viên
@@ -100,7 +94,7 @@ const StudentList = () => {
 
   const handleOnSave = (studentId: number) => {
     setStudentId(studentId)
-    fetchStudents()
+    fetchStudents('')
     setTimeout(() => {
       setStudentId(null)
     }, 3000)
@@ -116,16 +110,21 @@ const StudentList = () => {
     setIsOpen(true)
   }
 
+  const handleChangePage = (pagination: any) => {
+    setSearchParam({ page: pagination.current })
+  }
+
   return (
     <Card title={`Danh sách học viên (${students.length})`}>
       {/* ô tìm kiếm và bộ lọc */}
       <Row gutter={16} style={{ marginBottom: 20 }}>
         <Col span={6}>
-          <Input // ô tìm kiếm
+          <Input.Search // ô tìm kiếm
             placeholder='Tìm theo tên hoặc mã...'
             prefix={<SearchOutlined />}
             allowClear
-            onChange={(e) => setSearchText(e.target.value)}
+            //onChange={(e) => setSearchText(e.target.value)}
+            onSearch={fetchStudents}
           />
         </Col>
 
@@ -153,7 +152,7 @@ const StudentList = () => {
       </Row>
       {/* Bảng hiển thị dữ liệu */}
       <Table
-        dataSource={filteredData}
+        dataSource={students}
         columns={columns}
         loading={loading}
         rowClassName={
@@ -161,7 +160,12 @@ const StudentList = () => {
             return record.ID === studentId ? 'highlight-row' : ''
           }
         }
-        pagination={{ defaultPageSize: 10 }}
+        //pagination={{ defaultPageSize: 10 }}
+        pagination={{
+          current: currentPage,
+          pageSize: 10
+        }}
+        onChange={handleChangePage}
         rowKey="ID"
         scroll={{ x: 1100, y: 426 }}
       />

@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import classApi from "../../api/classApi";
 import ClassModal from "./ClassModal";
 import ClassAction from "./ClassAction";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 const { Text } = Typography
 
 const ClassList = () => {
@@ -22,13 +22,14 @@ const ClassList = () => {
   const [openClassModal, setOpenClassModal] = useState(false)
   const [classId, setClassId] = useState<number | null>(null)
   const [editingClass, setEditingClass] = useState<ClassDB | null>(null)
+  const [searchParam, setSearchParam] = useSearchParams()
+  const currentPage = Number(searchParam.get('page')) || 1
 
   const fetchClasses = async () => {
     setLoading(true)
     try {
       const res = await classApi.findMany()
       setClasses(res.data)
-      // console.log("data fetch", res.data)
     } catch (error) {
       message.error("Có lỗi xảy ra!")
       console.log("Có lỗi hàm fetchClasses: ", error)
@@ -80,6 +81,9 @@ const ClassList = () => {
     setOpenClassModal(true)
   }
 
+  const handleBack = (pagination: any) =>
+    setSearchParam({ page: pagination.current })
+
   const columns = [
     {// mã lớp+tên lớp chung
       title: 'Lớp học', dataIndex: 'MaLopHoc', key: 'MaLopHoc', ellipsis: true,
@@ -101,7 +105,7 @@ const ClassList = () => {
     { // giáo viên
       title: 'Giáo viên', dataIndex: ['GiaoVien', 'HoTen'],
       key: 'HoTen', ellipsis: true,
-      render: (name: string, lophoc: ClassDB) => 
+      render: (name: string, lophoc: ClassDB) =>
         <Link to={`/admin/teachers/${lophoc.GiaoVien.ID}`}>{name}</Link>
     },
     { // khai giảng = ngày bắt đầu
@@ -210,7 +214,12 @@ const ClassList = () => {
             return lophoc.ID === classId ? 'highlight-row' : ''
           }
         }
-        pagination={{ defaultPageSize: 8 }}
+        // pagination={{ defaultPageSize: 8 }}
+        pagination={{
+          current: currentPage,
+          pageSize: 8
+        }}
+        onChange={handleBack}
         rowKey="ID"
         scroll={{ x: 1000, y: 430 }}
       />

@@ -1,13 +1,19 @@
 import { useEffect, useState } from "react"
-import { Link, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import type { StudentDB } from "./StudentDTO"
 import type { ClassDB } from "../class/ClassDTO"
 import type { SS_StudentDetail } from "../session/SessionDTO"
 import { studentApi } from "../../api/studentApi"
 import classApi from "../../api/classApi"
 import { sessionApi } from "../../api/sessionApi"
-import { Avatar, Badge, Breadcrumb, Button, Card, Col, Descriptions, notification, Popover, Row, Space, Statistic, Table, Tabs, Tag, Tooltip, Typography } from "antd"
-import { CalendarOutlined, ClockCircleOutlined, EditOutlined, EnvironmentOutlined, HomeOutlined, MailOutlined, PhoneOutlined, ReadOutlined, UserOutlined } from "@ant-design/icons"
+import {
+  Avatar, Badge, Button, Card, Col, Descriptions, notification,
+  Popover, Row, Space, Statistic, Table, Tabs, Tag, Tooltip, Typography
+} from "antd"
+import {
+  ArrowLeftOutlined, CalendarOutlined, ClockCircleOutlined,
+  EditOutlined, EnvironmentOutlined, MailOutlined, PhoneOutlined, ReadOutlined, UserOutlined
+} from "@ant-design/icons"
 import StudentModal from "./StudentModal"
 import { DateHelper } from "../common/date.helper"
 
@@ -20,6 +26,7 @@ const StudentDetail = () => {
   const [classes, setClasses] = useState<ClassDB[]>([])
   const [sessions, setSessions] = useState<SS_StudentDetail[]>([])
   const [openStudentModal, setopenStudentModal] = useState(false)
+  const navigate = useNavigate()
 
   const fetchStudent = async () => {
     try {
@@ -218,12 +225,12 @@ const StudentDetail = () => {
     <div style={{ minHeight: 'calc(100vh - 64px)', background: '#f0f2f5' }}>
       {/* Phần HEADER */}
       <div style={{ background: '#fff', padding: '16px 24px', borderBlock: '1px solid #e8e8e8' }}>
-        {/* Thanh bánh mì */}
-        <Breadcrumb items={[
-          { title: <Link to='/admin/home'><HomeOutlined /></Link> },
-          { title: <Link to='/admin/students'>Học viên</Link> },
-          { title: `GV. ${student.TenHocVien}` }
-        ]} />
+        {/* nút quay lại */}
+        <Button icon={<ArrowLeftOutlined />}
+          onClick={() => navigate(-1)}
+        >
+          Quay lại
+        </Button>
 
         {/* Tiêu đề, avata */}
         <div style={{
@@ -277,12 +284,12 @@ const StudentDetail = () => {
                     label: `Lớp ghi danh (${classes.length})`,
                     children: (
                       <Table
-                        style={{ marginTop: 8 }}
+                        //style={{ marginTop: 8 }}
                         dataSource={classes}
                         columns={columnsOfClass}
                         pagination={{ defaultPageSize: 5 }}
                         rowKey="ID"
-                        scroll={{ y: 290 }}
+                        scroll={{ y: 280 }}
                       />
                     ),
                   },
@@ -290,12 +297,12 @@ const StudentDetail = () => {
                     key: '2',
                     label: `Kết quả buổi học (${sessions.length})`,
                     children: (
-                      <Table style={{ marginTop: 8 }}
+                      <Table //style={{ marginTop: 8 }}
                         dataSource={sessions}
                         columns={columnsOfSS}
                         pagination={{ defaultPageSize: 8 }}
                         rowKey="ID"
-                        scroll={{ y: 290 }}
+                        scroll={{ y: 280 }}
                       />
                     ),
                   }
@@ -339,7 +346,7 @@ const StudentDetail = () => {
               <Row gutter={16}>
                 {/* <Col span={12}> */}
                 <Statistic
-                  title={`Số buổi đã học trong tháng ${now.getMonth()+1}`}
+                  title={`Số buổi đã học trong tháng ${now.getMonth() + 1}`}
                   value={totalSSofM.length}
                   prefix={<ReadOutlined />}
                 />
