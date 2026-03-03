@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react"
 import type { EnrollDB } from "./EnrollDTO"
 import { enrollApi } from "../../api/enrollApi"
-import { Button, Card, Col, Input, message, notification, Popconfirm, Row, Select, Table, Tag, Tooltip, Typography } from "antd"
-import { Link } from "react-router-dom"
-import { CalendarOutlined, CheckCircleOutlined, CloseCircleOutlined, DeleteOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons"
+import {
+  Button, Card, Col, Input, message, notification, Popconfirm, Row,
+  Select, Table, Tag, Tooltip, Typography
+} from "antd"
+import { Link, useLocation } from "react-router-dom"
+import {
+  CalendarOutlined, CheckCircleOutlined, CloseCircleOutlined,
+  DeleteOutlined, PlusOutlined, SearchOutlined
+} from "@ant-design/icons"
 import EnrollModal from "./EnrollModal"
 
 const { Text } = Typography
@@ -14,6 +20,7 @@ const EnrollList = () => {
   const [loading, setLoading] = useState(false)
   const [isOpen, setIsOpen] = useState(false) // open modal
   const [filterStatus, setFilterStatus] = useState('')
+  const location = useLocation()
 
   const handelError = (error: any) => {
     notification.error({
@@ -63,8 +70,8 @@ const EnrollList = () => {
 
   const columns = [
     { // mã học viên
-      title: 'Mã HV', dataIndex: 'MaHocVien',
-      key: 'MaHocVien', width: 120, align: 'center' as const,
+      title: 'Mã HV', dataIndex: 'MaHocVien', //width: 120,
+      key: 'MaHocVien', align: 'center' as const,
       render: (code: string) => <Text code>{code}</Text>
     },
     { // tên học viên
@@ -82,7 +89,7 @@ const EnrollList = () => {
     },
     { // ngày ghi danh
       title: 'Ngày ghi danh', dataIndex: 'NgayGhiDanh',
-      key: 'NgayGhiDanh', width: 150,
+      key: 'NgayGhiDanh', //width: 150,
       filters: [
         { text: "Tháng 1", value: 0 }, { text: "Tháng 2", value: 1 },
         { text: "Tháng 3", value: 2 }, { text: "Tháng 4", value: 3 },
@@ -100,7 +107,7 @@ const EnrollList = () => {
     },
     { // trạng thái
       title: 'Trạng thái GD', dataIndex: 'TrangThai',
-      key: 'TrangThai', width: 160,
+      key: 'TrangThai', //width: 160,
       render: (value: string) => {
         if (value === 'ACTIVE')
           return <Tag color='green'><CheckCircleOutlined /> Thành công</Tag>
@@ -109,7 +116,7 @@ const EnrollList = () => {
       }
     },
     {// thao tác
-      title: 'Thao tác', key: 'action', align: 'center' as const, width: 150,
+      title: 'Thao tác', key: 'action', align: 'center' as const, //width: 150,
       render: (_: any, enroll: EnrollDB) => {
         if (enroll.TrangThai === 'ACTIVE')
           return <Tooltip title="Hủy ghi danh">
@@ -127,10 +134,10 @@ const EnrollList = () => {
         else return <>Không thể thao tác</>
       }
     },
-    { // ghi chú
-      title: 'Ghi chú', dataIndex: 'GhiChu', key: "GhiChu",
-      render: (value: string) => !value || '' ? '-' : value
-    }
+    // { // ghi chú
+    //   title: 'Ghi chú', dataIndex: 'GhiChu', key: "GhiChu",
+    //   render: (value: string) => !value || '' ? '-' : value
+    // }
   ]
 
   return (
@@ -164,7 +171,7 @@ const EnrollList = () => {
           <Button
             type="primary"
             icon={<PlusOutlined />}
-            onClick={()=>setIsOpen(true)}
+            onClick={() => setIsOpen(true)}
           > Ghi danh mới
           </Button>
         </Col>

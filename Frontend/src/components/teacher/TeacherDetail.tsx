@@ -349,7 +349,7 @@ const TeacherDetail = () => {
 
                 <Descriptions.Item // Chuyên môn
                   label={<span style={{ color: '#888' }}>
-                    <BookOutlined /> Chuyên môn:</span>}
+                    <BookOutlined /> CM:</span>}
                 >{teacher.ChuyenMon || 'Chưa cập nhật...'}
                 </Descriptions.Item>
               </Descriptions>

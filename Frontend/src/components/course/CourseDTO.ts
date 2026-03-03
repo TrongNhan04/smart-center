@@ -29,7 +29,7 @@ export type CourseForCmb = Pick<CourseDB,
 // từ table tiếng việt thành form tiếng anh
 export const mapDataCourse = (record: CourseDB): CourseDto => {
   return {
-    id: record.ID,
+    // id: record.ID, không cần id vì form ko có id
     code: record.MaKhoaHoc,
     name: record.TenKhoaHoc,
     level: record.TrinhDo,

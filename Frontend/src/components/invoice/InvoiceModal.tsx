@@ -21,16 +21,6 @@ const InvoiceModal = ({ open, onCancel, invoice, onSave, isReceipt }: Props) => 
   const DaTra = Number(invoice.DaTra)
   const ConNo = Number(invoice.TongTien) - DaTra
 
-  const handleError = (error: any) => {
-    notification.error({
-      title: 'Có lỗi xảy ra',
-      description: error.response.data.message,
-      showProgress: true,
-      pauseOnHover: true
-    })
-    console.log("Có lỗi xảy ra", error.response.data.message)
-  }
-
   const handleCancel = () => {
     form.resetFields()
     onCancel()
@@ -58,6 +48,16 @@ const InvoiceModal = ({ open, onCancel, invoice, onSave, isReceipt }: Props) => 
     }
   }
 
+  const handleError = (error: any) => {
+    notification.error({
+      title: 'Có lỗi xảy ra',
+      description: error.response.data.message,
+      showProgress: true,
+      pauseOnHover: true
+    })
+    console.log("Có lỗi xảy ra", error.response.data.message)
+  }
+
   const handlePayFull = () => {
     form.setFieldValue('amount', isReceipt ? ConNo : DaTra)
   }
@@ -73,16 +73,19 @@ const InvoiceModal = ({ open, onCancel, invoice, onSave, isReceipt }: Props) => 
       width={450}
       maskClosable={false}
       confirmLoading={loading}
+      okButtonProps={{ danger: !isReceipt }}
     >
       {/* cảnh báo */}
       <Alert
         title={`Đang ${isReceipt ? 'THU' : 'HOÀN'} tiền cho hóa đơn: ${invoice.MaHoaDon}`}
         description={
           isReceipt ? <div>
-            Số tiền khách còn nợ: <Text type="danger" strong>{ConNo.toLocaleString()} VNĐ</Text>
+            Số tiền khách còn nợ: <Text type="danger" strong>
+              {ConNo.toLocaleString()} VNĐ</Text>
           </div>
             : <div>
-              Số tiền có thể hoàn: <Text type="danger" strong>{DaTra.toLocaleString()} VNĐ</Text>
+              Số tiền có thể hoàn: <Text type="danger" strong>
+                {DaTra.toLocaleString()} VNĐ</Text>
             </div>
         }
         type={isReceipt ? 'info' : 'warning'}
@@ -94,7 +97,7 @@ const InvoiceModal = ({ open, onCancel, invoice, onSave, isReceipt }: Props) => 
       <Form
         form={form} layout="vertical"
         initialValues={{ PhuongThuc: 'CASH' }}>
-        <Form.Item
+        <Form.Item //số tiền thu
           label={isReceipt ? "Số tiền thu (VNĐ):" : 'Số tiền hoàn (VNĐ):'}
           name="amount"
           rules={[
@@ -102,7 +105,7 @@ const InvoiceModal = ({ open, onCancel, invoice, onSave, isReceipt }: Props) => 
             { type: 'number', min: 1000, message: 'Số tiền phải lớn hơn 1.000đ' },
             {
               type: 'number', max: isReceipt ? ConNo : DaTra,
-              message: `Không được ${isReceipt ? 'thu' : 'hoàn'} vượt quá (${isReceipt ? ConNo : DaTra})`
+              message: `Không được ${isReceipt ? 'thu' : 'hoàn'} vượt quá ${isReceipt ? ConNo : DaTra}`
             }
           ]}
         >
@@ -122,7 +125,8 @@ const InvoiceModal = ({ open, onCancel, invoice, onSave, isReceipt }: Props) => 
           </Button>
         </div>
 
-        <Form.Item label="Phương thức" name="PhuongThuc"
+        <Form.Item // phương thức
+          label="Phương thức" name="PhuongThuc"
         >
           <Select
             options={[
@@ -134,11 +138,11 @@ const InvoiceModal = ({ open, onCancel, invoice, onSave, isReceipt }: Props) => 
         </Form.Item>
 
         {isReceipt ?
-          <Form.Item label="Ghi chú" name="GhiChu" style={{ flex: 1 }}>
+          <Form.Item label="Ghi chú" name="note" style={{ flex: 1 }}>
             <Input.TextArea placeholder="VD: ..." />
           </Form.Item>
           :
-          <Form.Item
+          <Form.Item //lý do hoàn tiền
             label="Lý do hoàn tiền" name="reason" style={{ flex: 1 }}
             rules={[{ required: true, message: 'Nhập lý do hoàn tiền!' }]}
           >

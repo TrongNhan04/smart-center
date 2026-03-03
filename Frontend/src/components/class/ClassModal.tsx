@@ -11,6 +11,7 @@ import classApi from '../../api/classApi';
 import { mapDataClass, type ClassDB, type ClassDto } from './ClassDTO';
 import { DateHelper } from '../common/date.helper';
 import type { TeacherForCmb } from '../teacher/TeacherDTO';
+import { getChangedValue } from '../common/utils';
 
 const { RangePicker } = DatePicker
 
@@ -59,13 +60,13 @@ const ClassModal = ({
         const { fromDate, toDate, startTime, endTime, ...rest } = record
         const formData = {
           ...rest,
-          // gộp thành fromToDate
+          // gộp thành fromToDate 
           fromToDate: [dayjs(fromDate), dayjs(toDate)],
           // format từ string thành dayjs để hiện lên form
           startTime: DateHelper.ConvertHourStrToDayJS(startTime),
           endTime: DateHelper.ConvertHourStrToDayJS(endTime),
         }
-        
+
         form.setFieldsValue(formData)
       }
       else
@@ -79,14 +80,14 @@ const ClassModal = ({
     { label: 'Thứ 4', value: 3 }, { label: 'Thứ 5', value: 4 },
     { label: 'Thứ 6', value: 5 }, { label: 'Thứ 7', value: 6 },
   ]
-// mã + thời gian + học phí
+  // mã + thời gian + học phí
   const courseOption = courses.map(item => ({
     label: `${item.MaKhoaHoc} (${item.ThoiGian} tháng - ${item.HocPhi})`,
     value: item.ID,
   }))
 
   const teacherOption = teachers.map(item => ({
-    label: `${item.MaGiaoVien} - `+item.HoTen,
+    label: `${item.MaGiaoVien} - ` + item.HoTen,
     value: item.ID,
   }))
 
@@ -94,12 +95,11 @@ const ClassModal = ({
     setLoading(true)
     try {
       const values = await form.validateFields()
-
       await new Promise(resolve => { setTimeout(resolve, 1000) })
 
       // tách riêng fromToDate => rest là phần còn lại
       const { fromToDate, ...rest } = values
-      // endTime, fromToDate, startTime
+      // format lại startTime, endTime, khai báo thêm fromDate, toDate
       const payload: ClassDto = {
         ...rest, // phần còn lại
         fromDate: dayjs(values.fromToDate[0]).toISOString(),
@@ -108,20 +108,29 @@ const ClassModal = ({
         endTime: values.endTime.format('HH:mm'),
         room: values.room || null,
       }
+
+      const mapOrigin = mapDataClass(editingClass) // map data gốc thành tiếng anh
+      const updateData = getChangedValue(mapOrigin, payload)
+      if (Object.keys(updateData).length === 0) {
+        message.info('Không có thông tin nào thay đổi!')
+        return
+      }
+
       let res = null
       if (isEdit && editingClass.TrangThai === 'OPEN')
-        res = await classApi.updateOpen(editingClass.ID, payload)
+        res = await classApi.updateOpen(editingClass.ID, updateData)
       else if (isEdit && editingClass.TrangThai === 'RUNNING')
-        res = await classApi.updateRunning(editingClass.ID, payload)
+        res = await classApi.updateRunning(editingClass.ID, updateData)
       else
         res = await classApi.create(payload)
+
 
       message.success(`Thao tác thành công`)
       onSave(res.data.ID)
       handleCancel()
     }
     catch (error: any) {
-      console.log("Có lỗi xảy ra: ", error)
+      console.log("Có lỗi xảy ra: ", error.response.data.message)
 
       if (error.response) {
         const serverError = error.response.data
@@ -159,9 +168,7 @@ const ClassModal = ({
         centered
       >
         <Form
-          form={form}
-          layout="vertical"
-          autoComplete='true'
+          form={form} layout="vertical" autoComplete='true'
           initialValues={{ courseId: initCourseId }}
         >
           <Row gutter={16}>
@@ -172,20 +179,16 @@ const ClassModal = ({
                 name="courseId"
                 rules={[{ required: true, message: 'Vui lòng chọn khóa học!' }]}
               >
-                {isEdit ?
-                  <div style={{ padding: '4px 11px', color: '#000' }}>
-                    - {editingClass.KhoaHoc.TenKhoaHoc}
-                  </div>
-                  : <Select
-                    placeholder="Chọn khóa học"
-                    options={courseOption}
-                    disabled={isEdit}
-                    showSearch={{
-                      filterOption: (input, option) =>
-                        (option?.label ?? '').toLowerCase()
-                          .includes(input.toLowerCase()),
-                    }}
-                  />}
+                <Select
+                  placeholder="Chọn khóa học"
+                  options={courseOption}
+                  disabled={isEdit}
+                  showSearch={{
+                    filterOption: (label, option) =>
+                      (option?.label ?? '').toLowerCase()
+                        .includes(label.toLowerCase())
+                  }}
+                />
               </Form.Item>
 
               <Form.Item // mã lớp học
@@ -193,12 +196,8 @@ const ClassModal = ({
                 name="code"
                 rules={[{ required: true, message: 'Vui lòng nhập mã lớp!' }]}
               >
-                {isEdit ?
-                  <div style={{ padding: '4px 11px', color: '#000' }}>
-                    - {editingClass.MaLopHoc}
-                  </div>
-                  : (<Input readOnly={isEdit} placeholder="VD: ENG001-01" />)
-                }
+                <Input disabled={isEdit} placeholder="VD: ENG001-01" />
+
               </Form.Item>
 
               <Form.Item // tên lớp
@@ -206,7 +205,7 @@ const ClassModal = ({
                 name="name"
                 rules={[{ required: true, message: 'Vui lòng nhập tên lớp!' }]}
               >
-                <Input placeholder="VD: Lớp Sáng T2-T4-T6" />
+                <Input placeholder="VD: Lớp sáng T2-T4-T6" />
               </Form.Item>
 
               <Form.Item // giáo viên
@@ -217,9 +216,9 @@ const ClassModal = ({
                 <Select
                   placeholder="Chọn giáo viên"
                   showSearch={{
-                    filterOption: (input, option) =>
-                      (option?.label ?? '').toLowerCase()
-                        .includes(input.toLowerCase()),
+                    filterOption: (label, option) =>
+                      (option?.label ?? '').toLowerCase().
+                        includes(label.toLowerCase())
                   }}
                   options={teacherOption}
                 />
@@ -233,19 +232,12 @@ const ClassModal = ({
                 name="fromToDate"
                 rules={[{ required: true, message: 'Vui lòng chọn thời gian!' }]}
               >
-                {isEdit && editingClass.TrangThai === 'RUNNING' ?
-                  <div style={{ padding: '4px 11px', color: '#000' }}>
-                    {/* {`- Từ ngày: ${editingClass.TuNgay.slice(0, 10)} đến ngày: ${editingClass.DenNgay.slice(0, 10)}`} */}
-                    - Từ ngày: {new Date(editingClass.TuNgay).toLocaleDateString()}
-                    &nbsp; đến ngày: {new Date(editingClass.DenNgay).toLocaleDateString()}
-                  </div>
-                  : <RangePicker
-                    style={{ width: '100%' }}
-                    format="DD/MM/YYYY"
-                    placeholder={['Từ ngày', 'Đến ngày']}
-                    disabled={isEdit && editingClass.TrangThai === 'RUNNING'}
-                  />
-                }
+                <RangePicker
+                  style={{ width: '100%' }}
+                  format="DD/MM/YYYY"
+                  placeholder={['Từ ngày', 'Đến ngày']}
+                  disabled={isEdit && editingClass.TrangThai === 'RUNNING'}
+                />
               </Form.Item>
 
               <Form.Item // lịch học
@@ -253,18 +245,11 @@ const ClassModal = ({
                 name="timeTable"
                 rules={[{ required: true, message: 'Chọn lịch học' }]}
               >
-                {isEdit && editingClass.TrangThai === 'RUNNING' ?
-                  <div style={{ padding: '4px 11px', color: '#000' }}>
-                    - {editingClass.LichHoc.map(
-                      // lấy thứ từ dow rồi ghép lại 
-                      item => daysOfWeek[item].label).join(', ')}
-                  </div>
-                  : <Select placeholder="Chọn lịch học" mode="multiple"
-                    options={daysOfWeek}
-                    maxCount={7}
-                    disabled={isEdit && editingClass.TrangThai === 'RUNNING'}
-                  />
-                }
+                <Select placeholder="Chọn lịch học" mode="multiple"
+                  options={daysOfWeek}
+                  maxCount={7}
+                  disabled={isEdit && editingClass.TrangThai === 'RUNNING'}
+                />
               </Form.Item>
 
               <Row gutter={8}>
@@ -274,46 +259,37 @@ const ClassModal = ({
                     name="startTime"
                     rules={[{ required: true, message: 'Chọn giờ!' }]}
                   >
-                    {isEdit && editingClass.TrangThai === 'RUNNING' ?
-                      <div style={{ padding: '4px 11px', color: '#000' }}>
-                        - {editingClass.GioHoc.slice(0, 5)}
-                      </div>
-                      : <TimePicker
-                        style={{ width: '100%' }}
-                        format="HH:mm"
-                        placeholder="VD: 18:00"
-                        minuteStep={15}
-                        disabledTime={() => ({
-                          disabledHours: () => [0, 1, 2, 3, 4, 5, 6, 22, 23]
-                        })}
-                        hideDisabledOptions={true}
-                        disabled={isEdit && editingClass.TrangThai === 'RUNNING'}
-                      />
-                    }
+                    <TimePicker
+                      style={{ width: '100%' }}
+                      format="HH:mm"
+                      placeholder="VD: 18:00"
+                      minuteStep={15}
+                      disabledTime={() => ({
+                        disabledHours: () => [0, 1, 2, 3, 4, 5, 6, 22, 23]
+                      })}
+                      hideDisabledOptions={true}
+                      disabled={isEdit && editingClass.TrangThai === 'RUNNING'}
+                    />
                   </Form.Item>
                 </Col>
+
                 <Col span={12}>
                   <Form.Item // giờ kết thúc
                     label="Giờ kết thúc"
                     name="endTime"
                     rules={[{ required: true, message: 'Chọn giờ!' }]}
                   >
-                    {isEdit && editingClass.TrangThai === 'RUNNING' ?
-                      <div style={{ padding: '4px 11px', color: '#000' }}>
-                        - {editingClass.GioHoc.slice(8, 13)}
-                      </div>
-                      : <TimePicker
-                        style={{ width: '100%' }}
-                        format="HH:mm"
-                        placeholder="VD: 20:00"
-                        minuteStep={15}
-                        disabledTime={() => ({
-                          disabledHours: () => [0, 1, 2, 3, 4, 5, 6, 22, 23]
-                        })}
-                        hideDisabledOptions={true}
-                        disabled={isEdit && editingClass.TrangThai === 'RUNNING'}
-                      />
-                    }
+                    <TimePicker
+                      style={{ width: '100%' }}
+                      format="HH:mm"
+                      placeholder="VD: 20:00"
+                      minuteStep={15}
+                      disabledTime={() => ({
+                        disabledHours: () => [0, 1, 2, 3, 4, 5, 6, 22, 23]
+                      })}
+                      hideDisabledOptions={true}
+                      disabled={isEdit && editingClass.TrangThai === 'RUNNING'}
+                    />
                   </Form.Item>
                 </Col>
               </Row>

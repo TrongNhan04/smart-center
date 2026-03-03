@@ -49,10 +49,9 @@ const router = createBrowserRouter([
 
           { path: 'enrolls', element: <EnrollList/> },
 
-          { path: 'invoices', element: <InvoiceList/> },
-          
+          { path: 'invoices', element: <InvoiceList/> },   
+          { path: 'invoices/:id', element: <InvoiceDetail/> },
 
-          { path: 'debts', element: <InvoiceDetail/> },
           { path: 'account', element: <div>Trang tài khoản</div> }
         ]
       }

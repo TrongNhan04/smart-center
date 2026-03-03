@@ -50,7 +50,7 @@ export interface ClassForCmb {
 
 // để cho edit
 export const mapDataClass = (lophoc: ClassDB): ClassDto => ({
-    id: lophoc.ID,
+    //id: lophoc.ID,
     code: lophoc.MaLopHoc,
     courseId: lophoc.KhoaHoc.ID,
     teacherId: lophoc.GiaoVien.ID,

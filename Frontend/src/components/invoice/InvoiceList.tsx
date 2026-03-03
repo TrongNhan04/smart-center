@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react"
 import type { InvoiceDB } from "./InvoiceDTO"
 import {
-  Badge, Card, Col, Input, notification, Row, Select, Space, Table, Tag, Typography
+  Badge, Card, Col, Input, notification, Row, Select, Space, Table, Tag,
+  Typography
 } from "antd"
 import { invoiceApi } from "../../api/invoiceApi"
-import { Link } from "react-router-dom"
-import { CalendarOutlined, CheckCircleOutlined, PhoneOutlined, SearchOutlined } from "@ant-design/icons"
+import {
+  CalendarOutlined, CheckCircleOutlined, PhoneOutlined, SearchOutlined,
+  UserOutlined
+} from "@ant-design/icons"
 import InvoiceAction from "./InvoiceAction"
 import InvoiceModal from "./InvoiceModal"
+import { useSearchParams } from "react-router-dom"
 
 const { Text } = Typography
 
@@ -19,6 +23,14 @@ const InvoiceList = () => {
   const [filterStatus, setFilterStatus] = useState('')
   const [invoice, setInvoice] = useState<InvoiceDB | null>(null)
   const [isReceipt, setIsReceipt] = useState(false)
+
+  const [searchParam, setSearchParam] = useSearchParams()
+  const currentPage = Number(searchParam.get('page')) || 1
+  // const [pagination, setPagination] = useState({
+  //   page: 1,
+  //   pageSize: 12
+  // })
+  // const location = useLocation()
 
   const handelError = (error: any) => {
     notification.error({
@@ -45,7 +57,12 @@ const InvoiceList = () => {
 
   useEffect(() => {
     fetchInvoices('')
-  }, [filterStatus])
+  }, [filterStatus, currentPage])
+
+  // useEffect(() => {
+  // if(location.state?.pagination)
+  //   setPagination(location.state.pagination)
+  //  }, [])
 
   const handleSaveModal = (invoiceId: number) => {
     setInvoiceId(invoiceId)
@@ -94,8 +111,7 @@ const InvoiceList = () => {
       key: 'TenHocVien', ellipsis: true,
       render: (name: string, invoice: InvoiceDB) =>
         <Space orientation="vertical">
-          <Link to={`/admin/students/${invoice.HocVienID}`}
-            style={{ fontWeight: 'bold' }}>{name}</Link>
+          <Text><UserOutlined /> {name}</Text>
           <Text><PhoneOutlined /> {invoice.DienThoai}</Text>
         </Space>
     },
@@ -105,14 +121,14 @@ const InvoiceList = () => {
         if (!total) return <Text >0đ</Text>
         const tongTien = Number(total || 0)
         const daTra = Number(invoice.DaTra || 0)
-        const conNo = total - daTra
+        const conNo = tongTien - daTra
         const isCancelled = invoice.TrangThai === 'CANCELLED'
         let subContent
-        let status = 'DEBT'
+        let status = 'DEBT' // mặc định là nợ
 
         if (isCancelled && daTra == 0) status = 'NO_COST' // chưa phát sinh
-        if (isCancelled && daTra > 0) status = 'REFUND' // hoàn tiền
-        if (conNo == 0) status = 'PAID' // hoàn tất
+        else if (isCancelled && daTra > 0) status = 'REFUND' // hoàn tiền
+        else if (conNo == 0) status = 'PAID' // hoàn tất
 
         switch (status) {
           case 'NO_COST':
@@ -150,15 +166,20 @@ const InvoiceList = () => {
       filters: months, // value là value của months
       onFilter: (value: any, invoice: InvoiceDB) =>
         new Date(invoice.NgayHetHan).getMonth() == value,
+
       render: (invoiceDate: string, invoice: InvoiceDB) => {
         const dueDate = new Date(invoiceDate).getTime()
         const overTime = now - dueDate
         const overDate = Math.floor(overTime / (24 * 60 * 60 * 1000))
+        const isCancelled = invoice.TrangThai === 'CANCELLED'
+
+        if (isCancelled) return <Text > <CalendarOutlined />
+          {new Date(invoiceDate).toLocaleDateString()}</Text>
+
         if (overTime > 0 && (invoice.TongTien - invoice.DaTra > 0))
           return <Space orientation="vertical">
             <Text > <CalendarOutlined />
               {new Date(invoiceDate).toLocaleDateString()}</Text>
-            {/* <Badge status={'error'} text={`Trễ ${overDate} ngày`}/> */}
             <Tag color='red'>Trễ {overDate} ngày</Tag>
           </Space>
         else
@@ -213,6 +234,10 @@ const InvoiceList = () => {
         />
     }
   ]
+  const handleChange = (pagination: any) => {
+    setSearchParam({ page: pagination.current })
+    console.log('page: ', pagination.current)
+  }
 
   return (
     <Card title={`Danh sách hóa đơn`}>
@@ -254,7 +279,12 @@ const InvoiceList = () => {
             return record.ID === invoiceId ? 'highlight-row' : ''
           }
         }
-        pagination={{ defaultPageSize: 12 }}
+        //pagination={{ defaultPageSize: 12 }}
+        pagination={{
+          current: currentPage,
+          pageSize: 12,
+        }}
+        onChange={handleChange}
         rowKey="ID"
         scroll={{ x: 1100, y: 426 }}
       />
