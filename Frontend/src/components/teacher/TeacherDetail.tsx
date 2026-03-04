@@ -234,21 +234,24 @@ const TeacherDetail = () => {
 
   return (
     // div này bọc toàn bộ nội dung trang chi tiết
-    <div style={{ minHeight: 'calc(100vh - 64px)', background: '#f0f2f5' }}>
+    <div style={{ minHeight: '85vh', background: '#f0f2f5' }}>
       {/* Phần HEADER */}
-      <div style={{ background: '#fff', padding: '16px 24px', borderBlock: '1px solid #e8e8e8' }}>
-
-        {/* Nút quay lại */}
-        <Button icon={<ArrowLeftOutlined />}
-          onClick={() => navigate(-1)}>  Quay lại
-        </Button>
+      <div style={{
+        background: '#fff', margin: '18px', padding: '18px',
+        borderBlock: '1px solid #e8e8e8', borderRadius: 10
+      }}>
 
         {/* Tiêu đề, avata */}
         <div style={{
-          display: 'flex', justifyContent: 'space-between',
-          alignItems: 'center', marginTop: 16
+          display: 'flex', justifyContent: 'space-between', 
+          alignItems: 'center'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            {/* Nút quay lại */}
+            <Button icon={<ArrowLeftOutlined />}
+              onClick={() => navigate(-1)}>  Quay lại
+            </Button>
+
             <Avatar shape="square" size={49} style={{ background: `#0d6efd` }}>
               {teacher.MaGiaoVien}
             </Avatar>
@@ -280,8 +283,8 @@ const TeacherDetail = () => {
       </div>{/*  div của header */}
 
       {/* div của body */}
-      <div style={{ padding: '24px' }}>
-        <Row gutter={24}>
+      <div style={{ padding: '0px 18px 0px 18px' }}>
+        <Row gutter={18}>
           {/* cột trái: bảng lớp học */}
           <Col span={19}>
             <Card>
@@ -310,7 +313,7 @@ const TeacherDetail = () => {
                         columns={columnsOfSS}
                         pagination={{ defaultPageSize: 8 }}
                         rowKey="ID"
-                        scroll={{ y: 280 }}
+                        scroll={{ y: 308 }}
                       />
                     ),
                   }
@@ -325,7 +328,7 @@ const TeacherDetail = () => {
 
           {/* Cột phải: chứa thông tin tổng quan */}
           <Col span={5}>
-            <Card title="Thông tin giáo viên" style={{ marginBottom: 24 }}>
+            <Card title="Thông tin giáo viên" style={{ marginBottom: 18 }}>
               <Descriptions
                 column={1}
                 size="small"

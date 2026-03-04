@@ -233,6 +233,7 @@ export const HoaDonScalarFieldEnum = {
   ID: 'ID',
   MaHoaDon: 'MaHoaDon',
   GhiDanhID: 'GhiDanhID',
+  HocVienID: 'HocVienID',
   TongTien: 'TongTien',
   DaTra: 'DaTra',
   ThoiHan: 'ThoiHan',

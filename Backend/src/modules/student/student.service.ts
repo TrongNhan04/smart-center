@@ -46,7 +46,7 @@ export class StudentService {
 
             // thêm hóa đơn
             const newInvoice = await this.invoiceService.CreateInvoice
-                (newEnroll.ID, classDB?.DenNgay, fee, client)
+                (newStudent.ID, newEnroll.ID, classDB?.DenNgay, fee, client)
 
             // thêm thông báo
             await this.notisService.InvoiceNotify(userId, newInvoice, client)
@@ -135,7 +135,7 @@ export class StudentService {
             select: {
                 ID: true, MaHocVien: true, TenHocVien: true
             },
-            orderBy:{MaHocVien:'asc'}
+            orderBy: { MaHocVien: 'asc' }
         })
     }
 

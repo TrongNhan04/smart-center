@@ -2,6 +2,7 @@ import { Col, Form, Input, message, Modal, Row } from 'antd'
 import { useEffect, useState } from 'react'
 import { mapDataTeacher, type TeacherDB, type TeacherDto } from './TeacherDTO'
 import teacherApi from '../../api/teacherApi'
+import { getChangedValue } from '../common/utils'
 
 interface Props {
   open: boolean
@@ -20,11 +21,16 @@ const TeacherModal = ({ open, onCancel, onSave, editing }: Props) => {
     try {
       // dữ liệu từ form (tiếng anh)
       const values: TeacherDto = await form.validateFields()
-      console.log("value lấy từ form teacher: ", values)
 
       await new Promise(resolve => setTimeout(resolve, 1000))
+      const originData = mapDataTeacher(editing)
+      const updateData = getChangedValue(originData, values)
+      if (Object.keys(updateData).length === 0) {
+        message.info('Không có thông tin nào thay đổi!')
+        return
+      }
 
-      const res = isEdit ? await teacherApi.update(editing.ID, values)
+      const res = isEdit ? await teacherApi.update(editing.ID, updateData)
         : await teacherApi.create(values)
       message.success(isEdit ? 'Cập nhật thành công' : 'Thêm mới thành công')
       onSave(res.data.ID)

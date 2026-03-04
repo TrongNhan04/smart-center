@@ -13,7 +13,7 @@ type OverdueInvoice = {
     student_code: string,
     student_name: string,
     parent_phone: string,
-    class: string,
+    class?: string | null,
     debt: number,
     payment_term: string
     overdue: number
@@ -144,17 +144,13 @@ export class DashboardService {
             select: {
                 ID: true, MaHoaDon: true, TongTien: true,
                 DaTra: true, ThoiHan: true,
-                ghidanh: {
+                hocvien: {
                     select: {
-                        hocvien: {
-                            select: {
-                                TenHocVien: true, MaHocVien: true,
-                                Parent: { select: { DienThoai: true } }
-                            }
-                        },
-                        lophoc: { select: { TenLop: true } }
+                        TenHocVien: true, MaHocVien: true,
+                        Parent: { select: { DienThoai: true } }
                     }
-                }
+                },
+                ghidanh: { select: { lophoc: { select: { TenLop: true } } } }
             }, orderBy: { ThoiHan: 'asc' }, take: 5
         })
 
@@ -170,10 +166,10 @@ export class DashboardService {
                 debts.push({
                     inv_id: inv.ID,
                     inv_code: inv.MaHoaDon,
-                    student_code: inv.ghidanh.hocvien.MaHocVien,
-                    student_name: inv.ghidanh.hocvien.TenHocVien,
-                    parent_phone: inv.ghidanh.hocvien.Parent.DienThoai,
-                    class: inv.ghidanh.lophoc.TenLop,
+                    student_code: inv.hocvien.MaHocVien,
+                    student_name: inv.hocvien.TenHocVien,
+                    parent_phone: inv.hocvien.Parent.DienThoai,
+                    class: inv.ghidanh?.lophoc.TenLop ?? null,
                     debt: debt,
                     payment_term: inv.ThoiHan.toLocaleDateString(),
                     overdue: overDay

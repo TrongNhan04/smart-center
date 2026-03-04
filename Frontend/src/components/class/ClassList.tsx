@@ -168,71 +168,76 @@ const ClassList = () => {
   ]
 
   return (
-    <Card title={`Danh sách lớp học (${classes.length})`}>
-      {/* ô tìm kiếm và bộ lọc */}
-      <Row gutter={16} style={{ marginBottom: 18 }}>
-        <Col span={6}>
-          <Input
-            placeholder='Tìm theo tên hoặc mã...'
-            prefix={<SearchOutlined />}
-            allowClear
-            onChange={(e) => setSearchText(e.target.value)}
-          />
-        </Col>
-
-        <Col span={3}>
-          <Select
-            placeholder='Trạng thái'
-            style={{ width: '100%' }}
-            allowClear
-            onChange={(e) => setFilterStatus(e)}
-            options={[
-              { label: 'Tuyển sinh', value: 'OPEN' },
-              { label: 'Đang hoạt động', value: 'RUNNING' },
-              { label: 'Đã đóng', value: 'CLOSED' },
-            ]}
-          >
-          </Select>
-        </Col>
-        <Col style={{ marginLeft: 'auto' }}>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={OpenModalAdd}
-          >
-            Thêm lớp học
-          </Button>
-        </Col>
-      </Row>
-      {/* Bảng hiển thị dữ liệu */}
-      <Table <ClassDB>
-        dataSource={filteredData}
-        columns={columns}
-        loading={loading}
-        rowClassName={
-          (lophoc) => {
-            return lophoc.ID === classId ? 'highlight-row' : ''
-          }
-        }
-        // pagination={{ defaultPageSize: 8 }}
-        pagination={{
-          current: currentPage,
-          pageSize: 8
+    <div style={{ padding: 10, background: '#f5f5f5', minHeight: '90vh' }}>
+      <Card title={`Danh sách lớp học (${classes.length})`}
+        styles={{
+          header: { backgroundColor: '#e6f4ff', color: '#0958d9' }
         }}
-        onChange={handleBack}
-        rowKey="ID"
-        scroll={{ x: 1000, y: 430 }}
-      />
+      >
+        {/* ô tìm kiếm và bộ lọc */}
+        <Row gutter={16} style={{ marginBottom: 18 }}>
+          <Col span={6}>
+            <Input
+              placeholder='Tìm theo tên hoặc mã...'
+              prefix={<SearchOutlined />}
+              allowClear
+              onChange={(e) => setSearchText(e.target.value)}
+            />
+          </Col>
 
-      {/* Hiển thị Modal UI */}
-      <ClassModal
-        open={openClassModal}
-        onCancel={() => setOpenClassModal(false)}
-        khoahocId={null}
-        onSave={handleSaveModal}
-        editingClass={editingClass!}
-      />
-    </Card>
+          <Col span={4}>
+            <Select
+              placeholder='Trạng thái'
+              style={{ width: '100%' }}
+              allowClear
+              onChange={(e) => setFilterStatus(e)}
+              options={[
+                { label: 'Tuyển sinh', value: 'OPEN' },
+                { label: 'Đang hoạt động', value: 'RUNNING' },
+                { label: 'Đã đóng', value: 'CLOSED' },
+              ]}
+            >
+            </Select>
+          </Col>
+          <Col style={{ marginLeft: 'auto' }}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={OpenModalAdd}
+            >
+              Thêm lớp học
+            </Button>
+          </Col>
+        </Row>
+        {/* Bảng hiển thị dữ liệu */}
+        <Table <ClassDB>
+          dataSource={filteredData}
+          columns={columns}
+          loading={loading}
+          rowClassName={
+            (lophoc) => 
+              lophoc.ID === classId ? 'highlight-row' : ''            
+          }
+          // pagination={{ defaultPageSize: 8 }}
+          pagination={{
+            current: currentPage,
+            pageSize: 8
+          }}
+          onChange={handleBack}
+          rowKey="ID"
+          scroll={{ x: 1000, y: 410 }}
+        />
+
+        {/* Hiển thị Modal UI */}
+        <ClassModal
+          open={openClassModal}
+          onCancel={() => setOpenClassModal(false)}
+          khoahocId={null}
+          onSave={handleSaveModal}
+          editingClass={editingClass!}
+        />
+      </Card>
+    </div>
   )
 }
 

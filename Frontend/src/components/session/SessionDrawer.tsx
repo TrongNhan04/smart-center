@@ -3,7 +3,7 @@ import { sessionApi } from '../../api/sessionApi';
 import { useEffect, useState } from 'react';
 import type { SessionDetail, SessionResult } from './SessionDTO';
 import { DateHelper } from '../common/date.helper';
-import { PhoneFilled, UserOutlined } from '@ant-design/icons';
+import { PhoneFilled, PhoneOutlined, UserOutlined } from '@ant-design/icons';
 
 interface Props {
   open: boolean,
@@ -58,7 +58,7 @@ const SessionDrawer = ({ open, onCancel, sessionId }: Props) => {
           content={(
             <div>
               <p><UserOutlined/> Phụ huynh: {result.PhuHuynh}</p>
-              <p><PhoneFilled/> Điện thoại: {result.DienThoai}</p>
+              <p><PhoneOutlined/> Điện thoại: {result.DienThoai}</p>
             </div>
           )}
           title="Thông tin liên lạc">

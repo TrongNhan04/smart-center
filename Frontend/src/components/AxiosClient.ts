@@ -24,12 +24,12 @@ axiosClient.interceptors.request.use(
 
 // can thiệp sau khi nhận phản hồi
 axiosClient.interceptors.response.use(
-    response =>{
-        if(response.data)
+    response => {
+        if (response.data)
             return response.data
     },
     error => {
-        if(error.response?.status===401){
+        if (error.response?.status === 401) {
             console.log(error)
             useAuthStore.getState().logout()
             //window.location.href = '/'

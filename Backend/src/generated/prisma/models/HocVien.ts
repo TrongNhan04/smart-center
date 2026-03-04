@@ -262,6 +262,7 @@ export type HocVienWhereInput = {
   UpdatedAt?: Prisma.DateTimeFilter<"HocVien"> | Date | string
   Parent?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   Ghidanh?: Prisma.GhiDanhListRelationFilter
+  hoaDons?: Prisma.HoaDonListRelationFilter
 }
 
 export type HocVienOrderByWithRelationInput = {
@@ -277,6 +278,7 @@ export type HocVienOrderByWithRelationInput = {
   UpdatedAt?: Prisma.SortOrder
   Parent?: Prisma.UserOrderByWithRelationInput
   Ghidanh?: Prisma.GhiDanhOrderByRelationAggregateInput
+  hoaDons?: Prisma.HoaDonOrderByRelationAggregateInput
 }
 
 export type HocVienWhereUniqueInput = Prisma.AtLeast<{
@@ -295,6 +297,7 @@ export type HocVienWhereUniqueInput = Prisma.AtLeast<{
   UpdatedAt?: Prisma.DateTimeFilter<"HocVien"> | Date | string
   Parent?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   Ghidanh?: Prisma.GhiDanhListRelationFilter
+  hoaDons?: Prisma.HoaDonListRelationFilter
 }, "ID" | "MaHocVien">
 
 export type HocVienOrderByWithAggregationInput = {
@@ -342,6 +345,7 @@ export type HocVienCreateInput = {
   UpdatedAt?: Date | string
   Parent: Prisma.UserCreateNestedOneWithoutHocVienInput
   Ghidanh?: Prisma.GhiDanhCreateNestedManyWithoutHocvienInput
+  hoaDons?: Prisma.HoaDonCreateNestedManyWithoutHocvienInput
 }
 
 export type HocVienUncheckedCreateInput = {
@@ -356,6 +360,7 @@ export type HocVienUncheckedCreateInput = {
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   Ghidanh?: Prisma.GhiDanhUncheckedCreateNestedManyWithoutHocvienInput
+  hoaDons?: Prisma.HoaDonUncheckedCreateNestedManyWithoutHocvienInput
 }
 
 export type HocVienUpdateInput = {
@@ -369,6 +374,7 @@ export type HocVienUpdateInput = {
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Parent?: Prisma.UserUpdateOneRequiredWithoutHocVienNestedInput
   Ghidanh?: Prisma.GhiDanhUpdateManyWithoutHocvienNestedInput
+  hoaDons?: Prisma.HoaDonUpdateManyWithoutHocvienNestedInput
 }
 
 export type HocVienUncheckedUpdateInput = {
@@ -383,6 +389,7 @@ export type HocVienUncheckedUpdateInput = {
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Ghidanh?: Prisma.GhiDanhUncheckedUpdateManyWithoutHocvienNestedInput
+  hoaDons?: Prisma.HoaDonUncheckedUpdateManyWithoutHocvienNestedInput
 }
 
 export type HocVienCreateManyInput = {
@@ -546,6 +553,20 @@ export type HocVienUpdateOneRequiredWithoutGhidanhNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.HocVienUpdateToOneWithWhereWithoutGhidanhInput, Prisma.HocVienUpdateWithoutGhidanhInput>, Prisma.HocVienUncheckedUpdateWithoutGhidanhInput>
 }
 
+export type HocVienCreateNestedOneWithoutHoaDonsInput = {
+  create?: Prisma.XOR<Prisma.HocVienCreateWithoutHoaDonsInput, Prisma.HocVienUncheckedCreateWithoutHoaDonsInput>
+  connectOrCreate?: Prisma.HocVienCreateOrConnectWithoutHoaDonsInput
+  connect?: Prisma.HocVienWhereUniqueInput
+}
+
+export type HocVienUpdateOneRequiredWithoutHoaDonsNestedInput = {
+  create?: Prisma.XOR<Prisma.HocVienCreateWithoutHoaDonsInput, Prisma.HocVienUncheckedCreateWithoutHoaDonsInput>
+  connectOrCreate?: Prisma.HocVienCreateOrConnectWithoutHoaDonsInput
+  upsert?: Prisma.HocVienUpsertWithoutHoaDonsInput
+  connect?: Prisma.HocVienWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.HocVienUpdateToOneWithWhereWithoutHoaDonsInput, Prisma.HocVienUpdateWithoutHoaDonsInput>, Prisma.HocVienUncheckedUpdateWithoutHoaDonsInput>
+}
+
 export type HocVienCreateWithoutParentInput = {
   MaHocVien: string
   TenHocVien: string
@@ -556,6 +577,7 @@ export type HocVienCreateWithoutParentInput = {
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   Ghidanh?: Prisma.GhiDanhCreateNestedManyWithoutHocvienInput
+  hoaDons?: Prisma.HoaDonCreateNestedManyWithoutHocvienInput
 }
 
 export type HocVienUncheckedCreateWithoutParentInput = {
@@ -569,6 +591,7 @@ export type HocVienUncheckedCreateWithoutParentInput = {
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   Ghidanh?: Prisma.GhiDanhUncheckedCreateNestedManyWithoutHocvienInput
+  hoaDons?: Prisma.HoaDonUncheckedCreateNestedManyWithoutHocvienInput
 }
 
 export type HocVienCreateOrConnectWithoutParentInput = {
@@ -623,6 +646,7 @@ export type HocVienCreateWithoutGhidanhInput = {
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   Parent: Prisma.UserCreateNestedOneWithoutHocVienInput
+  hoaDons?: Prisma.HoaDonCreateNestedManyWithoutHocvienInput
 }
 
 export type HocVienUncheckedCreateWithoutGhidanhInput = {
@@ -636,6 +660,7 @@ export type HocVienUncheckedCreateWithoutGhidanhInput = {
   TrangThai?: $Enums.TrangThaiHV
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
+  hoaDons?: Prisma.HoaDonUncheckedCreateNestedManyWithoutHocvienInput
 }
 
 export type HocVienCreateOrConnectWithoutGhidanhInput = {
@@ -664,6 +689,7 @@ export type HocVienUpdateWithoutGhidanhInput = {
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Parent?: Prisma.UserUpdateOneRequiredWithoutHocVienNestedInput
+  hoaDons?: Prisma.HoaDonUpdateManyWithoutHocvienNestedInput
 }
 
 export type HocVienUncheckedUpdateWithoutGhidanhInput = {
@@ -677,6 +703,77 @@ export type HocVienUncheckedUpdateWithoutGhidanhInput = {
   TrangThai?: Prisma.EnumTrangThaiHVFieldUpdateOperationsInput | $Enums.TrangThaiHV
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hoaDons?: Prisma.HoaDonUncheckedUpdateManyWithoutHocvienNestedInput
+}
+
+export type HocVienCreateWithoutHoaDonsInput = {
+  MaHocVien: string
+  TenHocVien: string
+  NgaySinh: Date | string
+  DiaChi?: string | null
+  GhiChu?: string | null
+  TrangThai?: $Enums.TrangThaiHV
+  CreatedAt?: Date | string
+  UpdatedAt?: Date | string
+  Parent: Prisma.UserCreateNestedOneWithoutHocVienInput
+  Ghidanh?: Prisma.GhiDanhCreateNestedManyWithoutHocvienInput
+}
+
+export type HocVienUncheckedCreateWithoutHoaDonsInput = {
+  ID?: number
+  MaHocVien: string
+  UserID: number
+  TenHocVien: string
+  NgaySinh: Date | string
+  DiaChi?: string | null
+  GhiChu?: string | null
+  TrangThai?: $Enums.TrangThaiHV
+  CreatedAt?: Date | string
+  UpdatedAt?: Date | string
+  Ghidanh?: Prisma.GhiDanhUncheckedCreateNestedManyWithoutHocvienInput
+}
+
+export type HocVienCreateOrConnectWithoutHoaDonsInput = {
+  where: Prisma.HocVienWhereUniqueInput
+  create: Prisma.XOR<Prisma.HocVienCreateWithoutHoaDonsInput, Prisma.HocVienUncheckedCreateWithoutHoaDonsInput>
+}
+
+export type HocVienUpsertWithoutHoaDonsInput = {
+  update: Prisma.XOR<Prisma.HocVienUpdateWithoutHoaDonsInput, Prisma.HocVienUncheckedUpdateWithoutHoaDonsInput>
+  create: Prisma.XOR<Prisma.HocVienCreateWithoutHoaDonsInput, Prisma.HocVienUncheckedCreateWithoutHoaDonsInput>
+  where?: Prisma.HocVienWhereInput
+}
+
+export type HocVienUpdateToOneWithWhereWithoutHoaDonsInput = {
+  where?: Prisma.HocVienWhereInput
+  data: Prisma.XOR<Prisma.HocVienUpdateWithoutHoaDonsInput, Prisma.HocVienUncheckedUpdateWithoutHoaDonsInput>
+}
+
+export type HocVienUpdateWithoutHoaDonsInput = {
+  MaHocVien?: Prisma.StringFieldUpdateOperationsInput | string
+  TenHocVien?: Prisma.StringFieldUpdateOperationsInput | string
+  NgaySinh?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  DiaChi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  TrangThai?: Prisma.EnumTrangThaiHVFieldUpdateOperationsInput | $Enums.TrangThaiHV
+  CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  Parent?: Prisma.UserUpdateOneRequiredWithoutHocVienNestedInput
+  Ghidanh?: Prisma.GhiDanhUpdateManyWithoutHocvienNestedInput
+}
+
+export type HocVienUncheckedUpdateWithoutHoaDonsInput = {
+  ID?: Prisma.IntFieldUpdateOperationsInput | number
+  MaHocVien?: Prisma.StringFieldUpdateOperationsInput | string
+  UserID?: Prisma.IntFieldUpdateOperationsInput | number
+  TenHocVien?: Prisma.StringFieldUpdateOperationsInput | string
+  NgaySinh?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  DiaChi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  TrangThai?: Prisma.EnumTrangThaiHVFieldUpdateOperationsInput | $Enums.TrangThaiHV
+  CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  Ghidanh?: Prisma.GhiDanhUncheckedUpdateManyWithoutHocvienNestedInput
 }
 
 export type HocVienCreateManyParentInput = {
@@ -701,6 +798,7 @@ export type HocVienUpdateWithoutParentInput = {
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Ghidanh?: Prisma.GhiDanhUpdateManyWithoutHocvienNestedInput
+  hoaDons?: Prisma.HoaDonUpdateManyWithoutHocvienNestedInput
 }
 
 export type HocVienUncheckedUpdateWithoutParentInput = {
@@ -714,6 +812,7 @@ export type HocVienUncheckedUpdateWithoutParentInput = {
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Ghidanh?: Prisma.GhiDanhUncheckedUpdateManyWithoutHocvienNestedInput
+  hoaDons?: Prisma.HoaDonUncheckedUpdateManyWithoutHocvienNestedInput
 }
 
 export type HocVienUncheckedUpdateManyWithoutParentInput = {
@@ -735,10 +834,12 @@ export type HocVienUncheckedUpdateManyWithoutParentInput = {
 
 export type HocVienCountOutputType = {
   Ghidanh: number
+  hoaDons: number
 }
 
 export type HocVienCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   Ghidanh?: boolean | HocVienCountOutputTypeCountGhidanhArgs
+  hoaDons?: boolean | HocVienCountOutputTypeCountHoaDonsArgs
 }
 
 /**
@@ -758,6 +859,13 @@ export type HocVienCountOutputTypeCountGhidanhArgs<ExtArgs extends runtime.Types
   where?: Prisma.GhiDanhWhereInput
 }
 
+/**
+ * HocVienCountOutputType without action
+ */
+export type HocVienCountOutputTypeCountHoaDonsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.HoaDonWhereInput
+}
+
 
 export type HocVienSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   ID?: boolean
@@ -772,6 +880,7 @@ export type HocVienSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   UpdatedAt?: boolean
   Parent?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   Ghidanh?: boolean | Prisma.HocVien$GhidanhArgs<ExtArgs>
+  hoaDons?: boolean | Prisma.HocVien$hoaDonsArgs<ExtArgs>
   _count?: boolean | Prisma.HocVienCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["hocVien"]>
 
@@ -820,6 +929,7 @@ export type HocVienOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 export type HocVienInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   Parent?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   Ghidanh?: boolean | Prisma.HocVien$GhidanhArgs<ExtArgs>
+  hoaDons?: boolean | Prisma.HocVien$hoaDonsArgs<ExtArgs>
   _count?: boolean | Prisma.HocVienCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type HocVienIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -834,6 +944,7 @@ export type $HocVienPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   objects: {
     Parent: Prisma.$UserPayload<ExtArgs>
     Ghidanh: Prisma.$GhiDanhPayload<ExtArgs>[]
+    hoaDons: Prisma.$HoaDonPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     ID: number
@@ -1242,6 +1353,7 @@ export interface Prisma__HocVienClient<T, Null = never, ExtArgs extends runtime.
   readonly [Symbol.toStringTag]: "PrismaPromise"
   Parent<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   Ghidanh<T extends Prisma.HocVien$GhidanhArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.HocVien$GhidanhArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GhiDanhPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  hoaDons<T extends Prisma.HocVien$hoaDonsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.HocVien$hoaDonsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HoaDonPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1698,6 +1810,30 @@ export type HocVien$GhidanhArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.GhiDanhScalarFieldEnum | Prisma.GhiDanhScalarFieldEnum[]
+}
+
+/**
+ * HocVien.hoaDons
+ */
+export type HocVien$hoaDonsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the HoaDon
+   */
+  select?: Prisma.HoaDonSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the HoaDon
+   */
+  omit?: Prisma.HoaDonOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.HoaDonInclude<ExtArgs> | null
+  where?: Prisma.HoaDonWhereInput
+  orderBy?: Prisma.HoaDonOrderByWithRelationInput | Prisma.HoaDonOrderByWithRelationInput[]
+  cursor?: Prisma.HoaDonWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.HoaDonScalarFieldEnum | Prisma.HoaDonScalarFieldEnum[]
 }
 
 /**

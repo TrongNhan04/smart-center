@@ -44,7 +44,8 @@ export class EnrollService {
                 }
             })
             // thêm hóa đơn
-            const newInvoice = await this.invoiceService.CreateInvoice(newEnroll.ID, classDB.DenNgay, body.fee, tx)
+            const newInvoice = await this.invoiceService.CreateInvoice
+                (studentDB.ID, newEnroll.ID, classDB.DenNgay, body.fee, tx)
             // thêm thông báo
             await this.notisService.InvoiceNotify(studentDB.UserID, newInvoice, tx)
             return { ID: newEnroll.ID }

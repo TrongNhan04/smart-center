@@ -129,66 +129,72 @@ const TeacherList = () => {
     setSearchParam({ page: pagination.current })
 
   return (
-    <Card title={`Danh sách giáo viên (${teachers.length})`}>
-      {/* ô tìm kiếm và bộ lọc */}
-      <Row gutter={16} style={{ marginBottom: 20 }}>
-        <Col span={6}>
-          <Input // ô tìm kiếm
-            placeholder='Tìm theo tên hoặc mã...'
-            prefix={<SearchOutlined />}
-            allowClear
-            onChange={(e) => setSearchText(e.target.value)}
-          />
-        </Col>
-
-        <Col span={4}>
-          <Select // bộ lọc
-            placeholder='Trạng thái'
-            style={{ width: '100%' }}
-            allowClear
-            onChange={(e) => setFilterStatus(e)}
-            options={[
-              { label: 'Đang hoạt động', value: 'ACTIVE' },
-              { label: 'Ngừng hoạt động', value: 'INACTIVE' },
-            ]}
-          >
-          </Select>
-        </Col>
-        <Col style={{ marginLeft: 'auto' }}>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={OpenModalAdd}
-          > Thêm giáo viên
-          </Button>
-        </Col>
-      </Row>
-      {/* Bảng hiển thị dữ liệu */}
-      <Table //<CourseDB>
-        dataSource={filteredData}
-        columns={columns}
-        loading={loading}
-        rowClassName={
-          (record) => record.ID === teacherId ? 'highlight-row' : ''
-        }
-        //pagination={{ defaultPageSize: 10 }}
-        pagination = {{
-          current: currentPage,
-          pageSize: 10
+    <div style={{ padding: 10, background: '#f5f5f5', minHeight: '90vh' }}>
+      <Card title={`Danh sách giáo viên (${teachers.length})`}
+        styles={{
+          header: { backgroundColor: '#e6f4ff', color: '#0958d9' }
         }}
-        onChange={handleBack}
-        rowKey="ID"
-        scroll={{ x: 1100, y: 426 }}
-      />
+      >
+        {/* ô tìm kiếm và bộ lọc */}
+        <Row gutter={16} style={{ marginBottom: 20 }}>
+          <Col span={6}>
+            <Input // ô tìm kiếm
+              placeholder='Tìm theo tên hoặc mã...'
+              prefix={<SearchOutlined />}
+              allowClear
+              onChange={(e) => setSearchText(e.target.value)}
+            />
+          </Col>
 
-      {/* Hiển thị Modal UI */}
-      <TeacherModal
-        open={isOpen}
-        onCancel={() => setIsOpen(false)}
-        onSave={handleOnSave}
-        editing={editing!}
-      />
-    </Card>
+          <Col span={4}>
+            <Select // bộ lọc
+              placeholder='Trạng thái'
+              style={{ width: '100%' }}
+              allowClear
+              onChange={(e) => setFilterStatus(e)}
+              options={[
+                { label: 'Đang hoạt động', value: 'ACTIVE' },
+                { label: 'Ngừng hoạt động', value: 'INACTIVE' },
+              ]}
+            >
+            </Select>
+          </Col>
+          <Col style={{ marginLeft: 'auto' }}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={OpenModalAdd}
+            > Thêm giáo viên
+            </Button>
+          </Col>
+        </Row>
+        {/* Bảng hiển thị dữ liệu */}
+        <Table //<CourseDB>
+          dataSource={filteredData}
+          columns={columns}
+          loading={loading}
+          rowClassName={
+            (record) => record.ID === teacherId ? 'highlight-row' : ''
+          }
+          //pagination={{ defaultPageSize: 10 }}
+          pagination={{
+            current: currentPage,
+            pageSize: 10
+          }}
+          onChange={handleBack}
+          rowKey="ID"
+          scroll={{ x: 1100, y: 408 }}
+        />
+
+        {/* Hiển thị Modal UI */}
+        <TeacherModal
+          open={isOpen}
+          onCancel={() => setIsOpen(false)}
+          onSave={handleOnSave}
+          editing={editing!}
+        />
+      </Card>
+    </div>
   )
 }
 

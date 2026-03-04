@@ -567,14 +567,6 @@ export type PhieuChiUncheckedUpdateOneWithoutHoadonNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PhieuChiUpdateToOneWithWhereWithoutHoadonInput, Prisma.PhieuChiUpdateWithoutHoadonInput>, Prisma.PhieuChiUncheckedUpdateWithoutHoadonInput>
 }
 
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type PhieuChiCreateWithoutUserInput = {
   MaPhieuChi: string
   SoTien: runtime.Decimal | runtime.DecimalJsLike | number | string

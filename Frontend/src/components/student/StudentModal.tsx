@@ -86,6 +86,10 @@ const StudentModal = ({ open, onSave, onCancel, editing }: Props) => {
       await new Promise(resolve => setTimeout(resolve, 1000))
       const originData = mapDataStudent(editing)
       const updateData = getChangedValue(originData, payload)
+      if (Object.keys(updateData).length === 0) {
+        message.info('Không có thông tin nào thay đổi!')
+        return
+      }
 
       const res = isEdit ? await studentApi.update(editing.ID, updateData)
         : await studentApi.create(payload)

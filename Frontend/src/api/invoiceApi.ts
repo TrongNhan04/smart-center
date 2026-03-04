@@ -5,10 +5,10 @@ export const invoiceApi = {
     findOne: (invoiceId: number) =>
         axiosClient.get(`admin/invoices/${invoiceId}`),
 
-    findMany: (q: string, status: string) => {
-        const param: { q: string, status?: string } = { q }
-        if (status)
-            param.status = status
+    findMany: (query: QueryDto) => {
+        const param: QueryDto = { q: query.q, page: query.page }
+        if (query.status)
+            param.status = query.status
         return axiosClient.get(`admin/invoices`, {
             params: param
         })
@@ -32,4 +32,10 @@ export const invoiceApi = {
                 page: page
             }
         })
+}
+
+interface QueryDto {
+    q: string,
+    status?: string,
+    page: number
 }

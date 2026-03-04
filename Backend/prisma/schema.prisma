@@ -31,7 +31,7 @@ model User {
   VaiTro       Vaitro
   ToKenVerSion Int     @default(0)
 
-  CreatedAt DateTime @default(dbgenerated("now()")) @db.Timestamptz(3)
+  CreatedAt DateTime @default(now()) @db.Timestamptz(3)
   UpdatedAt DateTime @updatedAt @db.Timestamptz(3)
 
   //Quan hệ
@@ -56,7 +56,7 @@ model GiaoVien {
   ChuyenMon String?
   GhiChu    String?
   TrangThai TrangThaiGV @default(ACTIVE) //thêm mới là ACTIVE
-  CreatedAt DateTime    @default(dbgenerated("now()")) @db.Timestamptz(3)
+  CreatedAt DateTime    @default(now()) @db.Timestamptz(3)
   UpdatedAt DateTime    @updatedAt @db.Timestamptz(3)
 
   //Quan hệ
@@ -82,12 +82,13 @@ model HocVien {
   GhiChu     String?
   TrangThai  TrangThaiHV @default(ACTIVE) //thêm mới là ACTIVE
 
-  CreatedAt DateTime @default(dbgenerated("now()")) @db.Timestamptz(3)
+  CreatedAt DateTime @default(now()) @db.Timestamptz(3)
   UpdatedAt DateTime @updatedAt @db.Timestamptz(3)
 
   //Quan hệ
   Parent  User      @relation(fields: [UserID], references: [ID])
-  Ghidanh GhiDanh[] //lớp học có nhiều học viên ghi danh
+  Ghidanh GhiDanh[] //học viên ghi danh nhiều lần
+  hoaDons HoaDon[] // học viên có nhiều hóa đơn
 
   // index
   @@index([TenHocVien])
@@ -112,7 +113,7 @@ model KhoaHoc {
   TrangThai  TrangThaiKH @default(DRAFT) //mặc định là DRAFT
   MoTa       String?
 
-  CreatedAt DateTime @default(dbgenerated("now()")) @db.Timestamptz(3)
+  CreatedAt DateTime @default(now()) @db.Timestamptz(3)
   UpdatedAt DateTime @updatedAt @db.Timestamptz(3)
 
   //Quan hệ
@@ -143,7 +144,7 @@ model LopHoc {
   SiSo       Int
   PhongHoc   String?
   TrangThai  TrangThaiLH @default(OPEN) //mặc định là OPEN
-  CreatedAt  DateTime    @default(dbgenerated("now()")) @db.Timestamptz(3)
+  CreatedAt  DateTime    @default(now()) @db.Timestamptz(3)
   UpdatedAt  DateTime    @updatedAt @db.Timestamptz(3)
 
   //Quan hệ
@@ -176,7 +177,7 @@ model BuoiHoc {
   NgayYeuCau   DateTime?   @db.Timestamptz(3)
   TrangThai    TrangThaiBH @default(SCHEDULED) //mặc định là SCHEDULE
 
-  CreatedAt      DateTime        @default(dbgenerated("now()")) @db.Timestamptz(3)
+  CreatedAt      DateTime        @default(now()) @db.Timestamptz(3)
   UpdatedAt      DateTime        @updatedAt @db.Timestamptz(3)
   lophoc         LopHoc          @relation(fields: [LopHocID], references: [ID]) //buổi học thuộc về lớp học
   ketqua_buoihoc KetQua_BuoiHoc? //buổi học có kết quả buổi học
@@ -198,7 +199,7 @@ model KetQua_BuoiHoc {
   NhanXetChung String
   TrangThai    TrangThai_KQBH @default(DRAFT) //mặc định là DRAFT
 
-  CreatedAt DateTime @default(dbgenerated("now()")) @db.Timestamptz(3)
+  CreatedAt DateTime @default(now()) @db.Timestamptz(3)
   UpdatedAt DateTime @updatedAt @db.Timestamptz(3)
 
   //Quan hệ
@@ -216,7 +217,7 @@ model KetQua_ChiTiet {
   DiemDanh     Boolean
   Diem         Decimal? @db.Decimal(4, 2)
 
-  CreatedAt      DateTime       @default(dbgenerated("now()")) @db.Timestamptz(3)
+  CreatedAt      DateTime       @default(now()) @db.Timestamptz(3)
   UpdatedAt      DateTime       @updatedAt @db.Timestamptz(3)
   ketqua_buoihoc KetQua_BuoiHoc @relation(fields: [KetQuaID], references: [ID])
   ghidanh        GhiDanh        @relation(fields: [GhiDanhID], references: [ID])
@@ -240,7 +241,7 @@ model GhiDanh {
   GhiChu      String?
   TrangThai   TrangThai_GD @default(ACTIVE)
 
-  CreatedAt      DateTime         @default(dbgenerated("now()")) @db.Timestamptz(3)
+  CreatedAt      DateTime         @default(now()) @db.Timestamptz(3)
   UpdatedAt      DateTime         @updatedAt @db.Timestamptz(3)
   hocvien        HocVien          @relation(fields: [HocVienID], references: [ID])
   lophoc         LopHoc           @relation(fields: [LopHocID], references: [ID])
@@ -255,20 +256,23 @@ enum TrangThai_HD {
 }
 
 model HoaDon {
-  ID        Int          @id @default(autoincrement())
-  MaHoaDon  String       @unique
-  GhiDanhID Int          @unique
+  ID        Int    @id @default(autoincrement())
+  MaHoaDon  String @unique
+  GhiDanhID Int?   @unique
+  HocVienID Int 
+
   TongTien  Decimal      @db.Decimal(10, 2)
   DaTra     Decimal      @default(0) @db.Decimal(10, 2)
   ThoiHan   DateTime     @db.Timestamptz(3)
   GhiChu    String?
   TrangThai TrangThai_HD @default(ACTIVE)
 
-  CreatedAt DateTime @default(dbgenerated("now()")) @db.Timestamptz(3)
+  CreatedAt DateTime @default(now()) @db.Timestamptz(3)
   UpdatedAt DateTime @updatedAt @db.Timestamptz(3)
 
-  //Quan hệ
-  ghidanh  GhiDanh    @relation(fields: [GhiDanhID], references: [ID])
+  //Quan hệ             // trả tiền cho ghi danh nào
+  ghidanh  GhiDanh?   @relation(fields: [GhiDanhID], references: [ID])
+  hocvien  HocVien    @relation(fields: [HocVienID], references: [ID])
   phieuthu PhieuThu[] //hóa đơn có nhiều phiếu thu
   phieuchi PhieuChi?
 }
@@ -285,7 +289,7 @@ model PhieuThu {
   PhuongThuc String?
   GhiChu     String?
 
-  CreatedAt DateTime @default(dbgenerated("now()")) @db.Timestamptz(3)
+  CreatedAt DateTime @default(now()) @db.Timestamptz(3)
   UpdatedAt DateTime @updatedAt @db.Timestamptz(3)
 
   //Quan hệ
@@ -315,10 +319,10 @@ model PhieuChi {
   ID       Int  @id @default(autoincrement())
   HoaDonID Int? @unique
 
-  MaPhieuChi String @unique
+  MaPhieuChi String   @unique
   SoTien     Decimal  @db.Decimal(10, 2)
   LyDo       String
-  UserID Int
+  UserID     Int
   NgayChi    DateTime @db.Timestamptz(3)
   PhuongThuc String?
 

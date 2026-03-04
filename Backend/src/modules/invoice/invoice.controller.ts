@@ -16,16 +16,16 @@ export class InvoiceController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Get('receipts-payments')
-    async GetAllReceipt_Payment(@Query('page') page: number) {
-        
-        return await this.invoiceService.GetAllReceipt_Payment(page)
+    async GetAllReceipt_Payment(@Query() query: QueryInvoiceDTO) {
+        return await this.invoiceService.GetAllReceipt_Payment(query)
     }
 
     //lấy danh sách hóa đơn + tìm kiếm mã hóa đơn, tên học viên
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Get()
-    async GetInvoices(@Query() query: QueryInvoiceDTO) {
+    async GetInvoices(
+        @Query() query: QueryInvoiceDTO) {
         return await this.invoiceService.GetInvoices(query)
     }
 

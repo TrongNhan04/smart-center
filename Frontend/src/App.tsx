@@ -53,7 +53,9 @@ const router = createBrowserRouter([
           { path: 'invoices', element: <InvoiceList/> },   
           { path: 'invoices/:id', element: <InvoiceDetail/> },
 
-          { path: 'account', element: <TongHopThuChi/> }
+          {path: 'receipts-payments', element: <TongHopThuChi/>},
+
+          { path: 'account', element: <div>trang tài khoản</div> }
         ]
       }
     ]

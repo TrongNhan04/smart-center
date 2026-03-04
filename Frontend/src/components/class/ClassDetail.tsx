@@ -105,7 +105,7 @@ const ClassDetail = () => {
       title: 'Nội dung', dataIndex: 'ChuDe', key: 'ChuDe', ellipsis: true,
       render: (topic: string, session: SessionDB) => {
         return <Space orientation="vertical" size={0}>
-          <Text strong ellipsis={{ tooltip: topic }}>
+          <Text strong >
             {topic ?? `Chủ đề: chưa cập nhật...`}</Text>
           <Text type="secondary" style={{ fontSize: '14px' }}>
             {session.PhongHoc ?? `Chưa cập nhật`}
@@ -162,7 +162,7 @@ const ClassDetail = () => {
       }
     },
     {// thao tác
-      title: 'Thao tác', key: 'action', align: 'center' as const,
+      title: 'Thao tác', key: 'action', align: 'center' as const, width:120,
       render: (value: SessionDB) => <SessionAction
         session={value}
         unlock={handleUnlock}
@@ -230,19 +230,23 @@ const ClassDetail = () => {
 
   return (
     // div này bọc toàn bộ nội dung trang chi tiết
-    <div style={{ minHeight: 'calc(100vh - 64px)', background: '#f0f2f5' }}>
+    <div style={{ minHeight: '85vh', background: '#f0f2f5' }}>
       {/* Phần HEADER */}
-      <div style={{ background: '#fff', padding: '16px 24px', borderBlock: '1px solid #e8e8e8' }}>
-        {/* nút quay lại */}
-        <Button icon={<ArrowLeftOutlined />}
-          onClick={() => navigate(-1)}> Quay lại</Button>
+      <div style={{
+        background: '#fff', margin: '18px', padding: '16px 24px',
+        borderBlock: '1px solid #e8e8e8', borderRadius: 10
+      }}>
 
         {/* Tiêu đề, avatar */}
         <div style={{
           display: 'flex', justifyContent: 'space-between',
-          alignItems: 'center', marginTop: 16
+          alignItems: 'center', 
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            {/* nút quay lại */}
+            <Button icon={<ArrowLeftOutlined />}
+              onClick={() => navigate(-1)}> Quay lại</Button>
+
             <Avatar shape="square" size={49}
               style={{ background: `#0d6efd` }}
             > {lophoc.MaLopHoc}
@@ -275,8 +279,8 @@ const ClassDetail = () => {
       </div>{/* kết thúc div của header */}
 
       {/* div của body */}
-      <div style={{ paddingTop: '24px', paddingLeft: '24px', paddingRight: '24px' }}>
-        <Row gutter={24}>
+      <div style={{ padding: '0px 18px 0px 18px' }}>
+        <Row gutter={19}>
           {/* cột trái: bảng buổi học và mô tả */}
           <Col span={18}>
             <Card>
@@ -315,7 +319,7 @@ const ClassDetail = () => {
                         columns={columns}
                         pagination={{ defaultPageSize: 6 }}
                         rowKey="ID"
-                        scroll={{ y: 280 }}
+                        scroll={{ y: 320 }}
                       />
                     ),
                   },
@@ -341,7 +345,7 @@ const ClassDetail = () => {
           {/* Cột phải: chứa thông tin tổng quan */}
           <Col span={6}>
             {/* thông tin tổng quan  */}
-            <Card title="Thông tin chung" style={{ marginBottom: 24 }}>
+            <Card title="Thông tin chung" style={{ marginBottom: 18 }}>
               <Descriptions column={1} size='small' colon={false} layout="horizontal" items={[
                 { // khóa học
                   label: <><span style={{ color: '#888' }}>

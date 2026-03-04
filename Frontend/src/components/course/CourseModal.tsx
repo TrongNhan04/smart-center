@@ -26,7 +26,10 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: Props) => {
       
       const originData = mapDataCourse(editingCourse)
       const updateData = getChangedValue(originData, values)
-      // console.log('updateData: ', updateData)
+      if (Object.keys(updateData).length === 0) {
+        message.info('Không có thông tin nào thay đổi!')
+        return
+      }
       const payload = isEdit ? await courseApi.update(editingCourse.ID, updateData) :
         await courseApi.create(values)
 

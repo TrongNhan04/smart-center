@@ -20,12 +20,14 @@ const InvoiceList = () => {
   const [invoiceId, setInvoiceId] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
   const [isOpen, setIsOpen] = useState(false) // open modal
+  const [searchText, setSearchText] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
   const [invoice, setInvoice] = useState<InvoiceDB | null>(null)
   const [isReceipt, setIsReceipt] = useState(false)
 
   const [searchParam, setSearchParam] = useSearchParams()
   const currentPage = Number(searchParam.get('page')) || 1
+  const [total, setTotal] = useState()
 
   const handelError = (error: any) => {
     notification.error({
@@ -37,11 +39,18 @@ const InvoiceList = () => {
     console.log('Có lỗi xảy ra: ', error.response.data.message)
   }
 
-  const fetchInvoices = async (keyword: string) => {
+  const fetchInvoices = async () => {
     setLoading(true)
     try {
-      const res = await invoiceApi.findMany(keyword, filterStatus)
-      setInvoices(res.data)
+      const query = {
+        q: searchText,
+        status: filterStatus,
+        page: currentPage
+      }
+      const res = await invoiceApi.findMany(query)
+      setInvoices(res.data.items)
+      setTotal(res.data.total)
+      console.log("total: ", res.data.total)
     } catch (error: any) {
       handelError(error)
     }
@@ -51,12 +60,12 @@ const InvoiceList = () => {
   }
 
   useEffect(() => {
-    fetchInvoices('')
-  }, [filterStatus, currentPage])
+    fetchInvoices()
+  }, [currentPage, filterStatus, searchText])
 
   const handleSaveModal = (invoiceId: number) => {
     setInvoiceId(invoiceId)
-    fetchInvoices('')
+    fetchInvoices()
     setTimeout(() => {
       setInvoiceId(null)
     }, 3000)
@@ -231,64 +240,70 @@ const InvoiceList = () => {
   ]
 
   return (
-    <Card title={`Danh sách hóa đơn`}>
-      {/* ô tìm kiếm và bộ lọc */}
-      <Row gutter={16} style={{ marginBottom: 20 }}>
-        <Col span={6}>
-          <Input.Search // ô tìm kiếm
-            placeholder='Tìm theo tên hoặc mã...'
-            prefix={<SearchOutlined />}
-            allowClear
-            onSearch={fetchInvoices}
-          />
-        </Col>
-
-        <Col span={3}>
-          <Select // bộ lọc
-            placeholder='Trạng thái HĐ'
-            style={{ width: '100%' }}
-            allowClear
-            onChange={(e) => setFilterStatus(e)}
-            options={[
-              { label: 'Còn hiệu lục', value: 'ACTIVE' },
-              { label: 'Đã hủy', value: 'CANCELLED' },
-            ]}
-          >
-          </Select>
-        </Col>
-        <Col style={{ marginLeft: 'auto' }}>
-          Tổng cộng:<Text strong> {invoices.length} hóa đơn</Text>
-        </Col>
-      </Row>
-      {/* Bảng hiển thị dữ liệu */}
-      <Table
-        dataSource={invoices}
-        columns={columns}
-        loading={loading}
-        rowClassName={
-          (record) => {
-            return record.ID === invoiceId ? 'highlight-row' : ''
-          }
-        }
-        //pagination={{ defaultPageSize: 12 }}
-        pagination={{
-          current: currentPage,
-          pageSize: 12,
+    <div style={{ padding: 10, background: '#f5f5f5', minHeight: '90vh' }}>
+      <Card title={`Danh sách hóa đơn`}
+        styles={{
+          header: { backgroundColor: '#e6f4ff', color: '#0958d9' }
         }}
-        onChange={handleChange}
-        rowKey="ID"
-        scroll={{ x: 1100, y: 426 }}
-      />
+      >
+        {/* ô tìm kiếm và bộ lọc */}
+        <Row gutter={16} style={{ marginBottom: 20 }}>
+          <Col span={6}>
+            <Input.Search // ô tìm kiếm
+              placeholder='Tìm theo tên hoặc mã...'
+              prefix={<SearchOutlined />}
+              allowClear
+              onSearch={(value) => { setSearchText(value) }}
+            />
+          </Col>
 
-      {/* Hiển thị Modal UI */}
-      <InvoiceModal
-        open={isOpen}
-        onCancel={() => setIsOpen(false)}
-        onSave={handleSaveModal}
-        invoice={invoice!}
-        isReceipt={isReceipt}
-      />
-    </Card>
+          <Col span={3}>
+            <Select // bộ lọc
+              placeholder='Trạng thái HĐ'
+              style={{ width: '100%' }}
+              allowClear
+              onChange={(e) => setFilterStatus(e)}
+              options={[
+                { label: 'Còn hiệu lực', value: 'ACTIVE' },
+                { label: 'Đã hủy', value: 'CANCELLED' },
+              ]}
+            >
+            </Select>
+          </Col>
+          <Col style={{ marginLeft: 'auto' }}>
+            Tổng cộng:<Text strong> {invoices.length} hóa đơn</Text>
+          </Col>
+        </Row>
+        {/* Bảng hiển thị dữ liệu */}
+        <Table
+          dataSource={invoices}
+          columns={columns}
+          loading={loading}
+          rowClassName={
+            (record) =>
+              record.ID === invoiceId ? 'highlight-row' : ''
+          }
+          //pagination={{ defaultPageSize: 12 }}
+          pagination={{
+            current: currentPage,
+            pageSize: 12,
+            total: total
+          }}
+          onChange={handleChange}
+          rowKey="ID"
+          scroll={{ x: 1100, y: 408 }}
+        />
+
+        {/* Hiển thị Modal UI */}
+        <InvoiceModal
+          open={isOpen}
+          onCancel={() => setIsOpen(false)}
+          onSave={handleSaveModal}
+          invoice={invoice!}
+          isReceipt={isReceipt}
+        />
+      </Card>
+    </div>
   )
 }
 
