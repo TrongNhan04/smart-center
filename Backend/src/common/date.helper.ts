@@ -52,9 +52,9 @@ export class DateHelper {
     }
 
     // lấy đầu tháng này đến đầu tháng kia
-    static GetStartEndOfMonth(now: Date) {
-        const start = startOfMonth(now)// ngày đầu tháng
-        const end = startOfMonth(addMonths(now, 1)) // ngày đầu tháng sau
+    static GetStartEndOfMonth(date: Date) {
+        const start = startOfMonth(date)// ngày đầu tháng
+        const end = startOfMonth(addMonths(date, 1)) // ngày đầu tháng sau
         return { start, end }
     }
 

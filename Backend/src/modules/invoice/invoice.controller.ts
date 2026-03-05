@@ -3,7 +3,7 @@ import { Roles } from "src/auth/decorators/roles.decorator";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guard/roles.guard";
 import { InvoiceService } from "./invoice.service";
-import { CreatePaymentDTO, CreateReceiptDTO, QueryInvoiceDTO } from "./invoice.dto";
+import { CreateTransactionDTO, QueryInvoiceDTO } from "./invoice.dto";
 import { Request } from 'express';
 
 type RequestWithUser = Request & { user: { userId: number; role?: string } };
@@ -12,12 +12,12 @@ type RequestWithUser = Request & { user: { userId: number; role?: string } };
 export class InvoiceController {
     constructor(private invoiceService: InvoiceService) { }
 
-    // lấy toàn bộ phiếu thu + phiếu chi
+    // lấy toàn bộ giao dịch có query + phân trang 
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
-    @Get('receipts-payments')
-    async GetAllReceipt_Payment(@Query() query: QueryInvoiceDTO) {
-        return await this.invoiceService.GetAllReceipt_Payment(query)
+    @Get('transactions')
+    async GetTransactions(@Query() query: QueryInvoiceDTO) {
+        return await this.invoiceService.GetTransactions(query)
     }
 
     //lấy danh sách hóa đơn + tìm kiếm mã hóa đơn, tên học viên
@@ -29,45 +29,37 @@ export class InvoiceController {
         return await this.invoiceService.GetInvoices(query)
     }
 
-    //thêm phiếu thu
+    //thêm giao dịch thu tiền
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Post(':id/receipts')
     async CreateInvoices(
         @Param('id') invoiceId: number,
-        @Body() body: CreateReceiptDTO,
+        @Body() body: CreateTransactionDTO,
         @Req() req: RequestWithUser) {
         return await this.invoiceService.CreateReceipt(
             +req.user.userId, +invoiceId, body)
     }
 
-    //Lấy danh sách phiếu thu theo hóa đơn 
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles('ADMIN')
-    @Get(':id/receipts')
-    async GetReceipts(@Param('id') invoiceId: number,) {
-        return await this.invoiceService.GetReceipts(+invoiceId)
-    }
-
-    // thêm phiếu chi
+    // thêm giao dịch chi tiền
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Post(':id/payments')
     async CreatePayment(
         @Param('id') invoiceId: number,
-        @Body() body: CreatePaymentDTO,
+        @Body() body: CreateTransactionDTO,
         @Req() req: RequestWithUser) {
-        const userId = req.user.userId
-        return await this.invoiceService.CreatePayment
-            (+userId, +invoiceId, body)
+            const userId = req.user.userId
+            return await this.invoiceService.CreatePayment
+                (+userId, +invoiceId, body)
     }
 
-    // lấy danh sách phiếu chi theo hóa đơn
+    //Lấy danh sách giao dịch theo hóa đơn 
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
-    @Get(':id/payments')
-    async GetPayments(@Param('id') invoiceId: number,) {
-        return await this.invoiceService.GetPayments(+invoiceId)
+    @Get(':id/transactions')
+    async GetTransactionsById(@Param('id') invoiceId: number,) {
+        return await this.invoiceService.GetTransactionsById(+invoiceId)
     }
 
     // lấy chi tiết hóa đơn

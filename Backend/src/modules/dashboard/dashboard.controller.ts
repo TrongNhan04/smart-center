@@ -10,10 +10,11 @@ import { Roles } from "src/auth/decorators/roles.decorator";
 export class DashboardController {
     constructor(private dashboard: DashboardService) { }
 
-    // lấy tổng học viên, lớp học, ghi danh mới, tổng thu - chi trong tháng
+    // lấy tổng học viên, ghi danh mới, tổng thực thu
+    // và số hóa đơn còn hiệu lực nhưng quá hạn và còn nợ trong tháng
     @Get('sumaries')
-    async GetSumary(@Query() q:{m:number, y:number}) {
-        return this.dashboard.GetSumary(q.m, q.y)
+    async GetSumaries(@Query() q:{m:number, y:number}) {
+        return this.dashboard.GetSumaries(q.m, q.y)
     }
 
     // lấy dữ liệu thu - chi, ghi danh mới theo tháng để vẽ biểu đồ
@@ -29,7 +30,7 @@ export class DashboardController {
         return await this.dashboard.GetTodaySession()
     }
 
-    // danh sách việc cần làm: các hóa đơn hết hạn, 
+    // danh sách việc cần làm: các hóa đơn ACTIVE hết hạn, 
     // các lớp sắp hết buổi học cần tạo thêm, 
     // yêu cầu mở khóa buổi học, các buổi học đã kết thúc 
     // > 48h chưa SUBMITTED

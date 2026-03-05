@@ -88,17 +88,12 @@ export type GhiDanh = Prisma.GhiDanhModel
  */
 export type HoaDon = Prisma.HoaDonModel
 /**
- * Model PhieuThu
+ * Model GiaoDich
  * 
  */
-export type PhieuThu = Prisma.PhieuThuModel
+export type GiaoDich = Prisma.GiaoDichModel
 /**
  * Model ThongBao
  * 
  */
 export type ThongBao = Prisma.ThongBaoModel
-/**
- * Model PhieuChi
- * 
- */
-export type PhieuChi = Prisma.PhieuChiModel

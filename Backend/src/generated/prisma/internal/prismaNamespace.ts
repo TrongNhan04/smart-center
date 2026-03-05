@@ -394,9 +394,8 @@ export const ModelName = {
   KetQua_ChiTiet: 'KetQua_ChiTiet',
   GhiDanh: 'GhiDanh',
   HoaDon: 'HoaDon',
-  PhieuThu: 'PhieuThu',
-  ThongBao: 'ThongBao',
-  PhieuChi: 'PhieuChi'
+  GiaoDich: 'GiaoDich',
+  ThongBao: 'ThongBao'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -412,7 +411,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "giaoVien" | "hocVien" | "khoaHoc" | "lopHoc" | "buoiHoc" | "ketQua_BuoiHoc" | "ketQua_ChiTiet" | "ghiDanh" | "hoaDon" | "phieuThu" | "thongBao" | "phieuChi"
+    modelProps: "user" | "giaoVien" | "hocVien" | "khoaHoc" | "lopHoc" | "buoiHoc" | "ketQua_BuoiHoc" | "ketQua_ChiTiet" | "ghiDanh" | "hoaDon" | "giaoDich" | "thongBao"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1156,77 +1155,77 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    PhieuThu: {
-      payload: Prisma.$PhieuThuPayload<ExtArgs>
-      fields: Prisma.PhieuThuFieldRefs
+    GiaoDich: {
+      payload: Prisma.$GiaoDichPayload<ExtArgs>
+      fields: Prisma.GiaoDichFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.PhieuThuFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuThuPayload> | null
+          args: Prisma.GiaoDichFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GiaoDichPayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.PhieuThuFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuThuPayload>
+          args: Prisma.GiaoDichFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GiaoDichPayload>
         }
         findFirst: {
-          args: Prisma.PhieuThuFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuThuPayload> | null
+          args: Prisma.GiaoDichFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GiaoDichPayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.PhieuThuFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuThuPayload>
+          args: Prisma.GiaoDichFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GiaoDichPayload>
         }
         findMany: {
-          args: Prisma.PhieuThuFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuThuPayload>[]
+          args: Prisma.GiaoDichFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GiaoDichPayload>[]
         }
         create: {
-          args: Prisma.PhieuThuCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuThuPayload>
+          args: Prisma.GiaoDichCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GiaoDichPayload>
         }
         createMany: {
-          args: Prisma.PhieuThuCreateManyArgs<ExtArgs>
+          args: Prisma.GiaoDichCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.PhieuThuCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuThuPayload>[]
+          args: Prisma.GiaoDichCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GiaoDichPayload>[]
         }
         delete: {
-          args: Prisma.PhieuThuDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuThuPayload>
+          args: Prisma.GiaoDichDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GiaoDichPayload>
         }
         update: {
-          args: Prisma.PhieuThuUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuThuPayload>
+          args: Prisma.GiaoDichUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GiaoDichPayload>
         }
         deleteMany: {
-          args: Prisma.PhieuThuDeleteManyArgs<ExtArgs>
+          args: Prisma.GiaoDichDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.PhieuThuUpdateManyArgs<ExtArgs>
+          args: Prisma.GiaoDichUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.PhieuThuUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuThuPayload>[]
+          args: Prisma.GiaoDichUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GiaoDichPayload>[]
         }
         upsert: {
-          args: Prisma.PhieuThuUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuThuPayload>
+          args: Prisma.GiaoDichUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GiaoDichPayload>
         }
         aggregate: {
-          args: Prisma.PhieuThuAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregatePhieuThu>
+          args: Prisma.GiaoDichAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateGiaoDich>
         }
         groupBy: {
-          args: Prisma.PhieuThuGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.PhieuThuGroupByOutputType>[]
+          args: Prisma.GiaoDichGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GiaoDichGroupByOutputType>[]
         }
         count: {
-          args: Prisma.PhieuThuCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.PhieuThuCountAggregateOutputType> | number
+          args: Prisma.GiaoDichCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GiaoDichCountAggregateOutputType> | number
         }
       }
     }
@@ -1301,80 +1300,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ThongBaoCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ThongBaoCountAggregateOutputType> | number
-        }
-      }
-    }
-    PhieuChi: {
-      payload: Prisma.$PhieuChiPayload<ExtArgs>
-      fields: Prisma.PhieuChiFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.PhieuChiFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuChiPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.PhieuChiFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuChiPayload>
-        }
-        findFirst: {
-          args: Prisma.PhieuChiFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuChiPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.PhieuChiFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuChiPayload>
-        }
-        findMany: {
-          args: Prisma.PhieuChiFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuChiPayload>[]
-        }
-        create: {
-          args: Prisma.PhieuChiCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuChiPayload>
-        }
-        createMany: {
-          args: Prisma.PhieuChiCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.PhieuChiCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuChiPayload>[]
-        }
-        delete: {
-          args: Prisma.PhieuChiDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuChiPayload>
-        }
-        update: {
-          args: Prisma.PhieuChiUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuChiPayload>
-        }
-        deleteMany: {
-          args: Prisma.PhieuChiDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.PhieuChiUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.PhieuChiUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuChiPayload>[]
-        }
-        upsert: {
-          args: Prisma.PhieuChiUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PhieuChiPayload>
-        }
-        aggregate: {
-          args: Prisma.PhieuChiAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregatePhieuChi>
-        }
-        groupBy: {
-          args: Prisma.PhieuChiGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.PhieuChiGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.PhieuChiCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.PhieuChiCountAggregateOutputType> | number
         }
       }
     }
@@ -1581,20 +1506,21 @@ export const HoaDonScalarFieldEnum = {
 export type HoaDonScalarFieldEnum = (typeof HoaDonScalarFieldEnum)[keyof typeof HoaDonScalarFieldEnum]
 
 
-export const PhieuThuScalarFieldEnum = {
+export const GiaoDichScalarFieldEnum = {
   ID: 'ID',
   UserID: 'UserID',
-  MaPhieuThu: 'MaPhieuThu',
   HoaDonID: 'HoaDonID',
+  MaGiaoDich: 'MaGiaoDich',
+  LoaiGiaoDich: 'LoaiGiaoDich',
   SoTien: 'SoTien',
-  NgayThu: 'NgayThu',
+  NgayGiaoDich: 'NgayGiaoDich',
   PhuongThuc: 'PhuongThuc',
   GhiChu: 'GhiChu',
   CreatedAt: 'CreatedAt',
   UpdatedAt: 'UpdatedAt'
 } as const
 
-export type PhieuThuScalarFieldEnum = (typeof PhieuThuScalarFieldEnum)[keyof typeof PhieuThuScalarFieldEnum]
+export type GiaoDichScalarFieldEnum = (typeof GiaoDichScalarFieldEnum)[keyof typeof GiaoDichScalarFieldEnum]
 
 
 export const ThongBaoScalarFieldEnum = {
@@ -1610,22 +1536,6 @@ export const ThongBaoScalarFieldEnum = {
 } as const
 
 export type ThongBaoScalarFieldEnum = (typeof ThongBaoScalarFieldEnum)[keyof typeof ThongBaoScalarFieldEnum]
-
-
-export const PhieuChiScalarFieldEnum = {
-  ID: 'ID',
-  HoaDonID: 'HoaDonID',
-  MaPhieuChi: 'MaPhieuChi',
-  SoTien: 'SoTien',
-  LyDo: 'LyDo',
-  UserID: 'UserID',
-  NgayChi: 'NgayChi',
-  PhuongThuc: 'PhuongThuc',
-  CreatedAt: 'CreatedAt',
-  UpdatedAt: 'UpdatedAt'
-} as const
-
-export type PhieuChiScalarFieldEnum = (typeof PhieuChiScalarFieldEnum)[keyof typeof PhieuChiScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1995,9 +1905,8 @@ export type GlobalOmitConfig = {
   ketQua_ChiTiet?: Prisma.KetQua_ChiTietOmit
   ghiDanh?: Prisma.GhiDanhOmit
   hoaDon?: Prisma.HoaDonOmit
-  phieuThu?: Prisma.PhieuThuOmit
+  giaoDich?: Prisma.GiaoDichOmit
   thongBao?: Prisma.ThongBaoOmit
-  phieuChi?: Prisma.PhieuChiOmit
 }
 
 /* Types for Logging */

@@ -61,9 +61,8 @@ export const ModelName = {
   KetQua_ChiTiet: 'KetQua_ChiTiet',
   GhiDanh: 'GhiDanh',
   HoaDon: 'HoaDon',
-  PhieuThu: 'PhieuThu',
-  ThongBao: 'ThongBao',
-  PhieuChi: 'PhieuChi'
+  GiaoDich: 'GiaoDich',
+  ThongBao: 'ThongBao'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -246,20 +245,21 @@ export const HoaDonScalarFieldEnum = {
 export type HoaDonScalarFieldEnum = (typeof HoaDonScalarFieldEnum)[keyof typeof HoaDonScalarFieldEnum]
 
 
-export const PhieuThuScalarFieldEnum = {
+export const GiaoDichScalarFieldEnum = {
   ID: 'ID',
   UserID: 'UserID',
-  MaPhieuThu: 'MaPhieuThu',
   HoaDonID: 'HoaDonID',
+  MaGiaoDich: 'MaGiaoDich',
+  LoaiGiaoDich: 'LoaiGiaoDich',
   SoTien: 'SoTien',
-  NgayThu: 'NgayThu',
+  NgayGiaoDich: 'NgayGiaoDich',
   PhuongThuc: 'PhuongThuc',
   GhiChu: 'GhiChu',
   CreatedAt: 'CreatedAt',
   UpdatedAt: 'UpdatedAt'
 } as const
 
-export type PhieuThuScalarFieldEnum = (typeof PhieuThuScalarFieldEnum)[keyof typeof PhieuThuScalarFieldEnum]
+export type GiaoDichScalarFieldEnum = (typeof GiaoDichScalarFieldEnum)[keyof typeof GiaoDichScalarFieldEnum]
 
 
 export const ThongBaoScalarFieldEnum = {
@@ -275,22 +275,6 @@ export const ThongBaoScalarFieldEnum = {
 } as const
 
 export type ThongBaoScalarFieldEnum = (typeof ThongBaoScalarFieldEnum)[keyof typeof ThongBaoScalarFieldEnum]
-
-
-export const PhieuChiScalarFieldEnum = {
-  ID: 'ID',
-  HoaDonID: 'HoaDonID',
-  MaPhieuChi: 'MaPhieuChi',
-  SoTien: 'SoTien',
-  LyDo: 'LyDo',
-  UserID: 'UserID',
-  NgayChi: 'NgayChi',
-  PhuongThuc: 'PhuongThuc',
-  CreatedAt: 'CreatedAt',
-  UpdatedAt: 'UpdatedAt'
-} as const
-
-export type PhieuChiScalarFieldEnum = (typeof PhieuChiScalarFieldEnum)[keyof typeof PhieuChiScalarFieldEnum]
 
 
 export const SortOrder = {

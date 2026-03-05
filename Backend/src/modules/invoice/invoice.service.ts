@@ -1,8 +1,10 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { Prisma } from "src/generated/prisma/client";
-import { CreatePaymentDTO, CreateReceiptDTO, QueryInvoiceDTO } from "./invoice.dto";
+import { CreateTransactionDTO, QueryInvoiceDTO, QueryTransaction } from "./invoice.dto";
 import { NotifyService } from "../notify/notify.service";
+import { GiaoDichWhereInput } from "src/generated/prisma/models";
+import { DateHelper } from "src/common/date.helper";
 
 @Injectable()
 export class InvoiceService {
@@ -141,9 +143,9 @@ export class InvoiceService {
         })
     }
 
-    //thêm phiếu thu
+    //thêm giao dịch thu tiền theo hóa đơn id
     async CreateReceipt(userId: number, invoiceId: number,
-        body: CreateReceiptDTO) {
+        body: CreateTransactionDTO) {
         const [invoiceDB, receiptDB] = await Promise.all([
             this.prismaService.hoaDon.findUnique({
                 where: { ID: invoiceId },
@@ -151,8 +153,8 @@ export class InvoiceService {
                     TongTien: true, DaTra: true, TrangThai: true,
                     hocvien: { select: { UserID: true } }
                 }
-            }), // lấy ID mới nhất được tạo cho mã phiếu thu
-            this.prismaService.phieuThu.findFirst({
+            }), // lấy ID mới nhất của giao dịch để tạo mã
+            this.prismaService.giaoDich.findFirst({
                 orderBy: { ID: 'desc' }, select: { ID: true }
             })
         ])
@@ -164,17 +166,18 @@ export class InvoiceService {
         if (body.amount > remain) throw new BadRequestException
             (`Số tiền thu không được vượt quá ${remain} đ`)
 
-        let code = ''
-        if (!receiptDB) code = "PT0"
+        let code = '' ; console.log("ID", receiptDB?.ID)
+        if (!receiptDB) code = "PT0" // chưa có giao dịch nào hết
         else code = "PT" + (receiptDB.ID + 1)
 
         return await this.prismaService.$transaction(async tx => {
-            const newReceipt = await tx.phieuThu.create({
+            const newReceipt = await tx.giaoDich.create({
                 data: {
                     UserID: userId,
                     HoaDonID: invoiceId,
-                    MaPhieuThu: code,
-                    NgayThu: new Date(),
+                    MaGiaoDich: code,
+                    LoaiGiaoDich: 'RECEIPT',
+                    NgayGiaoDich: new Date(),
                     SoTien: body.amount,
                     PhuongThuc: body.method,
                     GhiChu: body.note
@@ -192,70 +195,15 @@ export class InvoiceService {
         })
     }
 
-    // lấy danh sách phiếu thu theo hóa đơn
-    async GetReceipts(invoiceId: number) {
-        const invoiceDB = await this.InvoiceValidator(invoiceId)
-        if (!invoiceDB) throw new NotFoundException('Không tìm thấy hóa đơn')
-        const receiptDB = await this.prismaService.phieuThu.findMany({
-            where: { HoaDonID: invoiceDB.ID },
-            select: {
-                ID: true,
-                MaPhieuThu: true,
-                NgayThu: true,
-                SoTien: true,
-                PhuongThuc: true,
-                user: { select: { HoTen: true } },
-                GhiChu: true
-            },
-            orderBy: { NgayThu: 'asc' }
-        })
-        return receiptDB.map(item => ({
-            ID: item.ID,
-            MaPhieuThu: item.MaPhieuThu,
-            NgayThu: item.NgayThu,
-            SoTien: item.SoTien,
-            PhuongThuc: item.PhuongThuc,
-            ThuNgan: item.user.HoTen,
-            GhiChu: item.GhiChu
-        }))
-    }
-
-    // lấy danh sách phiếu chi theo hóa đơn
-    async GetPayments(invoiceId: number) {
-        const invoiceDB = await this.InvoiceValidator(invoiceId)
-        if (!invoiceDB) throw new NotFoundException('Không tìm thấy hóa đơn')
-        const paymentDB = await this.prismaService.phieuChi.findMany({
-            where: { HoaDonID: invoiceDB.ID },
-            select: {
-                ID: true,
-                MaPhieuChi: true,
-                NgayChi: true,
-                SoTien: true,
-                PhuongThuc: true,
-                user: { select: { HoTen: true } },
-                LyDo: true
-            },
-            orderBy: { NgayChi: 'asc' }
-        })
-        return paymentDB.map(item => ({
-            ID: item.ID,
-            MaPhieuChi: item.MaPhieuChi,
-            NgayChi: item.NgayChi,
-            SoTien: item.SoTien,
-            PhuongThuc: item.PhuongThuc,
-            ThuNgan: item.user.HoTen,
-            LyDo: item.LyDo
-        }))
-    }
-
-    // tạo phiếu chi từ hóa đơn id
-    async CreatePayment(userId: number, invoiceId: number, body: CreatePaymentDTO) {
-        const reason = body.reason.trim()
+    // thêm giao dịch chi tiền theo hóa đơn id
+    async CreatePayment(userId: number, invoiceId: number,
+        body: CreateTransactionDTO) {
+        const reason = body.note?.trim() || null
         const [invoiceDB, paymentDB] = await Promise.all([
             this.prismaService.hoaDon.findUnique({
                 where: { ID: invoiceId }
             }),
-            this.prismaService.phieuChi.findFirst({
+            this.prismaService.giaoDich.findFirst({
                 orderBy: { ID: 'desc' }, select: { ID: true }
             })
         ])
@@ -272,18 +220,20 @@ export class InvoiceService {
             ('Số tiền hoàn phải nhỏ hơn hoặc bằng số tiền đã trả')
 
         let code = ''
-        if (!paymentDB) code = "PC0" // ko có phiếu chi
+        if (!paymentDB) code = "PC0" // chưa có giao dịch nào hết
         else code = 'PC' + (paymentDB.ID + 1)
 
         return this.prismaService.$transaction(async tx => {
-            await tx.phieuChi.create({
+            await tx.giaoDich.create({
                 data: {
                     UserID: userId,
                     HoaDonID: invoiceDB.ID,
-                    MaPhieuChi: code,
+                    MaGiaoDich: code,
+                    LoaiGiaoDich:'PAYMENT',
+                    NgayGiaoDich: new Date(),
                     SoTien: body.amount,
-                    LyDo: reason,
-                    NgayChi: new Date(),
+                    PhuongThuc: body.method,
+                    GhiChu: reason,
                 }
             })
             // cập nhật đã trả
@@ -298,61 +248,103 @@ export class InvoiceService {
         })
     }
 
-    // lấy toàn bộ phiếu thu + chi
-    // https://github.com/prisma/prisma/discussions/20568 lỗi tìm kiếm
-    async GetAllReceipt_Payment(query: QueryInvoiceDTO) {
-        const limit = 10
-        const offset = (query.page - 1) * limit
-        const search = query.q?.trim() || null
-        const [receiptDB, paymentDB, transactions] = await Promise.all([
-            this.prismaService.phieuThu.count({
-                where: {
-                    OR: [
-                        { MaPhieuThu: { contains: query.q } },
-                        { hoadon: { hocvien: { TenHocVien: { contains: query.q } } } }
-                    ]
-                }
-            }),
-            this.prismaService.phieuChi.count({
-                where: {
-                    OR: [
-                        { MaPhieuChi: { contains: query.q } },
-                        { hoadon: { hocvien: { TenHocVien: { contains: query.q } } } }
-                    ]
-                }
-            }),
-            this.prismaService.$queryRaw`
-            SELECT pt."ID", "MaPhieuThu" AS MaPhieu, "HoaDonID", "SoTien", 
-                "NgayThu" AS Ngay, "PhuongThuc", pt."GhiChu", 
-                'RECEIPT' AS Loai, nd."HoTen" as ThuNgan, hv."TenHocVien"
-            
-            FROM "PhieuThu" pt 
-            LEFT JOIN "HoaDon" hd on pt."HoaDonID" = hd."ID"
-            LEFT JOIN "HocVien" hv on hd."HocVienID" = hv."ID"
-            LEFT JOIN "User" nd on pt."UserID" = nd."ID"
-            WHERE (${search}::text is null 
-                    OR hv."TenHocVien" like '%' || ${search} || '%'
-                    OR pt."MaPhieuThu" like '%' || ${search} || '%')
+    // lấy danh sách giao dịch theo hóa đơn id
+    async GetTransactionsById(invoiceId: number) {
+        const invoiceDB = await this.InvoiceValidator(invoiceId)
+        if (!invoiceDB) throw new NotFoundException('Không tìm thấy hóa đơn')
 
-            UNION ALL
-            
-            SELECT pc."ID", "MaPhieuChi" AS MaPhieu, "HoaDonID", "SoTien", 
-                "NgayChi" AS Ngay, "PhuongThuc", pc."LyDo", 'PAYMENT' AS Loai, 
-                nd."HoTen" as ThuNgan, hv."TenHocVien"
-            
-            FROM "PhieuChi" pc
-            LEFT JOIN "HoaDon" hd on pc."HoaDonID" = hd."ID"
-            LEFT JOIN "HocVien" hv on hd."HocVienID" = hv."ID"
-            LEFT JOIN "User" nd on pc."UserID" = nd."ID"
-            WHERE (${search}::text is null or hv."TenHocVien" like '%' || ${search} || '%')
-                AND(${search}::text is null or pc."MaPhieuChi" like '%' || ${search} || '%')
+        const receiptDB = await this.prismaService.giaoDich.findMany({
+            where: { HoaDonID: invoiceDB.ID },
+            select: {
+                ID: true, MaGiaoDich: true, NgayGiaoDich: true,
+                LoaiGiaoDich:true, SoTien: true, PhuongThuc: true,
+                user: { select: { HoTen: true } }, GhiChu: true
+            },
+            orderBy: { NgayGiaoDich: 'asc' }
+        })
+        return receiptDB.map(item => ({
+            ID: item.ID,
+            MaGD: item.MaGiaoDich,
+            LoaiGD: item.LoaiGiaoDich,
+            NgayGD: item.NgayGiaoDich,
+            SoTien: item.SoTien,
+            PhuongThuc: item.PhuongThuc,
+            ThuNgan: item.user.HoTen,
+            GhiChu: item.GhiChu
+        }))
+    }
 
-            ORDER BY Ngay DESC
-            LIMIT ${limit} OFFSET ${offset}`
-        ])
+    // lấy toàn bộ giao dịch theo tháng - năm + phân trang
+    async GetTransactions(query: QueryTransaction) {
+        const take = 10
+        const skip = (query.page - 1) * take || 0
+        
+        const now = new Date()
+        const m = query.month ?? now.getMonth()
+        const y = query.year ?? now.getFullYear()
+        
+        const { start, end } = DateHelper.GetStartEndOfMonth(new Date(y, m))
+        const where:GiaoDichWhereInput = {
+            NgayGiaoDich:{ gte:start, lt: end}
+        }
+        
+        const [total, items] = await Promise.all([
+            this.prismaService.giaoDich.count({where:where}),
+            this.prismaService.giaoDich.findMany({
+                where:where,
+                select:{
+                    ID: true, MaGiaoDich:true, HoaDonID:true, SoTien:true,
+                    NgayGiaoDich:true, PhuongThuc:true, GhiChu:true,
+                    LoaiGiaoDich:true, user:{select:{HoTen:true}},
+                    hoadon:{select:{hocvien:{select:{TenHocVien:true}}}}
+                },
+                take:take,
+                skip:skip
+            })
+        ]) 
+        
+        const flatItems =  items.map(item=>({
+            ID: item.ID, MaGD: item.MaGiaoDich, HoaDonID: item.HoaDonID,
+            SoTien: item.SoTien, NgayGD: item.NgayGiaoDich,
+            PhuongThuc: item.PhuongThuc, GhiChu:item.GhiChu,
+            LoaiGD: item.LoaiGiaoDich,
+            ThuNgan: item.user.HoTen,
+            TenHocVien: item.hoadon?.hocvien.TenHocVien || null
+        }))
         return {
-            total: receiptDB + paymentDB,
-            items: transactions
+            total: total,
+            items: flatItems
         }
     }
 }
+
+
+// https://github.com/prisma/prisma/discussions/20568 lỗi tìm kiếm
+// this.prismaService.$queryRaw`
+//             SELECT pt."ID", "MaPhieuThu" AS MaPhieu, "HoaDonID", "SoTien", 
+//                 "NgayThu" AS Ngay, "PhuongThuc", pt."GhiChu", 
+//                 'RECEIPT' AS Loai, nd."HoTen" as ThuNgan, hv."TenHocVien"
+            
+//             FROM "PhieuThu" pt 
+//             LEFT JOIN "HoaDon" hd on pt."HoaDonID" = hd."ID"
+//             LEFT JOIN "HocVien" hv on hd."HocVienID" = hv."ID"
+//             LEFT JOIN "User" nd on pt."UserID" = nd."ID"
+//             WHERE (${search}::text is null 
+//                     OR hv."TenHocVien" like '%' || ${search} || '%'
+//                     OR pt."MaPhieuThu" like '%' || ${search} || '%')
+
+//             UNION ALL
+            
+//             SELECT pc."ID", "MaPhieuChi" AS MaPhieu, "HoaDonID", "SoTien", 
+//                 "NgayChi" AS Ngay, "PhuongThuc", pc."LyDo", 'PAYMENT' AS Loai, 
+//                 nd."HoTen" as ThuNgan, hv."TenHocVien"
+            
+//             FROM "PhieuChi" pc
+//             LEFT JOIN "HoaDon" hd on pc."HoaDonID" = hd."ID"
+//             LEFT JOIN "HocVien" hv on hd."HocVienID" = hv."ID"
+//             LEFT JOIN "User" nd on pc."UserID" = nd."ID"
+//             WHERE (${search}::text is null or hv."TenHocVien" like '%' || ${search} || '%')
+//                 AND(${search}::text is null or pc."MaPhieuChi" like '%' || ${search} || '%')
+
+//             ORDER BY Ngay DESC
+//             LIMIT ${limit} OFFSET ${offset}`

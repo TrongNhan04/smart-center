@@ -4,7 +4,8 @@ import { PrismaService } from "src/prisma/prisma.service";
 
 type MonthlyData = {
     month: number,
-    amount: number
+    amount: number,
+    type?: string
 }
 
 type OverdueInvoice = {
@@ -30,8 +31,9 @@ export interface lophoc {
 export class DashboardService {
     constructor(private prisma: PrismaService) { }
 
-    // tổng học viên active, ghi danh mới, tổng thu và nợ xấu trong tháng
-    async GetSumary(month: number, year: number) {
+    // tổng học viên active, ghi danh mới, tổng thu và 
+    // số hóa đơn còn hiệu lực nhưng vừa nợ vừa quá hạn
+    async GetSumaries(month: number, year: number) {
         const now = new Date()
         const m = month ?? now.getMonth()
         const y = year ?? now.getFullYear()
@@ -47,61 +49,56 @@ export class DashboardService {
                             lt: end // nhỏ hơn đầu tháng sau
                         }
                     }
-                }),
+                }),// hóa đơn quá hạn còn hiệu lực
                 this.prisma.hoaDon.findMany({
                     where: { TrangThai: 'ACTIVE', ThoiHan: { lt: now } }
-                }),
-                this.prisma.phieuThu.aggregate({
+                }), // tổng thu
+                this.prisma.giaoDich.aggregate({
                     _sum: { SoTien: true },
                     where: {
-                        NgayThu: { gte: start, lt: end }
+                        LoaiGiaoDich: 'RECEIPT',
+                        NgayGiaoDich: { gte: start, lt: end }
                     }
                 })
             ])
-
-        let sumBadDebt = 0
-        for (var inv of invoiceOverdue) {
-            const total = Number(inv.TongTien)
-            const paid = Number(inv.DaTra)
-            const badDebt = total - paid
-            if (badDebt > 0)
-                sumBadDebt += badDebt
-        }
-        // nợ xấu = những hóa đơn còn hiệu lực, quá hạn và còn nợ
+        // lọc hóa đơn quá hạn còn hiệu lực để tìm ra những đứa còn nợ
+        const totalOverdue = invoiceOverdue.filter
+            (f => f.DaTra < f.TongTien).length
         return {
             TongHVMoi: activeStudents,
-            GhiDanhMoiThang: newEnrollments,
-            TongThuTrongThang: Number(receiptThisMonth._sum.SoTien), // tổng thu theo tháng
-            TongNoXauHienTai: sumBadDebt
+            GhiDanhMoi: newEnrollments,
+            TongThucThu: Number(receiptThisMonth._sum.SoTien), // tổng thu theo tháng
+            HoaDonQuaHan: totalOverdue // hóa đơn còn hiệu lực nhưng nợ và quá hạn
         }
     }
 
     // lấy dữ liệu thu - chi, ghi danh mới theo tháng để vẽ biểu đồ
     async GetFinaceChart(year: number) {
-        const [receipts, payments, enrolls] = await Promise.all([
+        const [transactions, enrolls] = await Promise.all([
             this.prisma.$queryRaw<MonthlyData[]>`
-            select date_part('month', pt."NgayThu") as "month", 
-                sum (pt."SoTien") as "amount"
-            from public."PhieuThu" as pt
-            where date_part('year', pt."NgayThu") = ${year}
-            group by "month"`,
-
-            this.prisma.$queryRaw<MonthlyData[]>`
-            select date_part('month', pc."NgayChi") as "month", 
-                sum (pc."SoTien") as "amount"
-            from public."PhieuChi" as pc
-            where date_part('year', pc."NgayChi") = ${year}
-            group by "month" `,
+            select date_part('month', gd."NgayGiaoDich") as "month", 
+                sum (gd."SoTien") as "amount", gd."LoaiGiaoDich" as "type"
+            from "GiaoDich" as gd
+            where date_part('year', gd."NgayGiaoDich") = ${year}
+            group by "month", gd."LoaiGiaoDich"`,
 
             this.prisma.$queryRaw<MonthlyData[]>`
             select date_part('month', gd."NgayGhiDanh") as "month", 
                 count (gd."ID")::int as "amount"
             from public."GhiDanh" as gd
             where date_part('year', gd."NgayGhiDanh") = ${year}
-			and gd."TrangThai" = 'ACTIVE'
+        	and gd."TrangThai" = 'ACTIVE'
             group by "month"`
         ])
 
+        const receipts: MonthlyData[] = []
+        const payments: MonthlyData[] = []
+        for (var item of transactions) {
+            if (item.type === 'RECEIPT')
+                receipts.push(item)
+            if (item.type === 'PAYMENT')
+                payments.push(item)
+        }
         return this.MergeData(receipts, payments, enrolls)
     }
 
@@ -194,18 +191,18 @@ export class DashboardService {
         for (var lh of classDB) {
             const future = await this.prisma.buoiHoc.count({
                 where: { LopHocID: lh.ID, TrangThai: 'SCHEDULED' }
-            })
+            }) // số buổi đã tạo nhưng chưa học
 
             const total = lh.khoahoc.TongSoBuoi
-            const created = lh._count.buoihoc
+            const created = lh._count.buoihoc // số buổi học đã tạo gồm chưa học hoặc đã học
 
-            if (future <= 3) {
-                if (created < total) {
-                    alert.push({
+            if (future <= 3) { // còn 3 buổi chưa học
+                if (created < total) { // số buổi đã tạo nhỏ hơn tổng số buổi
+                    alert.push({ // => auto nhắc tạo thêm buổi
                         class_id: lh.ID,
                         class_name: lh.TenLop,
                         type: 'CREATE_MORE',
-                        mgs: `The class schedule is almost finished. Created ${created}/${total} sessions`
+                        mgs: `Lịch học của lớp gần hết. Đã tạo ${created}/${total} buổi học`
                     })
                 }
                 else {
@@ -213,7 +210,7 @@ export class DashboardService {
                         class_id: lh.ID,
                         class_name: lh.TenLop,
                         type: 'ENDING_CLASS',
-                        mgs: `The class is about to end. Please check the unpaid tuition fees`
+                        mgs: `Lớp học sắp kết thúc. Đừng quên kiểm tra các học phí chưa hoàn tất`
                     })
                 }
             }
@@ -293,7 +290,7 @@ export class DashboardService {
                 Thang: m,
                 TongThu: r,
                 TongChi: p,
-                DoanhThu: r - p,
+                LoiNhuan: r - p,
                 GhiDanhMoi: e
             }
         })

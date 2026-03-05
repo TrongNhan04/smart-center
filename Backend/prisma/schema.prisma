@@ -37,9 +37,8 @@ model User {
   //Quan hệ
   GiaoVien GiaoVien? //là giáo viên
   HocVien  HocVien[] //phụ huynh của nhiều học viên
-  ThongBao ThongBao[]
-  PhieuThu PhieuThu[]
-  PhieuChi PhieuChi[]
+  ThongBao ThongBao[] // thông báo của ai
+  GiaoDich GiaoDich[] // ai tạo giao dịch
 }
 
 // ============ 2. GIAOVIEN ============//
@@ -259,7 +258,7 @@ model HoaDon {
   ID        Int    @id @default(autoincrement())
   MaHoaDon  String @unique
   GhiDanhID Int?   @unique
-  HocVienID Int 
+  HocVienID Int
 
   TongTien  Decimal      @db.Decimal(10, 2)
   DaTra     Decimal      @default(0) @db.Decimal(10, 2)
@@ -270,31 +269,31 @@ model HoaDon {
   CreatedAt DateTime @default(now()) @db.Timestamptz(3)
   UpdatedAt DateTime @updatedAt @db.Timestamptz(3)
 
-  //Quan hệ             // trả tiền cho ghi danh nào
-  ghidanh  GhiDanh?   @relation(fields: [GhiDanhID], references: [ID])
-  hocvien  HocVien    @relation(fields: [HocVienID], references: [ID])
-  phieuthu PhieuThu[] //hóa đơn có nhiều phiếu thu
-  phieuchi PhieuChi?
+  //Quan hệ             
+  ghidanh  GhiDanh?   @relation(fields: [GhiDanhID], references: [ID]) // trả tiền cho ghi danh nào
+  hocvien  HocVien    @relation(fields: [HocVienID], references: [ID]) // hóa đơn của ai
+  giaodich GiaoDich[] //hóa đơn có nhiều giao dich
 }
 
-// ============ 11. PHIEUTHU  ============//
-model PhieuThu {
-  ID     Int @id @default(autoincrement())
-  UserID Int
+// ============ 11. GIAODICH  ============//
+model GiaoDich {
+  ID       Int  @id @default(autoincrement())
+  UserID   Int
+  HoaDonID Int? // có giao dịch không phải trả tiền cho hóa đơn
 
-  MaPhieuThu String   @unique
-  HoaDonID   Int
-  SoTien     Decimal  @db.Decimal(10, 2)
-  NgayThu    DateTime @db.Timestamptz(3)
-  PhuongThuc String?
-  GhiChu     String?
+  MaGiaoDich   String   @unique
+  LoaiGiaoDich String
+  SoTien       Decimal  @db.Decimal(10, 2)
+  NgayGiaoDich DateTime @db.Timestamptz(3)
+  PhuongThuc   String?
+  GhiChu       String?
 
   CreatedAt DateTime @default(now()) @db.Timestamptz(3)
   UpdatedAt DateTime @updatedAt @db.Timestamptz(3)
 
   //Quan hệ
-  hoadon HoaDon @relation(fields: [HoaDonID], references: [ID])
-  user   User   @relation(fields: [UserID], references: [ID])
+  hoadon HoaDon? @relation(fields: [HoaDonID], references: [ID])
+  user   User    @relation(fields: [UserID], references: [ID])
 }
 
 // ============ 12. THONGBAO  ============//
@@ -314,22 +313,22 @@ model ThongBao {
   User User @relation(fields: [UserID], references: [ID])
 }
 
-// ============ 13. PHIEUCHI  ============//
-model PhieuChi {
-  ID       Int  @id @default(autoincrement())
-  HoaDonID Int? @unique
+// ============ 13. PHIEU THU - CHI  ============//
+// model PhieuChi {
+//   ID       Int  @id @default(autoincrement())
+//   HoaDonID Int? @unique
 
-  MaPhieuChi String   @unique
-  SoTien     Decimal  @db.Decimal(10, 2)
-  LyDo       String
-  UserID     Int
-  NgayChi    DateTime @db.Timestamptz(3)
-  PhuongThuc String?
+//   MaPhieuChi String   @unique
+//   SoTien     Decimal  @db.Decimal(10, 2)
+//   LyDo       String
+//   UserID     Int
+//   NgayChi    DateTime @db.Timestamptz(3)
+//   PhuongThuc String?
 
-  CreatedAt DateTime @default(now()) @db.Timestamptz(3)
-  UpdatedAt DateTime @updatedAt()
+//   CreatedAt DateTime @default(now()) @db.Timestamptz(3)
+//   UpdatedAt DateTime @updatedAt()
 
-  //quan hệ
-  hoadon HoaDon? @relation(fields: [HoaDonID], references: [ID])
-  user   User    @relation(fields: [UserID], references: [ID])
-}
+//   //quan hệ
+//   hoadon HoaDon? @relation(fields: [HoaDonID], references: [ID])
+//   user   User    @relation(fields: [UserID], references: [ID])
+// }
