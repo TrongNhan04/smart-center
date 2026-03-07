@@ -1,7 +1,6 @@
 
 import {
-  Row, Col, Card, Statistic, Typography, List, Checkbox, Tag, Space,
-  notification
+  Row, Col, Card, Statistic, Typography, List, Tag, Space, notification
 } from 'antd';
 import {
   UserOutlined, UsergroupAddOutlined, DollarOutlined, WarningOutlined,
@@ -13,39 +12,31 @@ import {
 } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
 import { useEffect, useState } from 'react';
-import type { ClassNotis, FinanceChart, RequestNotis, SessionToday, Summaries, UnsubmitNotis } from './DashboardDTO';
+import type { FinanceChart, SessionToday, Summaries } from './DashboardDTO';
 import { dashboardApi } from '../../api/dashboardApi';
-import Task from './Task';
+import DashboardTask from './DashboardTask';
 
 // Đăng ký các thành phần của Chart.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement,
   PointElement, Title, Tooltip, Legend)
 
-const { Title: AntTitle, Text } = Typography
+const {Text } = Typography
 
 const Dashboard = () => {
   const [sumaries, setSumaries] = useState<Summaries>()
   const [financeChart, setFinanceChart] = useState<FinanceChart[]>([])
   // const [labelChart, setLabelChart] = useState<number[]>([])
   const [sessionsToday, setSessionsToday] = useState<SessionToday[]>([])
-  const [classes, setClasses] = useState<ClassNotis[]>([])
-  const [requestNotis, setRequestNotis] = useState<RequestNotis[]>([])
-  const [unsubmitNotis, setUnsubmitNotis] = useState<UnsubmitNotis[]>([])
-
   const fetchDashboard = async () => {
     try {
-      const [sumaryRes, chartRes, sessionRes, taskRes] = await Promise.all([
+      const [sumaryRes, chartRes, sessionRes] = await Promise.all([
         dashboardApi.getSumaries(),
         dashboardApi.getFinanceChart(),
         dashboardApi.getSessions(),
-        dashboardApi.getTasks()
       ])
       setSumaries(sumaryRes.data)
       setFinanceChart(chartRes.data)
       setSessionsToday(sessionRes.data)
-      setClasses(taskRes.data.LopHoc)
-      setRequestNotis(taskRes.data.BuoiHoc.YeuCauMoKhoa)
-      setUnsubmitNotis(taskRes.data.BuoiHoc.ChuaSubmit)
     } catch (error: any) {
       notification.error({
         title: 'Có lỗi xảy ra',
@@ -88,11 +79,8 @@ const Dashboard = () => {
       }
     ],
   }
-  
-  // Data Việc cần làm
-  const todos = [classes, requestNotis, unsubmitNotis]
 
-  // ---------------- RENDER UI ----------------
+  {console.log('total')}
   return (
     <div style={{ padding: 24, background: '#f0f2f5', minHeight: '100vh' }}>
       {/* <AntTitle level={3} style={{ marginTop: 0, marginBottom: 24 }}>Tổng quan Trung tâm</AntTitle> */}
@@ -182,6 +170,12 @@ const Dashboard = () => {
       {/* TẦNG 3: VẬN HÀNH (LỊCH HỌC & TODO) */}
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={14}>
+          {/* việc cần làm */}
+          <DashboardTask/> 
+        </Col>
+
+        <Col xs={24} lg={10}>
+          
           <Card title="Lịch học hôm nay" variant='borderless'
             styles={{
               header: { backgroundColor: '#e6f4ff', color: '#0958d9' }
@@ -191,7 +185,7 @@ const Dashboard = () => {
               itemLayout="horizontal"
               dataSource={sessionsToday}
               renderItem={item => (
-                <List.Item>
+                <List.Item style={{marginTop:9}}>
                   <List.Item.Meta
                     avatar={<Tag color="blue"
                       style={{ padding: '4px 8px', fontSize: 14 }}>
@@ -202,17 +196,6 @@ const Dashboard = () => {
                 </List.Item>
               )}
             />
-          </Card>
-        </Col>
-
-        <Col xs={24} lg={10}>
-          <Card title="Việc cần làm" variant='borderless'
-            styles={{
-              header: { backgroundColor: '#fff8e6', color: '#d97109' }
-            }}
-            style={{ borderRadius: 8 }}>
-            
-            <Task/>
           </Card>
         </Col>
       </Row>
@@ -229,8 +212,6 @@ export default Dashboard
   //     case 1:
   //       return setLabelChart(months?.slice(6, 12) || [])
   //     case 2:
-  //       return setLabelChart(months || [])
-  //     default:
   //       return setLabelChart(months || [])
   //   }
   // }

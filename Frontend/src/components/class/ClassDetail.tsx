@@ -75,8 +75,9 @@ const ClassDetail = () => {
 
   const statusColor: Record<string, string> = {
     OPEN: 'default',
-    RUNNING: 'success',
+    RUNNING: 'processing',
     CLOSED: 'error',
+    FINISHED: 'success'
   } // status cho tiêu đề
   const status = statusColor[lophoc.TrangThai]
 
@@ -119,16 +120,21 @@ const ClassDetail = () => {
       filters: [
         { text: 'Sắp tới', value: 'SCHEDULED' },
         { text: 'Hoàn thành', value: 'COMPLETED' },
-        { text: 'Đã hủy', value: 'CANCELLED' }
+        { text: 'Đã hủy', value: 'CANCELLED' },
+        { text: 'Chưa nộp KQ', value: 'UNSUBMIT' }
       ], // value là của thằng filter
       onFilter: (value: any, session: SessionDB) => {
+        const timeleft = DateHelper.Timeleft(session.KetThucLuc)
+        if(value === 'UNSUBMIT')
+          return session.TrangThai === 'SCHEDULED' && timeleft > (48*60*60*1000)
         return session.TrangThai === value
       },
       render: (value: string) => {
         const statusMap: Record<string, { color: string, text: string }> = {
           SCHEDULED: { color: 'default', text: 'Sắp tới' },
           COMPLETED: { color: 'success', text: 'Hoàn thành' },
-          CANCELLED: { color: 'error', text: 'Đã hủy' }
+          CANCELLED: { color: 'error', text: 'Đã hủy' },
+          UNSUBMIT: { color: 'processing', text: 'Chưa nộp điểm danh' }
         }
         // value là 1 trong 3 key đó
         const status = statusMap[value]
@@ -162,7 +168,7 @@ const ClassDetail = () => {
       }
     },
     {// thao tác
-      title: 'Thao tác', key: 'action', align: 'center' as const, width:120,
+      title: 'Thao tác', key: 'action', align: 'center' as const, width: 120,
       render: (value: SessionDB) => <SessionAction
         session={value}
         unlock={handleUnlock}
@@ -240,7 +246,7 @@ const ClassDetail = () => {
         {/* Tiêu đề, avatar */}
         <div style={{
           display: 'flex', justifyContent: 'space-between',
-          alignItems: 'center', 
+          alignItems: 'center',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             {/* nút quay lại */}
@@ -264,7 +270,7 @@ const ClassDetail = () => {
           </div>
           <Tooltip title='Sửa lớp học'>
             <Button type="primary" ghost icon={<EditOutlined />}
-              disabled={lophoc.TrangThai === 'CLOSED'}
+              disabled={lophoc.TrangThai === 'CLOSED' || lophoc.TrangThai === 'FINISHED'}
               onClick={() => setOpenClassModal(true)}
             />
           </Tooltip>

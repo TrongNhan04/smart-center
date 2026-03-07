@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
   BookOutlined,
+  CheckSquareOutlined,
   CreditCardOutlined,
   DashboardOutlined,
   FormOutlined,
@@ -36,7 +37,8 @@ function getItem(
 }
 
 const items: MenuItem[] = [
-  getItem('Dashboard', 'dashboard', <DashboardOutlined />),
+  getItem('Tổng quan', 'dashboard', <DashboardOutlined />),
+  getItem('Việc cần làm', 'tasks', <CheckSquareOutlined/>),
   getItem('Đào tạo', 'train', <BookOutlined />, [
     getItem('Khóa học', 'courses'),
     getItem('Lớp học', 'classes'),

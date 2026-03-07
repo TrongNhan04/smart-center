@@ -66,25 +66,38 @@ export class ClassService {
             where: { AND: condition },
             include: {
                 khoahoc: true, giaovien: { include: { User: true } },
-                _count: { select: { ghidanh: { where: { TrangThai: 'ACTIVE' } } } }
+                _count: {
+                    select: {
+                        ghidanh: { where: { TrangThai: 'ACTIVE' } },
+                        buoihoc: { where: { TrangThai: 'COMPLETED' } }
+                    }
+                }
             },
             orderBy: { ID: 'desc' }
         })
-        return classDB.map(lh => ({
-            ID: lh.ID, MaLopHoc: lh.MaLopHoc, TenLop: lh.TenLop,
-            GiaoVien: {
-                ID: lh.GiaoVienID,
-                HoTen: lh.giaovien.User.HoTen
-            },
-            KhoaHoc: {
-                ID: lh.KhoaHocID,
-                TenKhoaHoc: lh.khoahoc.TenKhoaHoc,
-            },
-            TuNgay: lh.TuNgay, DenNgay: lh.DenNgay,
-            LichHoc: lh.LichHoc, MoTa: lh.MoTa, PhongHoc: lh.PhongHoc,
-            GioHoc: lh.GioBatDau + ' - ' + lh.GioKetThuc, SiSo: lh.SiSo,
-            TrangThai: lh.TrangThai, TongGhiDanh: lh._count.ghidanh,
-        }))
+
+        return classDB.map(lh => {
+            let status: string | null = null
+            if (lh.khoahoc.TongSoBuoi == lh._count.buoihoc) {
+                status = 'FINISHED'
+            }
+
+            return {
+                ID: lh.ID, MaLopHoc: lh.MaLopHoc, TenLop: lh.TenLop,
+                GiaoVien: {
+                    ID: lh.GiaoVienID,
+                    HoTen: lh.giaovien.User.HoTen
+                },
+                KhoaHoc: {
+                    ID: lh.KhoaHocID,
+                    TenKhoaHoc: lh.khoahoc.TenKhoaHoc,
+                },
+                TuNgay: lh.TuNgay, DenNgay: lh.DenNgay,
+                LichHoc: lh.LichHoc, MoTa: lh.MoTa, PhongHoc: lh.PhongHoc,
+                GioHoc: lh.GioBatDau + ' - ' + lh.GioKetThuc, SiSo: lh.SiSo,
+                TrangThai: status || lh.TrangThai, TongGhiDanh: lh._count.ghidanh,
+            }
+        })
     }
 
     // lấy danh sách lớp cho combobox
@@ -114,10 +127,18 @@ export class ClassService {
             where: { ID: classId },
             include: {
                 khoahoc: true, giaovien: { include: { User: true } },
-                _count: { select: { ghidanh: { where: { TrangThai: 'ACTIVE' } } } }
+                _count: {
+                    select: {
+                        ghidanh: { where: { TrangThai: 'ACTIVE' } },
+                        buoihoc: { where: { TrangThai: 'COMPLETED' } }
+                    }
+                }
             }
         })
         if (!classDB) throw new NotFoundException('Không tìm thấy lớp học')
+        let status: string | null = null
+        if (classDB.khoahoc.TongSoBuoi == classDB._count.buoihoc)
+            status = 'FINISHED'
         return {
             ID: classDB.ID, MaLopHoc: classDB.MaLopHoc, TenLop: classDB.TenLop,
             GiaoVien: {
@@ -132,7 +153,7 @@ export class ClassService {
             TuNgay: classDB.TuNgay, DenNgay: classDB.DenNgay,
             LichHoc: classDB.LichHoc, MoTa: classDB.MoTa,
             GioHoc: classDB.GioBatDau + ' - ' + classDB.GioKetThuc, SiSo: classDB.SiSo,
-            TrangThai: classDB.TrangThai, TongGhiDanh: classDB._count.ghidanh,
+            TrangThai: status || classDB.TrangThai, TongGhiDanh: classDB._count.ghidanh,
         }
     }
 
@@ -188,7 +209,7 @@ export class ClassService {
 
         // nếu đổi giáo viên thì kiểm tra gv có rảnh không
         if (up.teacherId) await this.ChangeTeacher(classId, up, classId)
-        
+
         // nếu đổi phòng thì kiểm tra phòng có trống không
         if (up.room) await this.HasSameRoom(up, classDB.ID)
 

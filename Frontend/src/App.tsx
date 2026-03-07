@@ -18,6 +18,7 @@ import InvoiceList from "./components/invoice/InvoiceList";
 import InvoiceDetail from "./components/invoice/InvoiceDetail";
 import TongHopThuChi from "./components/invoice/TongHopThuChi";
 import Dashboard from "./components/dashboard/Dashboard";
+import TaskList from "./components/dashboard/TaskList";
 
 const router = createBrowserRouter([
   {
@@ -35,26 +36,27 @@ const router = createBrowserRouter([
         path: 'admin',
         element: <SidebarComponent />,
         children: [
-          { path: 'dashboard', element: <Dashboard/> },
-          
+          { path: 'dashboard', element: <Dashboard /> },
+          { path: 'tasks', element: <TaskList /> },
+
           { path: 'courses', element: <CourseList /> },
-          { path: 'courses/:id', element:<CourseDetail/> },
-          
-          { path: 'classes', element: <ClassList/> },
-          { path: 'classes/:id', element: <ClassDetail/>},
+          { path: 'courses/:id', element: <CourseDetail /> },
 
-          { path: 'teachers', element: <TeacherList/> },
-          { path: 'teachers/:id', element: <TeacherDetail/>},
+          { path: 'classes', element: <ClassList /> },
+          { path: 'classes/:id', element: <ClassDetail /> },
 
-          { path: 'students', element: <StudentList/> },
-          { path: 'students/:id', element: <StudentDetail/>},
+          { path: 'teachers', element: <TeacherList /> },
+          { path: 'teachers/:id', element: <TeacherDetail /> },
 
-          { path: 'enrolls', element: <EnrollList/> },
+          { path: 'students', element: <StudentList /> },
+          { path: 'students/:id', element: <StudentDetail /> },
 
-          { path: 'invoices', element: <InvoiceList/> },   
-          { path: 'invoices/:id', element: <InvoiceDetail/> },
+          { path: 'enrolls', element: <EnrollList /> },
 
-          {path: 'receipts-payments', element: <TongHopThuChi/>},
+          { path: 'invoices', element: <InvoiceList /> },
+          { path: 'invoices/:id', element: <InvoiceDetail /> },
+
+          { path: 'receipts-payments', element: <TongHopThuChi /> },
 
           { path: 'account', element: <div>trang tài khoản</div> }
         ]

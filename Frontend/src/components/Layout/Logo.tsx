@@ -5,12 +5,14 @@ const Logo = () => {
   const navigate = useNavigate()
 
   const handleClick = () => {
-    navigate('/admin/home')
+    navigate('/admin/dashboard')
   }
 
   return (
     <div className="logo">
-      <div className="logo-icon" onClick={handleClick}>
+      <div className="logo-icon" onClick={handleClick}
+        style={{ cursor: 'pointer' }}
+      >
         <SlackCircleFilled />
       </div>
     </div>

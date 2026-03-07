@@ -36,11 +36,14 @@ export class DashboardController {
     // > 48h chưa SUBMITTED
     @Get('tasks')
     async GetTasks(){
-        const [classs, sessions] = await Promise.all([
-            // this.dashboard.GetOverdueInvoices(),
-            this.dashboard.GetExpiringClasses(),
-            this.dashboard.GetPendingSessions()
-        ])
-        return {LopHoc:classs, BuoiHoc:sessions}
+        // const [classes, sessions] = await Promise.all([
+        //     // this.dashboard.GetOverdueInvoices(),
+        //     this.dashboard.GetExpiringClasses(),
+        //     this.dashboard.GetPendingSessions()
+        // ])
+        const sessions = await this.dashboard.GetPendingSessions()
+        return sessions
+        // ... = lấy phần ruột
+        // return [...classes, ...sessions]
     }
 }

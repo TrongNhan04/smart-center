@@ -40,7 +40,6 @@ const InvoiceList = () => {
       const res = await invoiceApi.findMany(query)
       setInvoices(res.data.items)
       setTotal(res.data.total)
-      console.log("total: ", res.data.total)
     } catch (error: any) {
       handelError(error)
     }

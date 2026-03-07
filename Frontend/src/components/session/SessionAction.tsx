@@ -52,7 +52,7 @@ const SessionAction = ({ session, unlock, onCancel, onOpenDrawer }: Props) => {
           <Popconfirm
             title="Xác nhận mở khóa?"
             description="Thao này có thể thay đổi kết quả buổi học!"
-            okText="Lưu"
+            okText="Xác nhận mở khóa"
             cancelText="Hủy"
             onConfirm={() => unlock(session.ID)}
             okButtonProps={{ danger: true }}

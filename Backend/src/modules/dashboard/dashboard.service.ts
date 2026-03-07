@@ -8,18 +8,6 @@ type MonthlyData = {
     type?: string
 }
 
-type OverdueInvoice = {
-    HoaDonID: number,
-    MaHoaDon: string,
-    MaHocVien: string,
-    TenHocVien: string,
-    DienThoai: string,
-    TenLop?: string | null,
-    ConNo: number,
-    ThoiHan: string
-    QuaHan: number
-}
-
 type Notis = 'CREATE_MORE' | 'ENDING_CLASS'
 
 export interface lophoc {
@@ -128,7 +116,7 @@ export class DashboardService {
                 },
                 TrangThai: true
             },
-            orderBy: { BatDauLuc: 'asc' }, take: 10
+            orderBy: { BatDauLuc: 'asc' }, take: 5
         })
         return sessionDB.map(sm => ({
             ThoiGian: DateHelper.ISOToHHMM(sm.BatDauLuc, sm.KetThucLuc),
@@ -138,15 +126,15 @@ export class DashboardService {
             TrangThai: sm.TrangThai
         }))
     }
-    
+
     // lấy danh sách lớp gần hết buổi học hoặc cần sinh thêm buổi
     async GetExpiringClasses() {
         const classDB = await this.prisma.lopHoc.findMany({
-            where: { TrangThai: {not:'CLOSED'} },
+            where: { TrangThai: { not: 'CLOSED' } },
             include: {
                 khoahoc: true, // lấy tổng buổi khóa
                 _count: { select: { buoihoc: true } } // lấy tổng buổi đã tạo
-            }
+            },
         })
 
         const alert: lophoc[] = []
@@ -168,14 +156,14 @@ export class DashboardService {
                         LoiNhan: `Lịch học của lớp gần hết. Đã tạo ${created}/${total} buổi học`
                     })
                 }
-                else {
-                    alert.push({
-                        LopHocID: lh.ID,
-                        TenLop: lh.TenLop,
-                        Loai: 'ENDING_CLASS',
-                        LoiNhan: `Lớp học sắp kết thúc. Đừng quên kiểm tra các học phí chưa hoàn tất`
-                    })
-                }
+                // else {
+                //     alert.push({
+                //         LopHocID: lh.ID,
+                //         TenLop: lh.TenLop,
+                //         Loai: 'ENDING_CLASS',
+                //         LoiNhan: `Lớp học sắp kết thúc. Đừng quên kiểm tra các khoản phí chưa hoàn tất!`
+                //     })
+                // }
             }
         }
         return alert
@@ -183,10 +171,11 @@ export class DashboardService {
 
     // lấy danh sách buổi học cần xử lý
     async GetPendingSessions() {
-        const [requestUnlock, unSubmitted] = await Promise.all([
+        // const classDB = await this.GetExpiringClasses()
+        const [requestUnlock, classDB, unSubmitted] = await Promise.all([
             // buổi học được yêu cầu mở khóa
             this.prisma.buoiHoc.findMany({
-                where: { YeuCauMoKhoa: true },
+                where: { YeuCauMoKhoa: true, AdminMoKhoa: false },
                 select: {
                     ID: true, BuoiSo: true, LopHocID: true,
                     lophoc: {
@@ -197,8 +186,12 @@ export class DashboardService {
                     },
                     LyDoMoKhoa: true, NgayYeuCau: true
                 },
+                take: 10,
                 orderBy: { NgayYeuCau: 'asc' }// ai trước xử lý trước
             }),
+
+            this.GetExpiringClasses(),
+
             //session > 48h chưa nhập điểm
             this.prisma.buoiHoc.findMany({
                 where: { // 48h = 48 x 60p x 60 ms x 1000
@@ -207,38 +200,34 @@ export class DashboardService {
                     YeuCauMoKhoa: false
                 },
                 select: {
-                    ID: true, BuoiSo: true, LopHocID: true, BatDauLuc:true,
+                    ID: true, BuoiSo: true, LopHocID: true, BatDauLuc: true,
                     lophoc: {
                         select: {
-                            TenLop: true, 
+                            TenLop: true,
                             giaovien: { select: { User: { select: { HoTen: true } } } }
                         }
                     }
                 },
-                orderBy:{BatDauLuc:'asc'}, take:10
+                orderBy: { BatDauLuc: 'asc' }, take: 10
             })
         ])
 
-        return {
-            YeuCauMoKhoa: requestUnlock.map(rm => ({
-                // ID: rm.ID,
-                BuoiSo: rm.BuoiSo,
-                LopHocID: rm.LopHocID,
-                TenLop: rm.lophoc.TenLop,
-                GiaoVien: rm.lophoc.giaovien.User.HoTen,
-                LyDo: rm.LyDoMoKhoa,
-                Ngay: rm.NgayYeuCau
-            })),
-
-            ChuaSubmit: unSubmitted.map(um => ({
-                // ID: um.ID,
-                BuoiSo: um.BuoiSo,
-                LopHocID: um.LopHocID,
-                TenLop: um.lophoc.TenLop,
-                GiaoVien: um.lophoc.giaovien.User.HoTen,
-                NgayHoc: um.BatDauLuc
+        const mapData = (data: any, type?: string) =>
+            data.map(item => ({
+                BuoiSo: item.BuoiSo,
+                LopHocID: item.LopHocID,
+                TenLop: item.lophoc.TenLop,
+                GiaoVien: item.lophoc.giaovien.User.HoTen,
+                LoiNhan: item.LyDoMoKhoa || null,
+                Ngay: item.NgayYeuCau || item.BatDauLuc,
+                Loai: type
             }))
-        }
+        //return classes
+        return [
+            ...mapData(requestUnlock, 'REQUEST'),
+            ...classDB,
+            ...mapData(unSubmitted, 'UNSUBMIT')
+        ]
     }
 
     // ghép 3 mảng dữ liệu 

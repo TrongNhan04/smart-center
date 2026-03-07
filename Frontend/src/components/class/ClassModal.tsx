@@ -122,8 +122,8 @@ const ClassModal = ({ open, onCancel, khoahocId, onSave,
           res = await classApi.updateOpen(editingClass.ID, updateData)
         res = await classApi.updateRunning(editingClass.ID, updateData)
       }
-      
-      res = await classApi.create(payload)
+      else
+        res = await classApi.create(payload)
 
       message.success(`Thao tác thành công`)
       onSave(res.data.ID)

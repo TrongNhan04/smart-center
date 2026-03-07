@@ -6,6 +6,12 @@ export class DateHelper {
         return { h, m }
     }
 
+    static Timeleft(dateCompare: string) {
+        const timeNow = new Date().getTime()
+        const date = new Date(dateCompare).getTime()
+        return timeNow - date
+    }
+
     static ConvertHourStrToDayJS(time: string) {
         const { h, m } = this.PraseHHmm(time)
         const d = new Date()

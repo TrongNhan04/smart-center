@@ -54,16 +54,16 @@ const ClassAction = ({ lophoc, onEdit, onSoftDelete }: Props) => {
             size="small"
             type="primary"
             icon={<EditOutlined />}
-            onClick={()=>onEdit(lophoc)}
+            onClick={() => onEdit(lophoc)}
           >
           </Button>
         </Tooltip>
       </Space>
     )
-  else
-    return (
-      <>Không thể thao tác</>
-    )
+
+  return (
+    <>Không thể thao tác</>
+  )
 }
 
 export default ClassAction

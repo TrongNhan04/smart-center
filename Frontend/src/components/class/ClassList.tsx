@@ -86,7 +86,7 @@ const ClassList = () => {
 
   const columns = [
     {// mã lớp+tên lớp chung
-      title: 'Lớp học', dataIndex: 'TenLop', key: 'TenLop', ellipsis: true,
+      title: 'Lớp học', dataIndex: 'MaLopHoc', key: 'MaLopHoc ', ellipsis: true,
       // sorter: (a:any, b:any) => a.TenLop.localeCompare(b.name),
       render: (code: string, lophoc: ClassDB) => (
         <Space orientation="vertical">
@@ -97,12 +97,12 @@ const ClassList = () => {
         </Space>
       )
     },
-    { // khóa học 
-      title: 'Khóa học', dataIndex: ['KhoaHoc', 'TenKhoaHoc'],
-      key: 'TenKhoaHoc', ellipsis: true,
-      render: (name: string, lophoc: ClassDB) =>
-        <Link to={`/admin/courses/${lophoc.KhoaHoc.ID}`}>{name}</Link>
-    },
+    // { // khóa học 
+    //   title: 'Khóa học', dataIndex: ['KhoaHoc', 'TenKhoaHoc'],
+    //   key: 'TenKhoaHoc', ellipsis: true,
+    //   render: (name: string, lophoc: ClassDB) =>
+    //     <Link to={`/admin/courses/${lophoc.KhoaHoc.ID}`}>{name}</Link>
+    // },
     { // giáo viên
       title: 'Giáo viên', dataIndex: ['GiaoVien', 'HoTen'],
       key: 'HoTen', ellipsis: true,
@@ -147,11 +147,19 @@ const ClassList = () => {
     },
     { // trạng thái
       title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai',
+      filters: [
+        {text: 'Tuyển sinh', value: 'OPEN'},
+        {text: 'Đang hoạt động', value: 'RUNNING'},
+        {text: 'Đã đóng', value:'CLOSED'},
+        {text: 'Đã kết thúc', value: 'FINISHED'}
+      ],
+      onFilter:(value:any, lophoc:ClassDB) => lophoc.TrangThai === value,
       render: (value: string) => {
         const statusMap: Record<string, { color: string, text: string }> = {
           OPEN: { color: 'default', text: 'Tuyển sinh' },
-          RUNNING: { color: 'success', text: 'Đang hoạt động' },
-          CLOSED: { color: 'error', text: 'Đã đóng' }
+          RUNNING: { color: 'processing', text: 'Đang hoạt động' },
+          CLOSED: { color: 'error', text: 'Đã đóng' },
+          FINISHED: {color: 'success', text: 'Đã kết thúc'}
         }
         // value là 1 trong 3 key đó
         const status = statusMap[value]
