@@ -17,6 +17,7 @@ import EnrollList from "./components/enroll/EnrollList";
 import InvoiceList from "./components/invoice/InvoiceList";
 import InvoiceDetail from "./components/invoice/InvoiceDetail";
 import TongHopThuChi from "./components/invoice/TongHopThuChi";
+import Dashboard from "./components/dashboard/Dashboard";
 
 const router = createBrowserRouter([
   {
@@ -34,7 +35,7 @@ const router = createBrowserRouter([
         path: 'admin',
         element: <SidebarComponent />,
         children: [
-          { path: 'home', element: <div>Trang home</div> },
+          { path: 'dashboard', element: <Dashboard/> },
           
           { path: 'courses', element: <CourseList /> },
           { path: 'courses/:id', element:<CourseDetail/> },

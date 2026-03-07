@@ -1,12 +1,12 @@
-import { ArrowLeftOutlined, MoneyCollectOutlined, RollbackOutlined } from "@ant-design/icons";
+import {
+  ArrowLeftOutlined, MoneyCollectOutlined, RollbackOutlined
+} from "@ant-design/icons";
 import {
   Card, Descriptions, Table, Divider, Typography, Row, Col, Statistic,
-  Space, Button,
-  notification,
-  Tag,
+  Space, Button, notification, Tag,
 } from "antd";
 import { useEffect, useState } from "react";
-import type { InvoiceDB, PaymentDB, ReceiptDB } from "./InvoiceDTO";
+import type { GiaoDich, InvoiceDB } from "./InvoiceDTO";
 import { invoiceApi } from "../../api/invoiceApi";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import InvoiceModal from "./InvoiceModal";
@@ -17,22 +17,19 @@ const InvoiceDetail = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const [invoice, setInvoice] = useState<InvoiceDB | null>(null)
-  const [receipts, setReceipts] = useState<ReceiptDB[]>([])
-  const [payments, setPayments] = useState<PaymentDB[]>([])
+  const [transactions, setTransactions] = useState<GiaoDich[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const [isReceipt, setIsReceipt] = useState(false)
   const invoiceId = Number(id)
 
   const fetchDetail = async () => {
     try {
-      const [invoiceRes, receiptRes, paymentRes] = await Promise.all([
+      const [invoiceRes, transactionRes] = await Promise.all([
         invoiceApi.findOne(invoiceId),
-        invoiceApi.getReceiptById(invoiceId),
-        invoiceApi.getPaymentById(invoiceId)
+        invoiceApi.getTransactionsById(invoiceId)
       ])
       setInvoice(invoiceRes.data)
-      setReceipts(receiptRes.data)
-      setPayments(paymentRes.data)
+      setTransactions(transactionRes.data)
     } catch (error) {
       handleError(error)
     }
@@ -71,11 +68,22 @@ const InvoiceDetail = () => {
   const conNo = invoice.TongTien - invoice.DaTra
   const isCancelled = invoice.TrangThai === 'CANCELLED'
 
-  const tongThu = receipts.reduce((sum, item) =>
-    sum + Number(item.SoTien), 0) || 0
+  const receipts: GiaoDich[] = []
+  const payments: GiaoDich[] = []
+  let tongHoan = 0
+  let tongThu = 0
 
-  const tongHoan = payments.reduce((sum, item) =>
-    sum + Number(item.SoTien), 0) || 0
+  for (var item of transactions) {
+    if (item.LoaiGD === 'RECEIPT') {
+      receipts.push(item)
+      tongThu += Number(item.SoTien)
+    }
+
+    if (item.LoaiGD === 'PAYMENT') {
+      payments.push(item)
+      tongHoan += Number(item.SoTien)
+    }
+  }
 
   const noKH = tongThu - tongHoan
 
@@ -95,26 +103,43 @@ const InvoiceDetail = () => {
     CARD: 'Thẻ'
   }
 
-  const receiptColumns = [
-    {
-      title: 'Mã phiếu', dataIndex: 'MaPhieuThu', key: 'MaPhieuThu',
+  const transactionColumns = [
+    { // mã giao dịch
+      title: 'Mã giao dịch', dataIndex: 'MaGD', key: 'MaGD',
       width: 120, align: 'center' as const
     },
-    {
-      title: 'Thời gian', dataIndex: 'NgayThu', key: 'NgayThu', width: 150,
+    { // ngày giao dịch
+      title: 'Ngày giao dịch', dataIndex: 'NgayGD', key: 'NgayGD', width: 150,
       align: 'center' as const,
+      sorter: (a: any, b: any) => new Date(a.NgayGD).getTime() - new Date(b.NgayGD).getTime(),
       render: (value: string) => new Date(value).toLocaleDateString()
     },
-    { // số tiền thu
-      title: 'Số tiền (VNĐ)', dataIndex: 'SoTien', key: 'SoTien',
-      align: 'right' as const, width: 200,
-      render: (amount: number) => {
-        const value = Number(amount)
-        return <Text type="success" strong>
-          +{value.toLocaleString('vi-VN')}</Text>
+    { // loại giao dịch
+      title: 'Loại GD', dataIndex: 'LoaiGD', key: 'LoaiGD',
+      filters: [
+        { text: 'Thu tiền', value: 'RECEIPT' },
+        { text: 'Hoàn tiền', value: 'PAYMENT' },
+      ],
+      onFilter: (value: any, record: GiaoDich) => record.LoaiGD === value,
+      render: (type: string) => {
+        if (type === 'RECEIPT')
+          return <Tag color='green'> THU TIỀN</Tag>
+        return <Tag color='red'> HOÀN TIỀN</Tag>
       }
     },
-    {
+    { // số tiền
+      title: 'Số tiền (VNĐ)', dataIndex: 'SoTien', key: 'SoTien',
+      align: 'right' as const, width: 200,
+      render: (amount: number, record: GiaoDich) => {
+        const value = Number(amount)
+        const isReceipt = record.LoaiGD === 'RECEIPT'
+        let pos = isReceipt ? '+' : "-"
+        return <Text strong type={isReceipt ? 'success' : 'danger'}>
+          {pos} {value.toLocaleString()} đ
+        </Text>
+      }
+    },
+    { // phương thức
       title: 'Phương thức', dataIndex: 'PhuongThuc', key: 'PhuongThuc',
       width: 190,
       render: (value: string) => method[value]
@@ -124,33 +149,6 @@ const InvoiceDetail = () => {
       title: 'Ghi chú', dataIndex: 'GhiChu', key: 'GhiChu',
       render: (value: string) => !value || '' ? '-' : value
     },
-  ]
-
-  const paymentColumns = [
-    { // mã phiếu chi
-      title: 'Mã phiếu', dataIndex: 'MaPhieuChi', key: 'MaPhieuChi',
-      width: 120, align: 'center' as const
-    },
-    { // thời gian
-      title: 'Thời gian', dataIndex: 'NgayChi', key: 'NgayChi',
-      width: 150, align: 'center' as const,
-      render: (value: string) => new Date(value).toLocaleDateString()
-    },
-    { // số tiền
-      title: 'Số tiền (VNĐ)', dataIndex: 'SoTien', key: 'SoTien',
-      align: 'right' as const, width: 200,
-      render: (amount: number) => {
-        const value = Number(amount)
-        return <Text type="danger" strong>
-          +{value.toLocaleString()}</Text>
-      }
-    },
-    {
-      title: 'Phương thức', dataIndex: 'PhuongThuc', key: 'PhuongThuc',
-      width: 190, render: (value: string) => method[value]
-    },
-    { title: 'Thu ngân', dataIndex: 'ThuNgan', key: 'ThuNgan', width: 220, },
-    { title: 'Lý do', dataIndex: 'LyDo', key: 'LyDo', ellipsis: true },
   ]
 
   return (
@@ -295,35 +293,15 @@ const InvoiceDetail = () => {
 
         <Divider />
 
-        {/* Lịch sử phiếu thu */}
-        <Title level={5}>Lịch sử thu tiền ({receipts.length})</Title>
+        {/* Lịch sử giao dịch */}
+        <Title level={5}>Lịch sử giao dịch ({transactions.length})</Title>
         <Table
-          columns={receiptColumns}
-          dataSource={receipts}
+          columns={transactionColumns}
+          dataSource={transactions}
           pagination={false}
           bordered
           rowKey="ID"
         />
-
-        <Divider />
-
-        {/* Lịch sử hoàn tiền */}
-        <Title level={5}>Lịch sử hoàn tiền ({payments.length})</Title>
-        {10 > 0 ? (
-          <Table
-            columns={paymentColumns}
-            dataSource={payments}
-            pagination={false}
-            bordered
-            rowKey="ID"
-          />
-        ) : (
-          <Text type="secondary">
-            Không có phiếu hoàn tiền
-          </Text>
-        )}
-
-        <Divider />
       </Card>
     </div>
   )

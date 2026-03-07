@@ -29,16 +29,6 @@ const InvoiceList = () => {
   const currentPage = Number(searchParam.get('page')) || 1
   const [total, setTotal] = useState()
 
-  const handelError = (error: any) => {
-    notification.error({
-      title: 'Có lỗi xảy ra',
-      description: error.response.data.message,
-      showProgress: true,
-      pauseOnHover: true
-    })
-    console.log('Có lỗi xảy ra: ', error.response.data.message)
-  }
-
   const fetchInvoices = async () => {
     setLoading(true)
     try {
@@ -69,6 +59,16 @@ const InvoiceList = () => {
     setTimeout(() => {
       setInvoiceId(null)
     }, 3000)
+  }
+
+  const handelError = (error: any) => {
+    notification.error({
+      title: 'Có lỗi xảy ra',
+      description: error.response.data.message,
+      showProgress: true,
+      pauseOnHover: true
+    })
+    console.log('Có lỗi xảy ra: ', error.response.data.message)
   }
 
   const handleOpenReceipt = (invoice: InvoiceDB) => {
@@ -203,11 +203,12 @@ const InvoiceList = () => {
         const { DaTra, TongTien, NgayHetHan, TrangThai } = invoice
         const ConNo = TongTien - DaTra > 0
         const HetHan = new Date(NgayHetHan).getTime()
+        const isActive = TrangThai==='ACTIVE'
         switch (value) {
-          case 'Paid': return TongTien == DaTra
-          case 'Part': return DaTra > 0 && ConNo && TrangThai == 'ACTIVE'
-          case 'Unpaid': return DaTra == 0 && TrangThai == 'ACTIVE'
-          case 'OverDate': return now > HetHan && ConNo
+          case 'Paid': return TongTien == DaTra && isActive
+          case 'Part': return DaTra > 0 && ConNo && isActive
+          case 'Unpaid': return DaTra == 0 && isActive
+          case 'OverDate': return now > HetHan && ConNo && isActive
           default:
             return false
         }
@@ -271,7 +272,7 @@ const InvoiceList = () => {
             </Select>
           </Col>
           <Col style={{ marginLeft: 'auto' }}>
-            Tổng cộng:<Text strong> {invoices.length} hóa đơn</Text>
+            Hiển thị:<Text strong> {invoices.length} hóa đơn</Text>
           </Col>
         </Row>
         {/* Bảng hiển thị dữ liệu */}

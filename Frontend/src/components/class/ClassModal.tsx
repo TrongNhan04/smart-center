@@ -31,7 +31,7 @@ const ClassModal = ({ open, onCancel, khoahocId, onSave,
   const [teachers, setTeachers] = useState<TeacherForCmb[]>([])
   const [loading, setLoading] = useState(false)
   const isEdit = editingClass ? true : false
-  
+
   // useEffect 1 chỉ tải data cho combobox
   useEffect(() => {
     const fetchCourse_Teacher = async () => {
@@ -110,28 +110,27 @@ const ClassModal = ({ open, onCancel, khoahocId, onSave,
         room: values.room || null,
       }
 
-      const mapOrigin = mapDataClass(editingClass) // map data gốc thành tiếng anh
-      const updateData = getChangedValue(mapOrigin, payload)
-      if (Object.keys(updateData).length === 0) {
-        message.info('Không có thông tin nào thay đổi!')
-        return
-      }
-
       let res = null
-      if (isEdit && editingClass.TrangThai === 'OPEN')
-        res = await classApi.updateOpen(editingClass.ID, updateData)
-      else if (isEdit && editingClass.TrangThai === 'RUNNING')
+      if (isEdit) {
+        const mapOrigin = mapDataClass(editingClass) // map data gốc thành tiếng anh
+        const updateData = getChangedValue(mapOrigin, payload)
+        if (Object.keys(updateData).length === 0) {
+          message.info('Không có thông tin nào thay đổi!')
+          return
+        }
+        if (editingClass.TrangThai === 'OPEN')
+          res = await classApi.updateOpen(editingClass.ID, updateData)
         res = await classApi.updateRunning(editingClass.ID, updateData)
-      else
-        res = await classApi.create(payload)
-
+      }
+      
+      res = await classApi.create(payload)
 
       message.success(`Thao tác thành công`)
       onSave(res.data.ID)
       handleCancel()
     }
     catch (error: any) {
-      console.log("Có lỗi xảy ra: ", error.response.data.message)
+      console.log("Có lỗi xảy ra: ", error)
 
       if (error.response) {
         const serverError = error.response.data

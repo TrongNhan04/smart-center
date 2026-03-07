@@ -44,16 +44,13 @@ export interface PaymentDB {
     LyDo: string
 }
 
-//  SELECT pt."ID", "MaPhieuThu" AS MaPhieu, "HoaDonID", "SoTien", 
-//                 "NgayThu" AS Ngay, "PhuongThuc", pt."GhiChu", 
-//                 'RECEIPT' AS Loai, nd."HoTen" as ThuNgan, hv."TenHocVien"
 export interface GiaoDich {
     ID: number
-    MaPhieu: string,
+    MaGD: string,
     HoaDonID: number,
-    loai: string
+    LoaiGD: string
     SoTien: number,
-    ngay: string,
+    NgayGD: string,
     PhuongThuc: string,
     ThuNgan: string,
     TenHocVien: string,

@@ -16,7 +16,7 @@ const Login = () => {
       login(response.data.user, response.data.access_token)
 
       message.success('Đăng nhập thành công')
-      navigate('/admin/home')
+      navigate('/admin/dashboard')
     }
     catch (error: any) {
       message.error('Sai tài khoản hoặc mật khẩu')

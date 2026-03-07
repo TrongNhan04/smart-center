@@ -83,6 +83,7 @@ export class InvoiceService {
         const take = 12
         const skip = (query.page - 1) * take || 0
         const where: Prisma.HoaDonWhereInput = {}
+        
         const q = query.q?.trim()
         if (query.status)
             where.TrangThai = query.status

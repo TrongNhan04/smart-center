@@ -10,6 +10,9 @@ export class QueryInvoiceDTO {
 
     @IsOptional()
     q?: string
+
+    // @IsOptional()
+    // overdue:string
 }
 
 export class QueryTransaction {

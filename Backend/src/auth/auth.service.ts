@@ -92,7 +92,7 @@ export class AuthService {
             where: { ID: userId },
             data: { ToKenVerSion: { increment: 1 } }
         })
-        return { msg: "Logout succesfully" }
+       // return { msg: "Logout succesfully" }
     }
 
     async GetMe(userId: number) {

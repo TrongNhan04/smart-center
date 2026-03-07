@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import {
   BookOutlined,
   CreditCardOutlined,
+  DashboardOutlined,
   FormOutlined,
-  HomeOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   TeamOutlined,
@@ -36,7 +36,7 @@ function getItem(
 }
 
 const items: MenuItem[] = [
-  getItem('Trang chủ', 'home', <HomeOutlined />),
+  getItem('Dashboard', 'dashboard', <DashboardOutlined />),
   getItem('Đào tạo', 'train', <BookOutlined />, [
     getItem('Khóa học', 'courses'),
     getItem('Lớp học', 'classes'),
@@ -48,7 +48,7 @@ const items: MenuItem[] = [
   getItem('Ghi danh', 'enrolls', <FormOutlined />),
   getItem('Tài chính', 'finances', <CreditCardOutlined />, [
     getItem('Hóa đơn', 'invoices'),
-    getItem('Thu - Chi', 'receipts-payments')
+    getItem('Tổng hợp', 'receipts-payments')
   ]),
   getItem('Tài khoản', 'account', <UserOutlined />),
 ];

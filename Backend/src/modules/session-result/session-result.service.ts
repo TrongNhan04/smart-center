@@ -13,10 +13,10 @@ export class SessionResultService {
 
     // lưu NHÁP kết quả buổi học - DRAFT
     async SaveDraftResult(userId: number, sessionId: number, body: SessionsResultDTO) {
-        // 1. Validate quyền & Lấy thông tin
+        // kiểm tra quyền & Lấy thông tin
         const { sessionDB, teacherId } = await this.SessionAcsessValidate(userId, sessionId)
 
-        // 2. check thời gian cho phép lưu NHÁP
+        // kiểm tra quyền cho phép lưu NHÁP
         const minutesLeftStart = DateHelper.CheckTimeWindow(sessionDB.BatDauLuc)
         const minutesLeftEnd = DateHelper.CheckTimeWindow(sessionDB.KetThucLuc)
         if (sessionDB.AdminMoKhoa == false) {

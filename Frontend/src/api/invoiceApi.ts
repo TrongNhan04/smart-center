@@ -20,18 +20,17 @@ export const invoiceApi = {
     createPayment: (invoiceId: number, body: PaymentDto) =>
         axiosClient.post(`admin/invoices/${invoiceId}/payments`, body),
 
-    getReceiptById: (invoiceId: number) =>
-        axiosClient.get(`admin/invoices/${invoiceId}/receipts`),
-
-    getPaymentById: (invoiceId: number) =>
-        axiosClient.get(`admin/invoices/${invoiceId}/payments`),
-
-    getAllReceipt_Payment: (page: number) =>
-        axiosClient.get(`admin/invoices/receipts-payments`, {
+    getTransactions: (page: number, month?: number, year?: number) =>
+        axiosClient.get(`admin/invoices/transactions`, {
             params: {
-                page: page
+                page: page,
+                month: month,
+                year: year
             }
-        })
+        }),
+
+    getTransactionsById: (invoiceId: number) =>
+        axiosClient.get(`admin/invoices/${invoiceId}/transactions`),
 }
 
 interface QueryDto {

@@ -86,7 +86,8 @@ const ClassList = () => {
 
   const columns = [
     {// mã lớp+tên lớp chung
-      title: 'Lớp học', dataIndex: 'MaLopHoc', key: 'MaLopHoc', ellipsis: true,
+      title: 'Lớp học', dataIndex: 'TenLop', key: 'TenLop', ellipsis: true,
+      // sorter: (a:any, b:any) => a.TenLop.localeCompare(b.name),
       render: (code: string, lophoc: ClassDB) => (
         <Space orientation="vertical">
           <Link to={`/admin/classes/${lophoc.ID}`}

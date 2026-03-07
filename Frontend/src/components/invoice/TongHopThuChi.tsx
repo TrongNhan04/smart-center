@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import {
-  Table, Tag, Typography, Card, Space, Statistic, Row, Col,
-  notification
+  Table, Tag, Typography, Card, Statistic, Row, Col, notification,
+  DatePicker
 } from 'antd';
 import { Link, useSearchParams } from 'react-router-dom';
 import type { GiaoDich } from './InvoiceDTO';
 import { invoiceApi } from '../../api/invoiceApi';
+import dayjs from 'dayjs';
 
 const { Title } = Typography
 
@@ -14,11 +15,13 @@ const TongHopThuChi = () => {
   const [searchParam, setSearchParam] = useSearchParams()
   const currentPage = Number(searchParam.get('page')) || 1
   const [total, setTotal] = useState()
+  const [selectedDate, setSelectedDate] = useState(dayjs())
 
   const fetchTransactions = async () => {
     try {
-      const res = await invoiceApi.getAllReceipt_Payment(currentPage)
-      console.log("data: ", res.data.items)
+      const month = selectedDate.month()
+      const year = selectedDate.year()
+      const res = await invoiceApi.getTransactions(currentPage, month, year)
       setTransactions(res.data.items)
       setTotal(res.data.total)
     } catch (error: any) {
@@ -34,63 +37,53 @@ const TongHopThuChi = () => {
 
   useEffect(() => {
     fetchTransactions()
-  }, [currentPage])
-  // 2. TÍNH TOÁN THỐNG KÊ (Giả lập)
-  // const totalIncome = transactions.filter(t => t.type === 'INCOME').reduce((sum, t) => sum + t.amount, 0)
-  // const totalExpense = transactions.filter(t => t.type === 'EXPENSE').reduce((sum, t) => sum + t.amount, 0)
-  // const balance = totalIncome - totalExpense
+  }, [currentPage, selectedDate])
+
+  let tongThu = 0
+  let tongChi = 0
+  for (var item of transactions) {
+    if (item.LoaiGD == 'RECEIPT')
+      tongThu += Number(item.SoTien)
+    else tongChi += Number(item.SoTien)
+  }
+  const loiNhuan = tongThu - tongChi
 
   // 3. CỘT CHO BẢNG GIAO DỊCH
   const columns = [
     { // mã giao dịch
-      title: 'Mã GD',
-      dataIndex: 'maphieu',
-      key: 'maphieu',
-      width: 100,
+      title: 'Mã GD', dataIndex: 'MaGD', key: 'maphieu', width: 100,
     },
     { // ngày giao dịch
-      title: 'Ngày giao dịch',
-      dataIndex: 'ngay',
-      key: 'ngay',
-      width: 150,
-      sorter: (a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+      title: 'Ngày giao dịch', dataIndex: 'NgayGD', key: 'NgayGD', width: 150,
+      sorter: (a: any, b: any) => new Date(a.NgayGD).getTime() - new Date(b.NgayGD).getTime(),
       render: (value: string) => new Date(value).toLocaleDateString()
     },
     {
-      title: 'Loại GD',
-      dataIndex: 'loai',
-      key: 'loai',
-      width: 120,
+      title: 'Loại GD', dataIndex: 'LoaiGD', key: 'LoaiGD', width: 120,
       filters: [
-        { text: 'Phiếu Thu', value: 'RECEIPT' },
-        { text: 'Phiếu Chi', value: 'PAYMENT' },
+        { text: 'Thu tiền', value: 'RECEIPT' },
+        { text: 'Hoàn tiền', value: 'PAYMENT' },
       ],
-      onFilter: (value: any, record: any) => record.type === value,
-      render: (type: string) => (
-        <Tag color={type === 'RECEIPT' ? 'success' : 'error'}>
-          {type === 'RECEIPT' ? 'PHIẾU THU' : 'PHIẾU CHI'}
-        </Tag>
-      ),
+      onFilter: (value: any, record: GiaoDich) => record.LoaiGD === value,
+      render: (type: string) => {
+        if (type === 'RECEIPT')
+          return <Tag color='green'> THU TIỀN</Tag>
+        return <Tag color='red'> HOÀN TIỀN</Tag>
+      }
     },
     {
-      title: 'Học viên',
-      dataIndex: 'TenHocVien',
-      key: 'TenHocVien',
+      title: 'Học viên', dataIndex: 'TenHocVien', key: 'TenHocVien',
       render: (text: string) => text || '--',
     },
     {
-      title: 'Nội dung',
-      dataIndex: 'GhiChu',
-      key: 'GhiChu',
+      title: 'Nội dung', dataIndex: 'GhiChu', key: 'GhiChu',
     },
     {
-      title: 'Số tiền',
-      dataIndex: 'SoTien',
-      key: 'SoTien',
+      title: 'Số tiền', dataIndex: 'SoTien', key: 'SoTien',
       align: 'right' as const, // nếu số âm => a đứng trước b và ngược lại
-      sorter: (a: any, b: any) => a.amount - b.amount,
+      sorter: (a: any, b: any) => a.SoTien - b.SoTien,
       render: (val: number, record: GiaoDich) => {
-        const isIncome = record.loai === 'RECEIPT'
+        const isIncome = record.LoaiGD === 'RECEIPT'
         return (
           <strong style={{ color: isIncome ? '#52c41a' : '#ff4d4f', fontSize: 16 }}>
             {isIncome ? '+' : '-'}{Number(val).toLocaleString()} đ
@@ -106,22 +99,26 @@ const TongHopThuChi = () => {
   ]
 
   return (
-    <div
-      style={{
-        padding: 24,
-        background: "#f5f7fa",
-        minHeight: "90vh",
-      }}
-    >
+    <div style={{ padding: 24, background: "#f5f7fa", minHeight: "90vh" }}>
+
       {/* HEADER + SUMMARY */}
-      <Row 
+      <Row
         gutter={[16, 16]} align="middle"
         justify="space-between" style={{ marginBottom: 24 }}
       >
-        <Col xs={24} md={8} style={{textAlign:'center'}}>
+        <Col xs={24} md={8} style={{ textAlign: 'center' }}>
           <Title level={3} style={{ margin: 0 }}>
-            Tổng hợp Thu - Chi
+            Tổng hợp Tài chính
           </Title>
+          {/* <Text italic style={{ fontSize: 16 }}>
+            Tháng {month+1} / {now.getFullYear()}</Text> */}
+          <DatePicker
+            picker="month"
+            value={selectedDate}
+            format={`MM/YYYY`}
+            onChange={(date:any) => setSelectedDate(date)}
+            style={{ marginTop: 8 }}
+          />
         </Col>
 
         <Col xs={24} md={16}>
@@ -130,7 +127,7 @@ const TongHopThuChi = () => {
               <Card variant="borderless">
                 <Statistic
                   title="Tổng Thu"
-                  value={1000}
+                  value={tongThu}
                   suffix=" đ"
                   styles={{
                     content: {
@@ -146,7 +143,7 @@ const TongHopThuChi = () => {
               <Card variant="borderless">
                 <Statistic
                   title="Tổng Chi"
-                  value={500}
+                  value={tongChi}
                   suffix=" đ"
                   styles={{
                     content: {
@@ -162,7 +159,7 @@ const TongHopThuChi = () => {
               <Card variant="borderless">
                 <Statistic
                   title="Lợi nhuận"
-                  value={500}
+                  value={loiNhuan}
                   suffix=" đ"
                   styles={{
                     content: {
@@ -186,12 +183,12 @@ const TongHopThuChi = () => {
           pagination={{
             current: currentPage,
             pageSize: 10,
-            total:total
+            total: total
           }}
-          onChange={(pagination:any) =>
+          onChange={(pagination: any) =>
             setSearchParam({ page: pagination.current })
           }
-          scroll={{y:350}}
+          scroll={{ y: 350 }}
           bordered
         />
       </Card>

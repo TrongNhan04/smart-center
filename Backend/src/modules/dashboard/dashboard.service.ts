@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { DateHelper } from "src/common/date.helper";
 import { PrismaService } from "src/prisma/prisma.service";
 
@@ -9,22 +9,22 @@ type MonthlyData = {
 }
 
 type OverdueInvoice = {
-    inv_id: number,
-    inv_code: string,
-    student_code: string,
-    student_name: string,
-    parent_phone: string,
-    class?: string | null,
-    debt: number,
-    payment_term: string
-    overdue: number
+    HoaDonID: number,
+    MaHoaDon: string,
+    MaHocVien: string,
+    TenHocVien: string,
+    DienThoai: string,
+    TenLop?: string | null,
+    ConNo: number,
+    ThoiHan: string
+    QuaHan: number
 }
 
 type Notis = 'CREATE_MORE' | 'ENDING_CLASS'
 
 export interface lophoc {
-    class_id: number, class_name: string,
-    type: Notis, mgs: string
+    LopHocID: number, TenLop: string,
+    Loai: Notis, LoiNhan: string
 }
 
 @Injectable()
@@ -40,7 +40,7 @@ export class DashboardService {
         const { start, end } = DateHelper.GetStartEndOfMonth(new Date(y, m))
 
         const [activeStudents, newEnrollments, invoiceOverdue
-            , receiptThisMonth] = await Promise.all([
+            , transactions] = await Promise.all([
                 this.prisma.hocVien.count({ where: { TrangThai: 'ACTIVE' } }),
                 this.prisma.ghiDanh.count({
                     where: {
@@ -49,26 +49,34 @@ export class DashboardService {
                             lt: end // nhỏ hơn đầu tháng sau
                         }
                     }
-                }),// hóa đơn quá hạn còn hiệu lực
+                }),// lấy các hóa đơn quá hạn còn hiệu lực
                 this.prisma.hoaDon.findMany({
                     where: { TrangThai: 'ACTIVE', ThoiHan: { lt: now } }
-                }), // tổng thu
-                this.prisma.giaoDich.aggregate({
+                }), // lấy các giao dịch trong tháng
+                this.prisma.giaoDich.groupBy({
+                    by: ['LoaiGiaoDich'],
                     _sum: { SoTien: true },
-                    where: {
-                        LoaiGiaoDich: 'RECEIPT',
-                        NgayGiaoDich: { gte: start, lt: end }
-                    }
+                    where: { NgayGiaoDich: { gte: start, lt: end } }
                 })
             ])
         // lọc hóa đơn quá hạn còn hiệu lực để tìm ra những đứa còn nợ
-        const totalOverdue = invoiceOverdue.filter
-            (f => f.DaTra < f.TongTien).length
+        let countOverdue = 0
+        let sumOverdue = 0
+        invoiceOverdue.forEach(item => {
+            if (item.DaTra < item.TongTien) {//còn nợ 
+                countOverdue += 1
+                sumOverdue += Number(item.TongTien) - Number(item.DaTra)
+            }
+        })
+
+        const profit = Number(transactions[1]._sum.SoTien || 0) //RECEIPT
+            - Number(transactions[0]._sum.SoTien || 0) //PAYMENT
         return {
-            TongHVMoi: activeStudents,
+            TongHocVien: activeStudents,
             GhiDanhMoi: newEnrollments,
-            TongThucThu: Number(receiptThisMonth._sum.SoTien), // tổng thu theo tháng
-            HoaDonQuaHan: totalOverdue // hóa đơn còn hiệu lực nhưng nợ và quá hạn
+            LoiNhuan: profit,
+            HoaDonQuaHan: countOverdue, // số hóa đơn quá hạn còn nợ
+            TongNoQuaHan: sumOverdue // tổng nợ quá hạn
         }
     }
 
@@ -120,66 +128,21 @@ export class DashboardService {
                 },
                 TrangThai: true
             },
-            take: 10
+            orderBy: { BatDauLuc: 'asc' }, take: 10
         })
         return sessionDB.map(sm => ({
-            time: DateHelper.ISOToHHMM(sm.BatDauLuc, sm.KetThucLuc),
-            class: sm.lophoc.TenLop,
-            teacher: sm.lophoc.giaovien.User.HoTen,
-            room: sm.PhongHoc,
-            status: sm.TrangThai
+            ThoiGian: DateHelper.ISOToHHMM(sm.BatDauLuc, sm.KetThucLuc),
+            TenLop: sm.lophoc.TenLop,
+            GiaoVien: sm.lophoc.giaovien.User.HoTen,
+            PhongHoc: sm.PhongHoc,
+            TrangThai: sm.TrangThai
         }))
     }
-
-    // lấy danh sách hóa đơn quá hạn 
-    async GetOverdueInvoices() {
-        const invoiceDB = await this.prisma.hoaDon.findMany({
-            where: {
-                TrangThai: 'ACTIVE',
-                ThoiHan: { lt: new Date() }
-            },
-            select: {
-                ID: true, MaHoaDon: true, TongTien: true,
-                DaTra: true, ThoiHan: true,
-                hocvien: {
-                    select: {
-                        TenHocVien: true, MaHocVien: true,
-                        Parent: { select: { DienThoai: true } }
-                    }
-                },
-                ghidanh: { select: { lophoc: { select: { TenLop: true } } } }
-            }, orderBy: { ThoiHan: 'asc' }, take: 5
-        })
-
-        const debts: OverdueInvoice[] = []
-        for (var inv of invoiceDB) {
-            const total = Number(inv.TongTien)
-            const paid = Number(inv.DaTra)
-            if (paid < total) {
-                const debt = total - paid
-                const overTime = Math.abs(new Date().getTime() - inv.ThoiHan.getTime())
-                const overDay = Math.floor(overTime / (24 * 60 * 60 * 1000))
-
-                debts.push({
-                    inv_id: inv.ID,
-                    inv_code: inv.MaHoaDon,
-                    student_code: inv.hocvien.MaHocVien,
-                    student_name: inv.hocvien.TenHocVien,
-                    parent_phone: inv.hocvien.Parent.DienThoai,
-                    class: inv.ghidanh?.lophoc.TenLop ?? null,
-                    debt: debt,
-                    payment_term: inv.ThoiHan.toLocaleDateString(),
-                    overdue: overDay
-                })
-            }
-        }
-        return debts
-    }
-
+    
     // lấy danh sách lớp gần hết buổi học hoặc cần sinh thêm buổi
     async GetExpiringClasses() {
         const classDB = await this.prisma.lopHoc.findMany({
-            where: { TrangThai: 'RUNNING' },
+            where: { TrangThai: {not:'CLOSED'} },
             include: {
                 khoahoc: true, // lấy tổng buổi khóa
                 _count: { select: { buoihoc: true } } // lấy tổng buổi đã tạo
@@ -199,18 +162,18 @@ export class DashboardService {
             if (future <= 3) { // còn 3 buổi chưa học
                 if (created < total) { // số buổi đã tạo nhỏ hơn tổng số buổi
                     alert.push({ // => auto nhắc tạo thêm buổi
-                        class_id: lh.ID,
-                        class_name: lh.TenLop,
-                        type: 'CREATE_MORE',
-                        mgs: `Lịch học của lớp gần hết. Đã tạo ${created}/${total} buổi học`
+                        LopHocID: lh.ID,
+                        TenLop: lh.TenLop,
+                        Loai: 'CREATE_MORE',
+                        LoiNhan: `Lịch học của lớp gần hết. Đã tạo ${created}/${total} buổi học`
                     })
                 }
                 else {
                     alert.push({
-                        class_id: lh.ID,
-                        class_name: lh.TenLop,
-                        type: 'ENDING_CLASS',
-                        mgs: `Lớp học sắp kết thúc. Đừng quên kiểm tra các học phí chưa hoàn tất`
+                        LopHocID: lh.ID,
+                        TenLop: lh.TenLop,
+                        Loai: 'ENDING_CLASS',
+                        LoiNhan: `Lớp học sắp kết thúc. Đừng quên kiểm tra các học phí chưa hoàn tất`
                     })
                 }
             }
@@ -225,8 +188,13 @@ export class DashboardService {
             this.prisma.buoiHoc.findMany({
                 where: { YeuCauMoKhoa: true },
                 select: {
-                    ID: true, BuoiSo: true, PhongHoc: true,
-                    lophoc: { select: { giaovien: { select: { User: { select: { HoTen: true } } } } } },
+                    ID: true, BuoiSo: true, LopHocID: true,
+                    lophoc: {
+                        select: {
+                            TenLop: true,
+                            giaovien: { select: { User: { select: { HoTen: true } } } }
+                        }
+                    },
                     LyDoMoKhoa: true, NgayYeuCau: true
                 },
                 orderBy: { NgayYeuCau: 'asc' }// ai trước xử lý trước
@@ -239,27 +207,36 @@ export class DashboardService {
                     YeuCauMoKhoa: false
                 },
                 select: {
-                    ID: true, BuoiSo: true, PhongHoc: true,
-                    lophoc: { select: { giaovien: { select: { User: { select: { HoTen: true } } } } } }
-                }
+                    ID: true, BuoiSo: true, LopHocID: true, BatDauLuc:true,
+                    lophoc: {
+                        select: {
+                            TenLop: true, 
+                            giaovien: { select: { User: { select: { HoTen: true } } } }
+                        }
+                    }
+                },
+                orderBy:{BatDauLuc:'asc'}, take:10
             })
         ])
 
         return {
-            requestUnlock: requestUnlock.map(rm => ({
-                id: rm.ID,
-                lesson: rm.BuoiSo,
-                room: rm.PhongHoc ?? "No room",
-                teacher: rm.lophoc.giaovien.User.HoTen,
-                reason: rm.LyDoMoKhoa,
-                date: rm.NgayYeuCau
+            YeuCauMoKhoa: requestUnlock.map(rm => ({
+                // ID: rm.ID,
+                BuoiSo: rm.BuoiSo,
+                LopHocID: rm.LopHocID,
+                TenLop: rm.lophoc.TenLop,
+                GiaoVien: rm.lophoc.giaovien.User.HoTen,
+                LyDo: rm.LyDoMoKhoa,
+                Ngay: rm.NgayYeuCau
             })),
 
-            unSubmitted: unSubmitted.map(um => ({
-                id: um.ID,
-                lesson: um.BuoiSo,
-                room: um.PhongHoc ?? "No room",
-                teacher: um.lophoc.giaovien.User.HoTen,
+            ChuaSubmit: unSubmitted.map(um => ({
+                // ID: um.ID,
+                BuoiSo: um.BuoiSo,
+                LopHocID: um.LopHocID,
+                TenLop: um.lophoc.TenLop,
+                GiaoVien: um.lophoc.giaovien.User.HoTen,
+                NgayHoc: um.BatDauLuc
             }))
         }
     }
@@ -287,7 +264,7 @@ export class DashboardService {
             const p = listPayment.get(m) ?? 0
             const e = listEnroll.get(m) ?? 0
             return {
-                Thang: m,
+                Thang: `T${m}`,
                 TongThu: r,
                 TongChi: p,
                 LoiNhuan: r - p,
