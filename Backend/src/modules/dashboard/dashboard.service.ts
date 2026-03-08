@@ -1,6 +1,7 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { DateHelper } from "src/common/date.helper";
 import { PrismaService } from "src/prisma/prisma.service";
+import { RemindTeacher } from "./dashboard.dto";
 
 type MonthlyData = {
     month: number,
@@ -11,7 +12,7 @@ type MonthlyData = {
 type Notis = 'CREATE_MORE' | 'ENDING_CLASS'
 
 export interface lophoc {
-    LopHocID: number, TenLop: string,
+    LopHocID: number, TenLop: string, GiaoVienID: number,
     Loai: Notis, LoiNhan: string
 }
 
@@ -152,18 +153,11 @@ export class DashboardService {
                     alert.push({ // => auto nhắc tạo thêm buổi
                         LopHocID: lh.ID,
                         TenLop: lh.TenLop,
+                        GiaoVienID: lh.GiaoVienID,
                         Loai: 'CREATE_MORE',
-                        LoiNhan: `Lịch học của lớp gần hết. Đã tạo ${created}/${total} buổi học`
+                        LoiNhan: `Lịch học của lớp sắp hết. Đã tạo ${created}/${total} buổi học`
                     })
                 }
-                // else {
-                //     alert.push({
-                //         LopHocID: lh.ID,
-                //         TenLop: lh.TenLop,
-                //         Loai: 'ENDING_CLASS',
-                //         LoiNhan: `Lớp học sắp kết thúc. Đừng quên kiểm tra các khoản phí chưa hoàn tất!`
-                //     })
-                // }
             }
         }
         return alert
@@ -180,7 +174,7 @@ export class DashboardService {
                     ID: true, BuoiSo: true, LopHocID: true,
                     lophoc: {
                         select: {
-                            TenLop: true,
+                            TenLop: true, GiaoVienID: true,
                             giaovien: { select: { User: { select: { HoTen: true } } } }
                         }
                     },
@@ -190,7 +184,7 @@ export class DashboardService {
                 orderBy: { NgayYeuCau: 'asc' }// ai trước xử lý trước
             }),
 
-            this.GetExpiringClasses(),
+            this.GetExpiringClasses(), // lớp cần bổ sung lịch học
 
             //session > 48h chưa nhập điểm
             this.prisma.buoiHoc.findMany({
@@ -203,7 +197,7 @@ export class DashboardService {
                     ID: true, BuoiSo: true, LopHocID: true, BatDauLuc: true,
                     lophoc: {
                         select: {
-                            TenLop: true,
+                            TenLop: true, GiaoVienID: true,
                             giaovien: { select: { User: { select: { HoTen: true } } } }
                         }
                     }
@@ -214,20 +208,50 @@ export class DashboardService {
 
         const mapData = (data: any, type?: string) =>
             data.map(item => ({
+                BuoiHocID: item.ID,
                 BuoiSo: item.BuoiSo,
                 LopHocID: item.LopHocID,
                 TenLop: item.lophoc.TenLop,
+                GiaoVienID: item.lophoc.GiaoVienID,
                 GiaoVien: item.lophoc.giaovien.User.HoTen,
                 LoiNhan: item.LyDoMoKhoa || null,
                 Ngay: item.NgayYeuCau || item.BatDauLuc,
                 Loai: type
             }))
-        //return classes
+
         return [
             ...mapData(requestUnlock, 'REQUEST'),
             ...classDB,
             ...mapData(unSubmitted, 'UNSUBMIT')
         ]
+    }
+
+    // gửi thông báo nhắc nhở giáo viên
+    async RemindTeacher(teacherId: number, body: RemindTeacher) {
+        const classDB = await this.prisma.lopHoc.findFirst({
+            where: { ID: body.classId, GiaoVienID: teacherId },
+            select: {
+                ID:true, TenLop:true,
+                giaovien: {
+                    select: {
+                        UserID: true,
+                    }
+                }
+            }
+        })
+        if (!classDB) throw new NotFoundException('Không tìm thấy giáo viên hoặc lớp học')
+        await this.prisma.thongBao.create({
+            data: {
+                UserID: classDB.giaovien.UserID,
+                TieuDe: "Thông báo hệ thống",
+NoiDung: `Nhắc nhở GV gửi kết quả buổi học, lớp ${classDB.TenLop} - buổi ${body.ssNumber}`,
+                Loai: 'SYSTERM_ARLERT',
+                DuLieu: {
+                    classId: classDB.ID
+                },
+                DaDoc: false
+            }
+        })
     }
 
     // ghép 3 mảng dữ liệu 

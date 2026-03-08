@@ -1,10 +1,11 @@
 import { Button, Card, Form, Input, message } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { loginApi } from '../api/authApi';
 import { useAuthStore } from '../store/useAuthStore';
 
 const Login = () => {
   const navigate = useNavigate()
+  const user = useAuthStore(state => state.user)
   const login = useAuthStore(state => state.login)
   const onFinish = async (value: any) => {
     try {
@@ -25,25 +26,26 @@ const Login = () => {
 
   return (
     <>
-      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 100 }}>
-        <Card title="Đăng nhập hệ thống" style={{ width: 400 }}>
-          <Form onFinish={onFinish} layout="vertical">
-            <Form.Item label="Email" name="email"
-              rules={[{ required: true , message:'Vui lòng nhập email!'}]}>
-              <Input placeholder="Nhập email..." />
-            </Form.Item>
+      {user ? <Navigate to="/admin/dashboard" />
+        : <div style={{ display: 'flex', justifyContent: 'center', marginTop: 100 }}>
+          <Card title="Đăng nhập hệ thống" style={{ width: 400 }}>
+            <Form onFinish={onFinish} layout="vertical">
+              <Form.Item label="Email" name="email"
+                rules={[{ required: true, message: 'Vui lòng nhập email!' }]}>
+                <Input placeholder="Nhập email..." />
+              </Form.Item>
 
-            <Form.Item label="Mật khẩu" name="password"
-              rules={[{ required: true , message:'Nhập mật khẩu!'}]}>
-              <Input.Password placeholder="Nhập mật khẩu..." />
-            </Form.Item>
+              <Form.Item label="Mật khẩu" name="password"
+                rules={[{ required: true, message: 'Nhập mật khẩu!' }]}>
+                <Input.Password placeholder="Nhập mật khẩu..." />
+              </Form.Item>
 
-            <Button type="primary" htmlType="submit" block>
-              Đăng nhập
-            </Button>
-          </Form>
-        </Card>
-      </div>
+              <Button type="primary" htmlType="submit" block>
+                Đăng nhập
+              </Button>
+            </Form>
+          </Card>
+        </div>}
     </>
   )
 }

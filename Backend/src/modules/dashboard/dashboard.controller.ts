@@ -1,8 +1,9 @@
-import { Controller, Get, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Query, UseGuards } from "@nestjs/common";
 import { DashboardService } from "./dashboard.service";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guard/roles.guard";
 import { Roles } from "src/auth/decorators/roles.decorator";
+import { RemindTeacher } from "./dashboard.dto";
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('ADMIN')
@@ -45,5 +46,13 @@ export class DashboardController {
         return sessions
         // ... = lấy phần ruột
         // return [...classes, ...sessions]
+    }
+
+    // gửi thông báo nhắc nhở giáo viên
+    @Post('teachers/:id/reminders')
+    async RemindTeacher(
+        @Param('id') teacherId: number,
+        @Body() body: RemindTeacher){
+        return await this.dashboard.RemindTeacher(+teacherId, body)
     }
 }

@@ -31,7 +31,7 @@ const Dashboard = () => {
     try {
       const [sumaryRes, chartRes, sessionRes] = await Promise.all([
         dashboardApi.getSumaries(),
-        dashboardApi.getFinanceChart(),
+        dashboardApi.getCharts(),
         dashboardApi.getSessions(),
       ])
       setSumaries(sumaryRes.data)
@@ -80,7 +80,6 @@ const Dashboard = () => {
     ],
   }
 
-  {console.log('total')}
   return (
     <div style={{ padding: 24, background: '#f0f2f5', minHeight: '100vh' }}>
       {/* <AntTitle level={3} style={{ marginTop: 0, marginBottom: 24 }}>Tổng quan Trung tâm</AntTitle> */}

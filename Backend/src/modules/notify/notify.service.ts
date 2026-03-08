@@ -149,10 +149,13 @@ export class NotifyService {
         })
     }
 
-    // thông báo mở khóa buổi học tx?
-    async UnLockSSNotify(userId: number, session: any) {
+    // thông báo mở khóa buổi học có tx
+    async UnLockSSNotify(userId: number, session: any, tx?:Prisma.TransactionClient) {
+        let client: Prisma.TransactionClient | null = null
+        if (tx) client = tx
+        else client = this.prisma
         const dateStr = session.BatDauLuc.toLocaleDateString('vi-VN')
-        return await this.prisma.thongBao.create({
+        return await client.thongBao.create({
             data: {
                 UserID: userId,
                 TieuDe: "Thông báo hệ thống",

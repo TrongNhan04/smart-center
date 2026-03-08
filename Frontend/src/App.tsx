@@ -1,5 +1,5 @@
 import { Result } from "antd";
-import { createBrowserRouter, RouterProvider } from "react-router-dom"
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom"
 import Login from "./components/Login";
 // import { useState } from "react";
 import PrivateRoute from "./components/PrivateRoute";
@@ -31,11 +31,13 @@ const router = createBrowserRouter([
   },
   {
     element: <PrivateRoute />,
-    children: [
-      {
+    children: [ // toàn bộ children là outlet 1
+      { 
         path: 'admin',
-        element: <SidebarComponent />,
+        element: <SidebarComponent />, // trong này là outlet 2
         children: [
+          { index: true, element: <Navigate to="dashboard" replace /> },
+
           { path: 'dashboard', element: <Dashboard /> },
           { path: 'tasks', element: <TaskList /> },
 
@@ -78,3 +80,15 @@ const App = () => {
 }
 
 export default App
+
+// Bước 1: Đi qua Cửa bảo vệ (<PrivateRoute />)
+// React Router thấy route cha không có path cụ thể, chỉ có element: <PrivateRoute />. 
+// Nó sẽ chạy component này đầu tiên.
+// Logic kiểm tra: Role là ADMIN -> Chạy lệnh return <Outlet />.
+// Kết quả: Cái <Outlet /> này lập tức được thay thế bằng component con 
+// khớp với chữ admin trên URL. Tức là nó gọi ra <SidebarComponent />.
+// Bước 2: Đi qua Cửa giao diện (<SidebarComponent />)
+// Lúc này, <SidebarComponent /> đã được hiển thị lên màn hình 
+// Bên trong <SidebarComponent /> lại có một cái <Outlet /> nữa.
+// React Router tiếp tục đọc URL, thấy đoạn cuối là dashboard, 
+// nó sẽ lấy component <Dashboard /> nhét vào vị trí của cái <Outlet /> thứ hai này.

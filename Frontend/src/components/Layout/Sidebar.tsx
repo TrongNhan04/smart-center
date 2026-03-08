@@ -18,9 +18,9 @@ import Toggle from './Toggle';
 import HeaderCN from './Header';
 import { Outlet, useNavigate } from 'react-router-dom';
 
-const { Header, Sider, Content } = Layout;
+const { Header, Sider, Content } = Layout
 
-type MenuItem = Required<MenuProps>['items'][number];
+type MenuItem = Required<MenuProps>['items'][number]
 
 function getItem(
   label: React.ReactNode,
@@ -33,7 +33,7 @@ function getItem(
     icon,
     children,
     label,
-  } as MenuItem;
+  } as MenuItem
 }
 
 const items: MenuItem[] = [
@@ -53,7 +53,7 @@ const items: MenuItem[] = [
     getItem('Tổng hợp', 'receipts-payments')
   ]),
   getItem('Tài khoản', 'account', <UserOutlined />),
-];
+]
 
 const SidebarComponent = () => {
   const navigate = useNavigate()
@@ -61,8 +61,8 @@ const SidebarComponent = () => {
   const handleToggleTheme = () => {
     setDarkTheme(!darkTheme)
   }
-  const [collapsed, setCollapsed] = useState(false);
-  const { token: { colorBgContainer } } = theme.useToken();
+  const [collapsed, setCollapsed] = useState(false)
+  const { token: { colorBgContainer } } = theme.useToken()
 
   const handleMenuclick = (e: { key: string }) => {
     navigate(`${e.key}`)
@@ -101,7 +101,6 @@ const SidebarComponent = () => {
         </Content>
       </Layout>
     </Layout>
-  );
-};
-
-export default SidebarComponent;
+  )
+}
+export default SidebarComponent

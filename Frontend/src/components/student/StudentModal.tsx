@@ -84,15 +84,19 @@ const StudentModal = ({ open, onSave, onCancel, editing }: Props) => {
         fee: Number(values.fee)
       }
       await new Promise(resolve => setTimeout(resolve, 1000))
-      const originData = mapDataStudent(editing)
-      const updateData = getChangedValue(originData, payload)
-      if (Object.keys(updateData).length === 0) {
-        message.info('Không có thông tin nào thay đổi!')
-        return
-      }
 
-      const res = isEdit ? await studentApi.update(editing.ID, updateData)
-        : await studentApi.create(payload)
+      let res
+      if (isEdit) {
+        const originData = mapDataStudent(editing)
+        const updateData = getChangedValue(originData, payload)
+        if (Object.keys(updateData).length === 0) {
+          message.info('Không có thông tin nào thay đổi!')
+          return
+        }
+        res = await studentApi.update(editing.ID, updateData)
+      }
+      else res = await studentApi.create(payload)
+      
       message.success(isEdit ? 'Cập nhật thành công' : 'Thêm mới thành công')
       onSave(res.data.ID)
       handleCancel()

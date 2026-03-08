@@ -1,7 +1,7 @@
 import { Modal, Form, Input, InputNumber, Select, Row, Col, message } from 'antd';
 import { useEffect, useState } from 'react';
 import courseApi, { } from '../../api/courseApi';
-import {mapDataCourse, type CourseDB, type CourseDto } from './CourseDTO';
+import { mapDataCourse, type CourseDB, type CourseDto } from './CourseDTO';
 import { getChangedValue } from '../common/utils';
 
 interface Props {
@@ -23,15 +23,18 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: Props) => {
       const values: CourseDto = await form.validateFields()
 
       await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      const originData = mapDataCourse(editingCourse)
-      const updateData = getChangedValue(originData, values)
-      if (Object.keys(updateData).length === 0) {
-        message.info('Không có thông tin nào thay đổi!')
-        return
+
+      let payload
+      if (isEdit) {
+        const originData = mapDataCourse(editingCourse)
+        const updateData = getChangedValue(originData, values)
+        if (Object.keys(updateData).length === 0) {
+          message.info('Không có thông tin nào thay đổi!')
+          return
+        }
+        payload = await courseApi.update(editingCourse.ID, updateData)
       }
-      const payload = isEdit ? await courseApi.update(editingCourse.ID, updateData) :
-        await courseApi.create(values)
+      else payload = await courseApi.create(values)
 
       message.success(isEdit ? 'Cập nhật thành công' : 'Thêm mới thành công')
       onSave(payload.data.ID)

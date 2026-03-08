@@ -91,14 +91,15 @@ export class SessionResultService {
 
     // mở khóa lưu kết quả buổi học
     async UnlockSession(sessionId: number) {
-        const sessionDB = await this.SessionIdValidator(sessionId)
-        if (sessionDB.TrangThai === 'CANCELLED')
-            throw new ConflictException(`Session ID ${sessionId} is CANCELLED`)
-
         return await this.prisma.$transaction(async tx => {
-            const now = new Date()
-            if (now < sessionDB.KetThucLuc)
-                throw new ConflictException('Chỉ được mở khóa những buổi học đã diễn ra')
+            const sessionDB = await tx.buoiHoc.findUnique({where:{ID:sessionId}})
+            if(!sessionDB) throw new NotFoundException('Không tìm thấy buổi học')
+            if (sessionDB.TrangThai === 'CANCELLED')
+                throw new ConflictException(`Buổi học ID ${sessionId} đã hủy`)
+
+            const duration = new Date(Date.now() - (48*60*60*1000))
+            if (duration < sessionDB.KetThucLuc)
+                throw new ConflictException('Chỉ được mở khóa những buổi học quá hạn nộp kết quả')
 
             const sessionUp = await tx.buoiHoc.update({
                 where: { ID: sessionId },
@@ -116,9 +117,9 @@ export class SessionResultService {
                     }
                 }
             })
-            await this.notisService.UnLockSSNotify(sessionUp.lophoc.giaovien.UserID, sessionUp)
+            await this.notisService.UnLockSSNotify(sessionUp.lophoc.giaovien.UserID, sessionUp, tx)
 
-            // return { msg: `Unlock session id ${sessionDB.ID} successfully` }
+            return `Unlock session id ${sessionDB.ID} successfully`
         })
     }
 
@@ -136,7 +137,7 @@ export class SessionResultService {
                 NgayYeuCau: new Date()
             }
         })
-        return { msg: "Send request successfully" }
+        // return { msg: "Send request successfully" }
     }
 
     // xử lý Transaction lưu DB, Dùng chung cho cả Draft và Submit

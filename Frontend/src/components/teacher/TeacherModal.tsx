@@ -23,15 +23,19 @@ const TeacherModal = ({ open, onCancel, onSave, editing }: Props) => {
       const values: TeacherDto = await form.validateFields()
 
       await new Promise(resolve => setTimeout(resolve, 1000))
-      const originData = mapDataTeacher(editing)
-      const updateData = getChangedValue(originData, values)
-      if (Object.keys(updateData).length === 0) {
-        message.info('Không có thông tin nào thay đổi!')
-        return
-      }
 
-      const res = isEdit ? await teacherApi.update(editing.ID, updateData)
-        : await teacherApi.create(values)
+      let res
+      if (isEdit) {
+        const originData = mapDataTeacher(editing)
+        const updateData = getChangedValue(originData, values)
+        if (Object.keys(updateData).length === 0) {
+          message.info('Không có thông tin nào thay đổi!')
+          return
+        }
+        res = await teacherApi.update(editing.ID, updateData)
+      }
+      else res = await teacherApi.create(values)
+      
       message.success(isEdit ? 'Cập nhật thành công' : 'Thêm mới thành công')
       onSave(res.data.ID)
       handleCancel()

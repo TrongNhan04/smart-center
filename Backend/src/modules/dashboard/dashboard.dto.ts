@@ -3,6 +3,8 @@
 //     unSubmitted: UnsubmittedDTO[]
 // }
 
+import { IsNotEmpty } from "class-validator"
+
 export class RequestUnlockDTO {
     id: number
     lesson: number
@@ -19,20 +21,27 @@ export class UnsubmittedDTO {
     teacher: string
 }
 
-export interface PendingSSDTO {
-    rquestUnlock: {
-        id: number
-        lesson: number
-        room: string
-        teacher: string
-        reason: string
-        date: Date
-    }[],
+export class RemindTeacher {
+    @IsNotEmpty()
+    classId: number
 
-    unSubmitted: {
-        id: number
-        lesson: number
-        room: string
-        teacher: string
-    }
+    ssNumber: string
 }
+
+// export interface PendingSSDTO {
+//     rquestUnlock: {
+//         id: number
+//         lesson: number
+//         room: string
+//         teacher: string
+//         reason: string
+//         date: Date
+//     }[],
+
+//     unSubmitted: {
+//         id: number
+//         lesson: number
+//         room: string
+//         teacher: string
+//     }
+// }

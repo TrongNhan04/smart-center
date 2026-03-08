@@ -42,8 +42,8 @@ const DashboardTask = () => {
         break;
 
       case 'UNSUBMIT': // chưa nộp kết quả
-        TieuDe = `Chưa nộp điểm danh: Lớp ${item.TenLop}`,
-          MoTa = `GV: ${item.GiaoVien} chưa nộp kết quả ngày ${item.Ngay}.`,
+        TieuDe = `Chưa nộp kết quả: Lớp ${item.TenLop}`,
+          MoTa = `GV: ${item.GiaoVien} chưa nộp kết quả ngày ${new Date(item.Ngay).toLocaleDateString()}.`,
           Loai = 'info'
         break;
 
@@ -74,7 +74,8 @@ const DashboardTask = () => {
         }}
         style={{ borderRadius: 8 }}
         extra={
-          <a onClick={() => navigate(`/admin/tasks`)}>Xem tất cả</a>
+          <a style={{ backgroundColor: '#fff8e6', color: '#d97109' }}
+            onClick={() => navigate(`/admin/tasks`)}>Xem tất cả</a>
         }
       >
         {/* việc cần làm */}

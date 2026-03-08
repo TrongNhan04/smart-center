@@ -111,8 +111,8 @@ const ClassModal = ({ open, onCancel, khoahocId, onSave,
       }
 
       let res = null
-      if (isEdit) {
-        const mapOrigin = mapDataClass(editingClass) // map data gốc thành tiếng anh
+      if (isEdit) {// map data gốc thành tiếng anh
+        const mapOrigin = mapDataClass(editingClass) 
         const updateData = getChangedValue(mapOrigin, payload)
         if (Object.keys(updateData).length === 0) {
           message.info('Không có thông tin nào thay đổi!')
