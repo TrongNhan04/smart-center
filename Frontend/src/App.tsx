@@ -1,11 +1,9 @@
 import { Result } from "antd";
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom"
 import Login from "./components/Login";
-// import { useState } from "react";
 import PrivateRoute from "./components/PrivateRoute";
 import SidebarComponent from "./components/layout/Sidebar";
 import CourseList from "./components/course/CourseList";
-import HeaderCN from "./components/layout/Header";
 import CourseDetail from "./components/course/CourseDetail";
 import ClassList from "./components/class/ClassList";
 import ClassDetail from "./components/class/ClassDetail";
@@ -19,6 +17,7 @@ import InvoiceDetail from "./components/invoice/InvoiceDetail";
 import TongHopThuChi from "./components/invoice/TongHopThuChi";
 import Dashboard from "./components/dashboard/Dashboard";
 import TaskList from "./components/dashboard/TaskList";
+import Profile from "./components/account/Profile";
 
 const router = createBrowserRouter([
   {
@@ -26,13 +25,24 @@ const router = createBrowserRouter([
     element: <Login />
   },
   {
-    path: 'teacher',
-    element: <div>Trang giáo viên vận hành<HeaderCN /></div>
+    element: <PrivateRoute allowedRole={'TEACHER'} />,
+    children: [
+      {
+        path: 'teacher',
+        element: <SidebarComponent />,
+        children: [
+          { index: true, element: <Navigate to="account" replace /> },
+          { path: 'schedules', element: <div>thời khóa biểu</div> },
+          { path: 'my-class', element: <div>lớp của tôi</div> },
+          { path: 'account', element: <Profile /> }
+        ]
+      }
+    ]
   },
   {
-    element: <PrivateRoute />,
+    element: <PrivateRoute allowedRole={'ADMIN'} />,
     children: [ // toàn bộ children là outlet 1
-      { 
+      {
         path: 'admin',
         element: <SidebarComponent />, // trong này là outlet 2
         children: [
@@ -60,7 +70,7 @@ const router = createBrowserRouter([
 
           { path: 'receipts-payments', element: <TongHopThuChi /> },
 
-          { path: 'account', element: <div>trang tài khoản</div> }
+          { path: 'account', element: <Profile /> }
         ]
       }
     ]

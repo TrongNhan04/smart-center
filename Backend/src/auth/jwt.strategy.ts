@@ -22,9 +22,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         const userDB = await this.prismaService.user.findUnique({
             where: { ID: payload.sub }
         })
-        if (!userDB) throw new UnauthorizedException('Who are you?')
+        if (!userDB) throw new UnauthorizedException('Chưa đăng nhập, không thể truy cập')
         if (userDB.ToKenVerSion !== payload.tokenVersion)
-            throw new UnauthorizedException('Token was expired or cancelled')
+            throw new UnauthorizedException('Token đã hết hạn hoặc đã hủy')
         return { userId: payload.sub, email: payload.email, role: payload.role };
     }
 }

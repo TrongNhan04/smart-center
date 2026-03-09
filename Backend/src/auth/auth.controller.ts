@@ -41,12 +41,12 @@ export class AuthController {
 		return await this.authService.GetMe(+request.user.userId)
 	}
 
-	// đổi mật khẩu + tên
+	// đổi thông tin tài khoản
 	@UseGuards(JwtAuthGuard)
 	@Patch("profile")
 	async UpdateProfile(
 		@Req() req: RequestWithUser, @Body() profile: ProfileDTO) {
-		return await this.authService.UpdateProfile(
-			+req.user.userId, profile)
+		const userId = req.user.userId
+        return await this.authService.UpdateProfile(+userId, profile)
 	}
 }

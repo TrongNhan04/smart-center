@@ -32,7 +32,7 @@ axiosClient.interceptors.response.use(
         if (error.response?.status === 401) {
             console.log(error)
             useAuthStore.getState().logout()
-            //window.location.href = '/'
+            // window.location.href = '/test'
         }
         return Promise.reject(error)
     }

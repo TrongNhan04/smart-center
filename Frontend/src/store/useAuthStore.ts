@@ -5,7 +5,7 @@ interface User {
 	id: number,
 	email: string,
 	phone: string,
-	full_name:string
+	full_name: string
 	role: 'ADMIN' | 'TEACHER'
 }
 
@@ -14,6 +14,7 @@ interface AuthState {
 	access_token: string | null,
 
 	login: (user: User, token: string) => void,
+	update: (user: User) => void,
 	logout: () => void
 }
 
@@ -27,7 +28,11 @@ export const useAuthStore = create<AuthState>()(
 				user: userData,
 				access_token: token
 			}),
-			
+
+			update: (userData) => set({
+				user: userData
+			}),
+
 			logout: () => set({
 				user: null,
 				access_token: null

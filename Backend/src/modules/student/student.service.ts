@@ -72,7 +72,7 @@ export class StudentService {
         })
         // ko có user => tạo mới
         if (userDB.length == 0) {
-            const hashPW = await bcrypt.hash(body.phone, 10)
+            const hashPW = await bcrypt.hash(body.phone, 15)
             return await this.prismaService.$transaction(async (tx) => {
                 // thêm user
                 const newUser = await tx.user.create({

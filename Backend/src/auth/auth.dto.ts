@@ -32,7 +32,7 @@ export class ProfileDTO{
     @IsOptional()
     @IsNotEmpty()
     @IsString()
-    userName?: string
+    full_name?: string
 
     @IsOptional()
     @IsNotEmpty()
@@ -43,4 +43,14 @@ export class ProfileDTO{
     @IsNotEmpty()
     @IsString()
     newPassword: string
+
+    @IsOptional()
+    @IsEmail()
+    @IsNotEmpty()
+    email: string
+
+    @IsOptional()
+    @IsPhoneNumber('VN')//SĐT VN
+    @IsNotEmpty()
+    phone: string
 }

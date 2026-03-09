@@ -128,14 +128,12 @@ export class UpdateClassDTO {
 
 export class SchechuleDTO{
     @IsNotEmpty()
-    @Matches(/^\d{4}-\d{2}-\d{2}$/, { 
-    message: 'startDate must in format YYYY-MM-DD (exp: 2026-01-27)' 
-  })
-    startDate:string
+    @Type(() => Date)
+    @IsDate()
+    startDate: Date
 
     @IsNotEmpty()
-    @Matches(/^\d{4}-\d{2}-\d{2}$/, { 
-    message: 'endDate must in format YYYY-MM-DD (exp: 2026-01-27)' 
-  })
-    endDate:string
+    @Type(() => Date)
+    @IsDate()
+    endDate: Date
 }

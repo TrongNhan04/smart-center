@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
   BookOutlined,
+  CalendarOutlined,
   CheckSquareOutlined,
   CreditCardOutlined,
   DashboardOutlined,
@@ -17,52 +18,63 @@ import '../../index.css';
 import Toggle from './Toggle';
 import HeaderCN from './Header';
 import { Outlet, useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../../store/useAuthStore';
 
 const { Header, Sider, Content } = Layout
 
 type MenuItem = Required<MenuProps>['items'][number]
 
-function getItem(
-  label: React.ReactNode,
-  key: React.Key,
-  icon?: React.ReactNode,
-  children?: MenuItem[],
-): MenuItem {
-  return {
-    key,
-    icon,
-    children,
-    label,
-  } as MenuItem
-}
-
-const items: MenuItem[] = [
-  getItem('Tổng quan', 'dashboard', <DashboardOutlined />),
-  getItem('Việc cần làm', 'tasks', <CheckSquareOutlined/>),
-  getItem('Đào tạo', 'train', <BookOutlined />, [
-    getItem('Khóa học', 'courses'),
-    getItem('Lớp học', 'classes'),
-  ]),
-  getItem('Người dùng', 'users', <TeamOutlined />, [
-    getItem('Giáo viên', 'teachers'),
-    getItem('Học viên', 'students'),
-  ]),
-  getItem('Ghi danh', 'enrolls', <FormOutlined />),
-  getItem('Tài chính', 'finances', <CreditCardOutlined />, [
-    getItem('Hóa đơn', 'invoices'),
-    getItem('Tổng hợp', 'receipts-payments')
-  ]),
-  getItem('Tài khoản', 'account', <UserOutlined />),
-]
-
 const SidebarComponent = () => {
   const navigate = useNavigate()
   const [darkTheme, setDarkTheme] = useState(true)
+  const user = useAuthStore(state => state.user)
+  const [collapsed, setCollapsed] = useState(false)
+
+  const isAdmin = user?.role === 'ADMIN'
+  const { token: { colorBgContainer } } = theme.useToken()
+
+  const getItem = (
+    label: React.ReactNode,
+    key: React.Key,
+    icon?: React.ReactNode,
+    children?: MenuItem[],
+  ): MenuItem => {
+    return {
+      key,
+      icon,
+      children,
+      label,
+    } as MenuItem
+  }
+
+  const items: MenuItem[] = isAdmin ? [
+    getItem('Tổng quan', 'dashboard', <DashboardOutlined />),
+    getItem('Việc cần làm', 'tasks', <CheckSquareOutlined />),
+    getItem('Đào tạo', 'train', <BookOutlined />, [
+      getItem('Khóa học', 'courses'),
+      getItem('Lớp học', 'classes'),
+    ]),
+    getItem('Người dùng', 'users', <TeamOutlined />, [
+      getItem('Giáo viên', 'teachers'),
+      getItem('Học viên', 'students'),
+    ]),
+    getItem('Ghi danh', 'enrolls', <FormOutlined />),
+    getItem('Tài chính', 'finances', <CreditCardOutlined />, [
+      getItem('Hóa đơn', 'invoices'),
+      getItem('Tổng hợp', 'receipts-payments')
+    ]),
+    getItem('Tài khoản', 'account', <UserOutlined />),
+  ]
+  // không phải admin thì menu của giáo viên
+  : [
+    getItem('Thời khóa biểu', 'schedules', <CalendarOutlined/>),
+    getItem('Lớp của tôi', 'my-class', <BookOutlined/>),
+    getItem('Tài khoản', 'account', <UserOutlined />)
+  ]
+
   const handleToggleTheme = () => {
     setDarkTheme(!darkTheme)
   }
-  const [collapsed, setCollapsed] = useState(false)
-  const { token: { colorBgContainer } } = theme.useToken()
 
   const handleMenuclick = (e: { key: string }) => {
     navigate(`${e.key}`)

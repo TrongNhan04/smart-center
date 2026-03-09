@@ -52,7 +52,7 @@ const TaskList = () => {
       handelError(error)
     }
   }
-  const handleUnlock = async (sessionId:number) => {
+  const handleUnlock = async (sessionId: number) => {
     try {
       await dashboardApi.unlock(sessionId)
       fetchTasks()
@@ -128,7 +128,8 @@ const TaskList = () => {
           >{isReminded ? 'Đã nhắc' : 'Nhắc GV'}</Button>
         }
 
-        return <Button onClick={() => navigate(`/admin/classes/${task.LopHocID}`)}>
+        return <Button
+          onClick={() => navigate(`/admin/classes/${task.LopHocID}`)}>
           Bổ sung
         </Button>
       }
@@ -148,14 +149,7 @@ const TaskList = () => {
           style={{ margin: 8 }}
           dataSource={tasksToday}
           columns={columns}
-          //loading={loading}
-          //pagination={{ defaultPageSize: 10 }}
-          // pagination={{
-          //   current: currentPage,
-          //   pageSize: 12,
-          //   total: total
-          // }}
-          // onChange={handleChange}
+          pagination={{ defaultPageSize: 10 }}
           rowKey="ID"
           scroll={{ x: 1100, y: 408 }}
         />

@@ -8,7 +8,6 @@ import { type TaskDB } from './DashboardDTO';
 const DashboardTask = () => {
   const navigate = useNavigate()
   const [tasksToday, setTasksToday] = useState<TaskDB[]>([])
-  const totalTask = tasksToday.length
 
   const fetchTasks = async () => {
     try {
@@ -68,7 +67,7 @@ const DashboardTask = () => {
 
   return (
     <>
-      <Card title={`Việc cần làm (${totalTask})`} variant='borderless'
+      <Card title={`Việc cần làm`} variant='borderless'
         styles={{
           header: { backgroundColor: '#fff8e6', color: '#d97109' }
         }}

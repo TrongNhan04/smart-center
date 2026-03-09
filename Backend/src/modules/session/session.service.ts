@@ -6,7 +6,7 @@ import { DateHelper } from "src/common/date.helper";
 import { SessionResultService } from "../session-result/session-result.service";
 import { SessionsResultDTO } from "../session-result/session-result.dto";
 import { NotifyService } from "../notify/notify.service";
-import { endOfDay, startOfDay } from "date-fns";
+import { endOfDay, setDay, startOfDay } from "date-fns";
 import { BuoiHocWhereInput } from "src/generated/prisma/models";
 
 @Injectable()
@@ -214,11 +214,9 @@ export class SessionService {
   }
 
   // lấy lịch dạy 1 tuần cho giáo viên
-  async GetSessionsOneWeek(userId: number, start: string, end: string) {
-    let sod = new Date(start)
-    sod = startOfDay(sod)
-    let eod = new Date(end)
-    eod = endOfDay(eod)
+  async GetSessionsOneWeek(userId: number, start: Date, end: Date) {
+    const sod = startOfDay(start)
+    const eod = startOfDay(setDay(end, 1))
     const teacherDB = await this.GetTeacherByUserId(userId)
     const sessionDB = await this.prisma.buoiHoc.findMany({
       where: {

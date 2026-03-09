@@ -92,7 +92,7 @@ export class AuthService {
             where: { ID: userId },
             data: { ToKenVerSion: { increment: 1 } }
         })
-       // return { msg: "Logout succesfully" }
+        // return { msg: "Logout succesfully" }
     }
 
     async GetMe(userId: number) {
@@ -108,35 +108,56 @@ export class AuthService {
         return userDB
     }
 
-    // đổi tên + mật khẩu
+    // cập nhật thông tin tài khoản
     async UpdateProfile(userID: number, profile: ProfileDTO) {
         const userDB = await this.prismaService.user.findUnique({
             where: { ID: userID }
         })
         if (!userDB)
-            throw new NotFoundException("User not found")
+            throw new NotFoundException("không tìm thấy User")
 
         const data: Prisma.UserUpdateInput = {}
-        if (profile.userName)
-            data.HoTen = profile.userName.trim()
+        if (profile.email || profile.phone) {
+            const otherUser = await this.prismaService.user.findFirst({
+                where: {
+                    ID: { not: userID },
+                    OR: [
+                        { Email: profile.email },
+                        { DienThoai: profile.phone }
+                    ]
+                }
+            })
+            if (otherUser)
+                throw new ConflictException('Email hoặc điện thoại đã được sử dụng')
+            data.Email = profile.email
+            data.DienThoai = profile.phone
+        }
+
+        data.HoTen = profile.full_name ?? userDB.HoTen
 
         if (profile.newPassword && profile.oldPassword) {
             const comparePW = await bcrypt.compare(profile.oldPassword, userDB.MatKhauHash)
             if (!comparePW)
-                throw new UnauthorizedException("Incorrect password!")
+                throw new UnauthorizedException("Sai mật khẩu!")
 
             if (profile.oldPassword === profile.newPassword)
-                throw new BadRequestException("Password doesn't change!")
+                throw new BadRequestException("Mật khẩu không thay đổi!")
 
-            const hashPW = await bcrypt.hash(profile.newPassword, 10)
+            const hashPW = await bcrypt.hash(profile.newPassword, 15)
             data.MatKhauHash = hashPW
             data.PhaiDoiMK = false
             data.ToKenVerSion = { increment: 1 }
         }
 
-        await this.prismaService.user.update({
+        const update = await this.prismaService.user.update({
             where: { ID: userID }, data
         })
-        // return { mgs: "Update succesfully" }
+        return {
+            id: update.ID,
+            email: update.Email,
+            full_name: update.HoTen,
+            phone: update.DienThoai,
+            role: update.VaiTro
+        }
     }
 }

@@ -108,7 +108,7 @@ const TongHopThuChi = () => {
       >
         <Col xs={24} md={8} style={{ textAlign: 'center' }}>
           <Title level={3} style={{ margin: 0 }}>
-            Tổng hợp Tài chính
+            Tổng hợp tài chính
           </Title>
           {/* <Text italic style={{ fontSize: 16 }}>
             Tháng {month+1} / {now.getFullYear()}</Text> */}

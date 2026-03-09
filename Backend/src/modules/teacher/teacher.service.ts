@@ -51,7 +51,7 @@ export class TeacherService {
             this.TeacherCodeValidator(body.code),
             this.UserValidator(body.email, body.phone)
         ])
-        const hashPW = await bcrypt.hash(body.phone, 10)
+        const hashPW = await bcrypt.hash(body.phone, 15)
 
         return await this.prismaService.$transaction(async (tx) => {
             // thêm user
