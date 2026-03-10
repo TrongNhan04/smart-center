@@ -3,7 +3,7 @@ import { sessionApi } from '../../api/sessionApi';
 import { useEffect, useState } from 'react';
 import type { SessionDetail, SessionResult } from './SessionDTO';
 import { DateHelper } from '../common/date.helper';
-import { PhoneFilled, PhoneOutlined, UserOutlined } from '@ant-design/icons';
+import { PhoneOutlined, UserOutlined } from '@ant-design/icons';
 
 interface Props {
   open: boolean,
@@ -92,7 +92,7 @@ const SessionDrawer = ({ open, onCancel, sessionId }: Props) => {
         onClose={() => onCancel()}
         open={open}
       >
-        {/* PHẦN 1: THÔNG TIN CHUNG (Dùng Descriptions cho gọn gàng) */}
+        {/* Thông tin chung */}
         <Descriptions title="Thông tin chung" bordered column={2} size="small" style={{ marginBottom: 24 }}>
           <Descriptions.Item label="Lớp học">{sessionDetail?.LopHoc}</Descriptions.Item>
           <Descriptions.Item label="Giáo viên">{sessionDetail?.GiaoVien}</Descriptions.Item>
@@ -108,7 +108,7 @@ const SessionDrawer = ({ open, onCancel, sessionId }: Props) => {
           </Descriptions.Item>
         </Descriptions>
 
-        {/* PHẦN 2: KẾT QUẢ / ĐIỂM DANH */}
+        {/* Kết quả buổi học */}
         <div style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 16 }}>
           Kết quả buổi học
         </div>

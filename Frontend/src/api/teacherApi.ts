@@ -25,6 +25,14 @@ const teacherApi = {
     findManyForCmb: () => axiosClient.get('admin/teachers/combobox'),
 
     findOne: (teacherId: number) =>
-        axiosClient.get(`admin/teachers/${teacherId}`)
+        axiosClient.get(`admin/teachers/${teacherId}`),
+
+    getSchedule: (startDate:string, endDate:string) => 
+        axiosClient.get(`teachers/sessions-week`,{
+            params:{
+                startDate: startDate,
+                endDate: endDate
+            }
+        })
 }
 export default teacherApi

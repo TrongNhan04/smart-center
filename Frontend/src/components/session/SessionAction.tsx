@@ -51,7 +51,7 @@ const SessionAction = ({ session, unlock, onCancel, onOpenDrawer }: Props) => {
         <Tooltip title="Mở khóa">
           <Popconfirm
             title="Xác nhận mở khóa?"
-            description="Thao này có thể thay đổi kết quả buổi học!"
+            description="Thao tác này có thể thay đổi kết quả buổi học!"
             okText="Xác nhận mở khóa"
             cancelText="Hủy"
             onConfirm={() => unlock(session.ID)}

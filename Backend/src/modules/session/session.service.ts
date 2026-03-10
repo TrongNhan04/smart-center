@@ -223,13 +223,20 @@ export class SessionService {
         lophoc: { GiaoVienID: teacherDB.ID },
         BatDauLuc: { gte: sod },
         KetThucLuc: { lt: eod },
-      }, orderBy: { BatDauLuc: 'asc' }, include: { lophoc: true }
+      },
+      select: {
+        ID:true, BatDauLuc:true, KetThucLuc:true, PhongHoc:true,
+        TrangThai:true, LopHocID:true, lophoc:{select:{TenLop:true}}
+      },
+      orderBy: { BatDauLuc: 'asc' }
     })
-    if (sessionDB.length == 0) return { mgs: 'free period' }
+    if (sessionDB.length == 0) return []
 
-    return sessionDB.map(m => ({
-      id: m.ID, start: m.BatDauLuc, end: m.KetThucLuc,
-      class: m.lophoc.TenLop, status: m.TrangThai,
+    return sessionDB.map(item => ({
+      ID: item.ID, NgayHoc: item.BatDauLuc.toISOString().substring(0,10),
+      GioHoc: DateHelper.ISOToHHMM(item.BatDauLuc, item.KetThucLuc),
+      LopHocID: item.LopHocID, TenLop: item.lophoc.TenLop,
+      TrangThai: item.TrangThai, PhongHoc: item.PhongHoc
     }))
   }
 

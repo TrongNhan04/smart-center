@@ -2,6 +2,7 @@ import { Form, Input, message, Modal, notification } from "antd"
 import { useState } from "react"
 import { authApi } from "../../api/authApi"
 import { useAuthStore } from "../../store/useAuthStore"
+import { LockOutlined } from "@ant-design/icons"
 
 interface Props {
   open: boolean
@@ -17,10 +18,10 @@ const ChangePw = ({ open, onCancel }: Props) => {
       const values = await form.validateFields()
       const { confirmPassword, ...rest } = values
 
-      await authApi.update(rest)
-      message.success('Thao tác thành công')
+      await authApi.update(rest) // cập nhật
+      message.success('Đổi mật khẩu thành công, vui lòng đăng nhập lại để tiếp tục!')
       handelCancel()
-      useAuthStore.getState().logout()
+      useAuthStore.getState().logout() // set localStorage = null
     } catch (error: any) {
       notification.error({
         title: 'Có lỗi xảy ra',
@@ -44,7 +45,7 @@ const ChangePw = ({ open, onCancel }: Props) => {
       <Modal
         title={
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            {/* <LockOutlined style={{ color: '#ff4d4f' }} /> */}
+            <LockOutlined style={{ color: '#ff4d4f' }} />
             <span>Đổi mật khẩu bảo mật</span>
           </div>
         }

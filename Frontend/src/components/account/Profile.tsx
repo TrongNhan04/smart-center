@@ -35,6 +35,7 @@ const Profile = () => {
       message.success('Thao tác thành công')
       if (Object.keys(updateData).includes('email'))
         logout()
+      
     } catch (error: any) {
       notification.error({
         title: 'Có lỗi xảy ra',

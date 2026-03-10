@@ -1,12 +1,12 @@
 import { Button, Card, Form, Input, message } from 'antd';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { useAuthStore } from '../store/useAuthStore';
 import { authApi } from '../api/authApi';
 
 const Login = () => {
   const navigate = useNavigate()
-  const user = useAuthStore(state => state.user)
+  //const user = useAuthStore(state => state.user)
   const login = useAuthStore(state => state.login)
   const onFinish = async (value: any) => {
     try {

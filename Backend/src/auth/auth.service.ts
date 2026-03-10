@@ -69,7 +69,8 @@ export class AuthService {
         const payload = {
             sub: userDB.ID,
             role: userDB.VaiTro,
-            mustChangePW: userDB.PhaiDoiMK,
+            email: userDB.Email,
+            // mustChangePW: userDB.PhaiDoiMK,
             tokenVersion: userDB.ToKenVerSion
         }
 
@@ -92,7 +93,7 @@ export class AuthService {
             where: { ID: userId },
             data: { ToKenVerSion: { increment: 1 } }
         })
-        // return { msg: "Logout succesfully" }
+        return "Logout succesfully"
     }
 
     async GetMe(userId: number) {
@@ -131,6 +132,8 @@ export class AuthService {
                 throw new ConflictException('Email hoặc điện thoại đã được sử dụng')
             data.Email = profile.email
             data.DienThoai = profile.phone
+            if (profile.email)
+                data.ToKenVerSion = { increment: 1 }// xóa token cũ
         }
 
         data.HoTen = profile.full_name ?? userDB.HoTen
@@ -146,7 +149,7 @@ export class AuthService {
             const hashPW = await bcrypt.hash(profile.newPassword, 15)
             data.MatKhauHash = hashPW
             data.PhaiDoiMK = false
-            data.ToKenVerSion = { increment: 1 }
+            data.ToKenVerSion = { increment: 1 }// xóa token cũ
         }
 
         const update = await this.prismaService.user.update({

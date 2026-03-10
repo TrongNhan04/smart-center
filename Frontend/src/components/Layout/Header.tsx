@@ -1,16 +1,15 @@
-import { useNavigate } from "react-router-dom"
 import { useAuthStore } from "../../store/useAuthStore"
 import { Button } from "antd"
+import { authApi } from "../../api/authApi"
 
 const HeaderCN = () => {
-  const navigate = useNavigate()
 
   const user = useAuthStore(state => state.user)
   const logout = useAuthStore(state => state.logout)
 
-  const handleLogout = () => {
-    logout()
-    navigate('/')
+  const handleLogout = async () => {
+    await authApi.logout() // đăng xuất backend
+    logout() // đăng xuất frontend
   }
 
   return (

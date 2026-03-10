@@ -69,8 +69,8 @@ export class DateHelper {
 
     // lấy đầu ngày hôm nay đến đầu ngày mai
     static GetStartEndOfDay(now: Date) {
-        const start = startOfDay(now)// ngày đầu tháng
-        const end = startOfDay(addDays(now, 1)) // ngày đầu tháng sau
+        const start = startOfDay(now)// đầu này hôm nay
+        const end = startOfDay(addDays(now, 1)) // đầu ngày mai
         return { start, end }
     }
 

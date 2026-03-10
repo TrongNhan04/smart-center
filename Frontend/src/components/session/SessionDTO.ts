@@ -8,7 +8,7 @@ export interface SessionDto {
     room?: string
 }
 
-// list
+// list cho trang chi tiết lớp học / giáo viên
 export interface SessionDB {
     ID: number,
     LopHocID: number,
@@ -23,21 +23,15 @@ export interface SessionDB {
     YeuCauMoKhoa: boolean
 }
 
-// drawer
-export interface SessionDetail {
-    ID: number
-    BuoiSo: number,
-    ChuDe: string,
-    BatDauLuc: string,
-    KetThucLuc: string,
-    PhongHoc: string,
-    LopHoc: string,
-    GiaoVien: string,
-    TrangThai: string,
-    KetQua: SessionResult[]
-}
+// chi tiết 1 buổi học cho drawer
+export type SessionDetail =
+    Omit<SessionDB, 'AdminMoKhoa' | 'YeuCauMoKhoa'> & {
+        GiaoVien: string,
+        LopHoc: string,
+        KetQua: SessionResult[]
+    }
 
-// drawer
+// drawer danh sách điểm danh
 export interface SessionResult {
     HocVienID: number,
     MaHocVien: string,
@@ -50,17 +44,23 @@ export interface SessionResult {
     Diem: number
 }
 
-export interface SS_StudentDetail {
-    ID: number, // id kết quả chi tiết
-    BuoiSo: number,
-    ChuDe: string,
-    BatDauLuc: string,
-    KetThucLuc: string,
-    PhongHoc: string,
+// kết quả các buổi học viên đã học
+export type SS_StudentDetail =
+    Omit<SessionDB, 'AdminMoKhoa' | 'YeuCauMoKhoa'> &
+    {
+        TenGiaoVien: string,
+        NhanXet: string,
+        DiemDanh: boolean,
+        Diem: number
+    }
+
+// type cho lịch dạy của giáo viên
+export interface ScheduleOW {
+    ID: number, // id buổi học
+    NgayHoc: string,
+    GioHoc: string,
     LopHocID: number,
-    GiaoVienID: number,
-    TenGiaoVien: string,
-    NhanXet: string,
-    DiemDanh: boolean,
-    Diem: number
+    TenLop: string,
+    PhongHoc: string,
+    TrangThai: string
 }
