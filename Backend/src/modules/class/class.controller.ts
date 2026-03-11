@@ -44,10 +44,13 @@ export class ClassController {
 
     // lấy chi tiết lớp - phần trên 
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles('ADMIN')
+    @Roles('ADMIN','TEACHER')
     @Get('admin/classes/:id')
-    async GetClassById(@Param('id') classId: number) {
-        return await this.classService.GetClassById(+classId)
+    async GetClassById(
+        @Req() req: RequestWithUser,
+        @Param('id') classId: number) {
+        const userId = req.user.role === 'TEACHER' ? req.user.userId : null
+        return await this.classService.GetClassById(+classId,userId)
     }
 
     // cập nhật lớp theo trạng thái
@@ -69,11 +72,14 @@ export class ClassController {
 
     //  lấy danh sách buổi học của lớp - phần dưới
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles('ADMIN')
+    @Roles('ADMIN','TEACHER')
     @Get('admin/classes/:id/sessions')
-    async GetSessionsByClassId(@Param('id') classId: number,
+    async GetSessionsByClassId(
+        @Req() req:RequestWithUser,
+        @Param('id') classId: number,
         @Query() query: SessionStatusDTO) {
-        return await this.sessionService.GetSessionsByClassId(classId, query)
+        const userId = req.user.role === 'TEACHER' ? req.user.userId : null
+        return await this.sessionService.GetSessionsByClassId(classId, userId)
     }
 
     // tạo buổi học tự động - thủ công
@@ -83,28 +89,28 @@ export class ClassController {
     @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
     @Roles('ADMIN', 'TEACHER')
     @Get('teachers/classes')
-    async GetClassesByTeacherId(@Req() req: RequestWithUser) {
-        return this.classService.GetClassesByTeacherId(req.user.userId)
+    async GetClassesByUserId(@Req() req: RequestWithUser) {
+        return this.classService.GetClassesByUserId(req.user.userId)
     }
 
     // danh sách buổi học của 1 lớp giáo viên A dạy - xong
     @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
     @Roles('ADMIN', 'TEACHER')
     @Get('teachers/classes/:id/sessions')
-    async GetSessionsByTeacherId(
+    async GetSessionsByUserId(
         @Param('id') classId: number,
         @Req() req: RequestWithUser) {
         const userId = req.user.role === 'ADMIN' ? null : req.user.userId
         if (!userId) throw new NotFoundException('Không tìm thấy giáo viên')
-        return await this.sessionService.GetSessionsByTeacherId(+userId, +classId)
+        return await this.sessionService.GetSessionsByUserId(+userId, +classId)
     }
-    
+
     // lịch dạy của giáo viên
     @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
     @Roles('ADMIN', 'TEACHER')
     @Get('teachers/sessions-week')
     async GetSessionsOneWeek(@Req() req: RequestWithUser,
-        @Query() q:SchechuleDTO) {
+        @Query() q: SchechuleDTO) {
         const userId = req.user.role === 'ADMIN' ? null : req.user.userId
         if (!userId) throw new NotFoundException('Teacher not found')
         return await this.sessionService.GetSessionsOneWeek(+userId, q.startDate, q.endDate)

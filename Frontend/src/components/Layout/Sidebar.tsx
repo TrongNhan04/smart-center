@@ -68,7 +68,7 @@ const SidebarComponent = () => {
   // không phải admin thì menu của giáo viên
   : [
     getItem('Thời khóa biểu', 'schedules', <CalendarOutlined/>),
-    getItem('Lớp của tôi', 'my-class', <BookOutlined/>),
+    getItem('Lớp của tôi', 'classes', <BookOutlined/>),
     getItem('Tài khoản', 'account', <UserOutlined />)
   ]
 

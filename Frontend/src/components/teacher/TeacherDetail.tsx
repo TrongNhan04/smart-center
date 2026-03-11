@@ -108,10 +108,6 @@ const TeacherDetail = () => {
         </Space>
       )
     },
-    { // khóa học
-      title: 'Khóa học', dataIndex: ['KhoaHoc', 'TenKhoaHoc'],
-      key: 'TenKhoaHoc', ellipsis: true
-    },
     { // khai giảng = ngày bắt đầu
       title: 'Khai giảng', dataIndex: 'TuNgay', key: 'TuNgay', width: 130,
       render: (day: string) =>
@@ -234,7 +230,7 @@ const TeacherDetail = () => {
 
   return (
     // div này bọc toàn bộ nội dung trang chi tiết
-    <div style={{ minHeight: '85vh', background: '#f0f2f5' }}>
+    <div style={{ minHeight: '88vh', background: '#f0f2f5' }}>
       {/* Phần HEADER */}
       <div style={{
         background: '#fff', margin: '18px', padding: '18px',

@@ -18,17 +18,31 @@ export class SessionService {
   ) { }
 
   // lấy danh sách buổi học theo lớp
-  async GetSessionsByClassId(classId: number, query: SessionStatusDTO) {
-    const where: Prisma.BuoiHocWhereInput = {}
-    where.LopHocID = classId
-    if (query.status)
-      where.TrangThai = query.status
+  async GetSessionsByClassId(classId: number, userId: number | null) {
+    const where: Prisma.BuoiHocWhereInput = { LopHocID: classId }
+    if (userId) {
+      const classDB = await this.prisma.lopHoc.findFirst({
+        where: { ID: classId, giaovien: { UserID: userId } }
+      })
+      if (!classDB) throw new NotFoundException
+        ('Không tìm thấy lớp học hoặc truy cập bị từ chối')
+      where.lophoc = { giaovien: { UserID: userId } }
+    }
+
     const sessions = await this.prisma.buoiHoc.findMany({
       where,
       omit: { CreatedAt: true, UpdatedAt: true },
       orderBy: { BatDauLuc: 'asc' }
     })
-    return sessions
+    return sessions.map(item => {
+      let status = ''
+      const isOverTime = DateHelper.TimeDiff(item.KetThucLuc) > 2880 // qua 48h
+      if (isOverTime && item.TrangThai === 'SCHEDULED') {
+        status = 'UNSUBMIT'
+        return { ...item, TrangThai: status }
+      }
+      return item
+    })
   }
 
   //sửa buổi học: chủ đề 
@@ -225,15 +239,15 @@ export class SessionService {
         KetThucLuc: { lt: eod },
       },
       select: {
-        ID:true, BatDauLuc:true, KetThucLuc:true, PhongHoc:true,
-        TrangThai:true, LopHocID:true, lophoc:{select:{TenLop:true}}
+        ID: true, BatDauLuc: true, KetThucLuc: true, PhongHoc: true,
+        TrangThai: true, LopHocID: true, lophoc: { select: { TenLop: true } }
       },
       orderBy: { BatDauLuc: 'asc' }
     })
     if (sessionDB.length == 0) return []
 
     return sessionDB.map(item => ({
-      ID: item.ID, NgayHoc: item.BatDauLuc.toISOString().substring(0,10),
+      ID: item.ID, NgayHoc: item.BatDauLuc.toISOString().substring(0, 10),
       GioHoc: DateHelper.ISOToHHMM(item.BatDauLuc, item.KetThucLuc),
       LopHocID: item.LopHocID, TenLop: item.lophoc.TenLop,
       TrangThai: item.TrangThai, PhongHoc: item.PhongHoc
@@ -241,13 +255,17 @@ export class SessionService {
   }
 
   // lấy danh sách buổi học 1 lớp giáo viên A dạy 
-  async GetSessionsByTeacherId(userId: number, classId: number) {
+  async GetSessionsByUserId(userId: number, classId: number) {
     const teacherDB = await this.GetTeacherByUserId(userId)
+    const classDB = await this.prisma.lopHoc.findFirst({
+      where: { ID: classId, GiaoVienID: teacherDB.ID }
+    })
+    if (!classDB) throw new NotFoundException
+      ('Lớp không tồn tại hoặc truy cập bị từ chối')
     const sessions = await this.prisma.buoiHoc.findMany({
       where: { LopHocID: classId, lophoc: { GiaoVienID: teacherDB.ID } },
       omit: { ID: true, LopHocID: true, CreatedAt: true, UpdatedAt: true }
     })
-    if (sessions.length === 0) throw new ForbiddenException('access denied')
     return sessions
   }
 

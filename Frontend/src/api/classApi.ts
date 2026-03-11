@@ -11,6 +11,9 @@ const classApi = {
     getByStudentId: (studentId: number) =>
         axiosClient.get(`admin/students/${studentId}/classes`),
 
+    // teacher
+    getByUserId: () => axiosClient.get(`teachers/classes`),
+
     create: (body: ClassDto) =>
         axiosClient.post(`/admin/classes`, body),
 

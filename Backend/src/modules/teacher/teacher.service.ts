@@ -122,10 +122,10 @@ export class TeacherService {
                 MaGiaoVien: true,
                 User: { select: { HoTen: true } }
             },
-            orderBy:{MaGiaoVien:'asc'}
+            orderBy: { MaGiaoVien: 'asc' }
         })
-        return teacherDB.map(m=>({
-            ID: m.ID, 
+        return teacherDB.map(m => ({
+            ID: m.ID,
             MaGiaoVien: m.MaGiaoVien,
             HoTen: m.User.HoTen
         }))
@@ -213,21 +213,21 @@ export class TeacherService {
                 khoahoc: true,
                 _count: {
                     select:
-                        { ghidanh: { where: { TrangThai: 'ACTIVE' } } }
+                    {
+                        ghidanh: { where: { TrangThai: 'ACTIVE' } },
+                        buoihoc: { where: { TrangThai: 'COMPLETED' } }
+                    }
                 }
             }
         })
         if (classDB.length == 0) return []
         return classDB.map(lh => ({
             ID: lh.ID, MaLopHoc: lh.MaLopHoc, TenLop: lh.TenLop,
-            KhoaHoc: {
-                ID: lh.KhoaHocID,
-                TenKhoaHoc: lh.khoahoc.TenKhoaHoc
-            },
             PhongHoc: lh.PhongHoc, LichHoc: lh.LichHoc,
-            TuNgay: lh.TuNgay, DenNgay: lh.DenNgay, SiSo: lh.SiSo,
+            TuNgay: lh.TuNgay, 
             GioHoc: lh.GioBatDau + ' - ' + lh.GioKetThuc,
-            TrangThai: lh.TrangThai, TongGhiDanh: lh._count.ghidanh
+            TrangThai: lh.TrangThai, TongGhiDanh: lh._count.ghidanh,
+            TienDo: lh._count.buoihoc + '/' + lh.khoahoc.TongSoBuoi
         }))
     }
 

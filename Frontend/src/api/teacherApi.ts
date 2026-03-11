@@ -27,9 +27,9 @@ const teacherApi = {
     findOne: (teacherId: number) =>
         axiosClient.get(`admin/teachers/${teacherId}`),
 
-    getSchedule: (startDate:string, endDate:string) => 
-        axiosClient.get(`teachers/sessions-week`,{
-            params:{
+    getSchedule: (startDate: string | Date, endDate: string | Date) =>
+        axiosClient.get(`teachers/sessions-week`, {
+            params: {
                 startDate: startDate,
                 endDate: endDate
             }

@@ -83,7 +83,7 @@ const ClassList = () => {
 
   const handleBack = (pagination: any) =>
     setSearchParam({ page: pagination.current })
-
+//  render: (text, record, index) => index + 1, // index starts from 0
   const columns = [
     {// mã lớp+tên lớp chung
       title: 'Lớp học', dataIndex: 'MaLopHoc', key: 'MaLopHoc ', ellipsis: true,
@@ -97,12 +97,6 @@ const ClassList = () => {
         </Space>
       )
     },
-    // { // khóa học 
-    //   title: 'Khóa học', dataIndex: ['KhoaHoc', 'TenKhoaHoc'],
-    //   key: 'TenKhoaHoc', ellipsis: true,
-    //   render: (name: string, lophoc: ClassDB) =>
-    //     <Link to={`/admin/courses/${lophoc.KhoaHoc.ID}`}>{name}</Link>
-    // },
     { // giáo viên
       title: 'Giáo viên', dataIndex: ['GiaoVien', 'HoTen'],
       key: 'HoTen', ellipsis: true,
@@ -230,7 +224,7 @@ const ClassList = () => {
           // pagination={{ defaultPageSize: 8 }}
           pagination={{
             current: currentPage,
-            pageSize: 8
+            pageSize: 10
           }}
           onChange={handleBack}
           rowKey="ID"

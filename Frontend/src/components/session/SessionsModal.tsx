@@ -1,4 +1,4 @@
-import { Col, DatePicker, Form, Input, message, Modal, Row, TimePicker } from "antd"
+import { Col, DatePicker, Form, Input, message, Modal, notification, Row, TimePicker } from "antd"
 import { useState } from "react"
 import type { ClassDB } from "../class/ClassDTO"
 import { sessionApi } from "../../api/sessionApi"
@@ -19,6 +19,16 @@ const SessionsModal = ({ lophoc, open, onCancel, onSave }: Props) => {
   const handleCancel = () => {
     form.resetFields()
     onCancel()
+  }
+
+  const handleError = (error: any) => {
+    notification.error({
+      title: 'Có lỗi xảy ra',
+      description: error?.response?.data?.message,
+      showProgress: true,
+      pauseOnHover: true
+    })
+    console.log("Có lỗi xảy ra", error?.response?.data?.message)
   }
 
   const handleSubmit = async () => {
@@ -47,14 +57,14 @@ const SessionsModal = ({ lophoc, open, onCancel, onSave }: Props) => {
         if (Array.isArray(serverError.message))
           message.error(serverError.message[0])
         else if (typeof serverError.message === 'string')
-          message.error(serverError.message)
+          handleError(error)
         else
           message.error("Có lỗi xảy ra")
       }
     } finally { setLoading(false) }
   }
 
-  if(!lophoc) return 
+  if (!lophoc) return
 
   return (<>
     {/* Modal */}

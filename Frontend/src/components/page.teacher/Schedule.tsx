@@ -5,21 +5,23 @@ import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/vi'; // Import tiếng Việt cho dayjs
 import type { ScheduleOW } from '../session/SessionDTO';
 import teacherApi from '../../api/teacherApi';
+import { useNavigate } from 'react-router-dom';
 
 // Cài đặt ngôn ngữ tiếng Việt để thứ 2 là ngày đầu tuần
-dayjs.locale('vi');
+dayjs.locale('vi')
 
-const { Title, Text } = Typography;
+const { Title, Text } = Typography
 
 const Schedule = () => {
+  const navigate = useNavigate()
   //lưu ngày bắt đầu của tuần này
-  const [startOfWeek, setStartOfWeek] = useState<Dayjs>(dayjs().startOf('week'));
+  const [startOfWeek, setStartOfWeek] = useState<Dayjs>(dayjs().startOf('week'))
   const [scheduleOW, setScheduleOW] = useState<ScheduleOW[]>([])
 
   const fetchSchedule = async () => {
     try {
-      const startDate = startOfWeek.toISOString()
-      const endDate = startOfWeek.add(1, 'week').toISOString()
+      const startDate = startOfWeek.toDate()
+      const endDate = startOfWeek.add(1, 'week').toDate()
       const res = await teacherApi.getSchedule(startDate, endDate)
       setScheduleOW(res.data)
       // console.log(res.data)
@@ -51,8 +53,6 @@ const Schedule = () => {
   // tìm buổi học theo ngày
   const getClassesForDay = (date: Dayjs) => {
     const a = scheduleOW.filter(item => item.NgayHoc === date.format('YYYY-MM-DD'))
-    console.log(scheduleOW)
-    console.log(date.format('YYYY-MM-DD'))
     return a
   }
 
@@ -79,9 +79,9 @@ const Schedule = () => {
         style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: 16 }}>
         {/* day là 1 ngày của weekDays, index là id cho Card */}
         {weekDays.map((day, index) => {
-          const dailyClasses = getClassesForDay(day);
+          const dailyClasses = getClassesForDay(day)
           // console.log(day.format('YYYY-MM-DD'))
-          const isToday = day.format('YYYY-MM-DD') === dayjs().format('YYYY-MM-DD');
+          const isToday = day.format('YYYY-MM-DD') === dayjs().format('YYYY-MM-DD')
 
           return (
             <Card
@@ -107,7 +107,7 @@ const Schedule = () => {
               style={{
                 flex: '1 1 0', // Ép 7 cột chia đều không gian
                 minWidth: '180px', 
-                minHeight: '100px',
+                // minHeight: '100px',
                 borderRadius: 8,
                 borderTop: isToday ? '4px solid #1890ff'
                   : '4px solid transparent', // Highlight ngày hôm nay
@@ -115,7 +115,7 @@ const Schedule = () => {
 
               styles={{
                 body: {
-                  padding: '12px', minHeight: '400px',
+                  padding: '12px', minHeight: '450px',
                   backgroundColor: isToday ? '#e6f7ff' : '#fff'
                 }
               }}
@@ -126,29 +126,31 @@ const Schedule = () => {
                 </div>
               ) : (
                 <Space orientation="vertical" style={{ width: '100%' }}>
-                  {dailyClasses.map(lophoc => (
-                    // Thẻ Card nhỏ đại diện cho 1 ca học
-                    <div
-                      key={lophoc.ID}
+                  {dailyClasses.map(buoihoc => (
+                    // Thẻ div đại diện cho 1 ca học
+                    <div 
+                      onClick={()=>navigate(`/teacher/classes/${buoihoc.LopHocID}`)}
+                      key={buoihoc.ID}
                       style={{
                         padding: 8,
-                        backgroundColor: lophoc.TrangThai === 'CANCELLED' ? '#fff2f0' : '#f6ffed',
-                        borderLeft: `3px solid ${lophoc.TrangThai === 'CANCELLED' ? '#ff4d4f' : '#52c41a'}`,
+                        backgroundColor: buoihoc.TrangThai === 'CANCELLED' ? '#fff2f0' : '#f6ffed',
+                        borderLeft: `3px solid ${buoihoc.TrangThai === 'CANCELLED' ? '#ff4d4f' : '#52c41a'}`,
                         borderRadius: 4,
-                        fontSize: 13
+                        fontSize: 13,
+                        cursor: 'pointer'
                       }}
                     >
-                      <div style={{ fontWeight: 600, color: '#262626' }}>{lophoc.TenLop}</div>
+                      <div style={{ fontWeight: 600, color: '#262626' }}>{buoihoc.TenLop}</div>
                       <div style={{ color: '#595959', margin: '4px 0' }}>
-                        <ClockCircleOutlined /> {lophoc.GioHoc}
+                        <ClockCircleOutlined /> {buoihoc.GioHoc}
                       </div>
-                      <Tag color="default" style={{ margin: 0 }}>{lophoc.PhongHoc ?? '-'}</Tag>
+                      <Tag color="default" style={{ margin: 0 }}>{buoihoc.PhongHoc ?? '-'}</Tag>
                     </div>
                   ))}
                 </Space>
               )}
             </Card>
-          );
+          )
         })}
       </div>
 
@@ -186,7 +188,7 @@ const Schedule = () => {
         </Row>
       </div>
     </div>
-  );
-};
+  )
+}
 
 export default Schedule;

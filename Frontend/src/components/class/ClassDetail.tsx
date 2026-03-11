@@ -5,7 +5,7 @@ import {
 }
   from "@ant-design/icons"
 import {
-  Avatar, Badge, Button, Card, Col, Descriptions, message, Popconfirm,
+  Avatar, Badge, Button, Card, Col, Descriptions, message, notification, Popconfirm,
   Progress, Row, Space, Statistic, Table, Tabs, Tag, Tooltip, Typography
 } from "antd"
 import { Link, useNavigate, useParams } from "react-router-dom"
@@ -19,6 +19,7 @@ import ClassModal from "./ClassModal"
 import SessionAction from "../session/SessionAction"
 import SessionsModal from "../session/SessionsModal"
 import SessionDrawer from "../session/SessionDrawer"
+import { useAuthStore } from "../../store/useAuthStore"
 
 const { Title, Text } = Typography
 
@@ -32,35 +33,29 @@ const ClassDetail = () => {
   const [openDrawer, setOpenDrawer] = useState(false)
   const [sessionId, setSessionId] = useState(0)
   const navigate = useNavigate()
+  const user = useAuthStore(state => state.user)
+  const isAdmin = user?.role === 'ADMIN'
 
-  const fetchClass = async () => {
+  const initData = async () => {
     try {
-      const res = await classApi.findOne(classId)
-      setLopHoc(res.data)
+      const [classRes, sessionRes] = await Promise.all([
+        classApi.findOne(classId),
+        sessionApi.getByClassId(classId)
+      ])
+      setLopHoc(classRes.data)
+      setSessions(sessionRes.data)
     } catch (error: any) {
-      message.error("Có lỗi xảy ra!")
-      console.log("Có lỗi hàm fetchClass: ", error)
-    }
-  }
-
-  const fetchSessions = async () => {
-    try {
-      const res = await sessionApi.getByClassId(classId)
-      setSessions(res.data)
-    } catch (error) {
-      message.error("Có lỗi xảy ra!")
-      console.log("Có lỗi hàm fetchSessions: ", error)
+      notification.error({
+        title: 'Có lỗi xảy ra',
+        description: error.response.data.message,
+        showProgress: true,
+        pauseOnHover: true
+      })
+      console.log("Có lỗi xảy ra", error.response.data.message)
     }
   }
 
   useEffect(() => {
-    const initData = async () => {
-      try {
-        await Promise.all([fetchClass(), fetchSessions()])
-      } catch (error) {
-        console.log("lỗi chạy useEffect: ", error)
-      }
-    }
     if (!classId || isNaN(classId)) {
       console.log("id không phải số nên classId lỗi!", classId)
       return
@@ -116,7 +111,7 @@ const ClassDetail = () => {
     },
     { // trạng thái
       title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai',
-      width: 130, align: 'center' as const,
+       align: 'center' as const,
       filters: [
         { text: 'Sắp tới', value: 'SCHEDULED' },
         { text: 'Hoàn thành', value: 'COMPLETED' },
@@ -124,9 +119,6 @@ const ClassDetail = () => {
         { text: 'Chưa nộp KQ', value: 'UNSUBMIT' }
       ], // value là của thằng filter
       onFilter: (value: any, session: SessionDB) => {
-        const timeleft = DateHelper.Timeleft(session.KetThucLuc)
-        if(value === 'UNSUBMIT')
-          return session.TrangThai === 'SCHEDULED' && timeleft > (48*60*60*1000)
         return session.TrangThai === value
       },
       render: (value: string) => {
@@ -134,14 +126,14 @@ const ClassDetail = () => {
           SCHEDULED: { color: 'default', text: 'Sắp tới' },
           COMPLETED: { color: 'success', text: 'Hoàn thành' },
           CANCELLED: { color: 'error', text: 'Đã hủy' },
-          UNSUBMIT: { color: 'processing', text: 'Chưa nộp điểm danh' }
+          UNSUBMIT: { color: 'processing', text: 'Chưa nộp KQ' }
         }
         // value là 1 trong 3 key đó
         const status = statusMap[value]
         return <Badge status={status.color as any} text={status.text} />
       }
     },
-    {// tình trạng khóa
+    {// tình trạng khóa 
       title: 'Tình trạng khóa', dataIndex: 'AdminMoKhoa', width: 160,
       key: 'AdminMoKhoa', align: 'center' as const,
       filters: [// tạo bộ lọc giả
@@ -168,21 +160,28 @@ const ClassDetail = () => {
       }
     },
     {// thao tác
-      title: 'Thao tác', key: 'action', align: 'center' as const, width: 120,
-      render: (value: SessionDB) => <SessionAction
-        session={value}
-        unlock={handleUnlock}
-        onCancel={handleCancel}
-        onOpenDrawer={handleOpenDrawer}
-      />
+      title: 'Thao tác', key: 'action', align: 'center' as const, //width: 120,
+      render: (value: SessionDB) => {
+        return isAdmin ? <SessionAction
+          session={value}
+          unlock={handleUnlock}
+          onCancel={handleCancel}
+          onOpenDrawer={handleOpenDrawer} />
+          : <Button>Xem buổi học</Button>
+      }
     }
   ]
+
+  const filterColumns = () => {
+    if (isAdmin) return columns
+    return columns.filter(item => item.key !== 'AdminMoKhoa')
+  }
 
   const AutoGenerate = async (classId: number) => {
     try {
       const res = await sessionApi.generateAuto(classId)
       console.log("Data của res auto gene:", res)
-      fetchSessions()
+      initData()
       message.success(`Đã tạo thành công ${res.data.length} buổi học`)
     } catch (error: any) {
       // bắt lỗi từ backend
@@ -210,7 +209,7 @@ const ClassDetail = () => {
       await sessionApi.unlock(sessionId)
       // console.log('res của unlock: ', res.data)
       message.success('Thao tác thành công')
-      fetchSessions()
+      initData()
     } catch (error) {
       message.error('Có lỗi xảy ra')
       console.log('Có lỗi xảy ra: ', error)
@@ -221,7 +220,7 @@ const ClassDetail = () => {
     try {
       await sessionApi.cancel(sessionId, reason)
       message.success('Thao tác thành công')
-      fetchSessions()
+      initData()
     } catch (error: any) {
       message.error('Có lỗi xảy ra')
       console.log('Có lỗi xảy ra: ', error.response.data.message)
@@ -236,7 +235,7 @@ const ClassDetail = () => {
 
   return (
     // div này bọc toàn bộ nội dung trang chi tiết
-    <div style={{ minHeight: '85vh', background: '#f0f2f5' }}>
+    <div style={{ minHeight: '88vh', background: '#f0f2f5' }}>
       {/* Phần HEADER */}
       <div style={{
         background: '#fff', margin: '18px', padding: '16px 24px',
@@ -268,20 +267,22 @@ const ClassDetail = () => {
               <Text type="secondary">Mã LH: {lophoc.MaLopHoc}</Text>
             </div>
           </div>
-          <Tooltip title='Sửa lớp học'>
+          {/* là admin thì cho sửa */}
+          {isAdmin && <><Tooltip title='Sửa lớp học'>
             <Button type="primary" ghost icon={<EditOutlined />}
               disabled={lophoc.TrangThai === 'CLOSED' || lophoc.TrangThai === 'FINISHED'}
               onClick={() => setOpenClassModal(true)}
             />
           </Tooltip>
+            <ClassModal
+              open={openClassModal}
+              onCancel={() => setOpenClassModal(false)}
+              onSave={(_) => { initData() }}
+              khoahocId={lophoc.KhoaHoc.ID}
+              editingClass={lophoc}
+            />
+          </>}
         </div>
-        <ClassModal
-          open={openClassModal}
-          onCancel={() => setOpenClassModal(false)}
-          onSave={(_) => { fetchClass(); fetchSessions() }}
-          khoahocId={lophoc.KhoaHoc.ID}
-          editingClass={lophoc}
-        />
       </div>{/* kết thúc div của header */}
 
       {/* div của body */}
@@ -293,7 +294,7 @@ const ClassDetail = () => {
               <Tabs
                 defaultActiveKey="1"
                 tabBarExtraContent={ // 2 nút auto, manual
-                  <Space>
+                  isAdmin && <Space>
                     <Popconfirm title="Xác nhận tạo buổi học tự động?"
                       description='Tự động tạo buổi học trong 1 tháng'
                       onConfirm={() => AutoGenerate(lophoc.ID)}>
@@ -311,7 +312,7 @@ const ClassDetail = () => {
                       lophoc={lophoc}
                       open={openSessionModal}
                       onCancel={() => setOpenSessionModal(false)}
-                      onSave={fetchSessions}
+                      onSave={initData}
                     />
                   </Space>
                 }
@@ -322,8 +323,8 @@ const ClassDetail = () => {
                     children: (
                       <Table style={{ marginTop: 8 }}
                         dataSource={sessions}
-                        columns={columns}
-                        pagination={{ defaultPageSize: 6 }}
+                        columns={filterColumns()}
+                        pagination={{ defaultPageSize: 10 }}
                         rowKey="ID"
                         scroll={{ y: 320 }}
                       />
@@ -340,7 +341,7 @@ const ClassDetail = () => {
                   }
                 ]} /> {/* kết thúc tab */}
             </Card>
-            {/* khi nào mở drawer thì render drawer */}
+
             <SessionDrawer
               open={openDrawer}
               onCancel={() => setOpenDrawer(false)}
@@ -356,17 +357,23 @@ const ClassDetail = () => {
                 { // khóa học
                   label: <><span style={{ color: '#888' }}>
                     <BookOutlined /> Khóa học: &nbsp;</span>
-                    <Link to={`/admin/courses/${lophoc.KhoaHoc.ID}`}
-                      style={{ fontWeight: 'bold' }}>
-                      {lophoc.KhoaHoc.TenKhoaHoc}</Link>
+                    {isAdmin ?
+                      <Link to={`/admin/courses/${lophoc.KhoaHoc.ID}`}
+                        style={{ fontWeight: 'bold' }}>
+                        {lophoc.KhoaHoc.TenKhoaHoc}</Link>
+                      : <Text strong>{lophoc.KhoaHoc.TenKhoaHoc}</Text>
+                    }
                   </>
                 },
                 { // giáo viên
                   label: <><span style={{ color: '#888' }}>
                     <UserOutlined /> Giáo viên: &nbsp;</span>
-                    <Link to={`/admin/teachers/${lophoc.GiaoVien.ID}`}
-                      style={{ fontWeight: 'bold' }}>
-                      {lophoc.GiaoVien.HoTen}</Link>
+                    {isAdmin ?
+                      <Link to={`/admin/teachers/${lophoc.GiaoVien.ID}`}
+                        style={{ fontWeight: 'bold' }}>
+                        {lophoc.GiaoVien.HoTen}</Link>
+                      : <Text strong>{lophoc.GiaoVien.HoTen}</Text>
+                    }
                   </>
                 },
                 { // khai giảng

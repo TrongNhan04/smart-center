@@ -18,7 +18,9 @@ import TongHopThuChi from "./components/invoice/TongHopThuChi";
 import Dashboard from "./components/dashboard/Dashboard";
 import TaskList from "./components/dashboard/TaskList";
 import Profile from "./components/account/Profile";
-import Schedule from "./components/page.teacher/schedule";
+import Schedule from "./components/page.teacher/Schedule";
+import MyClasses from "./components/page.teacher/MyClasses";
+
 
 const router = createBrowserRouter([
   {
@@ -32,9 +34,10 @@ const router = createBrowserRouter([
         path: 'teacher',
         element: <SidebarComponent />,
         children: [
-          { index: true, element: <Navigate to="account" replace /> },
+          { index: true, element: <Navigate to="schedules" replace /> },
           { path: 'schedules', element: <Schedule/> },
-          { path: 'my-class', element: <div>lớp của tôi</div> },
+          { path: 'classes', element: <MyClasses/> },
+          { path: 'classes/:id', element: <ClassDetail /> },
           { path: 'account', element: <Profile /> }
         ]
       }

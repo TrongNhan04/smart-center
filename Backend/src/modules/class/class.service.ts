@@ -3,6 +3,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { QueryClassDTO, UpdateClassDTO, CreateClassDTO } from "./class.dto";
 import { Prisma } from "src/generated/prisma/client";
 import { DateHelper } from "src/common/date.helper";
+import { LopHocWhereInput, LopHocWhereUniqueInput } from "src/generated/prisma/models";
 
 @Injectable()
 export class ClassService {
@@ -78,9 +79,8 @@ export class ClassService {
 
         return classDB.map(lh => {
             let status: string | null = null
-            if (lh.khoahoc.TongSoBuoi == lh._count.buoihoc) {
+            if (lh.khoahoc.TongSoBuoi == lh._count.buoihoc)
                 status = 'FINISHED'
-            }
 
             return {
                 ID: lh.ID, MaLopHoc: lh.MaLopHoc, TenLop: lh.TenLop,
@@ -121,10 +121,13 @@ export class ClassService {
     }
 
     // lấy chi tiết lớp - phần trên
-    async GetClassById(classId: number) {
-        await this.ClassIDValidator(+classId)
+    async GetClassById(classId: number, userId: number | null) {
+        const where: LopHocWhereUniqueInput = { ID: classId }
+        if (userId) // có giáo viên thì lấy lớp giáo viên
+            where.giaovien = { UserID: userId }
+
         const classDB = await this.prismaService.lopHoc.findUnique({
-            where: { ID: classId },
+            where: where,
             include: {
                 khoahoc: true, giaovien: { include: { User: true } },
                 _count: {
@@ -135,7 +138,7 @@ export class ClassService {
                 }
             }
         })
-        if (!classDB) throw new NotFoundException('Không tìm thấy lớp học')
+        if (!classDB) throw new NotFoundException('Không tìm thấy lớp học hoặc truy cập bị từ chối')
         let status: string | null = null
         if (classDB.khoahoc.TongSoBuoi == classDB._count.buoihoc)
             status = 'FINISHED'
@@ -267,27 +270,34 @@ export class ClassService {
     }
 
     // lấy danh sách lớp theo giáo viên - userId
-    async GetClassesByTeacherId(userId: number) {
+    async GetClassesByUserId(userId: number) {
         const teacherDB = await this.prismaService.giaoVien.findUnique({
             where: { UserID: userId }
         })
         if (!teacherDB) throw new NotFoundException('Không tìm thấy giáo viên')
         if (teacherDB.TrangThai === 'INACTIVE')
             throw new ConflictException('Giáo viên đã nghỉ')
-        const classes = await this.prismaService.lopHoc.findMany({
+        const classDB = await this.prismaService.lopHoc.findMany({
             where: { GiaoVienID: teacherDB.ID },
-            select: {
-                MaLopHoc: true, khoahoc: { select: { TenKhoaHoc: true } },
-                TenLop: true, MoTa: true, TuNgay: true, DenNgay: true, LichHoc: true,
-                GioBatDau: true, GioKetThuc: true, SiSo: true, PhongHoc: true
+            include: {
+                khoahoc: true,
+                _count: {
+                    select:
+                    {
+                        ghidanh: { where: { TrangThai: 'ACTIVE' } },
+                        buoihoc: { where: { TrangThai: 'COMPLETED' } }
+                    }
+                }
             }
         })
-        return classes.map(x => ({
-            MaLopHoc: x.MaLopHoc, TenKhoaHoc: x.khoahoc.TenKhoaHoc,
-            TenLop: x.TenLop, MoTa: x.MoTa, TuNgay: x.TuNgay,
-            DenNgay: x.DenNgay, LichHoc: x.LichHoc,
-            GioBatDau: x.GioBatDau, GioKetThuc: x.GioKetThuc,
-            SiSo: x.SiSo, PhongHoc: x.PhongHoc
+        if (classDB.length == 0) return []
+        return classDB.map(lh => ({
+            ID: lh.ID, MaLopHoc: lh.MaLopHoc, TenLop: lh.TenLop,
+            PhongHoc: lh.PhongHoc, LichHoc: lh.LichHoc,
+            TuNgay: lh.TuNgay,
+            GioHoc: lh.GioBatDau + ' - ' + lh.GioKetThuc,
+            TrangThai: lh.TrangThai, TongGhiDanh: lh._count.ghidanh,
+            TongSoBuoi: lh.khoahoc.TongSoBuoi, BuoiDaHoc: lh._count.buoihoc
         }))
     }
 

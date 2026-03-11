@@ -48,6 +48,11 @@ export interface ClassForCmb {
     TongGhiDanh: number
 }
 
+export type TeacherClass = Omit<ClassDB,'GiaoVien'|'KhoaHoc'> & {
+    TongSoBuoi:number,
+    BuoiDaHoc:number
+}
+
 // để cho edit
 export const mapDataClass = (lophoc: ClassDB): ClassDto => ({
     //id: lophoc.ID,

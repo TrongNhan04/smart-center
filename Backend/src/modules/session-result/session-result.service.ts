@@ -17,11 +17,11 @@ export class SessionResultService {
         const { sessionDB, teacherId } = await this.SessionAcsessValidate(userId, sessionId)
 
         // kiểm tra quyền cho phép lưu NHÁP
-        const minutesLeftStart = DateHelper.CheckTimeWindow(sessionDB.BatDauLuc)
-        const minutesLeftEnd = DateHelper.CheckTimeWindow(sessionDB.KetThucLuc)
+        const minutesLeftStart = DateHelper.TimeDiff(sessionDB.BatDauLuc)
+        const minutesLeftEnd = DateHelper.TimeDiff(sessionDB.KetThucLuc)
         if (sessionDB.AdminMoKhoa == false) {
-            if (minutesLeftStart > 15 || minutesLeftEnd < -2880)
-                throw new BadRequestException(`Drafting is not allowed at this time`)
+            if (minutesLeftStart < -15 || minutesLeftEnd > 2880)
+                throw new BadRequestException(`Ngoài thời gian cho phép lưu NHÁP`)
         }
         // 3. gọi hàm thục thi chung
         return await this.ProcessSessionResult(sessionDB, teacherId, body, 'DRAFT')
@@ -33,10 +33,10 @@ export class SessionResultService {
         const { sessionDB, teacherId } = await this.SessionAcsessValidate(userId, sessionId)
 
         // 2. check thời gian cho lưu THẬT
-        const minutesLeftEnd = DateHelper.CheckTimeWindow(sessionDB.KetThucLuc)
+        const minutesLeftEnd = DateHelper.TimeDiff(sessionDB.KetThucLuc)
         if (!sessionDB.AdminMoKhoa) {
-            if (minutesLeftEnd > 0 || minutesLeftEnd < -2880)
-                throw new BadRequestException(`Submitting is not allowed at this time`)
+            if (minutesLeftEnd < 0 || minutesLeftEnd > 2880)
+                throw new BadRequestException(`Ngoài thời gian cho phép lưu kết quả`)
         }
         // 3. lưu thật phải có nhận xét chung
         if (!body.comment) throw new ConflictException('Comment is missing')

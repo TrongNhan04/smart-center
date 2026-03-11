@@ -22,10 +22,10 @@ export class DateHelper {
             throw new ConflictException('Từ ngày phải nhỏ hơn đến ngày')
     }
 
-    // kiểm tra thời gian trong lịch - hiện tại = bao nhiêu phút
-    static CheckTimeWindow(time: Date) {
+    // hiệu giữa 2 thời điểm: now - time
+    static TimeDiff(time: Date) {
         const now = new Date().getTime()
-        const timeLeft = time.getTime() - now
+        const timeLeft = now - time.getTime()
         return Math.floor(timeLeft / 60000)
     }
 
