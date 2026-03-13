@@ -197,7 +197,7 @@ const EnrollList = () => {
           // pagination={{ defaultPageSize: 10 }}
           pagination={{
             current: currentPage,
-            pageSize: 10
+            pageSize: 20
           }}
           onChange={handleBack}
           rowKey="ID"

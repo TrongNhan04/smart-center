@@ -8,7 +8,7 @@ import {
   Avatar, Badge, Button, Card, Col, Descriptions, message, notification, Popconfirm,
   Progress, Row, Space, Statistic, Table, Tabs, Tag, Tooltip, Typography
 } from "antd"
-import { Link, useNavigate, useParams } from "react-router-dom"
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom"
 import type { ClassDB } from "./ClassDTO"
 import { useEffect, useState } from "react"
 import classApi from "../../api/classApi"
@@ -111,7 +111,7 @@ const ClassDetail = () => {
     },
     { // trạng thái
       title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai',
-       align: 'center' as const,
+      align: 'center' as const,
       filters: [
         { text: 'Sắp tới', value: 'SCHEDULED' },
         { text: 'Hoàn thành', value: 'COMPLETED' },
@@ -167,7 +167,8 @@ const ClassDetail = () => {
           unlock={handleUnlock}
           onCancel={handleCancel}
           onOpenDrawer={handleOpenDrawer} />
-          : <Button>Xem buổi học</Button>
+          : <Button onClick={() => navigate(`/teacher/sessions/${value.ID}`)}>
+            Xem chi tiết</Button>
       }
     }
   ]
@@ -180,7 +181,6 @@ const ClassDetail = () => {
   const AutoGenerate = async (classId: number) => {
     try {
       const res = await sessionApi.generateAuto(classId)
-      console.log("Data của res auto gene:", res)
       initData()
       message.success(`Đã tạo thành công ${res.data.length} buổi học`)
     } catch (error: any) {
@@ -223,7 +223,7 @@ const ClassDetail = () => {
       initData()
     } catch (error: any) {
       message.error('Có lỗi xảy ra')
-      console.log('Có lỗi xảy ra: ', error.response.data.message)
+      console.log('Có lỗi xảy ra: ', error?.response?.data?.message)
     }
   }
 

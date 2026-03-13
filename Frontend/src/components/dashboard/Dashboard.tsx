@@ -1,10 +1,9 @@
 
 import {
-  Row, Col, Card, Statistic, Typography, List, Tag, Space, notification
+  Row, Col, Card, Statistic, Typography, notification
 } from 'antd';
 import {
   UserOutlined, UsergroupAddOutlined, DollarOutlined, WarningOutlined,
-  ClockCircleOutlined
 } from '@ant-design/icons';
 import {
   Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement,
@@ -12,31 +11,26 @@ import {
 } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
 import { useEffect, useState } from 'react';
-import type { FinanceChart, SessionToday, Summaries } from './DashboardDTO';
+import type { FinanceChart, Summaries } from './DashboardDTO';
 import { dashboardApi } from '../../api/dashboardApi';
-import DashboardTask from './DashboardTask';
 
 // Đăng ký các thành phần của Chart.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement,
   PointElement, Title, Tooltip, Legend)
 
-const {Text } = Typography
+const {Text, Title:AntTilte } = Typography
 
 const Dashboard = () => {
   const [sumaries, setSumaries] = useState<Summaries>()
   const [financeChart, setFinanceChart] = useState<FinanceChart[]>([])
-  // const [labelChart, setLabelChart] = useState<number[]>([])
-  const [sessionsToday, setSessionsToday] = useState<SessionToday[]>([])
   const fetchDashboard = async () => {
     try {
-      const [sumaryRes, chartRes, sessionRes] = await Promise.all([
+      const [sumaryRes, chartRes] = await Promise.all([
         dashboardApi.getSumaries(),
         dashboardApi.getCharts(),
-        dashboardApi.getSessions(),
       ])
       setSumaries(sumaryRes.data)
       setFinanceChart(chartRes.data)
-      setSessionsToday(sessionRes.data)
     } catch (error: any) {
       notification.error({
         title: 'Có lỗi xảy ra',
@@ -55,7 +49,7 @@ const Dashboard = () => {
   const months = financeChart.map(m => m.Thang) || []
 
   // Data Biểu đồ Thu - Chi (Bar Chart)
-  const revenueData = {
+  const thuChiData = {
     labels: months,
     datasets: [
       {
@@ -81,8 +75,8 @@ const Dashboard = () => {
   }
 
   return (
-    <div style={{ padding: 24, background: '#f0f2f5', minHeight: '100vh' }}>
-      {/* <AntTitle level={3} style={{ marginTop: 0, marginBottom: 24 }}>Tổng quan Trung tâm</AntTitle> */}
+    <div style={{ padding: 24, background: '#f0f2f5', minHeight: '91vh' }}>
+      <AntTilte level={3} style={{ marginTop: 0, marginBottom: 24 }}>Tổng quan Trung tâm</AntTilte>
 
       {/* TẦNG 1: 4 THẺ THỐNG KÊ */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
@@ -151,7 +145,7 @@ const Dashboard = () => {
             //   />
             // }
           >
-            <Bar data={revenueData} height={300}
+            <Bar data={thuChiData} height={300}
               options={{ responsive: true, maintainAspectRatio: false }}
             />
           </Card>
@@ -162,39 +156,6 @@ const Dashboard = () => {
             style={{ borderRadius: 8, height: '100%' }}>
             <Line data={enrollData} height={300}
               options={{ responsive: true, maintainAspectRatio: false }} />
-          </Card>
-        </Col>
-      </Row>
-
-      {/* TẦNG 3: VẬN HÀNH (LỊCH HỌC & TODO) */}
-      <Row gutter={[16, 16]}>
-        <Col xs={24} lg={14}>
-          {/* việc cần làm */}
-          <DashboardTask/> 
-        </Col>
-
-        <Col xs={24} lg={10}>
-          
-          <Card title="Lịch học hôm nay" variant='borderless'
-            styles={{
-              header: { backgroundColor: '#e6f4ff', color: '#0958d9' }
-            }}
-            style={{ borderRadius: 8 }}>
-            <List
-              itemLayout="horizontal"
-              dataSource={sessionsToday}
-              renderItem={item => (
-                <List.Item style={{marginTop:9}}>
-                  <List.Item.Meta
-                    avatar={<Tag color="blue"
-                      style={{ padding: '4px 8px', fontSize: 14 }}>
-                      <ClockCircleOutlined /> {item.ThoiGian}</Tag>}
-                    title={<Text strong>{item.TenLop}</Text>}
-                    description={<Space>{item.PhongHoc} | {item.GiaoVien}</Space>}
-                  />
-                </List.Item>
-              )}
-            />
           </Card>
         </Col>
       </Row>

@@ -28,17 +28,17 @@ export type SessionDetail =
     Omit<SessionDB, 'AdminMoKhoa' | 'YeuCauMoKhoa'> & {
         GiaoVien: string,
         LopHoc: string,
-        KetQua: SessionResult[]
+        ChiTietKetQua?: SessionResult[]
     }
 
 // drawer danh sách điểm danh
 export interface SessionResult {
-    HocVienID: number,
+    GhiDanhID: number,
     MaHocVien: string,
     TenHocVien: string,
     PhuHuynh: string,
     DienThoai: string,
-    Email: string
+    // Email: string
     DiemDanh: boolean,
     NhanXet: string
     Diem: number

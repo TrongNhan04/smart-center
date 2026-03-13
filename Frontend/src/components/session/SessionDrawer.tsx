@@ -113,7 +113,7 @@ const SessionDrawer = ({ open, onCancel, sessionId }: Props) => {
           Kết quả buổi học
         </div>
         <Table
-          dataSource={sessionDetail?.KetQua?.filter(Boolean) || []}
+          dataSource={sessionDetail?.ChiTietKetQua?.filter(Boolean) || []}
           columns={columns}
           rowKey="HocVienID"
           pagination={false}

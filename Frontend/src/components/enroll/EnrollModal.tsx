@@ -121,10 +121,10 @@ const EnrollModal = ({ open, onCancel, onSave }: Props) => {
     >
       <Alert
         title="Lưu ý"
-        description="Ghi danh thành công sẽ tạo HÓA ĐƠN và gửi thông báo"
+        description="Ghi danh thành công sẽ tạo HÓA ĐƠN và gửi thông báo đến phụ huynh"
         type="info"
         showIcon
-        style={{ marginBottom: 20 }}
+        style={{ marginBottom: 15 }}
       />
 
       <Form form={form} layout="vertical" size="middle">
@@ -144,9 +144,7 @@ const EnrollModal = ({ open, onCancel, onSave }: Props) => {
             onChange={handleClassChange}
           />
         </Form.Item>
-        {/* </Col> */}
 
-        {/* <Col span={12}> */}
         <Form.Item // chọn học viên
           label="Học viên"
           name="studentId"
@@ -163,10 +161,8 @@ const EnrollModal = ({ open, onCancel, onSave }: Props) => {
             onChange={handleClassChange}
           />
         </Form.Item>
-        {/* </Col> */}
-
-        {/* <Col span={12}> */}
-        <Form.Item
+    
+         <Form.Item
           label="Học phí"
           name="fee"
           rules={[{ required: true, message: 'Nhập học phí!' }]}>
@@ -181,10 +177,6 @@ const EnrollModal = ({ open, onCancel, onSave }: Props) => {
             step={1000}
           />
         </Form.Item>
-        {/* </Col> */}
-        {/* </Row> */}
-
-        {/* Lớp học - học phí chỉ hiện khi thêm học viên*/}
 
         {/* Ghi chú */}
         <Form.Item label="Ghi chú" name="address">

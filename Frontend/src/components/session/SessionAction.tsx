@@ -111,7 +111,7 @@ const SessionAction = ({ session, unlock, onCancel, onOpenDrawer }: Props) => {
             <Form.Item 
               label={<b>Lý do hủy (Sẽ hiển thị trong thông báo)</b>}
               name="reason"
-              rules={[{ required: true, message: 'Vui lòng nhập lý do hủy!' }]}
+              rules={[{ required: true, message: 'Vui lòng nhập lý do!' }]}
             >
               <Input.TextArea
                 rows={4}

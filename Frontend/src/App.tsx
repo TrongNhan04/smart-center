@@ -20,6 +20,8 @@ import TaskList from "./components/dashboard/TaskList";
 import Profile from "./components/account/Profile";
 import Schedule from "./components/page.teacher/Schedule";
 import MyClasses from "./components/page.teacher/MyClasses";
+import TeacherRoute from "./components/page.teacher/TeacherRoute";
+import SessionDetail from "./components/page.teacher/SessionDetail";
 
 
 const router = createBrowserRouter([
@@ -35,9 +37,16 @@ const router = createBrowserRouter([
         element: <SidebarComponent />,
         children: [
           { index: true, element: <Navigate to="schedules" replace /> },
-          { path: 'schedules', element: <Schedule/> },
-          { path: 'classes', element: <MyClasses/> },
-          { path: 'classes/:id', element: <ClassDetail /> },
+          { path: 'schedules', element: <Schedule /> },
+          { path: 'classes', element: <MyClasses /> },
+          {
+            path: 'classes/:id', 
+            element: <TeacherRoute/>,
+            children: [
+              {index:true, element:<ClassDetail/>},
+            ]
+          },
+          { path: 'sessions/:id', element:<SessionDetail/>},
           { path: 'account', element: <Profile /> }
         ]
       }
@@ -60,6 +69,7 @@ const router = createBrowserRouter([
 
           { path: 'classes', element: <ClassList /> },
           { path: 'classes/:id', element: <ClassDetail /> },
+          // { path: 'sessions/:id', element:<SessionDetail/>},
 
           { path: 'teachers', element: <TeacherList /> },
           { path: 'teachers/:id', element: <TeacherDetail /> },

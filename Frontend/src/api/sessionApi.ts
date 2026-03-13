@@ -1,12 +1,12 @@
 import axiosClient from "../components/AxiosClient";
-import type { SessionDto } from "../components/session/SessionDTO";
+import type { SessionDetail, SessionDto } from "../components/session/SessionDTO";
 
 export const sessionApi = {
     getByClassId: (classId: number) =>
         axiosClient.get(`admin/classes/${classId}/sessions`),
-    
+
     getDetailsById: (sessionId: number) =>
-        axiosClient.get(`teacher/sessions/${sessionId}`),
+        axiosClient.get(`sessions/${sessionId}`),
 
     getCompletedByTeacherId: (teacherId: number) =>
         axiosClient.get(`admin/teachers/${teacherId}/sessions-completed`),
@@ -26,5 +26,9 @@ export const sessionApi = {
     cancel: (sessionId: number, reason: string) =>
         axiosClient.patch(`admin/sessions/${sessionId}/cancel`, reason),
 
+    saveDraft: (sessionId: number, body:SessionDetail) =>
+        axiosClient.put(`teacher/sessions/${sessionId}/result-draft`, body),
 
+    submitted: (sessionId: number, body:SessionDetail) =>
+        axiosClient.put(`teacher/sessions/${sessionId}/result-submit`,body)
 }

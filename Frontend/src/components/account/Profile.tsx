@@ -65,25 +65,21 @@ const Profile = () => {
           >
             <Avatar
               size={140}
-              src={'https://api.dicebear.com/7.x/avataaars/svg?seed=Admin'}
+              // src={'https://api.dicebear.com/7.x/avataaars/svg?seed=Admin'}
               icon={<UserOutlined />}
               style={{ marginBottom: 16, border: '2px solid #f0f0f0' }}
             />
             <Title level={4} style={{ margin: 0 }}>{user?.full_name}</Title>
             <Text type="secondary">{role}</Text>
 
-            <Divider dashed />
+            <Divider />
 
             <Space orientation="vertical" style={{ width: '100%', textAlign: 'left' }}>
               <Text type="secondary"><MailFilled /> {user?.email}</Text>
               <Text type="secondary"><PhoneFilled /> {user?.phone}</Text>
             </Space>
 
-            <Divider dashed />
-
-            <Upload showUploadList={false}>
-              <Button icon={<UploadOutlined />} block>Đổi Ảnh Đại Diện</Button>
-            </Upload>
+            <Divider  />
           </Card>
         </Col>
 

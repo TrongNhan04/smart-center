@@ -6,10 +6,10 @@ export class DateHelper {
         return { h, m }
     }
 
-    static Timeleft(dateCompare: string) {
+    static TimeDiff(dateCompare: string) {
         const timeNow = new Date().getTime()
         const date = new Date(dateCompare).getTime()
-        return timeNow - date
+        return Math.floor(timeNow - date / 60000)
     }
 
     static ConvertHourStrToDayJS(time: string) {
