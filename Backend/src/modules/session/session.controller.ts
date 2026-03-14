@@ -53,12 +53,15 @@ export class SessionController {
         return await this.sessionService.CancelSessionById(+sessionId, reason)
     }
 
-    // thông tin buổi học
+    // thông tin chi tiết 1 buổi học
     @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
     @Roles('ADMIN', 'TEACHER')
-    @Get('teacher/sessions/:id')
-    async GetSession_Result(@Param('id') sessionId: number) {
-        return await this.sessionService.GetSession_Result(+sessionId)
+    @Get('sessions/:id')
+    async GetSession_Result(
+        @Req() req:RequestWithUser,
+        @Param('id') sessionId: number) {
+        const userId = req.user.role === 'TEACHER'? req.user.userId : null
+        return await this.sessionService.GetSession_Result(+sessionId, userId)
     }
 
     // lưu nháp kết quả buổi học - DRAFT

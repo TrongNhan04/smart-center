@@ -76,8 +76,7 @@ export class ClassController {
     @Get('admin/classes/:id/sessions')
     async GetSessionsByClassId(
         @Req() req:RequestWithUser,
-        @Param('id') classId: number,
-        @Query() query: SessionStatusDTO) {
+        @Param('id') classId: number) {
         const userId = req.user.role === 'TEACHER' ? req.user.userId : null
         return await this.sessionService.GetSessionsByClassId(classId, userId)
     }

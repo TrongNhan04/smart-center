@@ -24,10 +24,10 @@ export class AuthService {
             }
         })
 
-        if (userDB) throw new BadRequestException('Email or phone number is used')
+        if (userDB) throw new BadRequestException('Email hoặc số điện thoại đã được sử dụng')
 
         // 2 băm mật khẩu là số điện thoại
-        const passwordHash = await bcrypt.hash(registerDTO.phone, 10)
+        const passwordHash = await bcrypt.hash(registerDTO.phone, 15)
 
         // 3 lưu user vào DB
         return await this.prismaService.user.create({
@@ -54,11 +54,11 @@ export class AuthService {
             where: { Email: loginDTO.email }
         })
         if (!userDB)
-            throw new UnauthorizedException("User is not exist!")
+            throw new UnauthorizedException("Không tìm thấy người dùng!")
 
         const ok = await bcrypt.compare(loginDTO.password, userDB.MatKhauHash)
         if (!ok)
-            throw new UnauthorizedException("Incorrect password!")
+            throw new UnauthorizedException("Sai mật khẩu")
         return userDB
     }
 
@@ -73,16 +73,21 @@ export class AuthService {
             // mustChangePW: userDB.PhaiDoiMK,
             tokenVersion: userDB.ToKenVerSion
         }
+        const classes = await this.prismaService.lopHoc.findMany({
+            where: { giaovien: { UserID: userDB.ID } },
+            select: { ID: true }
+        })
 
         const token = await this.jwtService.signAsync(payload)
         return {
-            access_token: token,
+           access_token: token,
             user: {
                 id: userDB.ID,
                 email: userDB.Email,
                 full_name: userDB.HoTen,
                 phone: userDB.DienThoai,
-                role: userDB.VaiTro
+                role: userDB.VaiTro,
+                classes: classes.map(item=>item.ID)
             }
         }
     }

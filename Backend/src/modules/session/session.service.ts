@@ -24,7 +24,7 @@ export class SessionService {
       const classDB = await this.prisma.lopHoc.findFirst({
         where: { ID: classId, giaovien: { UserID: userId } }
       })
-      if (!classDB) throw new NotFoundException
+      if (!classDB) throw new ForbiddenException
         ('Không tìm thấy lớp học hoặc truy cập bị từ chối')
       where.lophoc = { giaovien: { UserID: userId } }
     }
@@ -35,8 +35,8 @@ export class SessionService {
       orderBy: { BatDauLuc: 'asc' }
     })
     return sessions.map(item => {
-      let status = ''
-      const isOverTime = DateHelper.TimeDiff(item.KetThucLuc) > 2880 // qua 48h
+      let status = '' // qua 12h là chưa nộp kết quả, vẫn cho phép nộp trong 48h
+      const isOverTime = DateHelper.TimeDiff(item.KetThucLuc) > 120 
       if (isOverTime && item.TrangThai === 'SCHEDULED') {
         status = 'UNSUBMIT'
         return { ...item, TrangThai: status }
@@ -270,21 +270,26 @@ export class SessionService {
   }
 
   // lấy thông tin buổi học
-  async GetSession_Result(sessionId: number) {
+  async GetSession_Result(sessionId: number, userId: number | null) {
+    if (userId) { // là giáo viên
+      const teacherDB = await this.GetTeacherByUserId(userId)
+      const canAccess = await this.prisma.buoiHoc.findFirst({
+        where: { ID: sessionId, lophoc: { GiaoVienID: teacherDB.ID } }
+      })
+      if (!canAccess)
+        throw new ForbiddenException('Không tìm thấy buổi học hoặc truy cập bị từ chối')
+    }
     const [sessionDB, result] = await Promise.all([
       this.prisma.buoiHoc.findFirst({
         where: { ID: sessionId },
         select: {
           ID: true, BuoiSo: true, ChuDe: true, PhongHoc: true,
           BatDauLuc: true, KetThucLuc: true, TrangThai: true,
+          ketqua_buoihoc: true,
           lophoc: {
             select: {
               TenLop: true,
-              giaovien: {
-                select: {
-                  User: { select: { HoTen: true } }
-                }
-              }
+              giaovien: { select: { User: { select: { HoTen: true } } } }
             }
           }
         }
@@ -296,9 +301,10 @@ export class SessionService {
       ID: sessionDB.ID, BuoiSo: sessionDB.BuoiSo, ChuDe: sessionDB.ChuDe,
       BatDauLuc: sessionDB.BatDauLuc, KetThucLuc: sessionDB.KetThucLuc,
       PhongHoc: sessionDB.PhongHoc, LopHoc: sessionDB.lophoc.TenLop,
+      NhanXetChung: sessionDB.ketqua_buoihoc?.NhanXetChung,
       GiaoVien: sessionDB.lophoc.giaovien.User.HoTen,
       TrangThai: sessionDB.TrangThai,
-      KetQua: result
+      ChiTietKetQua: result
     }
   }
 

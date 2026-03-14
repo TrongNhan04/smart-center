@@ -2,9 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   Card, Form, Input, Button, Upload, Table, Typography,
   Descriptions, Row, Col, Radio, Space, InputNumber, Tooltip, Tag,
-  message,
-  Popconfirm,
-  notification
+  message, Popconfirm, notification
 } from 'antd';
 import {
   ArrowLeftOutlined,
@@ -13,7 +11,8 @@ import {
 import type { SessionDetail, SessionResult } from '../session/SessionDTO';
 import { DateHelper } from '../common/date.helper';
 import { sessionApi } from '../../api/sessionApi';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
 
 const { Title, Text } = Typography
 const { TextArea } = Input
@@ -26,6 +25,7 @@ const SessionDetail = () => {
   const [loading, setLoading] = useState(false)
   const [session, setSession] = useState<SessionDetail>()
   const [students, setStudents] = useState<SessionResult[]>([])
+  const [fileURL, setFileURL] = useState<string[]>([])
 
   const sessionId = Number(id)
   const fetchSession = async () => {
@@ -80,12 +80,12 @@ const SessionDetail = () => {
         />
     },
     {
-      title: 'Nhận xét riêng', dataIndex: 'NhanXet', key: 'NhanXet',
+      title: 'Nhận xét riêng', dataIndex: 'NhanXetRieng', key: 'NhanXetRieng',
       render: (_: any, record: SessionResult) =>
         <Input
-          defaultValue={record.NhanXet}
+          defaultValue={record.NhanXetRieng}
           placeholder="Nhập nhận xét..."
-          onChange={(e) => handleStudentChange(record.GhiDanhID, 'NhanXet', e.target.value)}
+          onChange={(e) => handleStudentChange(record.GhiDanhID, 'NhanXetRieng', e.target.value)}
           allowClear
         />
     },
@@ -107,7 +107,7 @@ const SessionDetail = () => {
       showProgress: true,
       pauseOnHover: true
     })
-    console.log('Có lỗi xảy ra: ', error.response.data.message)
+    console.log('Có lỗi xảy ra: ', error?.response?.data?.message)
   }
 
   // Hàm cập nhật state khi giáo viên thao tác trên bảng
@@ -123,15 +123,39 @@ const SessionDetail = () => {
       const formData = await form.validateFields()
       const payload = {
         ...formData,
-        ChiTietKetQua: students
+        ChiTietKetQua: students.map(student => ({
+          GhiDanhID: student.GhiDanhID,
+          NhanXetRieng: student.NhanXetRieng,
+          DiemDanh: student.DiemDanh,
+          Diem: Number(student.Diem),
+        }))
       }
       console.log(payload)
-      const isSubmit = type === 'SUBMITTED'
-      isSubmit ? await sessionApi.saveDraft(sessionId, payload) :
-      await sessionApi.submitted(sessionId, payload)
-      fetchSession()
-      message.success('Thao tác thành công')
+      console.log(fileURL)
+      // const isSubmit = type === 'SUBMITTED'
+      // isSubmit ? await sessionApi.submitted(sessionId, payload) :
+      //   await sessionApi.saveDraft(sessionId, payload)
+      // fetchSession()
+      // message.success('Thao tác thành công')
     } catch (error) {
+      handelError(error)
+    }
+  }
+
+  const handleUpload = async (options: any) => {
+    try {
+      const { file, onSuccess } = options
+      const formData = new FormData()
+      formData.append('file', file)
+      const res = await axios.post('http://localhost:3000/api/file-upload', formData)
+      onSuccess('Ok')
+
+      const resURL = res.data.data.secure_url
+      setFileURL(prev=>[...prev, resURL])
+
+      // message.success('')
+    } catch (error) {
+      options.onError({ error })
       handelError(error)
     }
   }
@@ -216,10 +240,10 @@ const SessionDetail = () => {
         {/* phần upload hình ảnh hoặc video */}
         <Card title="Video / Hình ảnh buổi học"
           variant='borderless' style={{ marginBottom: 24, borderRadius: 8 }}>
-          <Form.Item name="media" noStyle
+          <Form.Item name="file" noStyle
             valuePropName={"filelist"}
           >
-            <Dragger multiple action="/api/upload"
+            <Dragger multiple customRequest={handleUpload}
               listType="picture" style={{ padding: 20 }}>
               <p className="ant-upload-drag-icon">
                 <InboxOutlined style={{ color: '#1890ff', fontSize: 48 }} />

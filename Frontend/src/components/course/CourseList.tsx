@@ -32,11 +32,11 @@ const CourseList = () => {
     catch (error: any) {
       notification.error({
         title: 'Có lỗi xảy ra',
-        description: error.response.data.message,
+        description: error?.response?.data?.message,
         showProgress: true,
         pauseOnHover: true
       })
-      console.log(error.response.data.message)
+      console.log(error?.response?.data?.message)
     }
     finally {
       setLoading(false)

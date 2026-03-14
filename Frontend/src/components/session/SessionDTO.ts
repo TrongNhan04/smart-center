@@ -40,7 +40,7 @@ export interface SessionResult {
     DienThoai: string,
     // Email: string
     DiemDanh: boolean,
-    NhanXet: string
+    NhanXetRieng: string
     Diem: number
 }
 

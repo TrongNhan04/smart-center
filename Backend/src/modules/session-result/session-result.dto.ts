@@ -4,30 +4,33 @@ import { IsArray, IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Mi
 export class ResultDetailDTO {
     @IsNotEmpty()
     @IsNumber()
-    enrollmentId: number
+    GhiDanhID: number
 
     @IsOptional()
     @IsString()
-    privateComment?: string
+    NhanXetRieng?: string
 
     @IsBoolean()
-    isAttend: boolean
+    DiemDanh: boolean
 
     @IsOptional()
     @IsNumber()
     @Min(0) @Max(10)
-    score?: number
+    Diem?: number
 }
 
 //đinh nghĩa lớp cha
 export class SessionsResultDTO{
     @IsString()
-    comment:string
+    NhanXetChung:string
+
+    @IsOptional()
+    TepDinhKem:string[]
 
     @IsArray()
     @ValidateNested({each:true})
     @Type(()=>ResultDetailDTO)
-    details: ResultDetailDTO[]
+    ChiTietKetQua: ResultDetailDTO[]
 }
 
 export class RequestUnlock{

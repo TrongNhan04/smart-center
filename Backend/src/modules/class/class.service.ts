@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { QueryClassDTO, UpdateClassDTO, CreateClassDTO } from "./class.dto";
 import { Prisma } from "src/generated/prisma/client";
@@ -138,7 +138,7 @@ export class ClassService {
                 }
             }
         })
-        if (!classDB) throw new NotFoundException('Không tìm thấy lớp học hoặc truy cập bị từ chối')
+        if (!classDB) throw new ForbiddenException('Không tìm thấy lớp học hoặc truy cập bị từ chối')
         let status: string | null = null
         if (classDB.khoahoc.TongSoBuoi == classDB._count.buoihoc)
             status = 'FINISHED'

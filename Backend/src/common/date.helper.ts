@@ -22,11 +22,11 @@ export class DateHelper {
             throw new ConflictException('Từ ngày phải nhỏ hơn đến ngày')
     }
 
-    // hiệu giữa 2 thời điểm: now - time
+    // hiệu giữa 2 thời điểm: hiện tại và thời gian muốn so sánh
     static TimeDiff(time: Date) {
         const now = new Date().getTime()
         const timeLeft = now - time.getTime()
-        return Math.floor(timeLeft / 60000)
+        return Math.floor(timeLeft / 60000)// 60 giây 
     }
 
     // kiểm tra giờ bắt đầu + kết thúc

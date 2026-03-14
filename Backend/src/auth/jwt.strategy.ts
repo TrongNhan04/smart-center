@@ -24,7 +24,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         })
         if (!userDB) throw new UnauthorizedException('Chưa đăng nhập, không thể truy cập')
         if (userDB.ToKenVerSion !== payload.tokenVersion)
-            throw new UnauthorizedException('Token đã hết hạn hoặc đã hủy')
+            throw new UnauthorizedException('Token hết hạn hoặc đã hủy')
         return { userId: payload.sub, email: payload.email, role: payload.role };
     }
 }
