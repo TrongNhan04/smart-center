@@ -3,6 +3,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { NotifyService } from "../notify/notify.service";
 import { SessionsResultDTO } from "./session-result.dto";
 import { DateHelper } from "src/common/date.helper";
+import { BuoiHocUpdateInput } from "src/generated/prisma/models";
 
 @Injectable()
 export class SessionResultService {
@@ -13,7 +14,7 @@ export class SessionResultService {
 
     // lưu NHÁP kết quả buổi học - DRAFT
     async SaveDraftResult(userId: number, sessionId: number, body: SessionsResultDTO) {
-        // kiểm tra quyền & Lấy thông tin
+        // kiểm tra quyền & Lấy thông tin 
         const { sessionDB, teacherId } = await this.SessionAcsessValidate(userId, sessionId)
 
         // kiểm tra quyền cho phép lưu NHÁP
@@ -145,31 +146,48 @@ export class SessionResultService {
     // xử lý Transaction lưu DB, Dùng chung cho cả Draft và Submit
     private async ProcessSessionResult(session: any, teacherId: number,
         body: SessionsResultDTO, status: 'DRAFT' | 'SUBMITTED') {
+
         // lấy danh sách học viên Active của lớp có buổi học id đó
         const listEnroll = await this.prisma.ghiDanh.findMany({
             where: { LopHocID: session.LopHocID, TrangThai: 'ACTIVE' },
             select: { ID: true, hocvien: { select: { UserID: true } } }
         })
-        // chuyển mảng input thành Map để tìm kiếm O(1)
         // key: enrollmentId, value: dữ liệu của body gửi lên 
         const inputMap = new Map(body.ChiTietKetQua.map(m => [m.GhiDanhID, m]))
         const listParent = listEnroll.map(e => e.hocvien.UserID)
 
         return await this.prisma.$transaction(async tx => {
-            // Upsert bảng KetQua_BuoiHoc
+            // Upsert bảng KetQua_BH và quan hệ 1-n của nó là tệp đính kèm
             const sessionResult = await tx.ketQua_BuoiHoc.upsert({
                 where: { BuoiHocID: session.ID },
-                create: {
-                    BuoiHocID: session.ID,
-                    GiaoVienID: teacherId,
+                update: { // có thì update
                     NhanXetChung: body.NhanXetChung ?? null,
-                    TrangThai: status
+                    TrangThai: status,
+                    tep_dinhkem: {// update luôn tệp đính kèm
+                        deleteMany: {}, // xóa hết những tệp cũ của kết quả này
+                        create: body.TepDinhKem.map(file => ({
+                            TepID: file.public_id,
+                            URL: file.secure_url,
+                            LoaiTep: file.resource_type
+                        }))
+                    }
                 },
-                update: {
+                create: { // không có thì create
+                    BuoiHocID: session.ID, GiaoVienID: teacherId,
+                    NoiDungBaiHoc: body.NoiDungBaiHoc,
+                    BaiTapVeNha: body.BaiTapVeNha,
                     NhanXetChung: body.NhanXetChung ?? null,
-                    TrangThai: status
+                    TrangThai: status,
+                    tep_dinhkem: { // tạo mới tệp đính kèm
+                        create: body.TepDinhKem.map(file => ({
+                            TepID: file.public_id,
+                            URL: file.secure_url,
+                            LoaiTep: file.resource_type
+                        }))
+                    }
                 }
             })
+
             // Chuẩn bị lệnh Upsert Chi Tiết
             const upsertResultDetail = listEnroll.map(item => {
                 // input map là danh sách ghi danh Id có điểm danh, nhận xét
@@ -188,6 +206,7 @@ export class SessionResultService {
                     NhanXetRieng: details?.NhanXetRieng ?? null,
                     Diem: details?.Diem ?? null
                 }
+
                 // không có await để đưa cho promise.all
                 return tx.ketQua_ChiTiet.upsert({
                     where: {
@@ -216,7 +235,10 @@ export class SessionResultService {
             if (status === 'SUBMITTED') {
                 const bh = await tx.buoiHoc.update({
                     where: { ID: session.ID }, // lưu xong tắt ưu tiên của admin, chỉ submit mới tắt
-                    data: { TrangThai: 'COMPLETED', AdminMoKhoa: false }
+                    data: {
+                        TrangThai: 'COMPLETED', AdminMoKhoa: false,
+                        ChuDe: body.ChuDe
+                    }
                 })
                 await tx.lopHoc.updateMany({
                     where: { ID: bh.LopHocID, TrangThai: 'OPEN' },

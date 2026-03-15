@@ -2,17 +2,20 @@ import { useEffect, useState } from 'react';
 import {
   Card, Form, Input, Button, Upload, Table, Typography,
   Descriptions, Row, Col, Radio, Space, InputNumber, Tooltip, Tag,
-  message, Popconfirm, notification
+  message, Popconfirm, notification,
+  Tabs
 } from 'antd';
 import {
   ArrowLeftOutlined,
   InboxOutlined, PhoneOutlined, SaveOutlined
 } from '@ant-design/icons';
-import type { SessionDetail, SessionResult } from '../session/SessionDTO';
+import type { SessionResult, TSessionDetail } from '../session/SessionDTO';
 import { DateHelper } from '../common/date.helper';
 import { sessionApi } from '../../api/sessionApi';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
+import FileUpload from './FileUpload';
+import { useAuthStore } from '../../store/useAuthStore';
 
 const { Title, Text } = Typography
 const { TextArea } = Input
@@ -23,11 +26,12 @@ const SessionDetail = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
-  const [session, setSession] = useState<SessionDetail>()
+  const [session, setSession] = useState<TSessionDetail>()
   const [students, setStudents] = useState<SessionResult[]>([])
   const [fileURL, setFileURL] = useState<string[]>([])
 
   const sessionId = Number(id)
+
   const fetchSession = async () => {
     try {
       const res = await sessionApi.getDetailsById(sessionId)
@@ -69,7 +73,7 @@ const SessionDetail = () => {
           <Radio value={false}><Tag color="error">Vắng</Tag></Radio>
         </Radio.Group>
     },
-    {
+    {// điểm số
       title: 'Điểm số', dataIndex: 'Diem', key: 'Diem', width: 100,
       render: (_: any, record: SessionResult) =>
         <InputNumber
@@ -79,7 +83,7 @@ const SessionDetail = () => {
           placeholder="Điểm"
         />
     },
-    {
+    {// nhận xét riêng
       title: 'Nhận xét riêng', dataIndex: 'NhanXetRieng', key: 'NhanXetRieng',
       render: (_: any, record: SessionResult) =>
         <Input
@@ -89,7 +93,7 @@ const SessionDetail = () => {
           allowClear
         />
     },
-    {
+    {//phụ huynh
       title: 'Phụ huynh', dataIndex: 'PhuHuynh', key: 'PhuHuynh', width: 150,
       render: (parent: string, record: SessionResult) =>
         <Tooltip title={`Gọi cho PH ${parent}`}>
@@ -123,6 +127,7 @@ const SessionDetail = () => {
       const formData = await form.validateFields()
       const payload = {
         ...formData,
+        TepDinhKem: fileURL,
         ChiTietKetQua: students.map(student => ({
           GhiDanhID: student.GhiDanhID,
           NhanXetRieng: student.NhanXetRieng,
@@ -130,13 +135,11 @@ const SessionDetail = () => {
           Diem: Number(student.Diem),
         }))
       }
-      console.log(payload)
-      console.log(fileURL)
       // const isSubmit = type === 'SUBMITTED'
       // isSubmit ? await sessionApi.submitted(sessionId, payload) :
       //   await sessionApi.saveDraft(sessionId, payload)
       // fetchSession()
-      // message.success('Thao tác thành công')
+      message.success('Thao tác thành công')
     } catch (error) {
       handelError(error)
     }
@@ -147,18 +150,28 @@ const SessionDetail = () => {
       const { file, onSuccess } = options
       const formData = new FormData()
       formData.append('file', file)
-      const res = await axios.post('http://localhost:3000/api/file-upload', formData)
-      onSuccess('Ok')
-
-      const resURL = res.data.data.secure_url
-      setFileURL(prev=>[...prev, resURL])
-
+      console.log(file)
+      const token = useAuthStore.getState().access_token
+      const res = await axios.post('http://localhost:3000/api/file-upload',
+        formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      onSuccess(res.data, file)
+      const resURL = res.data.data
+      setFileURL(prev => [...prev, resURL])
       // message.success('')
     } catch (error) {
       options.onError({ error })
       handelError(error)
     }
   }
+
+  // const handleRemoveFile = (file:any) => {
+  //   // chỉ giữ những thằng khác id của file
+  //   const newFileList = fileURL.filter(item=>item.uid)
+  // }
 
   const ngayHoc = new Date(session.BatDauLuc).toLocaleDateString()
   const gioHoc = DateHelper.ISOToHHMM(session.BatDauLuc, session.KetThucLuc)
@@ -238,22 +251,42 @@ const SessionDetail = () => {
         </Card>
 
         {/* phần upload hình ảnh hoặc video */}
-        <Card title="Video / Hình ảnh buổi học"
+        <Card //title="Video / Hình ảnh buổi học"
           variant='borderless' style={{ marginBottom: 24, borderRadius: 8 }}>
-          <Form.Item name="file" noStyle
-            valuePropName={"filelist"}
+          <Tabs
+            defaultActiveKey='1'
+            items={[
+              {
+                key: '1', label: 'Upload hình ảnh hoặc video',
+                children: (<>
+                  <Form.Item name="file" noStyle valuePropName={"fileList"}
+                    getValueFromEvent={(e) => { // đảm bảo các file là 1 mảng
+                      if (Array.isArray(e)) return e
+                      return e?.fileList || []
+                    }}
+                  >
+                    <Dragger multiple customRequest={handleUpload}
+                      listType="picture" style={{ padding: 20 }}>
+                      <p className="ant-upload-drag-icon">
+                        <InboxOutlined style={{ color: '#1890ff', fontSize: 48 }} />
+                      </p>
+                      <p className="ant-upload-text">Kéo thả file vào đây hoặc nhấp để tải lên</p>
+                      <p className="ant-upload-hint">
+                        Hỗ trợ tải lên ảnh (JPG, PNG) hoặc video ngắn (MP4) quay lại hoạt động của lớp.
+                      </p>
+                    </Dragger>
+                  </Form.Item>
+                  {/* <FileUpload /> */}
+                </>)
+              },
+              {
+                key: '2', label: 'Kết quả',
+                children: (<FileUpload />)
+              }
+            ]}
           >
-            <Dragger multiple customRequest={handleUpload}
-              listType="picture" style={{ padding: 20 }}>
-              <p className="ant-upload-drag-icon">
-                <InboxOutlined style={{ color: '#1890ff', fontSize: 48 }} />
-              </p>
-              <p className="ant-upload-text">Kéo thả file vào đây hoặc nhấp để tải lên</p>
-              <p className="ant-upload-hint">
-                Hỗ trợ tải lên ảnh (JPG, PNG) hoặc video ngắn (MP4) quay lại hoạt động của lớp.
-              </p>
-            </Dragger>
-          </Form.Item>
+
+          </Tabs>
         </Card>
 
         {/* điểm danh và nhận xét cá nhân */}

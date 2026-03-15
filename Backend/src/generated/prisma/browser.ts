@@ -53,6 +53,11 @@ export type BuoiHoc = Prisma.BuoiHocModel
  */
 export type KetQua_BuoiHoc = Prisma.KetQua_BuoiHocModel
 /**
+ * Model TepDinhKem_BuoiHoc
+ * 
+ */
+export type TepDinhKem_BuoiHoc = Prisma.TepDinhKem_BuoiHocModel
+/**
  * Model KetQua_ChiTiet
  * 
  */

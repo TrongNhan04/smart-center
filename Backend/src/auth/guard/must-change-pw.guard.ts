@@ -27,7 +27,7 @@ export class MustChangePWGuard implements CanActivate {
 
         if (allowed) return true;
 
-        throw new ForbiddenException('Must change password first')
+        throw new ForbiddenException('Vui lòng đổi mật khẩu một lần vì lý do bảo mật')
     }
 
 }

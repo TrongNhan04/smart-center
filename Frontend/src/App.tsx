@@ -23,7 +23,6 @@ import MyClasses from "./components/page.teacher/MyClasses";
 import TeacherRoute from "./components/page.teacher/TeacherRoute";
 import SessionDetail from "./components/page.teacher/SessionDetail";
 
-
 const router = createBrowserRouter([
   {
     path: '/',

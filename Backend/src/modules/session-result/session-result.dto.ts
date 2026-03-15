@@ -20,21 +20,33 @@ export class ResultDetailDTO {
 }
 
 //đinh nghĩa lớp cha
-export class SessionsResultDTO{
+export class SessionsResultDTO {
     @IsString()
-    NhanXetChung:string
+    ChuDe: string
 
     @IsOptional()
-    TepDinhKem:string[]
+    @IsString()
+    NoiDungBaiHoc?: string
+
+    @IsOptional()
+    @IsString()
+    BaiTapVeNha?: string
+
+    @IsString()
+    NhanXetChung: string
+
+
+    @IsOptional()
+    TepDinhKem: FileAttach[]
 
     @IsArray()
-    @ValidateNested({each:true})
-    @Type(()=>ResultDetailDTO)
+    @ValidateNested({ each: true })
+    @Type(() => ResultDetailDTO)
     ChiTietKetQua: ResultDetailDTO[]
 }
 
-export class RequestUnlock{
-    @IsNotEmpty()
-    @IsString()
-    reason:string
+export class FileAttach {
+    public_id: string
+    secure_url: string
+    resource_type: string
 }

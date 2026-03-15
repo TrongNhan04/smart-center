@@ -7,6 +7,7 @@ interface User {
 	phone: string,
 	full_name: string
 	role: 'ADMIN' | 'TEACHER'
+	must_change_pw: boolean
 	classes: number[]
 }
 

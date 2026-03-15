@@ -28,12 +28,12 @@ export type AggregateUser = {
 
 export type UserAvgAggregateOutputType = {
   ID: number | null
-  ToKenVerSion: number | null
+  PhienBanToken: number | null
 }
 
 export type UserSumAggregateOutputType = {
   ID: number | null
-  ToKenVerSion: number | null
+  PhienBanToken: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -44,7 +44,7 @@ export type UserMinAggregateOutputType = {
   MatKhauHash: string | null
   PhaiDoiMK: boolean | null
   VaiTro: $Enums.Vaitro | null
-  ToKenVerSion: number | null
+  PhienBanToken: number | null
   CreatedAt: Date | null
   UpdatedAt: Date | null
 }
@@ -57,7 +57,7 @@ export type UserMaxAggregateOutputType = {
   MatKhauHash: string | null
   PhaiDoiMK: boolean | null
   VaiTro: $Enums.Vaitro | null
-  ToKenVerSion: number | null
+  PhienBanToken: number | null
   CreatedAt: Date | null
   UpdatedAt: Date | null
 }
@@ -70,7 +70,7 @@ export type UserCountAggregateOutputType = {
   MatKhauHash: number
   PhaiDoiMK: number
   VaiTro: number
-  ToKenVerSion: number
+  PhienBanToken: number
   CreatedAt: number
   UpdatedAt: number
   _all: number
@@ -79,12 +79,12 @@ export type UserCountAggregateOutputType = {
 
 export type UserAvgAggregateInputType = {
   ID?: true
-  ToKenVerSion?: true
+  PhienBanToken?: true
 }
 
 export type UserSumAggregateInputType = {
   ID?: true
-  ToKenVerSion?: true
+  PhienBanToken?: true
 }
 
 export type UserMinAggregateInputType = {
@@ -95,7 +95,7 @@ export type UserMinAggregateInputType = {
   MatKhauHash?: true
   PhaiDoiMK?: true
   VaiTro?: true
-  ToKenVerSion?: true
+  PhienBanToken?: true
   CreatedAt?: true
   UpdatedAt?: true
 }
@@ -108,7 +108,7 @@ export type UserMaxAggregateInputType = {
   MatKhauHash?: true
   PhaiDoiMK?: true
   VaiTro?: true
-  ToKenVerSion?: true
+  PhienBanToken?: true
   CreatedAt?: true
   UpdatedAt?: true
 }
@@ -121,7 +121,7 @@ export type UserCountAggregateInputType = {
   MatKhauHash?: true
   PhaiDoiMK?: true
   VaiTro?: true
-  ToKenVerSion?: true
+  PhienBanToken?: true
   CreatedAt?: true
   UpdatedAt?: true
   _all?: true
@@ -221,7 +221,7 @@ export type UserGroupByOutputType = {
   MatKhauHash: string
   PhaiDoiMK: boolean
   VaiTro: $Enums.Vaitro
-  ToKenVerSion: number
+  PhienBanToken: number
   CreatedAt: Date
   UpdatedAt: Date
   _count: UserCountAggregateOutputType | null
@@ -257,7 +257,7 @@ export type UserWhereInput = {
   MatKhauHash?: Prisma.StringFilter<"User"> | string
   PhaiDoiMK?: Prisma.BoolFilter<"User"> | boolean
   VaiTro?: Prisma.EnumVaitroFilter<"User"> | $Enums.Vaitro
-  ToKenVerSion?: Prisma.IntFilter<"User"> | number
+  PhienBanToken?: Prisma.IntFilter<"User"> | number
   CreatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   UpdatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   GiaoVien?: Prisma.XOR<Prisma.GiaoVienNullableScalarRelationFilter, Prisma.GiaoVienWhereInput> | null
@@ -274,7 +274,7 @@ export type UserOrderByWithRelationInput = {
   MatKhauHash?: Prisma.SortOrder
   PhaiDoiMK?: Prisma.SortOrder
   VaiTro?: Prisma.SortOrder
-  ToKenVerSion?: Prisma.SortOrder
+  PhienBanToken?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
   UpdatedAt?: Prisma.SortOrder
   GiaoVien?: Prisma.GiaoVienOrderByWithRelationInput
@@ -294,7 +294,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   MatKhauHash?: Prisma.StringFilter<"User"> | string
   PhaiDoiMK?: Prisma.BoolFilter<"User"> | boolean
   VaiTro?: Prisma.EnumVaitroFilter<"User"> | $Enums.Vaitro
-  ToKenVerSion?: Prisma.IntFilter<"User"> | number
+  PhienBanToken?: Prisma.IntFilter<"User"> | number
   CreatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   UpdatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   GiaoVien?: Prisma.XOR<Prisma.GiaoVienNullableScalarRelationFilter, Prisma.GiaoVienWhereInput> | null
@@ -311,7 +311,7 @@ export type UserOrderByWithAggregationInput = {
   MatKhauHash?: Prisma.SortOrder
   PhaiDoiMK?: Prisma.SortOrder
   VaiTro?: Prisma.SortOrder
-  ToKenVerSion?: Prisma.SortOrder
+  PhienBanToken?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
   UpdatedAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
@@ -332,7 +332,7 @@ export type UserScalarWhereWithAggregatesInput = {
   MatKhauHash?: Prisma.StringWithAggregatesFilter<"User"> | string
   PhaiDoiMK?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   VaiTro?: Prisma.EnumVaitroWithAggregatesFilter<"User"> | $Enums.Vaitro
-  ToKenVerSion?: Prisma.IntWithAggregatesFilter<"User"> | number
+  PhienBanToken?: Prisma.IntWithAggregatesFilter<"User"> | number
   CreatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   UpdatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
@@ -344,7 +344,7 @@ export type UserCreateInput = {
   MatKhauHash: string
   PhaiDoiMK?: boolean
   VaiTro: $Enums.Vaitro
-  ToKenVerSion?: number
+  PhienBanToken?: number
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   GiaoVien?: Prisma.GiaoVienCreateNestedOneWithoutUserInput
@@ -361,7 +361,7 @@ export type UserUncheckedCreateInput = {
   MatKhauHash: string
   PhaiDoiMK?: boolean
   VaiTro: $Enums.Vaitro
-  ToKenVerSion?: number
+  PhienBanToken?: number
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   GiaoVien?: Prisma.GiaoVienUncheckedCreateNestedOneWithoutUserInput
@@ -377,7 +377,7 @@ export type UserUpdateInput = {
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
   PhaiDoiMK?: Prisma.BoolFieldUpdateOperationsInput | boolean
   VaiTro?: Prisma.EnumVaitroFieldUpdateOperationsInput | $Enums.Vaitro
-  ToKenVerSion?: Prisma.IntFieldUpdateOperationsInput | number
+  PhienBanToken?: Prisma.IntFieldUpdateOperationsInput | number
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   GiaoVien?: Prisma.GiaoVienUpdateOneWithoutUserNestedInput
@@ -394,7 +394,7 @@ export type UserUncheckedUpdateInput = {
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
   PhaiDoiMK?: Prisma.BoolFieldUpdateOperationsInput | boolean
   VaiTro?: Prisma.EnumVaitroFieldUpdateOperationsInput | $Enums.Vaitro
-  ToKenVerSion?: Prisma.IntFieldUpdateOperationsInput | number
+  PhienBanToken?: Prisma.IntFieldUpdateOperationsInput | number
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   GiaoVien?: Prisma.GiaoVienUncheckedUpdateOneWithoutUserNestedInput
@@ -411,7 +411,7 @@ export type UserCreateManyInput = {
   MatKhauHash: string
   PhaiDoiMK?: boolean
   VaiTro: $Enums.Vaitro
-  ToKenVerSion?: number
+  PhienBanToken?: number
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
 }
@@ -423,7 +423,7 @@ export type UserUpdateManyMutationInput = {
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
   PhaiDoiMK?: Prisma.BoolFieldUpdateOperationsInput | boolean
   VaiTro?: Prisma.EnumVaitroFieldUpdateOperationsInput | $Enums.Vaitro
-  ToKenVerSion?: Prisma.IntFieldUpdateOperationsInput | number
+  PhienBanToken?: Prisma.IntFieldUpdateOperationsInput | number
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -436,7 +436,7 @@ export type UserUncheckedUpdateManyInput = {
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
   PhaiDoiMK?: Prisma.BoolFieldUpdateOperationsInput | boolean
   VaiTro?: Prisma.EnumVaitroFieldUpdateOperationsInput | $Enums.Vaitro
-  ToKenVerSion?: Prisma.IntFieldUpdateOperationsInput | number
+  PhienBanToken?: Prisma.IntFieldUpdateOperationsInput | number
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -449,14 +449,14 @@ export type UserCountOrderByAggregateInput = {
   MatKhauHash?: Prisma.SortOrder
   PhaiDoiMK?: Prisma.SortOrder
   VaiTro?: Prisma.SortOrder
-  ToKenVerSion?: Prisma.SortOrder
+  PhienBanToken?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
   UpdatedAt?: Prisma.SortOrder
 }
 
 export type UserAvgOrderByAggregateInput = {
   ID?: Prisma.SortOrder
-  ToKenVerSion?: Prisma.SortOrder
+  PhienBanToken?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -467,7 +467,7 @@ export type UserMaxOrderByAggregateInput = {
   MatKhauHash?: Prisma.SortOrder
   PhaiDoiMK?: Prisma.SortOrder
   VaiTro?: Prisma.SortOrder
-  ToKenVerSion?: Prisma.SortOrder
+  PhienBanToken?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
   UpdatedAt?: Prisma.SortOrder
 }
@@ -480,14 +480,14 @@ export type UserMinOrderByAggregateInput = {
   MatKhauHash?: Prisma.SortOrder
   PhaiDoiMK?: Prisma.SortOrder
   VaiTro?: Prisma.SortOrder
-  ToKenVerSion?: Prisma.SortOrder
+  PhienBanToken?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
   UpdatedAt?: Prisma.SortOrder
 }
 
 export type UserSumOrderByAggregateInput = {
   ID?: Prisma.SortOrder
-  ToKenVerSion?: Prisma.SortOrder
+  PhienBanToken?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -586,7 +586,7 @@ export type UserCreateWithoutGiaoVienInput = {
   MatKhauHash: string
   PhaiDoiMK?: boolean
   VaiTro: $Enums.Vaitro
-  ToKenVerSion?: number
+  PhienBanToken?: number
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   HocVien?: Prisma.HocVienCreateNestedManyWithoutParentInput
@@ -602,7 +602,7 @@ export type UserUncheckedCreateWithoutGiaoVienInput = {
   MatKhauHash: string
   PhaiDoiMK?: boolean
   VaiTro: $Enums.Vaitro
-  ToKenVerSion?: number
+  PhienBanToken?: number
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   HocVien?: Prisma.HocVienUncheckedCreateNestedManyWithoutParentInput
@@ -633,7 +633,7 @@ export type UserUpdateWithoutGiaoVienInput = {
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
   PhaiDoiMK?: Prisma.BoolFieldUpdateOperationsInput | boolean
   VaiTro?: Prisma.EnumVaitroFieldUpdateOperationsInput | $Enums.Vaitro
-  ToKenVerSion?: Prisma.IntFieldUpdateOperationsInput | number
+  PhienBanToken?: Prisma.IntFieldUpdateOperationsInput | number
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   HocVien?: Prisma.HocVienUpdateManyWithoutParentNestedInput
@@ -649,7 +649,7 @@ export type UserUncheckedUpdateWithoutGiaoVienInput = {
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
   PhaiDoiMK?: Prisma.BoolFieldUpdateOperationsInput | boolean
   VaiTro?: Prisma.EnumVaitroFieldUpdateOperationsInput | $Enums.Vaitro
-  ToKenVerSion?: Prisma.IntFieldUpdateOperationsInput | number
+  PhienBanToken?: Prisma.IntFieldUpdateOperationsInput | number
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   HocVien?: Prisma.HocVienUncheckedUpdateManyWithoutParentNestedInput
@@ -664,7 +664,7 @@ export type UserCreateWithoutHocVienInput = {
   MatKhauHash: string
   PhaiDoiMK?: boolean
   VaiTro: $Enums.Vaitro
-  ToKenVerSion?: number
+  PhienBanToken?: number
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   GiaoVien?: Prisma.GiaoVienCreateNestedOneWithoutUserInput
@@ -680,7 +680,7 @@ export type UserUncheckedCreateWithoutHocVienInput = {
   MatKhauHash: string
   PhaiDoiMK?: boolean
   VaiTro: $Enums.Vaitro
-  ToKenVerSion?: number
+  PhienBanToken?: number
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   GiaoVien?: Prisma.GiaoVienUncheckedCreateNestedOneWithoutUserInput
@@ -711,7 +711,7 @@ export type UserUpdateWithoutHocVienInput = {
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
   PhaiDoiMK?: Prisma.BoolFieldUpdateOperationsInput | boolean
   VaiTro?: Prisma.EnumVaitroFieldUpdateOperationsInput | $Enums.Vaitro
-  ToKenVerSion?: Prisma.IntFieldUpdateOperationsInput | number
+  PhienBanToken?: Prisma.IntFieldUpdateOperationsInput | number
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   GiaoVien?: Prisma.GiaoVienUpdateOneWithoutUserNestedInput
@@ -727,7 +727,7 @@ export type UserUncheckedUpdateWithoutHocVienInput = {
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
   PhaiDoiMK?: Prisma.BoolFieldUpdateOperationsInput | boolean
   VaiTro?: Prisma.EnumVaitroFieldUpdateOperationsInput | $Enums.Vaitro
-  ToKenVerSion?: Prisma.IntFieldUpdateOperationsInput | number
+  PhienBanToken?: Prisma.IntFieldUpdateOperationsInput | number
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   GiaoVien?: Prisma.GiaoVienUncheckedUpdateOneWithoutUserNestedInput
@@ -742,7 +742,7 @@ export type UserCreateWithoutGiaoDichInput = {
   MatKhauHash: string
   PhaiDoiMK?: boolean
   VaiTro: $Enums.Vaitro
-  ToKenVerSion?: number
+  PhienBanToken?: number
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   GiaoVien?: Prisma.GiaoVienCreateNestedOneWithoutUserInput
@@ -758,7 +758,7 @@ export type UserUncheckedCreateWithoutGiaoDichInput = {
   MatKhauHash: string
   PhaiDoiMK?: boolean
   VaiTro: $Enums.Vaitro
-  ToKenVerSion?: number
+  PhienBanToken?: number
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   GiaoVien?: Prisma.GiaoVienUncheckedCreateNestedOneWithoutUserInput
@@ -789,7 +789,7 @@ export type UserUpdateWithoutGiaoDichInput = {
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
   PhaiDoiMK?: Prisma.BoolFieldUpdateOperationsInput | boolean
   VaiTro?: Prisma.EnumVaitroFieldUpdateOperationsInput | $Enums.Vaitro
-  ToKenVerSion?: Prisma.IntFieldUpdateOperationsInput | number
+  PhienBanToken?: Prisma.IntFieldUpdateOperationsInput | number
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   GiaoVien?: Prisma.GiaoVienUpdateOneWithoutUserNestedInput
@@ -805,7 +805,7 @@ export type UserUncheckedUpdateWithoutGiaoDichInput = {
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
   PhaiDoiMK?: Prisma.BoolFieldUpdateOperationsInput | boolean
   VaiTro?: Prisma.EnumVaitroFieldUpdateOperationsInput | $Enums.Vaitro
-  ToKenVerSion?: Prisma.IntFieldUpdateOperationsInput | number
+  PhienBanToken?: Prisma.IntFieldUpdateOperationsInput | number
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   GiaoVien?: Prisma.GiaoVienUncheckedUpdateOneWithoutUserNestedInput
@@ -820,7 +820,7 @@ export type UserCreateWithoutThongBaoInput = {
   MatKhauHash: string
   PhaiDoiMK?: boolean
   VaiTro: $Enums.Vaitro
-  ToKenVerSion?: number
+  PhienBanToken?: number
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   GiaoVien?: Prisma.GiaoVienCreateNestedOneWithoutUserInput
@@ -836,7 +836,7 @@ export type UserUncheckedCreateWithoutThongBaoInput = {
   MatKhauHash: string
   PhaiDoiMK?: boolean
   VaiTro: $Enums.Vaitro
-  ToKenVerSion?: number
+  PhienBanToken?: number
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   GiaoVien?: Prisma.GiaoVienUncheckedCreateNestedOneWithoutUserInput
@@ -867,7 +867,7 @@ export type UserUpdateWithoutThongBaoInput = {
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
   PhaiDoiMK?: Prisma.BoolFieldUpdateOperationsInput | boolean
   VaiTro?: Prisma.EnumVaitroFieldUpdateOperationsInput | $Enums.Vaitro
-  ToKenVerSion?: Prisma.IntFieldUpdateOperationsInput | number
+  PhienBanToken?: Prisma.IntFieldUpdateOperationsInput | number
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   GiaoVien?: Prisma.GiaoVienUpdateOneWithoutUserNestedInput
@@ -883,7 +883,7 @@ export type UserUncheckedUpdateWithoutThongBaoInput = {
   MatKhauHash?: Prisma.StringFieldUpdateOperationsInput | string
   PhaiDoiMK?: Prisma.BoolFieldUpdateOperationsInput | boolean
   VaiTro?: Prisma.EnumVaitroFieldUpdateOperationsInput | $Enums.Vaitro
-  ToKenVerSion?: Prisma.IntFieldUpdateOperationsInput | number
+  PhienBanToken?: Prisma.IntFieldUpdateOperationsInput | number
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   GiaoVien?: Prisma.GiaoVienUncheckedUpdateOneWithoutUserNestedInput
@@ -948,7 +948,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   MatKhauHash?: boolean
   PhaiDoiMK?: boolean
   VaiTro?: boolean
-  ToKenVerSion?: boolean
+  PhienBanToken?: boolean
   CreatedAt?: boolean
   UpdatedAt?: boolean
   GiaoVien?: boolean | Prisma.User$GiaoVienArgs<ExtArgs>
@@ -966,7 +966,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   MatKhauHash?: boolean
   PhaiDoiMK?: boolean
   VaiTro?: boolean
-  ToKenVerSion?: boolean
+  PhienBanToken?: boolean
   CreatedAt?: boolean
   UpdatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -979,7 +979,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   MatKhauHash?: boolean
   PhaiDoiMK?: boolean
   VaiTro?: boolean
-  ToKenVerSion?: boolean
+  PhienBanToken?: boolean
   CreatedAt?: boolean
   UpdatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -992,12 +992,12 @@ export type UserSelectScalar = {
   MatKhauHash?: boolean
   PhaiDoiMK?: boolean
   VaiTro?: boolean
-  ToKenVerSion?: boolean
+  PhienBanToken?: boolean
   CreatedAt?: boolean
   UpdatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"ID" | "HoTen" | "Email" | "DienThoai" | "MatKhauHash" | "PhaiDoiMK" | "VaiTro" | "ToKenVerSion" | "CreatedAt" | "UpdatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"ID" | "HoTen" | "Email" | "DienThoai" | "MatKhauHash" | "PhaiDoiMK" | "VaiTro" | "PhienBanToken" | "CreatedAt" | "UpdatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   GiaoVien?: boolean | Prisma.User$GiaoVienArgs<ExtArgs>
   HocVien?: boolean | Prisma.User$HocVienArgs<ExtArgs>
@@ -1024,7 +1024,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     MatKhauHash: string
     PhaiDoiMK: boolean
     VaiTro: $Enums.Vaitro
-    ToKenVerSion: number
+    PhienBanToken: number
     CreatedAt: Date
     UpdatedAt: Date
   }, ExtArgs["result"]["user"]>
@@ -1461,7 +1461,7 @@ export interface UserFieldRefs {
   readonly MatKhauHash: Prisma.FieldRef<"User", 'String'>
   readonly PhaiDoiMK: Prisma.FieldRef<"User", 'Boolean'>
   readonly VaiTro: Prisma.FieldRef<"User", 'Vaitro'>
-  readonly ToKenVerSion: Prisma.FieldRef<"User", 'Int'>
+  readonly PhienBanToken: Prisma.FieldRef<"User", 'Int'>
   readonly CreatedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly UpdatedAt: Prisma.FieldRef<"User", 'DateTime'>
 }
@@ -1660,6 +1660,11 @@ export type UserFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Skip the first `n` Users.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Users.
+   */
   distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[]
 }
 

@@ -80,12 +80,12 @@ export type PrismaVersion = {
 }
 
 /**
- * Prisma Client JS version: 7.2.0
- * Query Engine version: 0c8ef2ce45c83248ab3df073180d5eda9e8be7a3
+ * Prisma Client JS version: 7.5.0
+ * Query Engine version: 280c870be64f457428992c43c1f6d557fab6e29e
  */
 export const prismaVersion: PrismaVersion = {
-  client: "7.2.0",
-  engine: "0c8ef2ce45c83248ab3df073180d5eda9e8be7a3"
+  client: "7.5.0",
+  engine: "280c870be64f457428992c43c1f6d557fab6e29e"
 }
 
 /**
@@ -391,6 +391,7 @@ export const ModelName = {
   LopHoc: 'LopHoc',
   BuoiHoc: 'BuoiHoc',
   KetQua_BuoiHoc: 'KetQua_BuoiHoc',
+  TepDinhKem_BuoiHoc: 'TepDinhKem_BuoiHoc',
   KetQua_ChiTiet: 'KetQua_ChiTiet',
   GhiDanh: 'GhiDanh',
   HoaDon: 'HoaDon',
@@ -411,7 +412,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "giaoVien" | "hocVien" | "khoaHoc" | "lopHoc" | "buoiHoc" | "ketQua_BuoiHoc" | "ketQua_ChiTiet" | "ghiDanh" | "hoaDon" | "giaoDich" | "thongBao"
+    modelProps: "user" | "giaoVien" | "hocVien" | "khoaHoc" | "lopHoc" | "buoiHoc" | "ketQua_BuoiHoc" | "tepDinhKem_BuoiHoc" | "ketQua_ChiTiet" | "ghiDanh" | "hoaDon" | "giaoDich" | "thongBao"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -933,6 +934,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    TepDinhKem_BuoiHoc: {
+      payload: Prisma.$TepDinhKem_BuoiHocPayload<ExtArgs>
+      fields: Prisma.TepDinhKem_BuoiHocFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TepDinhKem_BuoiHocFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TepDinhKem_BuoiHocPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TepDinhKem_BuoiHocFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TepDinhKem_BuoiHocPayload>
+        }
+        findFirst: {
+          args: Prisma.TepDinhKem_BuoiHocFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TepDinhKem_BuoiHocPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TepDinhKem_BuoiHocFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TepDinhKem_BuoiHocPayload>
+        }
+        findMany: {
+          args: Prisma.TepDinhKem_BuoiHocFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TepDinhKem_BuoiHocPayload>[]
+        }
+        create: {
+          args: Prisma.TepDinhKem_BuoiHocCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TepDinhKem_BuoiHocPayload>
+        }
+        createMany: {
+          args: Prisma.TepDinhKem_BuoiHocCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TepDinhKem_BuoiHocCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TepDinhKem_BuoiHocPayload>[]
+        }
+        delete: {
+          args: Prisma.TepDinhKem_BuoiHocDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TepDinhKem_BuoiHocPayload>
+        }
+        update: {
+          args: Prisma.TepDinhKem_BuoiHocUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TepDinhKem_BuoiHocPayload>
+        }
+        deleteMany: {
+          args: Prisma.TepDinhKem_BuoiHocDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TepDinhKem_BuoiHocUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TepDinhKem_BuoiHocUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TepDinhKem_BuoiHocPayload>[]
+        }
+        upsert: {
+          args: Prisma.TepDinhKem_BuoiHocUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TepDinhKem_BuoiHocPayload>
+        }
+        aggregate: {
+          args: Prisma.TepDinhKem_BuoiHocAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTepDinhKem_BuoiHoc>
+        }
+        groupBy: {
+          args: Prisma.TepDinhKem_BuoiHocGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TepDinhKem_BuoiHocGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TepDinhKem_BuoiHocCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TepDinhKem_BuoiHocCountAggregateOutputType> | number
+        }
+      }
+    }
     KetQua_ChiTiet: {
       payload: Prisma.$KetQua_ChiTietPayload<ExtArgs>
       fields: Prisma.KetQua_ChiTietFieldRefs
@@ -1350,7 +1425,7 @@ export const UserScalarFieldEnum = {
   MatKhauHash: 'MatKhauHash',
   PhaiDoiMK: 'PhaiDoiMK',
   VaiTro: 'VaiTro',
-  ToKenVerSion: 'ToKenVerSion',
+  PhienBanToken: 'PhienBanToken',
   CreatedAt: 'CreatedAt',
   UpdatedAt: 'UpdatedAt'
 } as const
@@ -1434,7 +1509,6 @@ export const BuoiHocScalarFieldEnum = {
   ChuDe: 'ChuDe',
   BatDauLuc: 'BatDauLuc',
   KetThucLuc: 'KetThucLuc',
-  MoTa: 'MoTa',
   PhongHoc: 'PhongHoc',
   AdminMoKhoa: 'AdminMoKhoa',
   YeuCauMoKhoa: 'YeuCauMoKhoa',
@@ -1452,6 +1526,8 @@ export const KetQua_BuoiHocScalarFieldEnum = {
   ID: 'ID',
   BuoiHocID: 'BuoiHocID',
   GiaoVienID: 'GiaoVienID',
+  NoiDungBaiHoc: 'NoiDungBaiHoc',
+  BaiTapVeNha: 'BaiTapVeNha',
   NhanXetChung: 'NhanXetChung',
   TrangThai: 'TrangThai',
   CreatedAt: 'CreatedAt',
@@ -1459,6 +1535,19 @@ export const KetQua_BuoiHocScalarFieldEnum = {
 } as const
 
 export type KetQua_BuoiHocScalarFieldEnum = (typeof KetQua_BuoiHocScalarFieldEnum)[keyof typeof KetQua_BuoiHocScalarFieldEnum]
+
+
+export const TepDinhKem_BuoiHocScalarFieldEnum = {
+  ID: 'ID',
+  KQBuoiHocID: 'KQBuoiHocID',
+  TepID: 'TepID',
+  URL: 'URL',
+  LoaiTep: 'LoaiTep',
+  CreatedAt: 'CreatedAt',
+  UpdatedAt: 'UpdatedAt'
+} as const
+
+export type TepDinhKem_BuoiHocScalarFieldEnum = (typeof TepDinhKem_BuoiHocScalarFieldEnum)[keyof typeof TepDinhKem_BuoiHocScalarFieldEnum]
 
 
 export const KetQua_ChiTietScalarFieldEnum = {
@@ -1902,6 +1991,7 @@ export type GlobalOmitConfig = {
   lopHoc?: Prisma.LopHocOmit
   buoiHoc?: Prisma.BuoiHocOmit
   ketQua_BuoiHoc?: Prisma.KetQua_BuoiHocOmit
+  tepDinhKem_BuoiHoc?: Prisma.TepDinhKem_BuoiHocOmit
   ketQua_ChiTiet?: Prisma.KetQua_ChiTietOmit
   ghiDanh?: Prisma.GhiDanhOmit
   hoaDon?: Prisma.HoaDonOmit

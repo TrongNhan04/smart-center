@@ -2,26 +2,24 @@ import { Navigate, Outlet } from "react-router-dom"
 import { useAuthStore } from "../store/useAuthStore"
 
 interface Props {
-  allowedRole: 'ADMIN'|'TEACHER'
+  allowedRole: 'ADMIN' | 'TEACHER'
 }
 
 const PrivateRoute = ({ allowedRole }: Props) => {
   const token = useAuthStore(state => state.access_token)
   const role = useAuthStore(state => state.user?.role)
-
   // không có token hay role -> về đăng nhập
   // replace: không bấm nút quay lại được
   if (!token || !role) return <Navigate to='/' replace />
 
   // có token nhưng sai role -> đi lạc thì ai về nhà nấy
-  if (!allowedRole.includes(role)) {
+  if (role !== allowedRole) {
     if (role === 'ADMIN') return <Navigate to='/admin' replace />
     if (role === 'TEACHER') return <Navigate to='/teacher' replace />
     return <Navigate to='/' replace />
   }
-
-  // có token, đúng role -> vào
-  return <Outlet/>
+  // có token + đúng role
+  return <Outlet />
 }
 
 export default PrivateRoute

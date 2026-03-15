@@ -29,7 +29,7 @@ model User {
   MatKhauHash  String
   PhaiDoiMK    Boolean @default(true) //bắt buộc đổi mật khẩu lần đầu đăng nhập
   VaiTro       Vaitro
-  ToKenVerSion Int     @default(0)
+  PhienBanToken Int    @default(0)
 
   CreatedAt DateTime @default(now()) @db.Timestamptz(3)
   UpdatedAt DateTime @updatedAt @db.Timestamptz(3)
@@ -168,7 +168,6 @@ model BuoiHoc {
   ChuDe        String?
   BatDauLuc    DateTime    @db.Timestamptz(3)
   KetThucLuc   DateTime    @db.Timestamptz(3)
-  MoTa         String?
   PhongHoc     String?
   AdminMoKhoa  Boolean     @default(false)
   YeuCauMoKhoa Boolean     @default(false)
@@ -192,11 +191,14 @@ enum TrangThai_KQBH {
 }
 
 model KetQua_BuoiHoc {
-  ID           Int            @id @default(autoincrement())
-  BuoiHocID    Int            @unique
-  GiaoVienID   Int
-  NhanXetChung String
-  TrangThai    TrangThai_KQBH @default(DRAFT) //mặc định là DRAFT
+  ID         Int @id @default(autoincrement())
+  BuoiHocID  Int @unique
+  GiaoVienID Int
+
+  NoiDungBaiHoc String?
+  BaiTapVeNha   String?
+  NhanXetChung  String
+  TrangThai     TrangThai_KQBH @default(DRAFT) //mặc định là DRAFT
 
   CreatedAt DateTime @default(now()) @db.Timestamptz(3)
   UpdatedAt DateTime @updatedAt @db.Timestamptz(3)
@@ -205,6 +207,21 @@ model KetQua_BuoiHoc {
   buoihoc        BuoiHoc          @relation(fields: [BuoiHocID], references: [ID])
   giaovien       GiaoVien         @relation(fields: [GiaoVienID], references: [ID])
   ketqua_chitiet KetQua_ChiTiet[] //kết quả buổi học có nhiều kết quả chi tiết
+  tep_dinhkem TepDinhKem_BuoiHoc[] // 1 buổi học có thế có nhiều tệp đính kèm
+}
+
+model TepDinhKem_BuoiHoc {
+  ID          Int @id @default(autoincrement())
+  KQBuoiHocID Int
+
+  TepID   String
+  URL     String
+  LoaiTep String
+
+  CreatedAt DateTime @default(now()) @db.Timestamptz(3)
+  UpdatedAt DateTime @updatedAt @db.Timestamptz(3)
+  
+  ketqua_buoihoc KetQua_BuoiHoc @relation(fields: [KQBuoiHocID],references: [ID])
 }
 
 // ============ 8. KETQUA_CHITIET ============//

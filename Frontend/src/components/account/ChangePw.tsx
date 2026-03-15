@@ -19,6 +19,7 @@ const ChangePw = ({ open, onCancel }: Props) => {
       const { confirmPassword, ...rest } = values
 
       await authApi.update(rest) // cập nhật
+        
       message.success('Đổi mật khẩu thành công, vui lòng đăng nhập lại để tiếp tục!')
       handelCancel()
       useAuthStore.getState().logout() // set localStorage = null

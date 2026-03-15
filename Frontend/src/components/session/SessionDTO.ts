@@ -24,7 +24,7 @@ export interface SessionDB {
 }
 
 // chi tiết 1 buổi học cho drawer
-export type SessionDetail =
+export type TSessionDetail =
     Omit<SessionDB, 'AdminMoKhoa' | 'YeuCauMoKhoa'> & {
         GiaoVien: string,
         LopHoc: string,

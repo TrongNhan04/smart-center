@@ -42,6 +42,8 @@ export type KetQua_BuoiHocMinAggregateOutputType = {
   ID: number | null
   BuoiHocID: number | null
   GiaoVienID: number | null
+  NoiDungBaiHoc: string | null
+  BaiTapVeNha: string | null
   NhanXetChung: string | null
   TrangThai: $Enums.TrangThai_KQBH | null
   CreatedAt: Date | null
@@ -52,6 +54,8 @@ export type KetQua_BuoiHocMaxAggregateOutputType = {
   ID: number | null
   BuoiHocID: number | null
   GiaoVienID: number | null
+  NoiDungBaiHoc: string | null
+  BaiTapVeNha: string | null
   NhanXetChung: string | null
   TrangThai: $Enums.TrangThai_KQBH | null
   CreatedAt: Date | null
@@ -62,6 +66,8 @@ export type KetQua_BuoiHocCountAggregateOutputType = {
   ID: number
   BuoiHocID: number
   GiaoVienID: number
+  NoiDungBaiHoc: number
+  BaiTapVeNha: number
   NhanXetChung: number
   TrangThai: number
   CreatedAt: number
@@ -86,6 +92,8 @@ export type KetQua_BuoiHocMinAggregateInputType = {
   ID?: true
   BuoiHocID?: true
   GiaoVienID?: true
+  NoiDungBaiHoc?: true
+  BaiTapVeNha?: true
   NhanXetChung?: true
   TrangThai?: true
   CreatedAt?: true
@@ -96,6 +104,8 @@ export type KetQua_BuoiHocMaxAggregateInputType = {
   ID?: true
   BuoiHocID?: true
   GiaoVienID?: true
+  NoiDungBaiHoc?: true
+  BaiTapVeNha?: true
   NhanXetChung?: true
   TrangThai?: true
   CreatedAt?: true
@@ -106,6 +116,8 @@ export type KetQua_BuoiHocCountAggregateInputType = {
   ID?: true
   BuoiHocID?: true
   GiaoVienID?: true
+  NoiDungBaiHoc?: true
+  BaiTapVeNha?: true
   NhanXetChung?: true
   TrangThai?: true
   CreatedAt?: true
@@ -203,6 +215,8 @@ export type KetQua_BuoiHocGroupByOutputType = {
   ID: number
   BuoiHocID: number
   GiaoVienID: number
+  NoiDungBaiHoc: string | null
+  BaiTapVeNha: string | null
   NhanXetChung: string
   TrangThai: $Enums.TrangThai_KQBH
   CreatedAt: Date
@@ -236,6 +250,8 @@ export type KetQua_BuoiHocWhereInput = {
   ID?: Prisma.IntFilter<"KetQua_BuoiHoc"> | number
   BuoiHocID?: Prisma.IntFilter<"KetQua_BuoiHoc"> | number
   GiaoVienID?: Prisma.IntFilter<"KetQua_BuoiHoc"> | number
+  NoiDungBaiHoc?: Prisma.StringNullableFilter<"KetQua_BuoiHoc"> | string | null
+  BaiTapVeNha?: Prisma.StringNullableFilter<"KetQua_BuoiHoc"> | string | null
   NhanXetChung?: Prisma.StringFilter<"KetQua_BuoiHoc"> | string
   TrangThai?: Prisma.EnumTrangThai_KQBHFilter<"KetQua_BuoiHoc"> | $Enums.TrangThai_KQBH
   CreatedAt?: Prisma.DateTimeFilter<"KetQua_BuoiHoc"> | Date | string
@@ -243,12 +259,15 @@ export type KetQua_BuoiHocWhereInput = {
   buoihoc?: Prisma.XOR<Prisma.BuoiHocScalarRelationFilter, Prisma.BuoiHocWhereInput>
   giaovien?: Prisma.XOR<Prisma.GiaoVienScalarRelationFilter, Prisma.GiaoVienWhereInput>
   ketqua_chitiet?: Prisma.KetQua_ChiTietListRelationFilter
+  tep_dinhkem?: Prisma.TepDinhKem_BuoiHocListRelationFilter
 }
 
 export type KetQua_BuoiHocOrderByWithRelationInput = {
   ID?: Prisma.SortOrder
   BuoiHocID?: Prisma.SortOrder
   GiaoVienID?: Prisma.SortOrder
+  NoiDungBaiHoc?: Prisma.SortOrderInput | Prisma.SortOrder
+  BaiTapVeNha?: Prisma.SortOrderInput | Prisma.SortOrder
   NhanXetChung?: Prisma.SortOrder
   TrangThai?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
@@ -256,6 +275,7 @@ export type KetQua_BuoiHocOrderByWithRelationInput = {
   buoihoc?: Prisma.BuoiHocOrderByWithRelationInput
   giaovien?: Prisma.GiaoVienOrderByWithRelationInput
   ketqua_chitiet?: Prisma.KetQua_ChiTietOrderByRelationAggregateInput
+  tep_dinhkem?: Prisma.TepDinhKem_BuoiHocOrderByRelationAggregateInput
 }
 
 export type KetQua_BuoiHocWhereUniqueInput = Prisma.AtLeast<{
@@ -265,6 +285,8 @@ export type KetQua_BuoiHocWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.KetQua_BuoiHocWhereInput[]
   NOT?: Prisma.KetQua_BuoiHocWhereInput | Prisma.KetQua_BuoiHocWhereInput[]
   GiaoVienID?: Prisma.IntFilter<"KetQua_BuoiHoc"> | number
+  NoiDungBaiHoc?: Prisma.StringNullableFilter<"KetQua_BuoiHoc"> | string | null
+  BaiTapVeNha?: Prisma.StringNullableFilter<"KetQua_BuoiHoc"> | string | null
   NhanXetChung?: Prisma.StringFilter<"KetQua_BuoiHoc"> | string
   TrangThai?: Prisma.EnumTrangThai_KQBHFilter<"KetQua_BuoiHoc"> | $Enums.TrangThai_KQBH
   CreatedAt?: Prisma.DateTimeFilter<"KetQua_BuoiHoc"> | Date | string
@@ -272,12 +294,15 @@ export type KetQua_BuoiHocWhereUniqueInput = Prisma.AtLeast<{
   buoihoc?: Prisma.XOR<Prisma.BuoiHocScalarRelationFilter, Prisma.BuoiHocWhereInput>
   giaovien?: Prisma.XOR<Prisma.GiaoVienScalarRelationFilter, Prisma.GiaoVienWhereInput>
   ketqua_chitiet?: Prisma.KetQua_ChiTietListRelationFilter
+  tep_dinhkem?: Prisma.TepDinhKem_BuoiHocListRelationFilter
 }, "ID" | "BuoiHocID">
 
 export type KetQua_BuoiHocOrderByWithAggregationInput = {
   ID?: Prisma.SortOrder
   BuoiHocID?: Prisma.SortOrder
   GiaoVienID?: Prisma.SortOrder
+  NoiDungBaiHoc?: Prisma.SortOrderInput | Prisma.SortOrder
+  BaiTapVeNha?: Prisma.SortOrderInput | Prisma.SortOrder
   NhanXetChung?: Prisma.SortOrder
   TrangThai?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
@@ -296,6 +321,8 @@ export type KetQua_BuoiHocScalarWhereWithAggregatesInput = {
   ID?: Prisma.IntWithAggregatesFilter<"KetQua_BuoiHoc"> | number
   BuoiHocID?: Prisma.IntWithAggregatesFilter<"KetQua_BuoiHoc"> | number
   GiaoVienID?: Prisma.IntWithAggregatesFilter<"KetQua_BuoiHoc"> | number
+  NoiDungBaiHoc?: Prisma.StringNullableWithAggregatesFilter<"KetQua_BuoiHoc"> | string | null
+  BaiTapVeNha?: Prisma.StringNullableWithAggregatesFilter<"KetQua_BuoiHoc"> | string | null
   NhanXetChung?: Prisma.StringWithAggregatesFilter<"KetQua_BuoiHoc"> | string
   TrangThai?: Prisma.EnumTrangThai_KQBHWithAggregatesFilter<"KetQua_BuoiHoc"> | $Enums.TrangThai_KQBH
   CreatedAt?: Prisma.DateTimeWithAggregatesFilter<"KetQua_BuoiHoc"> | Date | string
@@ -303,6 +330,8 @@ export type KetQua_BuoiHocScalarWhereWithAggregatesInput = {
 }
 
 export type KetQua_BuoiHocCreateInput = {
+  NoiDungBaiHoc?: string | null
+  BaiTapVeNha?: string | null
   NhanXetChung: string
   TrangThai?: $Enums.TrangThai_KQBH
   CreatedAt?: Date | string
@@ -310,20 +339,26 @@ export type KetQua_BuoiHocCreateInput = {
   buoihoc: Prisma.BuoiHocCreateNestedOneWithoutKetqua_buoihocInput
   giaovien: Prisma.GiaoVienCreateNestedOneWithoutKetQua_BuoiHocInput
   ketqua_chitiet?: Prisma.KetQua_ChiTietCreateNestedManyWithoutKetqua_buoihocInput
+  tep_dinhkem?: Prisma.TepDinhKem_BuoiHocCreateNestedManyWithoutKetqua_buoihocInput
 }
 
 export type KetQua_BuoiHocUncheckedCreateInput = {
   ID?: number
   BuoiHocID: number
   GiaoVienID: number
+  NoiDungBaiHoc?: string | null
+  BaiTapVeNha?: string | null
   NhanXetChung: string
   TrangThai?: $Enums.TrangThai_KQBH
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   ketqua_chitiet?: Prisma.KetQua_ChiTietUncheckedCreateNestedManyWithoutKetqua_buoihocInput
+  tep_dinhkem?: Prisma.TepDinhKem_BuoiHocUncheckedCreateNestedManyWithoutKetqua_buoihocInput
 }
 
 export type KetQua_BuoiHocUpdateInput = {
+  NoiDungBaiHoc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  BaiTapVeNha?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   NhanXetChung?: Prisma.StringFieldUpdateOperationsInput | string
   TrangThai?: Prisma.EnumTrangThai_KQBHFieldUpdateOperationsInput | $Enums.TrangThai_KQBH
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -331,23 +366,29 @@ export type KetQua_BuoiHocUpdateInput = {
   buoihoc?: Prisma.BuoiHocUpdateOneRequiredWithoutKetqua_buoihocNestedInput
   giaovien?: Prisma.GiaoVienUpdateOneRequiredWithoutKetQua_BuoiHocNestedInput
   ketqua_chitiet?: Prisma.KetQua_ChiTietUpdateManyWithoutKetqua_buoihocNestedInput
+  tep_dinhkem?: Prisma.TepDinhKem_BuoiHocUpdateManyWithoutKetqua_buoihocNestedInput
 }
 
 export type KetQua_BuoiHocUncheckedUpdateInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
   BuoiHocID?: Prisma.IntFieldUpdateOperationsInput | number
   GiaoVienID?: Prisma.IntFieldUpdateOperationsInput | number
+  NoiDungBaiHoc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  BaiTapVeNha?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   NhanXetChung?: Prisma.StringFieldUpdateOperationsInput | string
   TrangThai?: Prisma.EnumTrangThai_KQBHFieldUpdateOperationsInput | $Enums.TrangThai_KQBH
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ketqua_chitiet?: Prisma.KetQua_ChiTietUncheckedUpdateManyWithoutKetqua_buoihocNestedInput
+  tep_dinhkem?: Prisma.TepDinhKem_BuoiHocUncheckedUpdateManyWithoutKetqua_buoihocNestedInput
 }
 
 export type KetQua_BuoiHocCreateManyInput = {
   ID?: number
   BuoiHocID: number
   GiaoVienID: number
+  NoiDungBaiHoc?: string | null
+  BaiTapVeNha?: string | null
   NhanXetChung: string
   TrangThai?: $Enums.TrangThai_KQBH
   CreatedAt?: Date | string
@@ -355,6 +396,8 @@ export type KetQua_BuoiHocCreateManyInput = {
 }
 
 export type KetQua_BuoiHocUpdateManyMutationInput = {
+  NoiDungBaiHoc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  BaiTapVeNha?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   NhanXetChung?: Prisma.StringFieldUpdateOperationsInput | string
   TrangThai?: Prisma.EnumTrangThai_KQBHFieldUpdateOperationsInput | $Enums.TrangThai_KQBH
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -365,6 +408,8 @@ export type KetQua_BuoiHocUncheckedUpdateManyInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
   BuoiHocID?: Prisma.IntFieldUpdateOperationsInput | number
   GiaoVienID?: Prisma.IntFieldUpdateOperationsInput | number
+  NoiDungBaiHoc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  BaiTapVeNha?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   NhanXetChung?: Prisma.StringFieldUpdateOperationsInput | string
   TrangThai?: Prisma.EnumTrangThai_KQBHFieldUpdateOperationsInput | $Enums.TrangThai_KQBH
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -390,6 +435,8 @@ export type KetQua_BuoiHocCountOrderByAggregateInput = {
   ID?: Prisma.SortOrder
   BuoiHocID?: Prisma.SortOrder
   GiaoVienID?: Prisma.SortOrder
+  NoiDungBaiHoc?: Prisma.SortOrder
+  BaiTapVeNha?: Prisma.SortOrder
   NhanXetChung?: Prisma.SortOrder
   TrangThai?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
@@ -406,6 +453,8 @@ export type KetQua_BuoiHocMaxOrderByAggregateInput = {
   ID?: Prisma.SortOrder
   BuoiHocID?: Prisma.SortOrder
   GiaoVienID?: Prisma.SortOrder
+  NoiDungBaiHoc?: Prisma.SortOrder
+  BaiTapVeNha?: Prisma.SortOrder
   NhanXetChung?: Prisma.SortOrder
   TrangThai?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
@@ -416,6 +465,8 @@ export type KetQua_BuoiHocMinOrderByAggregateInput = {
   ID?: Prisma.SortOrder
   BuoiHocID?: Prisma.SortOrder
   GiaoVienID?: Prisma.SortOrder
+  NoiDungBaiHoc?: Prisma.SortOrder
+  BaiTapVeNha?: Prisma.SortOrder
   NhanXetChung?: Prisma.SortOrder
   TrangThai?: Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
@@ -511,6 +562,20 @@ export type EnumTrangThai_KQBHFieldUpdateOperationsInput = {
   set?: $Enums.TrangThai_KQBH
 }
 
+export type KetQua_BuoiHocCreateNestedOneWithoutTep_dinhkemInput = {
+  create?: Prisma.XOR<Prisma.KetQua_BuoiHocCreateWithoutTep_dinhkemInput, Prisma.KetQua_BuoiHocUncheckedCreateWithoutTep_dinhkemInput>
+  connectOrCreate?: Prisma.KetQua_BuoiHocCreateOrConnectWithoutTep_dinhkemInput
+  connect?: Prisma.KetQua_BuoiHocWhereUniqueInput
+}
+
+export type KetQua_BuoiHocUpdateOneRequiredWithoutTep_dinhkemNestedInput = {
+  create?: Prisma.XOR<Prisma.KetQua_BuoiHocCreateWithoutTep_dinhkemInput, Prisma.KetQua_BuoiHocUncheckedCreateWithoutTep_dinhkemInput>
+  connectOrCreate?: Prisma.KetQua_BuoiHocCreateOrConnectWithoutTep_dinhkemInput
+  upsert?: Prisma.KetQua_BuoiHocUpsertWithoutTep_dinhkemInput
+  connect?: Prisma.KetQua_BuoiHocWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.KetQua_BuoiHocUpdateToOneWithWhereWithoutTep_dinhkemInput, Prisma.KetQua_BuoiHocUpdateWithoutTep_dinhkemInput>, Prisma.KetQua_BuoiHocUncheckedUpdateWithoutTep_dinhkemInput>
+}
+
 export type KetQua_BuoiHocCreateNestedOneWithoutKetqua_chitietInput = {
   create?: Prisma.XOR<Prisma.KetQua_BuoiHocCreateWithoutKetqua_chitietInput, Prisma.KetQua_BuoiHocUncheckedCreateWithoutKetqua_chitietInput>
   connectOrCreate?: Prisma.KetQua_BuoiHocCreateOrConnectWithoutKetqua_chitietInput
@@ -526,22 +591,28 @@ export type KetQua_BuoiHocUpdateOneRequiredWithoutKetqua_chitietNestedInput = {
 }
 
 export type KetQua_BuoiHocCreateWithoutGiaovienInput = {
+  NoiDungBaiHoc?: string | null
+  BaiTapVeNha?: string | null
   NhanXetChung: string
   TrangThai?: $Enums.TrangThai_KQBH
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   buoihoc: Prisma.BuoiHocCreateNestedOneWithoutKetqua_buoihocInput
   ketqua_chitiet?: Prisma.KetQua_ChiTietCreateNestedManyWithoutKetqua_buoihocInput
+  tep_dinhkem?: Prisma.TepDinhKem_BuoiHocCreateNestedManyWithoutKetqua_buoihocInput
 }
 
 export type KetQua_BuoiHocUncheckedCreateWithoutGiaovienInput = {
   ID?: number
   BuoiHocID: number
+  NoiDungBaiHoc?: string | null
+  BaiTapVeNha?: string | null
   NhanXetChung: string
   TrangThai?: $Enums.TrangThai_KQBH
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   ketqua_chitiet?: Prisma.KetQua_ChiTietUncheckedCreateNestedManyWithoutKetqua_buoihocInput
+  tep_dinhkem?: Prisma.TepDinhKem_BuoiHocUncheckedCreateNestedManyWithoutKetqua_buoihocInput
 }
 
 export type KetQua_BuoiHocCreateOrConnectWithoutGiaovienInput = {
@@ -577,6 +648,8 @@ export type KetQua_BuoiHocScalarWhereInput = {
   ID?: Prisma.IntFilter<"KetQua_BuoiHoc"> | number
   BuoiHocID?: Prisma.IntFilter<"KetQua_BuoiHoc"> | number
   GiaoVienID?: Prisma.IntFilter<"KetQua_BuoiHoc"> | number
+  NoiDungBaiHoc?: Prisma.StringNullableFilter<"KetQua_BuoiHoc"> | string | null
+  BaiTapVeNha?: Prisma.StringNullableFilter<"KetQua_BuoiHoc"> | string | null
   NhanXetChung?: Prisma.StringFilter<"KetQua_BuoiHoc"> | string
   TrangThai?: Prisma.EnumTrangThai_KQBHFilter<"KetQua_BuoiHoc"> | $Enums.TrangThai_KQBH
   CreatedAt?: Prisma.DateTimeFilter<"KetQua_BuoiHoc"> | Date | string
@@ -584,22 +657,28 @@ export type KetQua_BuoiHocScalarWhereInput = {
 }
 
 export type KetQua_BuoiHocCreateWithoutBuoihocInput = {
+  NoiDungBaiHoc?: string | null
+  BaiTapVeNha?: string | null
   NhanXetChung: string
   TrangThai?: $Enums.TrangThai_KQBH
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   giaovien: Prisma.GiaoVienCreateNestedOneWithoutKetQua_BuoiHocInput
   ketqua_chitiet?: Prisma.KetQua_ChiTietCreateNestedManyWithoutKetqua_buoihocInput
+  tep_dinhkem?: Prisma.TepDinhKem_BuoiHocCreateNestedManyWithoutKetqua_buoihocInput
 }
 
 export type KetQua_BuoiHocUncheckedCreateWithoutBuoihocInput = {
   ID?: number
   GiaoVienID: number
+  NoiDungBaiHoc?: string | null
+  BaiTapVeNha?: string | null
   NhanXetChung: string
   TrangThai?: $Enums.TrangThai_KQBH
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   ketqua_chitiet?: Prisma.KetQua_ChiTietUncheckedCreateNestedManyWithoutKetqua_buoihocInput
+  tep_dinhkem?: Prisma.TepDinhKem_BuoiHocUncheckedCreateNestedManyWithoutKetqua_buoihocInput
 }
 
 export type KetQua_BuoiHocCreateOrConnectWithoutBuoihocInput = {
@@ -619,17 +698,89 @@ export type KetQua_BuoiHocUpdateToOneWithWhereWithoutBuoihocInput = {
 }
 
 export type KetQua_BuoiHocUpdateWithoutBuoihocInput = {
+  NoiDungBaiHoc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  BaiTapVeNha?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   NhanXetChung?: Prisma.StringFieldUpdateOperationsInput | string
   TrangThai?: Prisma.EnumTrangThai_KQBHFieldUpdateOperationsInput | $Enums.TrangThai_KQBH
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   giaovien?: Prisma.GiaoVienUpdateOneRequiredWithoutKetQua_BuoiHocNestedInput
   ketqua_chitiet?: Prisma.KetQua_ChiTietUpdateManyWithoutKetqua_buoihocNestedInput
+  tep_dinhkem?: Prisma.TepDinhKem_BuoiHocUpdateManyWithoutKetqua_buoihocNestedInput
 }
 
 export type KetQua_BuoiHocUncheckedUpdateWithoutBuoihocInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
   GiaoVienID?: Prisma.IntFieldUpdateOperationsInput | number
+  NoiDungBaiHoc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  BaiTapVeNha?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  NhanXetChung?: Prisma.StringFieldUpdateOperationsInput | string
+  TrangThai?: Prisma.EnumTrangThai_KQBHFieldUpdateOperationsInput | $Enums.TrangThai_KQBH
+  CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ketqua_chitiet?: Prisma.KetQua_ChiTietUncheckedUpdateManyWithoutKetqua_buoihocNestedInput
+  tep_dinhkem?: Prisma.TepDinhKem_BuoiHocUncheckedUpdateManyWithoutKetqua_buoihocNestedInput
+}
+
+export type KetQua_BuoiHocCreateWithoutTep_dinhkemInput = {
+  NoiDungBaiHoc?: string | null
+  BaiTapVeNha?: string | null
+  NhanXetChung: string
+  TrangThai?: $Enums.TrangThai_KQBH
+  CreatedAt?: Date | string
+  UpdatedAt?: Date | string
+  buoihoc: Prisma.BuoiHocCreateNestedOneWithoutKetqua_buoihocInput
+  giaovien: Prisma.GiaoVienCreateNestedOneWithoutKetQua_BuoiHocInput
+  ketqua_chitiet?: Prisma.KetQua_ChiTietCreateNestedManyWithoutKetqua_buoihocInput
+}
+
+export type KetQua_BuoiHocUncheckedCreateWithoutTep_dinhkemInput = {
+  ID?: number
+  BuoiHocID: number
+  GiaoVienID: number
+  NoiDungBaiHoc?: string | null
+  BaiTapVeNha?: string | null
+  NhanXetChung: string
+  TrangThai?: $Enums.TrangThai_KQBH
+  CreatedAt?: Date | string
+  UpdatedAt?: Date | string
+  ketqua_chitiet?: Prisma.KetQua_ChiTietUncheckedCreateNestedManyWithoutKetqua_buoihocInput
+}
+
+export type KetQua_BuoiHocCreateOrConnectWithoutTep_dinhkemInput = {
+  where: Prisma.KetQua_BuoiHocWhereUniqueInput
+  create: Prisma.XOR<Prisma.KetQua_BuoiHocCreateWithoutTep_dinhkemInput, Prisma.KetQua_BuoiHocUncheckedCreateWithoutTep_dinhkemInput>
+}
+
+export type KetQua_BuoiHocUpsertWithoutTep_dinhkemInput = {
+  update: Prisma.XOR<Prisma.KetQua_BuoiHocUpdateWithoutTep_dinhkemInput, Prisma.KetQua_BuoiHocUncheckedUpdateWithoutTep_dinhkemInput>
+  create: Prisma.XOR<Prisma.KetQua_BuoiHocCreateWithoutTep_dinhkemInput, Prisma.KetQua_BuoiHocUncheckedCreateWithoutTep_dinhkemInput>
+  where?: Prisma.KetQua_BuoiHocWhereInput
+}
+
+export type KetQua_BuoiHocUpdateToOneWithWhereWithoutTep_dinhkemInput = {
+  where?: Prisma.KetQua_BuoiHocWhereInput
+  data: Prisma.XOR<Prisma.KetQua_BuoiHocUpdateWithoutTep_dinhkemInput, Prisma.KetQua_BuoiHocUncheckedUpdateWithoutTep_dinhkemInput>
+}
+
+export type KetQua_BuoiHocUpdateWithoutTep_dinhkemInput = {
+  NoiDungBaiHoc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  BaiTapVeNha?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  NhanXetChung?: Prisma.StringFieldUpdateOperationsInput | string
+  TrangThai?: Prisma.EnumTrangThai_KQBHFieldUpdateOperationsInput | $Enums.TrangThai_KQBH
+  CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  buoihoc?: Prisma.BuoiHocUpdateOneRequiredWithoutKetqua_buoihocNestedInput
+  giaovien?: Prisma.GiaoVienUpdateOneRequiredWithoutKetQua_BuoiHocNestedInput
+  ketqua_chitiet?: Prisma.KetQua_ChiTietUpdateManyWithoutKetqua_buoihocNestedInput
+}
+
+export type KetQua_BuoiHocUncheckedUpdateWithoutTep_dinhkemInput = {
+  ID?: Prisma.IntFieldUpdateOperationsInput | number
+  BuoiHocID?: Prisma.IntFieldUpdateOperationsInput | number
+  GiaoVienID?: Prisma.IntFieldUpdateOperationsInput | number
+  NoiDungBaiHoc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  BaiTapVeNha?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   NhanXetChung?: Prisma.StringFieldUpdateOperationsInput | string
   TrangThai?: Prisma.EnumTrangThai_KQBHFieldUpdateOperationsInput | $Enums.TrangThai_KQBH
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -638,22 +789,28 @@ export type KetQua_BuoiHocUncheckedUpdateWithoutBuoihocInput = {
 }
 
 export type KetQua_BuoiHocCreateWithoutKetqua_chitietInput = {
+  NoiDungBaiHoc?: string | null
+  BaiTapVeNha?: string | null
   NhanXetChung: string
   TrangThai?: $Enums.TrangThai_KQBH
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   buoihoc: Prisma.BuoiHocCreateNestedOneWithoutKetqua_buoihocInput
   giaovien: Prisma.GiaoVienCreateNestedOneWithoutKetQua_BuoiHocInput
+  tep_dinhkem?: Prisma.TepDinhKem_BuoiHocCreateNestedManyWithoutKetqua_buoihocInput
 }
 
 export type KetQua_BuoiHocUncheckedCreateWithoutKetqua_chitietInput = {
   ID?: number
   BuoiHocID: number
   GiaoVienID: number
+  NoiDungBaiHoc?: string | null
+  BaiTapVeNha?: string | null
   NhanXetChung: string
   TrangThai?: $Enums.TrangThai_KQBH
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
+  tep_dinhkem?: Prisma.TepDinhKem_BuoiHocUncheckedCreateNestedManyWithoutKetqua_buoihocInput
 }
 
 export type KetQua_BuoiHocCreateOrConnectWithoutKetqua_chitietInput = {
@@ -673,27 +830,35 @@ export type KetQua_BuoiHocUpdateToOneWithWhereWithoutKetqua_chitietInput = {
 }
 
 export type KetQua_BuoiHocUpdateWithoutKetqua_chitietInput = {
+  NoiDungBaiHoc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  BaiTapVeNha?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   NhanXetChung?: Prisma.StringFieldUpdateOperationsInput | string
   TrangThai?: Prisma.EnumTrangThai_KQBHFieldUpdateOperationsInput | $Enums.TrangThai_KQBH
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   buoihoc?: Prisma.BuoiHocUpdateOneRequiredWithoutKetqua_buoihocNestedInput
   giaovien?: Prisma.GiaoVienUpdateOneRequiredWithoutKetQua_BuoiHocNestedInput
+  tep_dinhkem?: Prisma.TepDinhKem_BuoiHocUpdateManyWithoutKetqua_buoihocNestedInput
 }
 
 export type KetQua_BuoiHocUncheckedUpdateWithoutKetqua_chitietInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
   BuoiHocID?: Prisma.IntFieldUpdateOperationsInput | number
   GiaoVienID?: Prisma.IntFieldUpdateOperationsInput | number
+  NoiDungBaiHoc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  BaiTapVeNha?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   NhanXetChung?: Prisma.StringFieldUpdateOperationsInput | string
   TrangThai?: Prisma.EnumTrangThai_KQBHFieldUpdateOperationsInput | $Enums.TrangThai_KQBH
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tep_dinhkem?: Prisma.TepDinhKem_BuoiHocUncheckedUpdateManyWithoutKetqua_buoihocNestedInput
 }
 
 export type KetQua_BuoiHocCreateManyGiaovienInput = {
   ID?: number
   BuoiHocID: number
+  NoiDungBaiHoc?: string | null
+  BaiTapVeNha?: string | null
   NhanXetChung: string
   TrangThai?: $Enums.TrangThai_KQBH
   CreatedAt?: Date | string
@@ -701,27 +866,35 @@ export type KetQua_BuoiHocCreateManyGiaovienInput = {
 }
 
 export type KetQua_BuoiHocUpdateWithoutGiaovienInput = {
+  NoiDungBaiHoc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  BaiTapVeNha?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   NhanXetChung?: Prisma.StringFieldUpdateOperationsInput | string
   TrangThai?: Prisma.EnumTrangThai_KQBHFieldUpdateOperationsInput | $Enums.TrangThai_KQBH
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   buoihoc?: Prisma.BuoiHocUpdateOneRequiredWithoutKetqua_buoihocNestedInput
   ketqua_chitiet?: Prisma.KetQua_ChiTietUpdateManyWithoutKetqua_buoihocNestedInput
+  tep_dinhkem?: Prisma.TepDinhKem_BuoiHocUpdateManyWithoutKetqua_buoihocNestedInput
 }
 
 export type KetQua_BuoiHocUncheckedUpdateWithoutGiaovienInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
   BuoiHocID?: Prisma.IntFieldUpdateOperationsInput | number
+  NoiDungBaiHoc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  BaiTapVeNha?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   NhanXetChung?: Prisma.StringFieldUpdateOperationsInput | string
   TrangThai?: Prisma.EnumTrangThai_KQBHFieldUpdateOperationsInput | $Enums.TrangThai_KQBH
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ketqua_chitiet?: Prisma.KetQua_ChiTietUncheckedUpdateManyWithoutKetqua_buoihocNestedInput
+  tep_dinhkem?: Prisma.TepDinhKem_BuoiHocUncheckedUpdateManyWithoutKetqua_buoihocNestedInput
 }
 
 export type KetQua_BuoiHocUncheckedUpdateManyWithoutGiaovienInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
   BuoiHocID?: Prisma.IntFieldUpdateOperationsInput | number
+  NoiDungBaiHoc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  BaiTapVeNha?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   NhanXetChung?: Prisma.StringFieldUpdateOperationsInput | string
   TrangThai?: Prisma.EnumTrangThai_KQBHFieldUpdateOperationsInput | $Enums.TrangThai_KQBH
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -735,10 +908,12 @@ export type KetQua_BuoiHocUncheckedUpdateManyWithoutGiaovienInput = {
 
 export type KetQua_BuoiHocCountOutputType = {
   ketqua_chitiet: number
+  tep_dinhkem: number
 }
 
 export type KetQua_BuoiHocCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ketqua_chitiet?: boolean | KetQua_BuoiHocCountOutputTypeCountKetqua_chitietArgs
+  tep_dinhkem?: boolean | KetQua_BuoiHocCountOutputTypeCountTep_dinhkemArgs
 }
 
 /**
@@ -758,11 +933,20 @@ export type KetQua_BuoiHocCountOutputTypeCountKetqua_chitietArgs<ExtArgs extends
   where?: Prisma.KetQua_ChiTietWhereInput
 }
 
+/**
+ * KetQua_BuoiHocCountOutputType without action
+ */
+export type KetQua_BuoiHocCountOutputTypeCountTep_dinhkemArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TepDinhKem_BuoiHocWhereInput
+}
+
 
 export type KetQua_BuoiHocSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   ID?: boolean
   BuoiHocID?: boolean
   GiaoVienID?: boolean
+  NoiDungBaiHoc?: boolean
+  BaiTapVeNha?: boolean
   NhanXetChung?: boolean
   TrangThai?: boolean
   CreatedAt?: boolean
@@ -770,6 +954,7 @@ export type KetQua_BuoiHocSelect<ExtArgs extends runtime.Types.Extensions.Intern
   buoihoc?: boolean | Prisma.BuoiHocDefaultArgs<ExtArgs>
   giaovien?: boolean | Prisma.GiaoVienDefaultArgs<ExtArgs>
   ketqua_chitiet?: boolean | Prisma.KetQua_BuoiHoc$ketqua_chitietArgs<ExtArgs>
+  tep_dinhkem?: boolean | Prisma.KetQua_BuoiHoc$tep_dinhkemArgs<ExtArgs>
   _count?: boolean | Prisma.KetQua_BuoiHocCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["ketQua_BuoiHoc"]>
 
@@ -777,6 +962,8 @@ export type KetQua_BuoiHocSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   ID?: boolean
   BuoiHocID?: boolean
   GiaoVienID?: boolean
+  NoiDungBaiHoc?: boolean
+  BaiTapVeNha?: boolean
   NhanXetChung?: boolean
   TrangThai?: boolean
   CreatedAt?: boolean
@@ -789,6 +976,8 @@ export type KetQua_BuoiHocSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   ID?: boolean
   BuoiHocID?: boolean
   GiaoVienID?: boolean
+  NoiDungBaiHoc?: boolean
+  BaiTapVeNha?: boolean
   NhanXetChung?: boolean
   TrangThai?: boolean
   CreatedAt?: boolean
@@ -801,17 +990,20 @@ export type KetQua_BuoiHocSelectScalar = {
   ID?: boolean
   BuoiHocID?: boolean
   GiaoVienID?: boolean
+  NoiDungBaiHoc?: boolean
+  BaiTapVeNha?: boolean
   NhanXetChung?: boolean
   TrangThai?: boolean
   CreatedAt?: boolean
   UpdatedAt?: boolean
 }
 
-export type KetQua_BuoiHocOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"ID" | "BuoiHocID" | "GiaoVienID" | "NhanXetChung" | "TrangThai" | "CreatedAt" | "UpdatedAt", ExtArgs["result"]["ketQua_BuoiHoc"]>
+export type KetQua_BuoiHocOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"ID" | "BuoiHocID" | "GiaoVienID" | "NoiDungBaiHoc" | "BaiTapVeNha" | "NhanXetChung" | "TrangThai" | "CreatedAt" | "UpdatedAt", ExtArgs["result"]["ketQua_BuoiHoc"]>
 export type KetQua_BuoiHocInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   buoihoc?: boolean | Prisma.BuoiHocDefaultArgs<ExtArgs>
   giaovien?: boolean | Prisma.GiaoVienDefaultArgs<ExtArgs>
   ketqua_chitiet?: boolean | Prisma.KetQua_BuoiHoc$ketqua_chitietArgs<ExtArgs>
+  tep_dinhkem?: boolean | Prisma.KetQua_BuoiHoc$tep_dinhkemArgs<ExtArgs>
   _count?: boolean | Prisma.KetQua_BuoiHocCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type KetQua_BuoiHocIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -829,11 +1021,14 @@ export type $KetQua_BuoiHocPayload<ExtArgs extends runtime.Types.Extensions.Inte
     buoihoc: Prisma.$BuoiHocPayload<ExtArgs>
     giaovien: Prisma.$GiaoVienPayload<ExtArgs>
     ketqua_chitiet: Prisma.$KetQua_ChiTietPayload<ExtArgs>[]
+    tep_dinhkem: Prisma.$TepDinhKem_BuoiHocPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     ID: number
     BuoiHocID: number
     GiaoVienID: number
+    NoiDungBaiHoc: string | null
+    BaiTapVeNha: string | null
     NhanXetChung: string
     TrangThai: $Enums.TrangThai_KQBH
     CreatedAt: Date
@@ -1235,6 +1430,7 @@ export interface Prisma__KetQua_BuoiHocClient<T, Null = never, ExtArgs extends r
   buoihoc<T extends Prisma.BuoiHocDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BuoiHocDefaultArgs<ExtArgs>>): Prisma.Prisma__BuoiHocClient<runtime.Types.Result.GetResult<Prisma.$BuoiHocPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   giaovien<T extends Prisma.GiaoVienDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GiaoVienDefaultArgs<ExtArgs>>): Prisma.Prisma__GiaoVienClient<runtime.Types.Result.GetResult<Prisma.$GiaoVienPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   ketqua_chitiet<T extends Prisma.KetQua_BuoiHoc$ketqua_chitietArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.KetQua_BuoiHoc$ketqua_chitietArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KetQua_ChiTietPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  tep_dinhkem<T extends Prisma.KetQua_BuoiHoc$tep_dinhkemArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.KetQua_BuoiHoc$tep_dinhkemArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TepDinhKem_BuoiHocPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1267,6 +1463,8 @@ export interface KetQua_BuoiHocFieldRefs {
   readonly ID: Prisma.FieldRef<"KetQua_BuoiHoc", 'Int'>
   readonly BuoiHocID: Prisma.FieldRef<"KetQua_BuoiHoc", 'Int'>
   readonly GiaoVienID: Prisma.FieldRef<"KetQua_BuoiHoc", 'Int'>
+  readonly NoiDungBaiHoc: Prisma.FieldRef<"KetQua_BuoiHoc", 'String'>
+  readonly BaiTapVeNha: Prisma.FieldRef<"KetQua_BuoiHoc", 'String'>
   readonly NhanXetChung: Prisma.FieldRef<"KetQua_BuoiHoc", 'String'>
   readonly TrangThai: Prisma.FieldRef<"KetQua_BuoiHoc", 'TrangThai_KQBH'>
   readonly CreatedAt: Prisma.FieldRef<"KetQua_BuoiHoc", 'DateTime'>
@@ -1467,6 +1665,11 @@ export type KetQua_BuoiHocFindManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Skip the first `n` KetQua_BuoiHocs.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of KetQua_BuoiHocs.
+   */
   distinct?: Prisma.KetQua_BuoiHocScalarFieldEnum | Prisma.KetQua_BuoiHocScalarFieldEnum[]
 }
 
@@ -1688,6 +1891,30 @@ export type KetQua_BuoiHoc$ketqua_chitietArgs<ExtArgs extends runtime.Types.Exte
   take?: number
   skip?: number
   distinct?: Prisma.KetQua_ChiTietScalarFieldEnum | Prisma.KetQua_ChiTietScalarFieldEnum[]
+}
+
+/**
+ * KetQua_BuoiHoc.tep_dinhkem
+ */
+export type KetQua_BuoiHoc$tep_dinhkemArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TepDinhKem_BuoiHoc
+   */
+  select?: Prisma.TepDinhKem_BuoiHocSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TepDinhKem_BuoiHoc
+   */
+  omit?: Prisma.TepDinhKem_BuoiHocOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TepDinhKem_BuoiHocInclude<ExtArgs> | null
+  where?: Prisma.TepDinhKem_BuoiHocWhereInput
+  orderBy?: Prisma.TepDinhKem_BuoiHocOrderByWithRelationInput | Prisma.TepDinhKem_BuoiHocOrderByWithRelationInput[]
+  cursor?: Prisma.TepDinhKem_BuoiHocWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TepDinhKem_BuoiHocScalarFieldEnum | Prisma.TepDinhKem_BuoiHocScalarFieldEnum[]
 }
 
 /**

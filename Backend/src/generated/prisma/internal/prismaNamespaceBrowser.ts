@@ -58,6 +58,7 @@ export const ModelName = {
   LopHoc: 'LopHoc',
   BuoiHoc: 'BuoiHoc',
   KetQua_BuoiHoc: 'KetQua_BuoiHoc',
+  TepDinhKem_BuoiHoc: 'TepDinhKem_BuoiHoc',
   KetQua_ChiTiet: 'KetQua_ChiTiet',
   GhiDanh: 'GhiDanh',
   HoaDon: 'HoaDon',
@@ -71,12 +72,12 @@ export type ModelName = (typeof ModelName)[keyof typeof ModelName]
  * Enums
  */
 
-export const TransactionIsolationLevel = {
+export const TransactionIsolationLevel = runtime.makeStrictEnum({
   ReadUncommitted: 'ReadUncommitted',
   ReadCommitted: 'ReadCommitted',
   RepeatableRead: 'RepeatableRead',
   Serializable: 'Serializable'
-} as const
+} as const)
 
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
@@ -89,7 +90,7 @@ export const UserScalarFieldEnum = {
   MatKhauHash: 'MatKhauHash',
   PhaiDoiMK: 'PhaiDoiMK',
   VaiTro: 'VaiTro',
-  ToKenVerSion: 'ToKenVerSion',
+  PhienBanToken: 'PhienBanToken',
   CreatedAt: 'CreatedAt',
   UpdatedAt: 'UpdatedAt'
 } as const
@@ -173,7 +174,6 @@ export const BuoiHocScalarFieldEnum = {
   ChuDe: 'ChuDe',
   BatDauLuc: 'BatDauLuc',
   KetThucLuc: 'KetThucLuc',
-  MoTa: 'MoTa',
   PhongHoc: 'PhongHoc',
   AdminMoKhoa: 'AdminMoKhoa',
   YeuCauMoKhoa: 'YeuCauMoKhoa',
@@ -191,6 +191,8 @@ export const KetQua_BuoiHocScalarFieldEnum = {
   ID: 'ID',
   BuoiHocID: 'BuoiHocID',
   GiaoVienID: 'GiaoVienID',
+  NoiDungBaiHoc: 'NoiDungBaiHoc',
+  BaiTapVeNha: 'BaiTapVeNha',
   NhanXetChung: 'NhanXetChung',
   TrangThai: 'TrangThai',
   CreatedAt: 'CreatedAt',
@@ -198,6 +200,19 @@ export const KetQua_BuoiHocScalarFieldEnum = {
 } as const
 
 export type KetQua_BuoiHocScalarFieldEnum = (typeof KetQua_BuoiHocScalarFieldEnum)[keyof typeof KetQua_BuoiHocScalarFieldEnum]
+
+
+export const TepDinhKem_BuoiHocScalarFieldEnum = {
+  ID: 'ID',
+  KQBuoiHocID: 'KQBuoiHocID',
+  TepID: 'TepID',
+  URL: 'URL',
+  LoaiTep: 'LoaiTep',
+  CreatedAt: 'CreatedAt',
+  UpdatedAt: 'UpdatedAt'
+} as const
+
+export type TepDinhKem_BuoiHocScalarFieldEnum = (typeof TepDinhKem_BuoiHocScalarFieldEnum)[keyof typeof TepDinhKem_BuoiHocScalarFieldEnum]
 
 
 export const KetQua_ChiTietScalarFieldEnum = {
@@ -286,7 +301,7 @@ export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
 export const JsonNullValueInput = {
-  JsonNull: 'JsonNull'
+  JsonNull: JsonNull
 } as const
 
 export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
@@ -309,9 +324,9 @@ export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
 export const JsonNullValueFilter = {
-  DbNull: 'DbNull',
-  JsonNull: 'JsonNull',
-  AnyNull: 'AnyNull'
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
 } as const
 
 export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]

@@ -1543,6 +1543,11 @@ export type GiaoDichFindManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Skip the first `n` GiaoDiches.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of GiaoDiches.
+   */
   distinct?: Prisma.GiaoDichScalarFieldEnum | Prisma.GiaoDichScalarFieldEnum[]
 }
 

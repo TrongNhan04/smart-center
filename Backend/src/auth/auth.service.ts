@@ -71,7 +71,7 @@ export class AuthService {
             role: userDB.VaiTro,
             email: userDB.Email,
             // mustChangePW: userDB.PhaiDoiMK,
-            tokenVersion: userDB.ToKenVerSion
+            tokenVersion: userDB.PhienBanToken
         }
         const classes = await this.prismaService.lopHoc.findMany({
             where: { giaovien: { UserID: userDB.ID } },
@@ -87,6 +87,7 @@ export class AuthService {
                 full_name: userDB.HoTen,
                 phone: userDB.DienThoai,
                 role: userDB.VaiTro,
+                must_change_pw: userDB.PhaiDoiMK,
                 classes: classes.map(item=>item.ID)
             }
         }
@@ -96,7 +97,7 @@ export class AuthService {
     async Logout(userId: number) {
         await this.prismaService.user.update({
             where: { ID: userId },
-            data: { ToKenVerSion: { increment: 1 } }
+            data: { PhienBanToken: { increment: 1 } }
         })
         return "Logout succesfully"
     }
@@ -138,7 +139,7 @@ export class AuthService {
             data.Email = profile.email
             data.DienThoai = profile.phone
             if (profile.email)
-                data.ToKenVerSion = { increment: 1 }// xóa token cũ
+                data.PhienBanToken = { increment: 1 }// xóa token cũ
         }
 
         data.HoTen = profile.full_name ?? userDB.HoTen
@@ -146,7 +147,7 @@ export class AuthService {
         if (profile.newPassword && profile.oldPassword) {
             const comparePW = await bcrypt.compare(profile.oldPassword, userDB.MatKhauHash)
             if (!comparePW)
-                throw new UnauthorizedException("Sai mật khẩu!")
+                throw new BadRequestException("Mật khẩu hiện tại không đúng!")
 
             if (profile.oldPassword === profile.newPassword)
                 throw new BadRequestException("Mật khẩu không thay đổi!")
@@ -154,7 +155,7 @@ export class AuthService {
             const hashPW = await bcrypt.hash(profile.newPassword, 15)
             data.MatKhauHash = hashPW
             data.PhaiDoiMK = false
-            data.ToKenVerSion = { increment: 1 }// xóa token cũ
+            data.PhienBanToken = { increment: 1 }// xóa token cũ
         }
 
         const update = await this.prismaService.user.update({

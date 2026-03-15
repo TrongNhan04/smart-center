@@ -17,7 +17,7 @@ import Logo from './Logo';
 import '../../index.css';
 import Toggle from './Toggle';
 import HeaderCN from './Header';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Navigate, Outlet, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/useAuthStore';
 
 const { Header, Sider, Content } = Layout

@@ -1301,6 +1301,11 @@ export type ThongBaoFindManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Skip the first `n` ThongBaos.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of ThongBaos.
+   */
   distinct?: Prisma.ThongBaoScalarFieldEnum | Prisma.ThongBaoScalarFieldEnum[]
 }
 

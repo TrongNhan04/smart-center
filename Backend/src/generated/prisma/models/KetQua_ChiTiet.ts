@@ -1434,6 +1434,11 @@ export type KetQua_ChiTietFindManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Skip the first `n` KetQua_ChiTiets.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of KetQua_ChiTiets.
+   */
   distinct?: Prisma.KetQua_ChiTietScalarFieldEnum | Prisma.KetQua_ChiTietScalarFieldEnum[]
 }
 

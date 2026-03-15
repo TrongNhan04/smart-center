@@ -1,12 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import { TransformInterceptor } from './common/transform.interceptor';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { urlencoded } from 'express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.useGlobalPipes(new ValidationPipe({ transform: true }))
-  // app.useGlobalInterceptors(new TransformInterceptor())
+  app.useBodyParser('json',{limit:'50mb'}) // cho request tối đa 50 mb
+  app.use(urlencoded({extended:true, limit:'50mb'}))
   app.enableCors()
   await app.listen(process.env.PORT ?? 3000);
 }

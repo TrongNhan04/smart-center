@@ -36,7 +36,7 @@ export class SessionService {
     })
     return sessions.map(item => {
       let status = '' // qua 12h là chưa nộp kết quả, vẫn cho phép nộp trong 48h
-      const isOverTime = DateHelper.TimeDiff(item.KetThucLuc) > 120 
+      const isOverTime = DateHelper.TimeDiff(item.KetThucLuc) > 120
       if (isOverTime && item.TrangThai === 'SCHEDULED') {
         status = 'UNSUBMIT'
         return { ...item, TrangThai: status }
@@ -73,7 +73,7 @@ export class SessionService {
 
     const updateSS = await this.prisma.buoiHoc.update({
       where: { ID: sessionId, TrangThai: 'SCHEDULED' },
-      data: { MoTa: reason, TrangThai: 'CANCELLED' },
+      data: { TrangThai: 'CANCELLED' },
       select: {
         BatDauLuc: true, LopHocID: true,
         lophoc: {
