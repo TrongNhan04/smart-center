@@ -1,15 +1,16 @@
-import { Controller, Post, UploadedFiles, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, UploadedFiles, UseGuards, UseInterceptors } from "@nestjs/common";
 import { CloudinaryService } from "./cloudinary.service";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guard/roles.guard";
 import { Roles } from "src/auth/decorators/roles.decorator";
+import { MustChangePWGuard } from "src/auth/guard/must-change-pw.guard";
 
 @Controller()
 export class CloudinaryController {
     constructor(private cloudinaryService: CloudinaryService) { }
 
-    @UseGuards(JwtAuthGuard,RolesGuard)
+    @UseGuards(JwtAuthGuard,MustChangePWGuard,RolesGuard)
     @Roles('ADMIN','TEACHER')
     @Post('api/file-upload')
     @UseInterceptors(FilesInterceptor('file', 10, {
@@ -28,8 +29,15 @@ export class CloudinaryController {
         const res =  await this.cloudinaryService.uploadFile(files[0])
         return {
             public_id: res.public_id,
-            secure_url: res.secure_url,
+            url: res.secure_url,
             resource_type: res.resource_type
         }
+    }
+
+    @UseGuards(JwtAuthGuard, MustChangePWGuard,RolesGuard)
+    @Roles('ADMIN','TEACHER','PARENT')
+    @Get('api/sessions/:id/file-upload')
+    async findBySessionId (@Param('id') sessionId:number){
+        return await this.cloudinaryService.findBySessionId(+sessionId)
     }
 }

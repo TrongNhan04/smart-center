@@ -1,60 +1,106 @@
-import { Space, Image } from "antd"
+import { Space, Image, notification } from "antd"
+import { useEffect, useState } from "react"
+import { sessionApi } from "../../api/sessionApi"
 
+interface Props {
+  sessionId: number
+  reload: number,
+  getOldFile: (data:any) => void
+}
 
-const FileUpload = () => {
+interface fileFormat {
+  ID: number,
+  KQBuoiHocID: number,
+  TepID: string,
+  URL: string,
+  LoaiTep: string
+}
+
+const FileUpload = ({ sessionId, reload, getOldFile }: Props) => {
+  const [fileAttachs, setFileAttachs] = useState<fileFormat[]>([])
   // Giả sử mảng tài liệu đính kèm của buổi học
-  const attachments = [
-    { id: 1, type: 'image', url: 'https://res.cloudinary.com/dgs39nlwr/image/upload/v1773545441/smart-center/fygw2b5rduv1ny27qavr.jpg' },
-    { id: 1, type: 'image', url: 'https://res.cloudinary.com/dgs39nlwr/image/upload/v1773545441/smart-center/fygw2b5rduv1ny27qavr.jpg' },
-    { id: 1, type: 'image', url: 'https://res.cloudinary.com/dgs39nlwr/image/upload/v1773545441/smart-center/fygw2b5rduv1ny27qavr.jpg' },
-    { id: 1, type: 'image', url: 'https://res.cloudinary.com/dgs39nlwr/image/upload/v1773545441/smart-center/fygw2b5rduv1ny27qavr.jpg' },
-    { id: 1, type: 'image', url: 'https://res.cloudinary.com/dgs39nlwr/image/upload/v1773545441/smart-center/fygw2b5rduv1ny27qavr.jpg' },
-    { id: 2, type: 'video', url: 'https://res.cloudinary.com/.../video1.mp4' },
-  ];
+  const fetchFileUpload = async () => {
+    try {
+      const res = await sessionApi.getFileUpload(sessionId)
+      setFileAttachs(res.data)
+      const formated = res.data.map((item: fileFormat, index:number) => ({
+        uid: item.TepID,
+        name: `Tệp đính kèm ${index+1}`,
+        status: 'done',
+        url: item.URL,
+        public_id: item.TepID,
+        resource_type: item.LoaiTep
+      }))
+      getOldFile(formated)
+    } catch (error) {
+      handelError(error)
+    }
+  }
+
+  useEffect(() => {
+    if (!sessionId) return
+    fetchFileUpload()
+    console.log(sessionId)
+  }, [sessionId, reload])
+
+  const handelError = (error: any) => {
+    notification.error({
+      title: 'Có lỗi xảy ra',
+      description: error?.response?.data?.message,
+      showProgress: true,
+      pauseOnHover: true
+    })
+    console.log('Có lỗi xảy ra: ', error?.response?.data?.message)
+  }
+
+  const images: fileFormat[] = []
+  const videos: fileFormat[] = []
+  for (const file of fileAttachs) {
+    if (file.LoaiTep === 'image')
+      images.push(file)
+    if (file.LoaiTep === 'video')
+      videos.push(file)
+  }
+
   return (
     <><Image.PreviewGroup>
       <Space
-        wrap
-        size={24}
+        wrap size={24}
         style={{
           width: "100%",
-          justifyContent: "center",
+         // justifyContent: "center",
         }}
       >
         {/* Render Ảnh */}
-        {attachments
-          .filter(f => f.type === "image")
-          .map(img => (
-            <Image
-              key={img.id}
-              width={200}
-              height={150}
-              src={img.url}
-              style={{
-                objectFit: "cover",
-                borderRadius: 8
-              }}
-            />
-          ))}
+        {images.map(img => (
+          <Image
+            key={img.ID}
+            width={205}
+            height={150}
+            src={img.URL}
+            style={{
+              objectFit: "cover",
+              borderRadius: 8
+            }}
+          />
+        ))}
 
         {/* Render Video */}
-        {attachments
-          .filter(f => f.type === "video")
-          .map(vid => (
-            <div
-              key={vid.id}
-              style={{
-                width: 300,
-                borderRadius: 8,
-                overflow: "hidden"
-              }}
-            >
-              <video width="100%" controls preload="metadata">
-                <source src={vid.url} type="video/mp4" />
-                Trình duyệt của bạn không hỗ trợ video.
-              </video>
-            </div>
-          ))}
+        {videos.map(vid => (
+          <div
+            key={vid.ID}
+            style={{
+              width: 300,
+              borderRadius: 8,
+              overflow: "hidden"
+            }}
+          >
+            <video width="100%" controls preload="metadata">
+              <source src={vid.URL} type="video/mp4" />
+              Trình duyệt của bạn không hỗ trợ video.
+            </video>
+          </div>
+        ))}
       </Space>
     </Image.PreviewGroup></>
   )

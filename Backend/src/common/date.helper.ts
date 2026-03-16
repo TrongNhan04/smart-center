@@ -26,7 +26,7 @@ export class DateHelper {
     static TimeDiff(time: Date) {
         const now = new Date().getTime()
         const timeLeft = now - time.getTime()
-        return Math.floor(timeLeft / 60000)// 60 giây 
+        return Math.floor(timeLeft / 60000)// 1 phút 
     }
 
     // kiểm tra giờ bắt đầu + kết thúc

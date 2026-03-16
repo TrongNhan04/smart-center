@@ -78,20 +78,6 @@ const MyClasses = () => {
                     <Text style={{ color: '#1d39c4' }}>{item.TenLop}</Text>
                   </Space>
                 }
-
-                actions={[
-                  <Text type="secondary" style={{ fontSize: 13 }}>
-                    Ca tới: <Text strong type="danger">{'Căng nghe'}</Text>
-                  </Text>,
-
-                  <Button
-                    type="primary"
-                    size="small"
-                    onClick={(e) => { e.stopPropagation(); navigate(`/teacher/classes/${item.ID}/attendance`); }}
-                  >
-                    Điểm danh
-                  </Button>
-                ]}
               > {/* kết thúc phần xử lý title của card */}
 
                 {/* thẻ <Space> để dàn hàng */}
@@ -120,7 +106,7 @@ const MyClasses = () => {
                         display: 'flex', justifyContent: 'space-between',
                         marginBottom: 4
                       }}>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
+                      <Text strong style={{ fontSize: 12 }}>
                         Tiến độ ({item.BuoiDaHoc}/{item.TongSoBuoi})</Text>
                       <Text strong style={{ fontSize: 12 }}>{percent}%</Text>
                     </div>

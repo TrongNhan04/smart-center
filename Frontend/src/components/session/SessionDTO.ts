@@ -24,8 +24,7 @@ export interface SessionDB {
 }
 
 // chi tiết 1 buổi học cho drawer
-export type TSessionDetail =
-    Omit<SessionDB, 'AdminMoKhoa' | 'YeuCauMoKhoa'> & {
+export type TSessionDetail = SessionDB & {
         GiaoVien: string,
         LopHoc: string,
         ChiTietKetQua?: SessionResult[]

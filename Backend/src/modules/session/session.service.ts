@@ -35,8 +35,8 @@ export class SessionService {
       orderBy: { BatDauLuc: 'asc' }
     })
     return sessions.map(item => {
-      let status = '' // qua 12h là chưa nộp kết quả, vẫn cho phép nộp trong 48h
-      const isOverTime = DateHelper.TimeDiff(item.KetThucLuc) > 120
+      let status = '' // qua 48h vẫn SCHEDULED = chưa nộp kết quả
+      const isOverTime = DateHelper.TimeDiff(item.KetThucLuc) > 2880
       if (isOverTime && item.TrangThai === 'SCHEDULED') {
         status = 'UNSUBMIT'
         return { ...item, TrangThai: status }
@@ -71,25 +71,27 @@ export class SessionService {
       throw new ConflictException('Buổi học đã hoàn thành hoặc đã hủy')
     if (!reason) throw new BadRequestException('Thiếu lý do hủy buổi học')
 
-    const updateSS = await this.prisma.buoiHoc.update({
-      where: { ID: sessionId, TrangThai: 'SCHEDULED' },
-      data: { TrangThai: 'CANCELLED' },
-      select: {
-        BatDauLuc: true, LopHocID: true,
-        lophoc: {
-          select: {
-            ID: true, MaLopHoc: true,
-            ghidanh: {
-              where: { TrangThai: 'ACTIVE' },
-              select: { hocvien: { select: { UserID: true } } }
+    return await this.prisma.$transaction(async (tx) => {
+      const updateSS = await tx.buoiHoc.update({
+        where: { ID: sessionId, TrangThai: 'SCHEDULED' },
+        data: { TrangThai: 'CANCELLED' },
+        select: {
+          BatDauLuc: true, LopHocID: true,
+          lophoc: {
+            select: {
+              ID: true, MaLopHoc: true,
+              ghidanh: {
+                where: { TrangThai: 'ACTIVE' },
+                select: { hocvien: { select: { UserID: true } } }
+              }
             }
           }
         }
-      }
+      })
+      const listParentID = updateSS.lophoc.ghidanh.map(e => e.hocvien.UserID)
+      const uniqueId = [...new Set(listParentID)]
+      await this.notisService.SSCancelledNotify(uniqueId, updateSS, reason, tx)
     })
-    const listParentID = updateSS.lophoc.ghidanh.map(e => e.hocvien.UserID)
-    const uniqueId = [...new Set(listParentID)]
-    await this.notisService.SSCancelledNotify(uniqueId, updateSS, reason)
     // return { mgs: "Session cancelled and notify parent successfully" }
   }
 
@@ -285,7 +287,7 @@ export class SessionService {
         select: {
           ID: true, BuoiSo: true, ChuDe: true, PhongHoc: true,
           BatDauLuc: true, KetThucLuc: true, TrangThai: true,
-          ketqua_buoihoc: true,
+          ketqua_buoihoc: true, AdminMoKhoa:true, YeuCauMoKhoa:true,
           lophoc: {
             select: {
               TenLop: true,
@@ -302,8 +304,8 @@ export class SessionService {
       BatDauLuc: sessionDB.BatDauLuc, KetThucLuc: sessionDB.KetThucLuc,
       PhongHoc: sessionDB.PhongHoc, LopHoc: sessionDB.lophoc.TenLop,
       NhanXetChung: sessionDB.ketqua_buoihoc?.NhanXetChung,
-      GiaoVien: sessionDB.lophoc.giaovien.User.HoTen,
-      TrangThai: sessionDB.TrangThai,
+      GiaoVien: sessionDB.lophoc.giaovien.User.HoTen, YeuCauMoKhoa:sessionDB.YeuCauMoKhoa,
+      TrangThai: sessionDB.TrangThai, AdminMoKhoa: sessionDB.AdminMoKhoa,
       ChiTietKetQua: result
     }
   }

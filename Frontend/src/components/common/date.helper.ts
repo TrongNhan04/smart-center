@@ -9,7 +9,7 @@ export class DateHelper {
     static TimeDiff(dateCompare: string) {
         const timeNow = new Date().getTime()
         const date = new Date(dateCompare).getTime()
-        return Math.floor(timeNow - date / 60000)
+        return Math.floor((timeNow - date) / 60000)// 1 phút
     }
 
     static ConvertHourStrToDayJS(time: string) {

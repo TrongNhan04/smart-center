@@ -113,7 +113,7 @@ const TaskList = () => {
           >
             <Button type="primary" size="small"
               icon={<CheckCircleOutlined />}
-              style={{ background: '#52c41a' }}
+              style={{ backgroundColor: '#2fb058', color: '#fff' }}
             > Duyệt</Button>
           </Popconfirm>
         if (task.Loai === 'UNSUBMIT') {
@@ -128,7 +128,7 @@ const TaskList = () => {
           >{isReminded ? 'Đã nhắc' : 'Nhắc GV'}</Button>
         }
 
-        return <Button
+        return <Button size="small"
           onClick={() => navigate(`/admin/classes/${task.LopHocID}`)}>
           Bổ sung
         </Button>

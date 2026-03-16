@@ -1,5 +1,8 @@
-import { MailFilled, PhoneFilled, SafetyOutlined, UploadOutlined, UserOutlined } from "@ant-design/icons"
-import { Avatar, Button, Card, Col, Divider, Form, Input, message, notification, Row, Select, Space, Typography, Upload } from "antd"
+import { SafetyOutlined, UserOutlined } from "@ant-design/icons"
+import {
+  Avatar, Button, Card, Col, Form, Input, message, notification,
+  Row, Select, Typography
+} from "antd"
 import { useAuthStore } from "../../store/useAuthStore"
 import { useState } from "react"
 import { getChangedValue } from "../common/utils"
@@ -35,7 +38,7 @@ const Profile = () => {
       message.success('Thao tác thành công')
       if (Object.keys(updateData).includes('email'))
         logout()
-      
+
     } catch (error: any) {
       notification.error({
         title: 'Có lỗi xảy ra',
@@ -72,14 +75,14 @@ const Profile = () => {
             <Title level={4} style={{ margin: 0 }}>{user?.full_name}</Title>
             <Text type="secondary">{role}</Text>
 
-            <Divider />
+            {/* <Divider />
 
             <Space orientation="vertical" style={{ width: '100%', textAlign: 'left' }}>
               <Text type="secondary"><MailFilled /> {user?.email}</Text>
               <Text type="secondary"><PhoneFilled /> {user?.phone}</Text>
             </Space>
 
-            <Divider  />
+            <Divider  /> */}
           </Card>
         </Col>
 
@@ -144,12 +147,12 @@ const Profile = () => {
                   </Form.Item>
                 </Col>
 
-                <Col span={24}>
+                {/* <Col span={24}>
                   <Form.Item // địa chỉ
                     label="Địa chỉ hiện tại" name="address">
                     <Input.TextArea rows={3} placeholder="Nhập địa chỉ của bạn" />
                   </Form.Item>
-                </Col>
+                </Col> */}
               </Row>
 
               <Form.Item // nút lưu cập nhật
@@ -166,7 +169,7 @@ const Profile = () => {
 
       <ChangePw
         open={isOpen}
-        onCancel={()=>{setIsOpen(false)}}
+        onCancel={() => { setIsOpen(false) }}
       />
     </div>
   )

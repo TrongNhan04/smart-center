@@ -68,7 +68,7 @@ const router = createBrowserRouter([
 
           { path: 'classes', element: <ClassList /> },
           { path: 'classes/:id', element: <ClassDetail /> },
-          // { path: 'sessions/:id', element:<SessionDetail/>},
+          { path: 'sessions/:id', element:<SessionDetail/>},
 
           { path: 'teachers', element: <TeacherList /> },
           { path: 'teachers/:id', element: <TeacherDetail /> },

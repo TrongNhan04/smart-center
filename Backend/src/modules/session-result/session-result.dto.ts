@@ -47,6 +47,6 @@ export class SessionsResultDTO {
 
 export class FileAttach {
     public_id: string
-    secure_url: string
+    url: string
     resource_type: string
 }

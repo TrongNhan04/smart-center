@@ -33,6 +33,13 @@ const teacherApi = {
                 startDate: startDate,
                 endDate: endDate
             }
-        })
+        }),
+
+    requestUnlock: (sessionId: number, reason: string) => {
+        const body = { reason: reason }
+        return axiosClient.post(`sessions/${sessionId}/request-unlock`, body)
+    }
+
+
 }
 export default teacherApi

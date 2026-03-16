@@ -5,10 +5,11 @@ import {
 }
   from "@ant-design/icons"
 import {
-  Avatar, Badge, Button, Card, Col, Descriptions, message, notification, Popconfirm,
-  Progress, Row, Space, Statistic, Table, Tabs, Tag, Tooltip, Typography
+  Avatar, Badge, Button, Card, Col, Descriptions, message, notification,
+  Popconfirm, Progress, Row, Space, Statistic, Table, Tabs, Tag, Tooltip,
+  Typography
 } from "antd"
-import { Link, Navigate, useNavigate, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom"
 import type { ClassDB } from "./ClassDTO"
 import { useEffect, useState } from "react"
 import classApi from "../../api/classApi"
@@ -33,6 +34,8 @@ const ClassDetail = () => {
   const [openDrawer, setOpenDrawer] = useState(false)
   const [sessionId, setSessionId] = useState(0)
   const navigate = useNavigate()
+  const [searchParam, setSearchParam] = useSearchParams()
+  const currentPage = Number(searchParam.get('page')) || 1
   const user = useAuthStore(state => state.user)
   const isAdmin = user?.role === 'ADMIN'
 
@@ -166,7 +169,8 @@ const ClassDetail = () => {
           session={value}
           unlock={handleUnlock}
           onCancel={handleCancel}
-          onOpenDrawer={handleOpenDrawer} />
+        //onOpenDrawer={handleOpenDrawer} 
+        />
           : <Button onClick={() => navigate(`/teacher/sessions/${value.ID}`)}>
             Xem chi tiết</Button>
       }
@@ -227,11 +231,7 @@ const ClassDetail = () => {
     }
   }
 
-  const handleOpenDrawer = (sessionId: number) => {
-    //console.log("session: ClassDetail", session)
-    setSessionId(sessionId)
-    setOpenDrawer(true)
-  }
+  const handleBack = (pagination: any) => setSearchParam({ page: pagination.current })
 
   return (
     // div này bọc toàn bộ nội dung trang chi tiết
@@ -324,7 +324,11 @@ const ClassDetail = () => {
                       <Table style={{ marginTop: 8 }}
                         dataSource={sessions}
                         columns={filterColumns()}
-                        pagination={{ defaultPageSize: 10 }}
+                        pagination={{
+                          current: currentPage,
+                          pageSize: 10
+                        }}
+                        onChange={handleBack}
                         rowKey="ID"
                         scroll={{ y: 320 }}
                       />

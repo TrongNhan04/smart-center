@@ -1,13 +1,10 @@
 import { useEffect, useState } from 'react';
 import {
-  Card, Form, Input, Button, Upload, Table, Typography,
-  Descriptions, Row, Col, Radio, Space, InputNumber, Tooltip, Tag,
-  message, Popconfirm, notification,
-  Tabs
+  Card, Form, Input, Button, Upload, Table, Typography,Descriptions, 
+  Row, Col, Radio, Space, InputNumber, Tooltip, Tag, message, notification,
 } from 'antd';
 import {
-  ArrowLeftOutlined,
-  InboxOutlined, PhoneOutlined, SaveOutlined
+  ArrowLeftOutlined, InboxOutlined, PhoneOutlined,
 } from '@ant-design/icons';
 import type { SessionResult, TSessionDetail } from '../session/SessionDTO';
 import { DateHelper } from '../common/date.helper';
@@ -16,20 +13,31 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import FileUpload from './FileUpload';
 import { useAuthStore } from '../../store/useAuthStore';
+import UnlockButton from './UnlockButton';
 
 const { Title, Text } = Typography
 const { TextArea } = Input
 const { Dragger } = Upload
 
+type trangThai = 'done' | 'uploading' | 'error' | 'removed'
+
+interface fileFormat {
+  uid: string,
+  name: string,
+  status: trangThai,
+  public_id: string,
+  url: string,
+  resource_type: string
+}
+
 const SessionDetail = () => {
   const [form] = Form.useForm()
   const { id } = useParams()
   const navigate = useNavigate()
-  const [loading, setLoading] = useState(false)
   const [session, setSession] = useState<TSessionDetail>()
   const [students, setStudents] = useState<SessionResult[]>([])
-  const [fileURL, setFileURL] = useState<string[]>([])
-
+  const [fileList, setFileList] = useState<fileFormat[]>([])
+  const [reload, setReload] = useState(0)// để con là bộ sưu tập biết mà tải lại
   const sessionId = Number(id)
 
   const fetchSession = async () => {
@@ -37,9 +45,9 @@ const SessionDetail = () => {
       const res = await sessionApi.getDetailsById(sessionId)
       setSession(res.data)
       setStudents(res.data.ChiTietKetQua)
+
     } catch (error: any) {
-      message.error('Có lỗi xảy ra')
-      console.log("Có lỗi xảy ra: ", error?.response?.data?.message)
+      handelError(error)
     }
   }
 
@@ -123,23 +131,29 @@ const SessionDetail = () => {
   }
 
   const handleSaveSession = async (type: 'DRAFT' | 'SUBMITTED') => {
+    //type === 'DRAFT' ? setLoadingDraft(true) : setLoadingSubmit(true)
     try {
       const formData = await form.validateFields()
       const payload = {
         ...formData,
-        TepDinhKem: fileURL,
+        TepDinhKem: fileList,
         ChiTietKetQua: students.map(student => ({
           GhiDanhID: student.GhiDanhID,
           NhanXetRieng: student.NhanXetRieng,
           DiemDanh: student.DiemDanh,
-          Diem: Number(student.Diem),
+          Diem: student.Diem ? Number(student.Diem) : null,
         }))
       }
-      // const isSubmit = type === 'SUBMITTED'
-      // isSubmit ? await sessionApi.submitted(sessionId, payload) :
-      //   await sessionApi.saveDraft(sessionId, payload)
-      // fetchSession()
+      //await new Promise(resolve => setTimeout(resolve, 1000))
+
+      const isSubmit = type === 'SUBMITTED'
+      isSubmit ? await sessionApi.submitted(sessionId, payload) :
+        await sessionApi.saveDraft(sessionId, payload)
+      fetchSession()
       message.success('Thao tác thành công')
+      // setFileList([])
+      console.log('fileList', fileList)
+      setReload(prev => prev + 1)// tăng lên để con biết reload
     } catch (error) {
       handelError(error)
     }
@@ -150,7 +164,6 @@ const SessionDetail = () => {
       const { file, onSuccess } = options
       const formData = new FormData()
       formData.append('file', file)
-      console.log(file)
       const token = useAuthStore.getState().access_token
       const res = await axios.post('http://localhost:3000/api/file-upload',
         formData, {
@@ -159,8 +172,15 @@ const SessionDetail = () => {
         }
       })
       onSuccess(res.data, file)
-      const resURL = res.data.data
-      setFileURL(prev => [...prev, resURL])
+      const resURL = {
+        uid: file.uid,
+        name: '',
+        status: 'done' as trangThai,
+        public_id: res.data.data.public_id,
+        url: res.data.data.url,
+        resource_type: res.data.data.resource_type
+      }
+      setFileList(prev => [...prev, resURL])
       // message.success('')
     } catch (error) {
       options.onError({ error })
@@ -168,10 +188,16 @@ const SessionDetail = () => {
     }
   }
 
-  // const handleRemoveFile = (file:any) => {
-  //   // chỉ giữ những thằng khác id của file
-  //   const newFileList = fileURL.filter(item=>item.uid)
-  // }
+  const handleGetOldFile = (oldFile: any) => {
+    setFileList(oldFile) // lưu vào status để đưa cho backend
+    form.setFieldValue('file', oldFile) // đưa cho form để hiển thị
+  }
+
+  const handleRemoveFile = (file: any) => {
+    // chỉ giữ những thằng khác id của file
+    const newFileList = fileList.filter(item => item.uid !== file.uid)
+    setFileList(newFileList)
+  }
 
   const ngayHoc = new Date(session.BatDauLuc).toLocaleDateString()
   const gioHoc = DateHelper.ISOToHHMM(session.BatDauLuc, session.KetThucLuc)
@@ -180,26 +206,14 @@ const SessionDetail = () => {
     <div style={{ padding: 24, background: '#f0f2f5', minHeight: '100vh' }}>
 
       <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
-        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)} />
-        <Title level={3} style={{ margin: 0 }}>Báo cáo Buổi học</Title>
+        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)} >Quay lại</Button>
+        <Title level={3} style={{ margin: 0 }}>Báo cáo buổi học</Title>
 
-        <Space>
-          <Button size="middle" icon={<SaveOutlined />} loading={loading}
-            onClick={() => handleSaveSession('DRAFT')} > Lưu thông tin
-          </Button>
-
-          <Popconfirm
-            title='Xác nhận chốt kết quả?'
-            description='Kết quả sẽ được gửi thông báo đến phụ huynh'
-            okText='Chốt kết quả'
-            cancelText='Quay lại'
-            onConfirm={() => handleSaveSession('SUBMITTED')}
-          >
-            <Button type="primary" size="middle" icon={<SaveOutlined />}
-              loading={loading}> Chốt kết quả
-            </Button>
-          </Popconfirm>
-        </Space>
+        <UnlockButton
+          session={session}
+          onSave={handleSaveSession}
+          onReload={fetchSession}
+        />
       </Row>
 
       <Form form={form} layout="vertical"
@@ -251,42 +265,42 @@ const SessionDetail = () => {
         </Card>
 
         {/* phần upload hình ảnh hoặc video */}
-        <Card //title="Video / Hình ảnh buổi học"
-          variant='borderless' style={{ marginBottom: 24, borderRadius: 8 }}>
-          <Tabs
-            defaultActiveKey='1'
-            items={[
-              {
-                key: '1', label: 'Upload hình ảnh hoặc video',
-                children: (<>
-                  <Form.Item name="file" noStyle valuePropName={"fileList"}
-                    getValueFromEvent={(e) => { // đảm bảo các file là 1 mảng
-                      if (Array.isArray(e)) return e
-                      return e?.fileList || []
-                    }}
-                  >
-                    <Dragger multiple customRequest={handleUpload}
-                      listType="picture" style={{ padding: 20 }}>
-                      <p className="ant-upload-drag-icon">
-                        <InboxOutlined style={{ color: '#1890ff', fontSize: 48 }} />
-                      </p>
-                      <p className="ant-upload-text">Kéo thả file vào đây hoặc nhấp để tải lên</p>
-                      <p className="ant-upload-hint">
-                        Hỗ trợ tải lên ảnh (JPG, PNG) hoặc video ngắn (MP4) quay lại hoạt động của lớp.
-                      </p>
-                    </Dragger>
-                  </Form.Item>
-                  {/* <FileUpload /> */}
-                </>)
-              },
-              {
-                key: '2', label: 'Kết quả',
-                children: (<FileUpload />)
-              }
-            ]}
+        <Card title="Upload hình ảnh hoặc video"
+          variant='borderless' style={{ marginBottom: 24, borderRadius: 8 }}
+          styles={{
+            header: { backgroundColor: '#f0f5ff', color: '#1d39c4' }
+          }}
+        >
+          <Form.Item name="file" noStyle valuePropName={"fileList"}
+            getValueFromEvent={(e) => { // đảm bảo các file là 1 mảng
+              if (Array.isArray(e)) return e
+              return e?.fileList || []
+            }}
           >
+            <Dragger multiple fileList={fileList}
+              customRequest={handleUpload} onRemove={handleRemoveFile}
+              listType="picture" style={{ padding: 20 }}>
+              <p className="ant-upload-drag-icon">
+                <InboxOutlined style={{ color: '#1890ff', fontSize: 48 }} />
+              </p>
+              <p className="ant-upload-text">Kéo thả file vào đây hoặc nhấp để tải lên</p>
+              <p className="ant-upload-hint">
+                Hỗ trợ tải lên ảnh (JPG, PNG) hoặc video ngắn (MP4) quay lại hoạt động của lớp.
+              </p>
+            </Dragger>
+          </Form.Item>
+        </Card>
 
-          </Tabs>
+        <Card title="Bộ sưu tập"
+          styles={{
+            header: { backgroundColor: '#f0f5ff', color: '#1d39c4' }
+          }}
+          variant='borderless' style={{ marginBottom: 24, borderRadius: 8 }}>
+          <FileUpload
+            getOldFile={handleGetOldFile}
+            sessionId={sessionId}
+            reload={reload}
+          />
         </Card>
 
         {/* điểm danh và nhận xét cá nhân */}

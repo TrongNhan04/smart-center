@@ -23,8 +23,13 @@ export class NotifyService {
         })
     }
 
-    // tạo NHIỀU thông báo cùng lúc tx?
-    async CreateManyNotis(listParentID: number[], session: any) {
+    // tạo NHIỀU thông báo cùng có tx?
+    async CreateManyNotis(listParentID: number[], session: any,
+        tx?: Prisma.TransactionClient) {
+
+        let client: Prisma.TransactionClient | null = null
+        if (tx) client = tx
+        else client = this.prisma
         const notionData = listParentID.map(id => ({
             UserID: id,
             TieuDe: 'Kết quả học tập mới',
@@ -37,7 +42,7 @@ export class NotifyService {
             DaDoc: false,
             CreatedAt: new Date()
         }))
-        return await this.prisma.thongBao.createMany({ data: notionData })
+        return await client.thongBao.createMany({ data: notionData })
     }
 
     // lấy danh sách
@@ -83,8 +88,14 @@ export class NotifyService {
         return { msg: "successful" }
     }
 
-    // thông báo hủy buổi học tx?
-    async SSCancelledNotify(userId: number[], session: any, reason: string) {
+    // thông báo hủy buổi học có tx?
+    async SSCancelledNotify(userId: number[], session: any, reason: string,
+        tx?: Prisma.TransactionClient) {
+
+        let client: Prisma.TransactionClient | null = null
+        if (tx) client = tx
+        else client = this.prisma
+
         const title = "Thông báo hủy buổi học"
         const dateStr = session.BatDauLuc.toLocaleDateString('vi-VN')
         const body = `Lớp ${session.lophoc.MaLopHoc} - Buổi ngày ${dateStr} đã bị hủy. Lý do: ${reason}`
@@ -102,7 +113,7 @@ export class NotifyService {
         }))
 
         if (notisData.length > 0)
-            return this.prisma.thongBao.createMany({ data: notisData })
+            return await client.thongBao.createMany({ data: notisData })
     }
 
     // thông báo học phí có tx
@@ -150,7 +161,7 @@ export class NotifyService {
     }
 
     // thông báo mở khóa buổi học có tx
-    async UnLockSSNotify(userId: number, session: any, tx?:Prisma.TransactionClient) {
+    async UnLockSSNotify(userId: number, session: any, tx?: Prisma.TransactionClient) {
         let client: Prisma.TransactionClient | null = null
         if (tx) client = tx
         else client = this.prisma

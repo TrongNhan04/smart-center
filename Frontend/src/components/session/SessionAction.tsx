@@ -2,17 +2,19 @@ import { Alert, Button, Form, Input, Modal, Popconfirm, Space, Tooltip } from "a
 import type { SessionDB } from "./SessionDTO"
 import { DeleteOutlined, InfoCircleOutlined, UnlockOutlined } from "@ant-design/icons"
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 interface Props {
   session: SessionDB,
   unlock: (sessionId: number) => void,
   onCancel: (sessionId: number, reason:string) => void
-  onOpenDrawer: (sessionId: number) => void
+  // onOpenDrawer: (sessionId: number) => void
 }
 
-const SessionAction = ({ session, unlock, onCancel, onOpenDrawer }: Props) => {
+const SessionAction = ({ session, unlock, onCancel }: Props) => {
   const [form] = Form.useForm()
   const [open, setOpen] = useState(false)
+  const navigate = useNavigate()
 
   const infoBtn = () => (
     <Tooltip title="Xem chi tiết">
@@ -20,7 +22,7 @@ const SessionAction = ({ session, unlock, onCancel, onOpenDrawer }: Props) => {
         size="small"
         type="primary"
         icon={<InfoCircleOutlined />}
-        onClick={() => onOpenDrawer(session.ID)}
+        onClick={()=>navigate(`/admin/sessions/${session.ID}`)}
       >
       </Button>
     </Tooltip>

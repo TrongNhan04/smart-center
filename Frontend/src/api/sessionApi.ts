@@ -1,5 +1,5 @@
 import axiosClient from "../components/AxiosClient";
-import type { SessionDetail, SessionDto } from "../components/session/SessionDTO";
+import type { SessionDto, TSessionDetail } from "../components/session/SessionDTO";
 
 export const sessionApi = {
     getByClassId: (classId: number) =>
@@ -20,15 +20,18 @@ export const sessionApi = {
     generateManual: (classId: number, body: SessionDto) =>
         axiosClient.post(`admin/sessions-manual/classes/${classId}`, body),
 
+    getFileUpload: (sessionId:number) => 
+        axiosClient.get(`api/sessions/${sessionId}/file-upload`),
+
     unlock: (sessionId: number) =>
         axiosClient.post(`admin/sessions/${sessionId}/unlock`),
 
     cancel: (sessionId: number, reason: string) =>
         axiosClient.patch(`admin/sessions/${sessionId}/cancel`, reason),
 
-    saveDraft: (sessionId: number, body:SessionDetail) =>
+    saveDraft: (sessionId: number, body:TSessionDetail) =>
         axiosClient.put(`teacher/sessions/${sessionId}/result-draft`, body),
 
-    submitted: (sessionId: number, body:SessionDetail) =>
-        axiosClient.put(`teacher/sessions/${sessionId}/result-submit`,body)
+    submitted: (sessionId: number, body:TSessionDetail) =>
+        axiosClient.put(`teacher/sessions/${sessionId}/result-submit`,body),
 }

@@ -7,7 +7,7 @@ import type { ScheduleOW } from '../session/SessionDTO';
 import teacherApi from '../../api/teacherApi';
 import { useNavigate } from 'react-router-dom';
 
-// Cài đặt ngôn ngữ tiếng Việt để thứ 2 là ngày đầu tuần
+// tiếng Việt để thứ 2 là ngày đầu tuần
 dayjs.locale('vi')
 
 const { Title, Text } = Typography
@@ -47,7 +47,7 @@ const Schedule = () => {
   // nút chọn tuần trước dựa vào state cũ
   const handlePrevWeek = () => setStartOfWeek(prev => prev.subtract(1, 'week'))
 
-  // tạo mảng 7 ngày cho tuần hiện tại
+  // tạo mảng 7 ngày cho tuần hiện tại: từ t2 đến cn
   const weekDays = Array.from({ length: 7 }).map((_, index) => startOfWeek.add(index, 'day'))
 
   // tìm buổi học theo ngày
@@ -77,10 +77,9 @@ const Schedule = () => {
       {/* body: tạo 7 thẻ từ thứ 2 đến chủ nhật */}
       <div
         style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: 16 }}>
-        {/* day là 1 ngày của weekDays, index là id cho Card */}
-        {weekDays.map((day, index) => {
+        {/* day là 1 ngày của weekDays, index là id cho Card để react dễ quản lý*/}
+        {weekDays.map((day, index) => {// bắt đầu là t2 (YYYY-MM-DD)
           const dailyClasses = getClassesForDay(day)
-          // console.log(day.format('YYYY-MM-DD'))
           const isToday = day.format('YYYY-MM-DD') === dayjs().format('YYYY-MM-DD')
 
           return (
@@ -129,7 +128,7 @@ const Schedule = () => {
                   {dailyClasses.map(buoihoc => (
                     // Thẻ div đại diện cho 1 ca học
                     <div 
-                      onClick={()=>navigate(`/teacher/classes/${buoihoc.LopHocID}`)}
+                      onClick={()=>navigate(`/teacher/sessions/${buoihoc.ID}`)}
                       key={buoihoc.ID}
                       style={{
                         padding: 8,

@@ -3,7 +3,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { NotifyService } from "../notify/notify.service";
 import { SessionsResultDTO } from "./session-result.dto";
 import { DateHelper } from "src/common/date.helper";
-import { BuoiHocUpdateInput } from "src/generated/prisma/models";
+import { BuoiHocUpdateInput, KetQua_BuoiHocUpdateInput } from "src/generated/prisma/models";
 
 @Injectable()
 export class SessionResultService {
@@ -22,7 +22,7 @@ export class SessionResultService {
         const minutesLeftEnd = DateHelper.TimeDiff(sessionDB.KetThucLuc)
         if (sessionDB.AdminMoKhoa == false) {
             if (minutesLeftStart < -15 || minutesLeftEnd > 2880) // quá giờ lưu
-                throw new BadRequestException(`Ngoài thời gian cho phép lưu NHÁP`)
+                throw new BadRequestException(`Ngoài thời gian cho phép lưu thông tin`)
             if (sessionDB.TrangThai === 'COMPLETED')// đã lưu thì không thao tác thêm hoặc xin admin
                 throw new ConflictException('Buổi học đã chốt kết quả, vui lòng liên hệ quản trị viên')
         }
@@ -39,7 +39,7 @@ export class SessionResultService {
         const minutesLeftEnd = DateHelper.TimeDiff(sessionDB.KetThucLuc)
         if (!sessionDB.AdminMoKhoa) {
             if (minutesLeftEnd < 0 || minutesLeftEnd > 2880)
-                throw new BadRequestException(`Ngoài thời gian cho phép lưu kết quả`)
+                throw new BadRequestException(`Ngoài thời gian cho phép chốt kết quả`)
             if (sessionDB.TrangThai === 'COMPLETED')// đã lưu thì không thao tác thêm hoặc xin admin
                 throw new ConflictException('Buổi học đã chốt kết quả, vui lòng liên hệ quản trị viên')
         }
@@ -69,7 +69,7 @@ export class SessionResultService {
             TenHocVien: item.hocvien.TenHocVien,
             PhuHuynh: item.hocvien.Parent.HoTen,
             DienThoai: item.hocvien.Parent.DienThoai,
-            DiemDanh: null,
+            DiemDanh: false,
             NhanXetRieng: null,
             Diem: null
         })
@@ -132,7 +132,7 @@ export class SessionResultService {
         if (sessionDB.BatDauLuc > new Date())
             throw new BadRequestException('Buổi học chưa bị khóa, không thể gửi yêu cầu')
         if (!reason) throw new BadRequestException('Chưa điền lý do')
-        await this.prisma.buoiHoc.update({
+        return await this.prisma.buoiHoc.update({
             where: { ID: sessionId },
             data: {
                 YeuCauMoKhoa: true,
@@ -144,12 +144,12 @@ export class SessionResultService {
     }
 
     // xử lý Transaction lưu DB, Dùng chung cho cả Draft và Submit
-    private async ProcessSessionResult(session: any, teacherId: number,
+    private async ProcessSessionResult(sessionDB: any, teacherId: number,
         body: SessionsResultDTO, status: 'DRAFT' | 'SUBMITTED') {
 
         // lấy danh sách học viên Active của lớp có buổi học id đó
         const listEnroll = await this.prisma.ghiDanh.findMany({
-            where: { LopHocID: session.LopHocID, TrangThai: 'ACTIVE' },
+            where: { LopHocID: sessionDB.LopHocID, TrangThai: 'ACTIVE' },
             select: { ID: true, hocvien: { select: { UserID: true } } }
         })
         // key: enrollmentId, value: dữ liệu của body gửi lên 
@@ -157,23 +157,26 @@ export class SessionResultService {
         const listParent = listEnroll.map(e => e.hocvien.UserID)
 
         return await this.prisma.$transaction(async tx => {
+            const updateData: KetQua_BuoiHocUpdateInput = {
+                NhanXetChung: body.NhanXetChung ?? null,
+                TrangThai: status,
+            }
+            if (body.TepDinhKem) // có tệp đính kèm
+                updateData.tep_dinhkem = {
+                    deleteMany: {}, // xóa những thằng cũ
+                    create: body.TepDinhKem.map(file => ({
+                        TepID: file.public_id,
+                        URL: file.url,
+                        LoaiTep: file.resource_type
+                    }))
+                }
+
             // Upsert bảng KetQua_BH và quan hệ 1-n của nó là tệp đính kèm
             const sessionResult = await tx.ketQua_BuoiHoc.upsert({
-                where: { BuoiHocID: session.ID },
-                update: { // có thì update
-                    NhanXetChung: body.NhanXetChung ?? null,
-                    TrangThai: status,
-                    tep_dinhkem: {// update luôn tệp đính kèm
-                        deleteMany: {}, // xóa hết những tệp cũ của kết quả này
-                        create: body.TepDinhKem.map(file => ({
-                            TepID: file.public_id,
-                            URL: file.secure_url,
-                            LoaiTep: file.resource_type
-                        }))
-                    }
-                },
+                where: { BuoiHocID: sessionDB.ID },
+                update: updateData,
                 create: { // không có thì create
-                    BuoiHocID: session.ID, GiaoVienID: teacherId,
+                    BuoiHocID: sessionDB.ID, GiaoVienID: teacherId,
                     NoiDungBaiHoc: body.NoiDungBaiHoc,
                     BaiTapVeNha: body.BaiTapVeNha,
                     NhanXetChung: body.NhanXetChung ?? null,
@@ -181,13 +184,12 @@ export class SessionResultService {
                     tep_dinhkem: { // tạo mới tệp đính kèm
                         create: body.TepDinhKem.map(file => ({
                             TepID: file.public_id,
-                            URL: file.secure_url,
+                            URL: file.url,
                             LoaiTep: file.resource_type
                         }))
                     }
                 }
             })
-
             // Chuẩn bị lệnh Upsert Chi Tiết
             const upsertResultDetail = listEnroll.map(item => {
                 // input map là danh sách ghi danh Id có điểm danh, nhận xét
@@ -232,21 +234,27 @@ export class SessionResultService {
             // gửi toàn bộ mảng upsertResultDetail cho  promise.all
             await Promise.all(upsertResultDetail)
             // Nếu là SUBMITTED -> Cập nhật trạng thái buổi học 
+            const data: BuoiHocUpdateInput = {
+                ChuDe: body.ChuDe
+            }
+
             if (status === 'SUBMITTED') {
-                const bh = await tx.buoiHoc.update({
-                    where: { ID: session.ID }, // lưu xong tắt ưu tiên của admin, chỉ submit mới tắt
-                    data: {
-                        TrangThai: 'COMPLETED', AdminMoKhoa: false,
-                        ChuDe: body.ChuDe
-                    }
-                })
-                await tx.lopHoc.updateMany({
-                    where: { ID: bh.LopHocID, TrangThai: 'OPEN' },
+                data.AdminMoKhoa = false // submit thì tắt ưu tiên nếu có
+                data.TrangThai = 'COMPLETED' // update trạng thái buổi học
+
+                await tx.lopHoc.updateMany({ // update trạng thái lớp
+                    where: { ID: sessionDB.LopHocID, TrangThai: 'OPEN' },
                     data: { TrangThai: 'RUNNING' },
                 })
                 // gửi thông báo cho phụ huynh
-                await this.notisService.CreateManyNotis(listParent, session)
+                await this.notisService.CreateManyNotis(listParent, sessionDB, tx)
             }
+            // update buổi học
+            await tx.buoiHoc.update({
+                where: { ID: sessionDB.ID },
+                data: data
+            })
+
             return { message: status === 'DRAFT' ? "Lưu nháp" : "Lưu thật" }
         })
     }
