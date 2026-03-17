@@ -1,4 +1,7 @@
-import { List, Card, Progress, Button, Typography, Space, Tag, Divider, Row, Col, notification } from 'antd';
+import {
+  List, Card, Progress, Typography, Space, Tag, Divider, Row, Col,
+  notification
+} from 'antd';
 import { TeamOutlined, CalendarOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -66,7 +69,7 @@ const MyClasses = () => {
           return (
             <List.Item>
               <Card
-                styles={{ header: { backgroundColor: '#f0f5ff'}}}
+                styles={{ header: { backgroundColor: '#f0f5ff' } }}
                 hoverable
                 onClick={() => navigate(`/teacher/classes/${item.ID}`)}
 

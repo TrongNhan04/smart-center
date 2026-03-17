@@ -209,6 +209,7 @@ model KetQua_BuoiHoc {
   ketqua_chitiet KetQua_ChiTiet[] //kết quả buổi học có nhiều kết quả chi tiết
   tep_dinhkem TepDinhKem_BuoiHoc[] // 1 buổi học có thế có nhiều tệp đính kèm
 }
+// ============ 8. TEPDINHKEM ============//
 
 model TepDinhKem_BuoiHoc {
   ID          Int @id @default(autoincrement())
@@ -224,7 +225,7 @@ model TepDinhKem_BuoiHoc {
   ketqua_buoihoc KetQua_BuoiHoc @relation(fields: [KQBuoiHocID],references: [ID])
 }
 
-// ============ 8. KETQUA_CHITIET ============//
+// ============ 9. KETQUA_CHITIET ============//
 model KetQua_ChiTiet {
   ID           Int      @id @default(autoincrement())
   KetQuaID     Int
@@ -242,7 +243,7 @@ model KetQua_ChiTiet {
   @@unique([KetQuaID, GhiDanhID]) //một kết quả buổi học chỉ có một chi tiết cho mỗi ghi danh 
 }
 
-// ============ 9. GHIDANH ============//
+// ============ 10. GHIDANH ============//
 enum TrangThai_GD {
   ACTIVE
   INACTIVE
@@ -265,7 +266,7 @@ model GhiDanh {
   hoadon         HoaDon? //1 ghi danh có 1 hóa đơn
 }
 
-// ============ 10. HOADON  ============//
+// ============ 11. HOADON  ============//
 enum TrangThai_HD {
   ACTIVE
   CANCELLED
@@ -292,7 +293,7 @@ model HoaDon {
   giaodich GiaoDich[] //hóa đơn có nhiều giao dich
 }
 
-// ============ 11. GIAODICH  ============//
+// ============ 12. GIAODICH  ============//
 model GiaoDich {
   ID       Int  @id @default(autoincrement())
   UserID   Int
@@ -313,7 +314,7 @@ model GiaoDich {
   user   User    @relation(fields: [UserID], references: [ID])
 }
 
-// ============ 12. THONGBAO  ============//
+// ============ 13. THONGBAO  ============//
 model ThongBao {
   ID Int @id @default(autoincrement())
 

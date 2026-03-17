@@ -19,7 +19,6 @@ import { DateHelper } from "../common/date.helper"
 import ClassModal from "./ClassModal"
 import SessionAction from "../session/SessionAction"
 import SessionsModal from "../session/SessionsModal"
-import SessionDrawer from "../session/SessionDrawer"
 import { useAuthStore } from "../../store/useAuthStore"
 
 const { Title, Text } = Typography
@@ -31,8 +30,6 @@ const ClassDetail = () => {
   const [sessions, setSessions] = useState<SessionDB[]>([])
   const [openClassModal, setOpenClassModal] = useState(false)
   const [openSessionModal, setOpenSessionModal] = useState(false)
-  const [openDrawer, setOpenDrawer] = useState(false)
-  const [sessionId, setSessionId] = useState(0)
   const navigate = useNavigate()
   const [searchParam, setSearchParam] = useSearchParams()
   const currentPage = Number(searchParam.get('page')) || 1
@@ -345,12 +342,6 @@ const ClassDetail = () => {
                   }
                 ]} /> {/* kết thúc tab */}
             </Card>
-
-            <SessionDrawer
-              open={openDrawer}
-              onCancel={() => setOpenDrawer(false)}
-              sessionId={sessionId}
-            />
           </Col>
 
           {/* Cột phải: chứa thông tin tổng quan */}
