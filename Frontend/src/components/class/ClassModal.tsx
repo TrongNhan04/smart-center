@@ -294,7 +294,7 @@ const ClassModal = ({ open, onCancel, khoahocId, onSave,
                 </Col>
               </Row>
 
-              {isEdit ?
+              {/* {isEdit ? */}
                 <Row gutter={8}>
                   <Col span={12}>
                     <Form.Item // sĩ số
@@ -321,8 +321,9 @@ const ClassModal = ({ open, onCancel, khoahocId, onSave,
                       <Input placeholder="VD: phòng A101" />
                     </Form.Item>
                   </Col>
-                </Row> : // không edit thì hiện mỗi ô sĩ số
-                <Form.Item
+                </Row> 
+                {/* : // không edit thì hiện mỗi ô sĩ số */}
+                {/* <Form.Item
                   label="Sĩ số"
                   name="classSize"
                   rules={[
@@ -336,8 +337,8 @@ const ClassModal = ({ open, onCancel, khoahocId, onSave,
                     max={50}
                     placeholder="VD: 20"
                   />
-                </Form.Item>
-              }
+                </Form.Item>  */}
+              {/* } */}
             </Col>
           </Row>
           <Form.Item label="Mô tả chi tiết" name="description">

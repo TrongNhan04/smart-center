@@ -10,7 +10,9 @@ export class NotifyController {
     constructor(private notifyService: NotifyService) { }
 
     @Get()
-    async GetMyNotis(@Req() req: RequestWithUser, @Query('page') page: number) {
+    async GetMyNotis(
+        @Req() req: RequestWithUser,
+        @Query('page') page: number) {
         return await this.notifyService.GetMyNotification(+req.user.userId, page)
     }
 

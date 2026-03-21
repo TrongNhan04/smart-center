@@ -2,18 +2,18 @@ import { useRouter } from 'expo-router';
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-const AboutScreen = () => {
+const AccountScreen = () => {
   const router = useRouter()
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>About screen</Text>
-      <Pressable onPress={()=>router.navigate('/')}>
-        <Text style={styles.button}>Go to Home screen</Text>
+      <Text style={styles.text}>Tài khoản cá nhân</Text>
+      <Pressable onPress={()=>router.replace('/login')}>
+        <Text style={styles.button}>Đăng xuất</Text>
       </Pressable>
     </View>
   );
 }
-export default AboutScreen
+export default AccountScreen
 
 const styles = StyleSheet.create({
   container: {

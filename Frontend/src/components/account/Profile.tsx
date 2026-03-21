@@ -68,7 +68,6 @@ const Profile = () => {
           >
             <Avatar
               size={140}
-              // src={'https://api.dicebear.com/7.x/avataaars/svg?seed=Admin'}
               icon={<UserOutlined />}
               style={{ marginBottom: 16, border: '2px solid #f0f0f0' }}
             />

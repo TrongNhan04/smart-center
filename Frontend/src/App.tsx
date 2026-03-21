@@ -61,7 +61,7 @@ const router = createBrowserRouter([
           { index: true, element: <Navigate to="dashboard" replace /> },
 
           { path: 'dashboard', element: <Dashboard /> },
-          { path: 'tasks', element: <TaskList /> },
+          // { path: 'tasks', element: <TaskList /> },
 
           { path: 'courses', element: <CourseList /> },
           { path: 'courses/:id', element: <CourseDetail /> },

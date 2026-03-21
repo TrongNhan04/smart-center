@@ -298,7 +298,7 @@ const StudentDetail = () => {
                     key: '2',
                     label: `Kết quả buổi học (${sessions.length})`,
                     children: (
-                      <Table style={{ marginTop: 8 }}
+                      <Table //style={{ marginTop: 8 }}
                         dataSource={sessions}
                         columns={columnsOfSS}
                         pagination={{ defaultPageSize: 10 }}

@@ -47,7 +47,7 @@ export class EnrollService {
             const newInvoice = await this.invoiceService.CreateInvoice
                 (studentDB.ID, newEnroll.ID, classDB.DenNgay, body.fee, tx)
             // thêm thông báo
-            await this.notisService.InvoiceNotify(studentDB.UserID, newInvoice, tx)
+            await this.notisService.InvoiceNotify(studentDB.UserID, newInvoice, classDB, tx)
             return { ID: newEnroll.ID }
         })
     }

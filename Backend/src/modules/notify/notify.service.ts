@@ -47,16 +47,17 @@ export class NotifyService {
 
     // lấy danh sách
     async GetMyNotification(userId: number, page: number = 1) {
-        const take = 20 // lấy bao nhiêu
-        const skip = (page - 1) * take // bỏ bao nhiêu
+        // const take = 10 // lấy bao nhiêu
+        // const skip = (page - 1) * take // bỏ bao nhiêu
 
         const [items, total, unReadCount] = await this.prisma.$transaction([
             // lấy danh sách thông báo theo phân trang
             this.prisma.thongBao.findMany({
                 where: { UserID: userId },
                 orderBy: { CreatedAt: 'desc' },// lấy tin mới nhất
-                take: take,
-                skip: skip
+                omit: { UserID:true, UpdatedAt: true },
+                // take: take,
+                // skip: skip
             }),
             // tổng số lượng thông báo
             this.prisma.thongBao.count({ where: { UserID: userId } }),
@@ -117,7 +118,8 @@ export class NotifyService {
     }
 
     // thông báo học phí có tx
-    async InvoiceNotify(userId: number, invoice: any, tx?: Prisma.TransactionClient) {
+    async InvoiceNotify(userId: number, invoice: any, classDB: any,
+        tx?: Prisma.TransactionClient) {
         let client: Prisma.TransactionClient | null = null
         if (tx) client = tx
         else client = this.prisma
@@ -127,12 +129,12 @@ export class NotifyService {
             data: {
                 UserID: userId,
                 TieuDe: 'Thông báo học phí',
-                NoiDung: `Học phí lớp ${invoice.TenLop}: ${invoice.TongTien}. Hạn thanh toán là ${dateStr}.`,
+                NoiDung: `Học phí lớp ${classDB.TenLop}: ${invoice.TongTien}. Hạn thanh toán là ${dateStr}.`,
                 Loai: 'INVOICE',
                 DuLieu: {
                     invoiceId: invoice.ID,
                     studentId: invoice.HocVienID,
-                    classId: invoice.LopHocID
+                    classId: classDB.ID
                 },
                 DaDoc: false,
             }

@@ -121,7 +121,7 @@ const EnrollModal = ({ open, onCancel, onSave }: Props) => {
     >
       <Alert
         title="Lưu ý"
-        description="Ghi danh thành công sẽ tạo HÓA ĐƠN và gửi thông báo đến phụ huynh"
+        description="Ghi danh thành công sẽ tạo HÓA ĐƠN và thông báo cho phụ huynh"
         type="info"
         showIcon
         style={{ marginBottom: 15 }}
@@ -158,7 +158,7 @@ const EnrollModal = ({ open, onCancel, onSave }: Props) => {
                 (option?.label ?? '').toLowerCase()
                   .includes(input.toLowerCase())
             }}
-            onChange={handleClassChange}
+            //onChange={handleClassChange}
           />
         </Form.Item>
     

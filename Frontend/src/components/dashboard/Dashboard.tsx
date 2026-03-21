@@ -131,7 +131,7 @@ const Dashboard = () => {
       {/* TẦNG 2: BIỂU ĐỒ */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={24} lg={14}>
-          <Card title="Doanh thu & Chi phí (6 tháng)" variant='borderless'
+          <Card title="Doanh thu & Chi phí (12 tháng)" variant='borderless'
             style={{ borderRadius: 8, height: '100%' }}
             // extra={
             //   <Select

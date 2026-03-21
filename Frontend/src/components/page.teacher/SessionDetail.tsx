@@ -39,7 +39,6 @@ const SessionDetail = () => {
   const [fileList, setFileList] = useState<fileFormat[]>([])
   const [reload, setReload] = useState(0)// để con là bộ sưu tập biết mà tải lại
   const sessionId = Number(id)
-
   const fetchSession = async () => {
     try {
       const res = await sessionApi.getDetailsById(sessionId)
@@ -131,7 +130,6 @@ const SessionDetail = () => {
   }
 
   const handleSaveSession = async (type: 'DRAFT' | 'SUBMITTED') => {
-    //type === 'DRAFT' ? setLoadingDraft(true) : setLoadingSubmit(true)
     try {
       const formData = await form.validateFields()
       const payload = {

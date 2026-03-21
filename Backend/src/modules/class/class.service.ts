@@ -17,7 +17,8 @@ export class ClassService {
             this.TeacherValidator(classDTO.teacherId),
             this.DuplicateClass(classDTO.teacherId, classDTO.fromDate,
                 classDTO.toDate, classDTO.timeTable, classDTO.startTime,
-                classDTO.endTime)
+                classDTO.endTime),
+            this.HasSameRoom(classDTO)
         ])
         DateHelper.ValidateTimeRange(classDTO.startTime, classDTO.endTime)
         DateHelper.FromDateToDateValidator(classDTO.fromDate, classDTO.toDate)
@@ -37,6 +38,7 @@ export class ClassService {
                     GioBatDau: classDTO.startTime,
                     GioKetThuc: classDTO.endTime,
                     SiSo: classDTO.classSize,
+                    PhongHoc: classDTO.room
                 }
             })
             tx.khoaHoc.updateMany({
@@ -404,7 +406,8 @@ export class ClassService {
     }
 
     // kiểm tra trùng phòng lớp
-    private async HasSameRoom(body: UpdateClassDTO, excludeClassId?: number) {
+    private async HasSameRoom(body: UpdateClassDTO | CreateClassDTO, 
+        excludeClassId?: number) {
         if (!body.room) return
         const conflict = await this.prismaService.lopHoc.findMany({
             where: {

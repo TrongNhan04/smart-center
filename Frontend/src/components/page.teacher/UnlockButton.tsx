@@ -4,6 +4,7 @@ import { CheckCircleOutlined, SaveOutlined } from "@ant-design/icons"
 import { DateHelper } from "../common/date.helper"
 import { useState } from "react"
 import teacherApi from "../../api/teacherApi"
+import { useAuthStore } from "../../store/useAuthStore"
 
 interface Props {
   session: TSessionDetail
@@ -15,7 +16,8 @@ const UnlockButton = ({ session, onSave, onReload }: Props) => {
   const [loadingDraft, setLoadingDraft] = useState(false)
   const [loadingSubmit, setLoadingSubmit] = useState(false)
   const [loadingRequest, setLoadingRequest] = useState(false)
-  
+  const isAdmin = useAuthStore.getState().user?.role === 'ADMIN'
+
   const handleSendRequest = async () => {
     setLoadingRequest(true)
     try {
@@ -41,7 +43,6 @@ const UnlockButton = ({ session, onSave, onReload }: Props) => {
     console.log('Có lỗi xảy ra: ', error?.response?.data?.message)
   }
 
-
   const timeLeft = DateHelper.TimeDiff(session.KetThucLuc)
   // cần mở khóa khi:
   // đã qua 48h và SCHEDULED || COMPLETED  || admin không mở khóa
@@ -62,13 +63,16 @@ const UnlockButton = ({ session, onSave, onReload }: Props) => {
     setTimeout(() => {
       setLoadingSubmit(false)
     }, 3000);
-  }
+  }  
 
   if (session.TrangThai === 'CANCELLED')
     return <Button type="default" disabled>
       Không thể thao tác
     </Button>
-  if (session.YeuCauMoKhoa)
+
+  else if (session.YeuCauMoKhoa){
+    if(isAdmin)
+      return <Button>Duyệt mở khóa</Button>
     return <Button
       type="primary"
       style={{ backgroundColor: '#2fb058', color: '#fff' }}
@@ -76,12 +80,16 @@ const UnlockButton = ({ session, onSave, onReload }: Props) => {
     >
       Đã gửi yêu cầu mở khóa
     </Button>
-  if (isNeedUnlock)
+  }
+
+  else if (isNeedUnlock && !isAdmin){
     return <Button type="primary"
       onClick={handleSendRequest} loading={loadingRequest}
     >
       Gửi yêu cầu mở khóa
     </Button>
+  }
+    
 
   return (
     <Space>

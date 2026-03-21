@@ -54,6 +54,9 @@ export class CreateClassDTO {
     @IsInt()
     @Min(0)
     classSize: number
+
+    @IsOptional()
+    room?:string
 }
 
 export class QueryClassDTO {
@@ -120,10 +123,6 @@ export class UpdateClassDTO {
     @IsInt()
     @Min(0)
     classSize?: number
-
-    @IsOptional()
-    @IsEnum(TrangThaiLH)
-    status?: TrangThaiLH
 }
 
 export class SchechuleDTO{
