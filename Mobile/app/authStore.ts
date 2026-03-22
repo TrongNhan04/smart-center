@@ -10,6 +10,7 @@ interface User {
 	role: 'ADMIN' | 'TEACHER' | 'PARENT'
 	must_change_pw: boolean
 	classes: number[]
+	children: number[]
 }
 
 interface AuthState {

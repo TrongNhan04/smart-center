@@ -73,9 +73,17 @@ export class AuthService {
             // mustChangePW: userDB.PhaiDoiMK,
             tokenVersion: userDB.PhienBanToken
         }
+
+        // tìm lớp giáo viên dạy
         const classes = await this.prismaService.lopHoc.findMany({
             where: { giaovien: { UserID: userDB.ID } },
             select: { ID: true }
+        })
+
+        // tìm con của user
+        const children = await this.prismaService.hocVien.findMany({
+            where:{Parent:{ID:userDB.ID}},
+            select:{ID:true}
         })
 
         const token = await this.jwtService.signAsync(payload)
@@ -88,7 +96,8 @@ export class AuthService {
                 phone: userDB.DienThoai,
                 role: userDB.VaiTro,
                 must_change_pw: userDB.PhaiDoiMK,
-                classes: classes.map(item=>item.ID)
+                classes: classes.map(item=>item.ID),
+                children: children.map(child=>child.ID)
             }
         }
     }

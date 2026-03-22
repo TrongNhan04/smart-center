@@ -40,7 +40,6 @@ const FileUpload = ({ sessionId, reload, getOldFile }: Props) => {
   useEffect(() => {
     if (!sessionId) return
     fetchFileUpload()
-    console.log(sessionId)
   }, [sessionId, reload])
 
   const handelError = (error: any) => {
@@ -90,7 +89,7 @@ const FileUpload = ({ sessionId, reload, getOldFile }: Props) => {
           <div
             key={vid.ID}
             style={{
-              width: 300,
+              width: 205,
               borderRadius: 8,
               overflow: "hidden"
             }}

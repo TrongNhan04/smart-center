@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, FlatList, StyleSheet, Text, View } from 'react-native';
-import { Divider, List } from 'react-native-paper';
+import { Alert, FlatList, StyleSheet, View } from 'react-native';
+import { Divider, List, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import mobileApi from '../api';
 
@@ -80,7 +80,7 @@ const notis = () => {
       descriptionNumberOfLines={2} // tối đa 2 dòng
 
       left={props => (
-        <List.Icon {...props} icon={item.Icon} color={item.IconColor} 
+        <List.Icon {...props} icon={item.Icon} color={item.IconColor}
         />
       )}
 
@@ -90,14 +90,16 @@ const notis = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={{ fontSize: 20, padding: 18 }}>Thông báo</Text>
+      <Text variant="titleLarge" style={{ padding: 23, fontWeight: 'bold' }}>
+        Thông báo
+      </Text>
       <FlatList
         data={notifications}
         renderItem={renderItem}
         keyExtractor={item => item.ID}
         ItemSeparatorComponent={() => <Divider />}
 
-        refreshing = {refresh}
+        refreshing={refresh}
         onRefresh={handleRefresh}
 
         ListEmptyComponent={

@@ -34,6 +34,7 @@ export class CloudinaryController {
         }
     }
 
+    // tìm tệp đính kèm buổi học
     @UseGuards(JwtAuthGuard, MustChangePWGuard,RolesGuard)
     @Roles('ADMIN','TEACHER','PARENT')
     @Get('api/sessions/:id/file-upload')

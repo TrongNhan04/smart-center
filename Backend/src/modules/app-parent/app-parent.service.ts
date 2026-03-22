@@ -27,7 +27,7 @@ export class AppParentService {
     // Tab trang chủ: buổi học sắp tới, kết quả gần nhất,
     //  nhắc đóng học phí chưa thanh toán của HỌC VIÊN
     async GetDashboard(userId: number, studentId: number) {
-        await this.StudentValidator(userId, studentId)
+        const studentDB = await this.StudentValidator(userId, studentId)
         const [nextSS, lastestResult, invoice] = await Promise.all([
             // buổi học sắp tới 
             this.prisma.buoiHoc.findFirst({
@@ -37,7 +37,7 @@ export class AppParentService {
                     lophoc: {
                         ghidanh: {
                             some: {
-                                HocVienID: studentId,
+                                HocVienID: studentDB.ID,
                                 TrangThai: 'ACTIVE'
                             }
                         }
@@ -58,14 +58,14 @@ export class AppParentService {
             // kết quả gần nhất
             this.prisma.ketQua_ChiTiet.findFirst({
                 where: {
-                    ghidanh: { HocVienID: studentId }
+                    ghidanh: { HocVienID: studentDB.ID }
                 },
                 select: {
                     ketqua_buoihoc: {
                         select: {
                             NhanXetChung: true,
                             giaovien: { select: { User: { select: { HoTen: true } } } },
-                            buoihoc: { select: { BatDauLuc: true, ChuDe: true } }
+                            buoihoc: { select: { BatDauLuc: true, ChuDe: true, BuoiSo: true } }
                         }
                     },
                     NhanXetRieng: true,
@@ -77,36 +77,40 @@ export class AppParentService {
             //lấy số hóa đơn chưa thanh toán
             this.prisma.hoaDon.findMany({
                 where: {
-                    ghidanh: { HocVienID: studentId }
+                    ghidanh: { HocVienID: studentDB.ID }
                 }
             })
         ])
-        if (!nextSS) throw new BadRequestException('Session not found')
-        if (!lastestResult) throw new BadRequestException('Student don\'t have any result')
+        let BuoiHocKe = {}
+        let KetQuaGanNhat = {}
+        if (nextSS)
+            BuoiHocKe = {
+                ID: nextSS.ID, BuoiSo: nextSS.BuoiSo, PhongHoc: nextSS.PhongHoc ?? '',
+                NgayHoc: nextSS.BatDauLuc,
+                GioHoc: DateHelper.ISOToHHMM(nextSS.BatDauLuc, nextSS.KetThucLuc),
+                Lop: nextSS.lophoc.TenLop,
+                GiaoVien: nextSS.lophoc.giaovien.User.HoTen
+            }
+        if (lastestResult)
+            KetQuaGanNhat = {
+                GiaoVien: lastestResult.ketqua_buoihoc.giaovien.User.HoTen,
+                BuoiSo: lastestResult.ketqua_buoihoc.buoihoc.BuoiSo,
+                Ngay: lastestResult.ketqua_buoihoc.buoihoc.BatDauLuc,
+                NhanXetLop: lastestResult.ketqua_buoihoc.NhanXetChung,
+                NhanXetCon: lastestResult.NhanXetRieng,
+                DiemDanh: lastestResult.DiemDanh,
+                Diem: lastestResult.Diem?.toNumber(),
+            }
         const invoiceFilter = invoice.filter(f => {
             return f.DaTra < f.TongTien
         })
 
         return {
-            nextSS: {
-                id: nextSS.ID, lesson: nextSS.BuoiSo, room: nextSS.PhongHoc ?? '',
-                date: nextSS.BatDauLuc.toLocaleDateString(),
-                time: DateHelper.ISOToHHMM(nextSS.BatDauLuc, nextSS.KetThucLuc),
-                class: nextSS.lophoc.TenLop,
-                teacher: nextSS.lophoc.giaovien.User.HoTen
-            },
-            lastestResult: {
-                teacher: lastestResult.ketqua_buoihoc.giaovien.User.HoTen,
-                lesson: lastestResult.ketqua_buoihoc.buoihoc.ChuDe,
-                date: lastestResult.ketqua_buoihoc.buoihoc.BatDauLuc.toLocaleDateString(),
-                comment: lastestResult.ketqua_buoihoc.NhanXetChung,
-                privateComment: lastestResult.NhanXetRieng,
-                attend: lastestResult.DiemDanh,
-                grade: lastestResult.Diem?.toNumber(),
-            },
-            invoice: {
-                unpaidCount: invoiceFilter.length,
-                deadline: invoiceFilter.length > 0 ? invoiceFilter[0].ThoiHan : null
+            ID: studentDB.ID,
+            HocVien: studentDB.TenHocVien, BuoiHocKe, KetQuaGanNhat,
+            HoaDon: {
+                SoHDChuaTra: invoiceFilter.length,
+                ThoiHan: invoiceFilter.length > 0 ? invoiceFilter[0].ThoiHan : null
             }
         }
     }
@@ -296,6 +300,6 @@ export class AppParentService {
             where: { ID: studentId, UserID: userId }
         })
         if (!studentDB) throw new NotFoundException('Student not found')
-        return { userId, studentId }
+        return studentDB
     }
 }

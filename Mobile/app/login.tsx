@@ -14,7 +14,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false)
   const [showMK, setShowMK] = useState(false)
-  const [visible, setVisible] = useState(false)
+  //const [visible, setVisible] = useState(false)
   const login = useAuthStore(state => state.login)
   const router = useRouter();
 
@@ -25,7 +25,8 @@ export default function LoginScreen() {
       const res = await mobileApi.login(payload)
       Alert.alert('Thông báo', 'Đăng nhập thành công!');
       login(res.data.user, res.data.access_token)
-      setVisible(true)
+
+      // setVisible(true)
       router.replace('/(tabs)');
     } catch (error:any) {
       Alert.alert('Thông báo', `Đăng nhập thất bại`);

@@ -18,7 +18,7 @@ export class CloudinaryService {
     uploadFile(file: Express.Multer.File): Promise<CloudinaryResponse> {
         return new Promise<CloudinaryResponse>((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(
-                { folder: 'smart-center' },
+                { folder: 'smart-center', resource_type:'auto' },
                 (error, result) => {
                     if (error) return reject(error)
                     if (!result) return reject(new Error('Upload thất bại'))
@@ -37,6 +37,7 @@ export class CloudinaryService {
         return Promise.all(multipleFile)
     }
 
+    // lấy tệp đính kèm buổi học
     async findBySessionId(sessionId: number) {
         const sessionDB = await this.prisma.buoiHoc.findUnique({
             where: { ID: sessionId },
