@@ -9,7 +9,7 @@ import { Pagination } from "../session/session.dto";
 
 type RequestWithUser = Request & { user: { userId: number; role?: string } };
 
-@UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('ADMIN', 'PARENT', 'TEACHER')
 @Controller('parents')
 export class AppParentController {

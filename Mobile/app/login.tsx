@@ -9,12 +9,10 @@ import mobileApi from './api';
 import useAuthStore from './authStore';
 
 export default function LoginScreen() {
-  // state để lưu dữ liệu người dùng gõ vào
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false)
   const [showMK, setShowMK] = useState(false)
-  //const [visible, setVisible] = useState(false)
   const login = useAuthStore(state => state.login)
   const router = useRouter();
 
@@ -35,7 +33,6 @@ export default function LoginScreen() {
     finally {
       setLoading(false)
     }
-    // console.log("Đăng nhập:", email, password);
   };
 
   return (<>
@@ -79,7 +76,6 @@ export default function LoginScreen() {
             }
           />
 
-          {/* Nút bấm tự có hiệu ứng Ripple (gợn sóng) khi chạm vào */}
           <Button
             mode="contained"
             onPress={handleLogin}
