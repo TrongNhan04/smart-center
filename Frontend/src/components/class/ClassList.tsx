@@ -1,10 +1,10 @@
-import { CalendarOutlined, ClockCircleOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import {
-  Badge,
-  Button, Card, Col, Input, message,
-  Progress,
-  Row, Select, Space, Table,
-  Typography
+  CalendarOutlined, ClockCircleOutlined, PlusOutlined,
+  SearchOutlined
+} from "@ant-design/icons";
+import {
+  Badge, Button, Card, Col, Input, message, Progress, Row, Select,
+  Space, Table, Typography
 } from "antd";
 import type { ClassDB } from "./ClassDTO";
 import { useEffect, useState } from "react";
@@ -83,11 +83,10 @@ const ClassList = () => {
 
   const handleBack = (pagination: any) =>
     setSearchParam({ page: pagination.current })
-//  render: (text, record, index) => index + 1, // index starts from 0
+  //  render: (text, record, index) => index + 1, // index starts from 0
   const columns = [
     {// mã lớp+tên lớp chung
       title: 'Lớp học', dataIndex: 'MaLopHoc', key: 'MaLopHoc ', ellipsis: true,
-      // sorter: (a:any, b:any) => a.TenLop.localeCompare(b.name),
       render: (code: string, lophoc: ClassDB) => (
         <Space orientation="vertical">
           <Link to={`/admin/classes/${lophoc.ID}`}
@@ -130,7 +129,7 @@ const ClassList = () => {
         <>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>{lophoc.TongGhiDanh}/{classSize}</span>
-            <small style={{ color: '#999' }}>HV</small>
+            <small style={{ color: '#999' }}>Học viên</small>
           </div>
           <Progress
             percent={(lophoc.TongGhiDanh / classSize) * 100}
@@ -142,18 +141,18 @@ const ClassList = () => {
     { // trạng thái
       title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai',
       filters: [
-        {text: 'Tuyển sinh', value: 'OPEN'},
-        {text: 'Đang hoạt động', value: 'RUNNING'},
-        {text: 'Đã đóng', value:'CLOSED'},
-        {text: 'Đã kết thúc', value: 'FINISHED'}
+        { text: 'Tuyển sinh', value: 'OPEN' },
+        { text: 'Đang hoạt động', value: 'RUNNING' },
+        { text: 'Đã đóng', value: 'CLOSED' },
+        { text: 'Đã kết thúc', value: 'FINISHED' }
       ],
-      onFilter:(value:any, lophoc:ClassDB) => lophoc.TrangThai === value,
+      onFilter: (value: any, lophoc: ClassDB) => lophoc.TrangThai === value,
       render: (value: string) => {
         const statusMap: Record<string, { color: string, text: string }> = {
           OPEN: { color: 'default', text: 'Tuyển sinh' },
           RUNNING: { color: 'processing', text: 'Đang hoạt động' },
           CLOSED: { color: 'error', text: 'Đã đóng' },
-          FINISHED: {color: 'success', text: 'Đã kết thúc'}
+          FINISHED: { color: 'success', text: 'Đã kết thúc' }
         }
         // value là 1 trong 3 key đó
         const status = statusMap[value]
@@ -218,8 +217,8 @@ const ClassList = () => {
           columns={columns}
           loading={loading}
           rowClassName={
-            (lophoc) => 
-              lophoc.ID === classId ? 'highlight-row' : ''            
+            (lophoc) =>
+              lophoc.ID === classId ? 'highlight-row' : ''
           }
           // pagination={{ defaultPageSize: 8 }}
           pagination={{

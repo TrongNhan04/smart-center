@@ -48,9 +48,10 @@ export interface ClassForCmb {
     TongGhiDanh: number
 }
 
-export type TeacherClass = Omit<ClassDB,'GiaoVien'|'KhoaHoc'> & {
+export type TeacherClass = Omit<ClassDB,'GiaoVien'|'KhoaHoc'|'MoTa'> & {
+    IDBuoiDau:number
     TongSoBuoi:number,
-    BuoiDaHoc:number
+    SoBuoiDaHoc:number
 }
 
 // để cho edit

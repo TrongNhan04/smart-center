@@ -10,7 +10,6 @@ const teacherApi = {
             name: body.name,
             major: body.major
         }
-        console.log("payload call api", payload)
         return axiosClient.patch(`admin/teachers/${teacherId}`, payload)
     },
 

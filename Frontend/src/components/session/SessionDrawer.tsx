@@ -1,7 +1,7 @@
 import { Drawer, Descriptions, Table, Tag, message, Popover } from 'antd';
 import { sessionApi } from '../../api/sessionApi';
 import { useEffect, useState } from 'react';
-import type { SessionDetail, SessionResult } from './SessionDTO';
+import type {SessionResult, TSessionDetail } from './SessionDTO';
 import { DateHelper } from '../common/date.helper';
 import { PhoneOutlined, UserOutlined } from '@ant-design/icons';
 
@@ -12,7 +12,7 @@ interface Props {
 }
 
 const SessionDrawer = ({ open, onCancel, sessionId }: Props) => {
-  const [sessionDetail, setSessionDetail] = useState<SessionDetail | null>(null)
+  const [sessionDetail, setSessionDetail] = useState<TSessionDetail | null>(null)
 
   const fetchSessionDetail = async () => {
     try {

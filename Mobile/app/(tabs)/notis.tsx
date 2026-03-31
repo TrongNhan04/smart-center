@@ -17,7 +17,7 @@ interface NotisDB {
 }
 
 
-const notis = () => {
+const Notis = () => {
   const [notifications, setNotifications] = useState<NotisDB[]>([])
   const [refresh, setRefresh] = useState(false)
 
@@ -73,7 +73,7 @@ const notis = () => {
 
   const renderItem = ({ item }: any) => (
     <List.Item
-      title={item.TieuDe} // chưa đọc in đậm
+      title={item.TieuDe} 
       titleStyle={{ fontWeight: item.DaDoc ? 'normal' : 'bold' }}
       // description={`${item.NoiDung}\n${item.CreatedAt}`}
       description={`${item.NoiDung}`}
@@ -112,7 +112,7 @@ const notis = () => {
   )
 }
 
-export default notis
+export default Notis
 
 const styles = StyleSheet.create({
   container: {

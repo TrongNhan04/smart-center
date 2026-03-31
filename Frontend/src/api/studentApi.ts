@@ -23,5 +23,8 @@ export const studentApi = {
         })
     },
 
-    findManyForCmb: () => axiosClient.get(`admin/students/combobox`)
+    findManyForCmb: () => axiosClient.get(`admin/students/combobox`),
+
+    getClassResultById: (studentId:number, classId: number) => 
+        axiosClient.get(`admin/students/${studentId}/classes/${classId}`)
 }

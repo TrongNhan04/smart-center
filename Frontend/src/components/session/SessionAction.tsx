@@ -22,7 +22,7 @@ const SessionAction = ({ session, unlock, onCancel }: Props) => {
         size="small"
         type="primary"
         icon={<InfoCircleOutlined />}
-        onClick={()=>navigate(`/admin/sessions/${session.ID}`)}
+        onClick={()=>navigate(`sessions/${session.ID}`)}
       >
       </Button>
     </Tooltip>

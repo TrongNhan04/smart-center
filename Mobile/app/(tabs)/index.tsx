@@ -46,7 +46,7 @@ export default function Index() {
       const res = await Promise.all(
         children.map(childId => mobileApi.getDashboard(childId))
       )
-      setStudents(res.map(item => item.data))
+      setStudents(res.map(item => item?.data))
     } catch (error) {
 
     }
@@ -62,62 +62,54 @@ export default function Index() {
     setRefresh(false)
   }
 
-  const formatThoiGian = (isoString:string) => {
+  const formatThoiGian = (isoString: string) => {
     if (!isoString) return '';
     return new Date(isoString).toLocaleDateString('vi-VN');
   };
 
-  const renderItem = ({ item }: { item: any }) => (
+  const renderItem = ({ item }: { item: StudentDashboard }) => (
     <Card style={styles.card}>
-
       <Card.Title
-        title={item.HocVien}
+        title={item.HocVien || 'Chưa cập nhật'}
         titleStyle={{ fontWeight: 'bold', fontSize: 18, color: '#2c3e50' }}
         left={(props) => <Avatar.Text {...props}
-          label={item.HocVien.charAt(0)} size={40} />}
+          label={item.HocVien ? item.HocVien.charAt(0) : 'HV'} size={40} />}
       />
       <Divider />
-
       <Card.Content style={{ paddingHorizontal: 0 }}>
-
-
         <List.Item
-          title={`Lịch: ${item.BuoiHocKe.Lop} (Buổi ${item.BuoiHocKe.BuoiSo})`}
+          title={`Lịch: ${item?.BuoiHocKe?.Lop} (Buổi ${item?.BuoiHocKe?.BuoiSo})`}
           titleStyle={{ fontWeight: 'bold' }}
-          description={`${formatThoiGian(item.BuoiHocKe.NgayHoc)} | ${item.BuoiHocKe.GioHoc}\nGV: ${item.BuoiHocKe.GiaoVien}`}
+          description={`${formatThoiGian(item?.BuoiHocKe?.NgayHoc)} | ${item?.BuoiHocKe?.GioHoc}\nGV: ${item?.BuoiHocKe?.GiaoVien}`}
           descriptionNumberOfLines={2}
           left={props => <List.Icon {...props} icon="calendar-clock" color="#3498db" />}
         />
         <Divider />
-
-
         <List.Item
-          title={`Điểm: ${item.KetQuaGanNhat.Diem} - ${item.KetQuaGanNhat.DiemDanh ? 'Có mặt' : 'Vắng'}`}
+          title={`Điểm: ${item?.KetQuaGanNhat?.Diem} - ${item?.KetQuaGanNhat?.DiemDanh ? 'Có mặt' : 'Vắng'}`}
           titleStyle={{ color: '#28a745', fontWeight: 'bold' }}
-          description={`Ngày ${formatThoiGian(item.KetQuaGanNhat.Ngay)}\nNhận xét: ${item.KetQuaGanNhat.NhanXetCon || item.KetQuaGanNhat.NhanXetLop}`}
+          description={`Ngày ${formatThoiGian(item?.KetQuaGanNhat?.Ngay)}\nNhận xét: ${item?.KetQuaGanNhat?.NhanXetCon || item?.KetQuaGanNhat?.NhanXetLop}`}
           descriptionNumberOfLines={3}
           left={props => <List.Icon {...props} icon="clipboard-check-outline" color="#28a745" />}
         />
         <Divider />
-
-
         <List.Item
           title={
-            item.HoaDon.SoHDChuaTra > 0 ?
-              `Nợ ${item.HoaDon.SoHDChuaTra} Hóa đơn` : 'Đã đóng đủ học phí'}
+            item?.HoaDon?.SoHDChuaTra > 0 ?
+              `Nợ ${item?.HoaDon?.SoHDChuaTra} Hóa đơn` : 'Đã đóng đủ học phí'}
           titleStyle={{
-            color: item.HoaDon.SoHDChuaTra > 0 ? '#dc3545' : 'gray',
+            color: item?.HoaDon?.SoHDChuaTra > 0 ? '#dc3545' : 'gray',
             fontWeight: 'bold'
           }}
           description={
-            item.HoaDon.SoHDChuaTra > 0 ?
-              `Hạn chót: ${formatThoiGian(item.HoaDon.ThoiHan)}` : 'Không có khoản thu nào'}
+            item?.HoaDon?.SoHDChuaTra > 0 ?
+              `Hạn chót: ${formatThoiGian(item?.HoaDon?.ThoiHan)}` : 'Không có khoản thu nào'}
           left={props => <List.Icon {...props} icon="receipt"
-            color={item.HoaDon.SoHDChuaTra > 0 ? "#dc3545" : "gray"} />}
+            color={item?.HoaDon?.SoHDChuaTra > 0 ? "#dc3545" : "gray"} />}
         />
-
       </Card.Content>
     </Card>
+    // <Text>Test</Text>
   );
 
   return (
@@ -125,10 +117,9 @@ export default function Index() {
       <Text variant="titleLarge" style={{ padding: 23, fontWeight: 'bold' }}>
         Tổng quan học tập
       </Text>
-
       <FlatList
         data={students}
-        keyExtractor={(item) => item.ID.toString()}
+        keyExtractor={(item) => item?.ID.toString()}
         renderItem={renderItem}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 20 }}
         refreshing={refresh}

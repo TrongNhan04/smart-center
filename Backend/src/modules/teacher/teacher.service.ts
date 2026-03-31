@@ -206,11 +206,12 @@ export class TeacherService {
 
     //lấy danh sách lớp giáo viên đang dạy - phần dưới tab 1
     async GetClassesByTeacherID(teacherId: number) {
-        await this.TeacherIdValidator(teacherId)
+        const teacherDB = await this.TeacherIdValidator(teacherId)
         const classDB = await this.prismaService.lopHoc.findMany({
-            where: { GiaoVienID: teacherId },
+            where: { GiaoVienID: teacherDB.ID },
             include: {
-                khoahoc: true,
+                khoahoc: true, 
+                buoihoc: { select:{ID:true},orderBy: { BatDauLuc: 'asc' } },
                 _count: {
                     select:
                     {
@@ -224,10 +225,13 @@ export class TeacherService {
         return classDB.map(lh => ({
             ID: lh.ID, MaLopHoc: lh.MaLopHoc, TenLop: lh.TenLop,
             PhongHoc: lh.PhongHoc, LichHoc: lh.LichHoc,
-            TuNgay: lh.TuNgay, 
+            TuNgay: lh.TuNgay,
             GioHoc: lh.GioBatDau + ' - ' + lh.GioKetThuc,
             TrangThai: lh.TrangThai, TongGhiDanh: lh._count.ghidanh,
-            TienDo: lh._count.buoihoc + '/' + lh.khoahoc.TongSoBuoi
+            SiSo: lh.SiSo,
+            TongSoBuoi: lh.khoahoc.TongSoBuoi,
+            SoBuoiDaHoc: lh._count.buoihoc,
+            IDBuoiDau: lh.buoihoc.map(item=>item.ID)[0]
         }))
     }
 

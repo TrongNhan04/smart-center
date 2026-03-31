@@ -7,10 +7,6 @@ interface Props {
   invoice: InvoiceDB
   onAddReceipt: (invoice: InvoiceDB) => void
   onAddPayment: (invoice: InvoiceDB) => void
-  // pagination: {
-  //   page: number,
-  //   pageSize: number
-  // }
 }
 
 const InvoiceAction = ({

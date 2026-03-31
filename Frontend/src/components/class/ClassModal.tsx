@@ -1,6 +1,7 @@
 import {
   Modal, Form, Input, Select, DatePicker, TimePicker, InputNumber,
   Row, Col, message,
+  notification,
 } from 'antd';
 import { useEffect, useState } from 'react';
 import courseApi from '../../api/courseApi';
@@ -92,6 +93,16 @@ const ClassModal = ({ open, onCancel, khoahocId, onSave,
     value: item.ID,
   }))
 
+  const handleError = (error: any) => {
+    notification.error({
+      title: 'Có lỗi xảy ra',
+      description: error.response.data.message,
+      showProgress: true,
+      pauseOnHover: true
+    })
+    console.log("Có lỗi xảy ra", error?.response?.data?.message)
+  }
+
   const handleSubmit = async () => {
     setLoading(true)
     try {
@@ -112,7 +123,7 @@ const ClassModal = ({ open, onCancel, khoahocId, onSave,
 
       let res = null
       if (isEdit) {// map data gốc thành tiếng anh
-        const mapOrigin = mapDataClass(editingClass) 
+        const mapOrigin = mapDataClass(editingClass)
         const updateData = getChangedValue(mapOrigin, payload)
         if (Object.keys(updateData).length === 0) {
           message.info('Không có thông tin nào thay đổi!')
@@ -138,7 +149,7 @@ const ClassModal = ({ open, onCancel, khoahocId, onSave,
         if (Array.isArray(serverError.message))
           message.error(serverError.message[0])
         else if (typeof serverError.message === 'string')
-          message.error(serverError.message)
+          handleError(error)
         else
           message.error("Có lỗi xảy ra")
       }
@@ -295,50 +306,33 @@ const ClassModal = ({ open, onCancel, khoahocId, onSave,
               </Row>
 
               {/* {isEdit ? */}
-                <Row gutter={8}>
-                  <Col span={12}>
-                    <Form.Item // sĩ số
-                      label="Sĩ số"
-                      name="classSize"
-                      rules={[
-                        { required: true, message: 'Vui lòng nhập sĩ số!' },
-                        { type: 'number', min: 1, max: 50, message: 'Sĩ số từ 1-50' }
-                      ]}
-                    >
-                      <InputNumber
-                        style={{ width: '100%' }}
-                        min={1}
-                        max={50}
-                        placeholder="VD: 20"
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col span={12}>
-                    <Form.Item // phòng học
-                      label="Phòng học"
-                      name="room"
-                    >
-                      <Input placeholder="VD: phòng A101" />
-                    </Form.Item>
-                  </Col>
-                </Row> 
-                {/* : // không edit thì hiện mỗi ô sĩ số */}
-                {/* <Form.Item
-                  label="Sĩ số"
-                  name="classSize"
-                  rules={[
-                    { required: true, message: 'Vui lòng nhập sĩ số!' },
-                    { type: 'number', min: 1, max: 50, message: 'Sĩ số từ 1-50' }
-                  ]}
-                >
-                  <InputNumber
-                    style={{ width: '100%' }}
-                    min={1}
-                    max={50}
-                    placeholder="VD: 20"
-                  />
-                </Form.Item>  */}
-              {/* } */}
+              <Row gutter={8}>
+                <Col span={12}>
+                  <Form.Item // sĩ số
+                    label="Sĩ số"
+                    name="classSize"
+                    rules={[
+                      { required: true, message: 'Vui lòng nhập sĩ số!' },
+                      { type: 'number', min: 1, max: 50, message: 'Sĩ số từ 1-50' }
+                    ]}
+                  >
+                    <InputNumber
+                      style={{ width: '100%' }}
+                      min={1}
+                      max={50}
+                      placeholder="VD: 20"
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item // phòng học
+                    label="Phòng học"
+                    name="room"
+                  >
+                    <Input placeholder="VD: phòng A101" />
+                  </Form.Item>
+                </Col>
+              </Row>
             </Col>
           </Row>
           <Form.Item label="Mô tả chi tiết" name="description">

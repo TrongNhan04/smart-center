@@ -33,23 +33,6 @@ export class StudentController {
         return await this.studentService.GetDataForCmb()
     }
 
-    // lấy chi tiết học viên - phần trên
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles('ADMIN')
-    @Get(':id')
-    async GetStudentByID(@Param('id') studentId: number) {
-        return await this.studentService.GetStudentByID(+studentId)
-    }
-
-    // sửa thông tin học viên
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles('ADMIN')
-    @Patch(':id')
-    async UpdateStudentByID(@Param('id') studentId: number,
-        @Body() body: UpdateStudentDTO) {
-        return await this.studentService.UpdateStudentByID(+studentId, body)
-    }
-
     // xóa mềm học viên
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
@@ -66,11 +49,30 @@ export class StudentController {
         return await this.studentService.GetClassesByStudentID(+studentId)
     }
 
-    // lấy danh sách buổi học đã học 
+    // thống kê kết quả học tập 1 lớp mà học viên học
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
-    @Get(':id/sessions-completed')
-    async GetCompletedSS(@Param('id') studentId: number) {
-        return await this.studentService.GetCompletedSS(+studentId)
+    @Get(':id/classes/:classId')
+    async GetClassResultById(
+        @Param('id') studentId: number,
+        @Param('classId') classId: number) {
+            return await this.studentService.GetClassResultById(+studentId, +classId)
+    }
+
+    // lấy chi tiết học viên - phần trên
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADMIN')
+    @Get(':id')
+    async GetStudentByID(@Param('id') studentId: number) {
+        return await this.studentService.GetStudentByID(+studentId)
+    }
+
+    // sửa thông tin học viên
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADMIN')
+    @Patch(':id')
+    async UpdateStudentByID(@Param('id') studentId: number,
+        @Body() body: UpdateStudentDTO) {
+        return await this.studentService.UpdateStudentByID(+studentId, body)
     }
 }

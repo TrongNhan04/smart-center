@@ -24,26 +24,6 @@ export interface PaymentDto {
     reason: string
 }
 
-export interface ReceiptDB {
-    ID: number,
-    MaPhieuThu: string,
-    NgayThu: string,
-    SoTien: number,
-    PhuongThuc: string,
-    ThuNgan: string,
-    GhiChu: string
-}
-
-export interface PaymentDB {
-    ID: number,
-    MaPhieuChi: string,
-    NgayChi: string,
-    SoTien: number,
-    PhuongThuc: string,
-    ThuNgan: string,
-    LyDo: string
-}
-
 export interface GiaoDich {
     ID: number
     MaGD: string,

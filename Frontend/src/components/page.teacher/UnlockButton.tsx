@@ -9,7 +9,7 @@ import { useAuthStore } from "../../store/useAuthStore"
 interface Props {
   session: TSessionDetail
   onSave: (type: 'DRAFT' | 'SUBMITTED') => void
-  onReload: () => void
+  onReload: (id:number) => void
 }
 
 const UnlockButton = ({ session, onSave, onReload }: Props) => {
@@ -23,7 +23,7 @@ const UnlockButton = ({ session, onSave, onReload }: Props) => {
     try {
       const reason = `Cập nhật kết quả`
       await teacherApi.requestUnlock(session.ID, reason)
-      onReload()
+      onReload(session.ID)
     } catch (error) {
       handelError(error)
     }
@@ -40,39 +40,35 @@ const UnlockButton = ({ session, onSave, onReload }: Props) => {
       pauseOnHover: true
     })
     console.log(error)
-    console.log('Có lỗi xảy ra: ', error?.response?.data?.message)
   }
 
   const timeLeft = DateHelper.TimeDiff(session.KetThucLuc)
-  // cần mở khóa khi:
-  // đã qua 48h và SCHEDULED || COMPLETED  || admin không mở khóa
-  const isNeedUnlock = (timeLeft > 2880 && session.TrangThai === 'SCHEDULED'
-    && session.AdminMoKhoa === false) || session.TrangThai === 'COMPLETED'
-
+  // cần mở khóa khi: admin không mở khóa và
+  // đã qua 48h hoặc đã submit trước đó
+  const isNeedUnlock = !session.AdminMoKhoa && (timeLeft > 2880 || session.TrangThai === 'COMPLETED')
+  
   const handleSaveDraft = () => {
-    onSave('DRAFT')
     setLoadingDraft(true)
     setTimeout(() => {
       setLoadingDraft(false)
-    }, 3000);
+    }, 1000);
+    onSave('DRAFT')
   }
 
   const handleSubmit = () => {
-    onSave('SUBMITTED')
     setLoadingSubmit(true)
     setTimeout(() => {
       setLoadingSubmit(false)
-    }, 3000);
+    }, 1000);
+    onSave('SUBMITTED')
   }  
 
-  if (session.TrangThai === 'CANCELLED')
+  if (session.TrangThai === 'CANCELLED' || isAdmin)
     return <Button type="default" disabled>
       Không thể thao tác
     </Button>
-
-  else if (session.YeuCauMoKhoa){
-    if(isAdmin)
-      return <Button>Duyệt mở khóa</Button>
+  // đã gửi yêu cầu nhưng admin chưa mở khóa
+  else if (session.YeuCauMoKhoa && !session.AdminMoKhoa){
     return <Button
       type="primary"
       style={{ backgroundColor: '#2fb058', color: '#fff' }}
@@ -82,7 +78,7 @@ const UnlockButton = ({ session, onSave, onReload }: Props) => {
     </Button>
   }
 
-  else if (isNeedUnlock && !isAdmin){
+  else if (isNeedUnlock){
     return <Button type="primary"
       onClick={handleSendRequest} loading={loadingRequest}
     >
@@ -90,7 +86,6 @@ const UnlockButton = ({ session, onSave, onReload }: Props) => {
     </Button>
   }
     
-
   return (
     <Space>
       <Button size="middle" icon={<SaveOutlined />} loading={loadingDraft}

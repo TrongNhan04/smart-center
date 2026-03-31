@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
-import { Avatar, Button, Divider, List, Modal, Portal, Text, TextInput } from 'react-native-paper';
+import { Avatar, Button, Divider, List, Modal, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import mobileApi from '../api';
 import useAuthStore from '../authStore';
@@ -49,11 +49,11 @@ const AccountScreen = () => {
         phone: phone
       }
       const res = await mobileApi.updateProfile(payload)
-      
+
       updateUser(res.data)
       if (email !== user?.email) {// nếu thay đổi email thì đăng nhập lại
         Alert.alert(
-          'Thành công', 
+          'Thành công',
           'Cập nhật email thành công! Vui lòng đăng nhập lại.',
           [
             {
@@ -69,7 +69,7 @@ const AccountScreen = () => {
         );
       }
       hideModal()
-    } catch (error:any) {
+    } catch (error: any) {
       Alert.alert('Thông báo', 'Có lỗi xảy ra')
       console.log('Có lỗi xảy ra: ', error)
     }
@@ -85,7 +85,8 @@ const AccountScreen = () => {
   const hideModal = () => setVisible(false)
 
   // Lấy chữ cái đầu của tên để làm Avatar mặc định
-  const avatarLabel = user?.full_name.charAt(0).toUpperCase() ?? 'U'
+  const avatarLabel = user?.full_name ?
+    user?.full_name.charAt(0).toUpperCase() : 'U'
 
   return (
     <SafeAreaView style={styles.container}>
@@ -123,12 +124,12 @@ const AccountScreen = () => {
         />
         <Divider />
 
-        <List.Item
+        {/* <List.Item
           title="Đổi mật khẩu"
           left={props => <List.Icon {...props} icon="lock-outline" color="#6c757d" />}
           right={props => <List.Icon {...props} icon="chevron-right" />}
           onPress={() => console.log('Chuyển sang trang đổi mật khẩu')}
-        />
+        /> */}
         <Divider />
       </View>
 
@@ -140,13 +141,13 @@ const AccountScreen = () => {
           textColor="#dc3545" // Chữ màu đỏ cảnh báo
           style={styles.logoutButton}
           onPress={handleLogout}
-        > Đăng xuất
+        >Đăng xuất
         </Button>
       </View>
 
 
       {/* dùng portal thì phải có <PaperProvider> */}
-      <Portal>
+      {/* <Portal> */}
         <Modal
           contentContainerStyle={styles.modalContainer}
           visible={visible} onDismiss={hideModal} style={{ justifyContent: 'center' }}
@@ -154,43 +155,44 @@ const AccountScreen = () => {
           <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
 
-              <Text variant='titleLarge' style={styles.modalTitle}>
-                Cập nhật tài khoản</Text>
+            <Text variant='titleLarge' style={styles.modalTitle}>
+              Cập nhật tài khoản
+            </Text>
 
-              <TextInput // ô họ tên
-                label={'Họ và tên'} mode='outlined' style={styles.modalInput}
-                value={name} onChangeText={setName}
-              />
+            <TextInput // ô họ tên
+              label={'Họ và tên'} mode='outlined' style={styles.modalInput}
+              value={name} onChangeText={setName}
+            />
 
-              <TextInput // ô họ tên
-                label={'Email'} mode='outlined' style={styles.modalInput}
-                value={email} onChangeText={setEmail}
-              />
+            <TextInput // ô họ tên
+              label={'Email'} mode='outlined' style={styles.modalInput}
+              value={email} onChangeText={setEmail}
+            />
 
-              <TextInput
-                label={'Điện thoại'} mode='outlined'
-                style={styles.modalInput} value={phone}
-                onChangeText={setPhone} keyboardType='phone-pad'
-              />
+            <TextInput
+              label={'Điện thoại'} mode='outlined'
+              style={styles.modalInput} value={phone}
+              onChangeText={setPhone} keyboardType='phone-pad'
+            />
 
-              <View style={styles.modalButtonRow}>
-                <Button mode="text" onPress={hideModal}
-                  style={{ flex: 1 }} textColor="gray">
-                  Hủy
-                </Button>
-                <Button
-                  mode="contained"
-                  onPress={updateAccount}
-                  loading={loading}
-                  style={{ flex: 1, backgroundColor: '#3498db' }}
-                >
-                  Lưu
-                </Button>
-              </View>
-            
+            <View style={styles.modalButtonRow}>
+              <Button mode="text" onPress={hideModal}
+                style={{ flex: 1 }} textColor="gray">
+                Hủy
+              </Button>
+              <Button
+                mode="contained"
+                onPress={updateAccount}
+                loading={loading}
+                style={{ flex: 1, backgroundColor: '#3498db' }}
+              >
+                Lưu
+              </Button>
+            </View>
+
           </KeyboardAvoidingView>
         </Modal>
-      </Portal>
+      {/* </Portal> */}
 
     </SafeAreaView>
   )
@@ -234,7 +236,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 24,
     margin: 20,
-    borderRadius: 12, 
+    borderRadius: 12,
   },
   modalTitle: {
     fontWeight: 'bold',
@@ -249,7 +251,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 20,
-    marginBottom:100,
+    marginBottom: 100,
     gap: 10, // Tạo khoảng cách giữa 2 nút (Dùng cho React Native mới)
   }
 })

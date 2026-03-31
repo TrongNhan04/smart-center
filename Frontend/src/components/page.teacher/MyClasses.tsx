@@ -64,7 +64,7 @@ const MyClasses = () => {
         }}
         dataSource={classes}
         renderItem={item => {
-          const percent = Math.round((item.BuoiDaHoc / item.TongSoBuoi) * 100);
+          const percent = Math.round((item.SoBuoiDaHoc / item.TongSoBuoi) * 100);
 
           return (
             <List.Item>
@@ -110,7 +110,7 @@ const MyClasses = () => {
                         marginBottom: 4
                       }}>
                       <Text strong style={{ fontSize: 12 }}>
-                        Tiến độ ({item.BuoiDaHoc}/{item.TongSoBuoi})</Text>
+                        Tiến độ ({item.SoBuoiDaHoc}/{item.TongSoBuoi}) buổi học</Text>
                       <Text strong style={{ fontSize: 12 }}>{percent}%</Text>
                     </div>
                     <Progress percent={percent} showInfo={false} size="small" />

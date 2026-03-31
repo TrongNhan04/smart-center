@@ -22,6 +22,7 @@ import Schedule from "./components/page.teacher/Schedule";
 import MyClasses from "./components/page.teacher/MyClasses";
 import TeacherRoute from "./components/page.teacher/TeacherRoute";
 import SessionDetail from "./components/page.teacher/SessionDetail";
+import ThongKeDiHoc from "./components/student/ThongKeDiHoc";
 
 const router = createBrowserRouter([
   {
@@ -39,13 +40,13 @@ const router = createBrowserRouter([
           { path: 'schedules', element: <Schedule /> },
           { path: 'classes', element: <MyClasses /> },
           {
-            path: 'classes/:id', 
-            element: <TeacherRoute/>,
+            path: 'classes/:id',
+            element: <TeacherRoute />,
             children: [
-              {index:true, element:<ClassDetail/>},
+              { index: true, element: <ClassDetail /> },
             ]
           },
-          { path: 'sessions/:id', element:<SessionDetail/>},
+          { path: 'sessions/:id', element: <SessionDetail /> },
           { path: 'account', element: <Profile /> }
         ]
       }
@@ -61,20 +62,21 @@ const router = createBrowserRouter([
           { index: true, element: <Navigate to="dashboard" replace /> },
 
           { path: 'dashboard', element: <Dashboard /> },
-          // { path: 'tasks', element: <TaskList /> },
+          { path: 'tasks', element: <TaskList /> },
 
           { path: 'courses', element: <CourseList /> },
           { path: 'courses/:id', element: <CourseDetail /> },
 
           { path: 'classes', element: <ClassList /> },
           { path: 'classes/:id', element: <ClassDetail /> },
-          { path: 'sessions/:id', element:<SessionDetail/>},
+          { path: 'classes/:classId/sessions/:sessionId', element: <SessionDetail /> },
 
           { path: 'teachers', element: <TeacherList /> },
           { path: 'teachers/:id', element: <TeacherDetail /> },
 
           { path: 'students', element: <StudentList /> },
           { path: 'students/:id', element: <StudentDetail /> },
+          { path: 'students/:studentId/classes/:classId', element: <ThongKeDiHoc /> },
 
           { path: 'enrolls', element: <EnrollList /> },
 

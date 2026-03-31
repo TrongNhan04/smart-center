@@ -14,39 +14,39 @@ export class SessionResultService {
 
     // lưu NHÁP kết quả buổi học - DRAFT
     async SaveDraftResult(userId: number, sessionId: number, body: SessionsResultDTO) {
-        // kiểm tra quyền & Lấy thông tin 
+        // kiểm tra quyền và lấy thông tin 
         const { sessionDB, teacherId } = await this.SessionAcsessValidate(userId, sessionId)
 
         // kiểm tra quyền cho phép lưu NHÁP
-        const minutesLeftStart = DateHelper.TimeDiff(sessionDB.BatDauLuc)
-        const minutesLeftEnd = DateHelper.TimeDiff(sessionDB.KetThucLuc)
-        if (sessionDB.AdminMoKhoa == false) {
-            if (minutesLeftStart < -15 || minutesLeftEnd > 2880) // quá giờ lưu
-                throw new BadRequestException(`Ngoài thời gian cho phép lưu thông tin`)
-            if (sessionDB.TrangThai === 'COMPLETED')// đã lưu thì không thao tác thêm hoặc xin admin
-                throw new ConflictException('Buổi học đã chốt kết quả, vui lòng liên hệ quản trị viên')
-        }
+        // const minutesLeftStart = DateHelper.TimeDiff(sessionDB.BatDauLuc)
+        // const minutesLeftEnd = DateHelper.TimeDiff(sessionDB.KetThucLuc)
+        // if (sessionDB.AdminMoKhoa == false) {
+        //     if (minutesLeftStart < -15 || minutesLeftEnd > 2880) // quá giờ lưu
+        //         throw new BadRequestException(`Ngoài thời gian cho phép lưu thông tin`)
+        //     if (sessionDB.TrangThai === 'COMPLETED')// đã lưu thì không thao tác thêm hoặc xin admin
+        //         throw new ConflictException('Buổi học đã chốt kết quả, vui lòng liên hệ quản trị viên')
+        // }
         // 3. gọi hàm thục thi chung
         return await this.ProcessSessionResult(sessionDB, teacherId, body, 'DRAFT')
     }
 
     // lưu THẬT kết quả buổi học - SUBMITTED
     async SubmittedResult(userId: number, sessionId: number, body: SessionsResultDTO) {
-        // 1. Validate quyền và lấy thông tin
+        // validate quyền và lấy thông tin
         const { sessionDB, teacherId } = await this.SessionAcsessValidate(userId, sessionId)
 
-        // 2. check thời gian cho lưu THẬT
-        const minutesLeftEnd = DateHelper.TimeDiff(sessionDB.KetThucLuc)
-        if (!sessionDB.AdminMoKhoa) {
-            if (minutesLeftEnd < 0 || minutesLeftEnd > 2880)
-                throw new BadRequestException(`Ngoài thời gian cho phép chốt kết quả`)
-            if (sessionDB.TrangThai === 'COMPLETED')// đã lưu thì không thao tác thêm hoặc xin admin
-                throw new ConflictException('Buổi học đã chốt kết quả, vui lòng liên hệ quản trị viên')
-        }
-        // 3. lưu thật phải có nhận xét chung
+        // check thời gian cho lưu THẬT
+        // const minutesLeftEnd = DateHelper.TimeDiff(sessionDB.KetThucLuc)
+        // if (!sessionDB.AdminMoKhoa) {
+        //     if (minutesLeftEnd < 0 || minutesLeftEnd > 2880)
+        //         throw new BadRequestException(`Ngoài thời gian cho phép chốt kết quả`)
+        //     if (sessionDB.TrangThai === 'COMPLETED')// đã lưu thì không thao tác thêm hoặc xin admin
+        //         throw new ConflictException('Buổi học đã chốt kết quả, vui lòng liên hệ quản trị viên')
+        // }
+        // lưu thật phải có nhận xét chung
         if (!body.NhanXetChung) throw new ConflictException('Thiếu nhận xét chung')
 
-        // 4. gọi hàm thực thi chung
+        // gọi hàm thực thi chung
         return await this.ProcessSessionResult(sessionDB, teacherId, body, 'SUBMITTED')
     }
 
@@ -60,34 +60,34 @@ export class SessionResultService {
             }),
             this.prisma.ghiDanh.findMany({
                 where: { LopHocID: sessionDB.LopHocID, TrangThai: 'ACTIVE' },
-                include: { hocvien: { include: { Parent: true } } }
+                include: { hocvien: { include: { Parent: true } } },
+                orderBy: { hocvien: { TenHocVien: 'asc' } }
             })
         ])
+        // console.log(enrolls)
         const mapStudent = (item: any) => ({
             GhiDanhID: item.ID,
             MaHocVien: item.hocvien.MaHocVien,
             TenHocVien: item.hocvien.TenHocVien,
             PhuHuynh: item.hocvien.Parent.HoTen,
             DienThoai: item.hocvien.Parent.DienThoai,
-            DiemDanh: false,
+            DiemDanh: null,
             NhanXetRieng: null,
             Diem: null
         })
         if (!result)
             return enrolls.map(item => mapStudent(item))
 
-        // tạo map với key là ghi danh ID, value là tt của học viên, phụ huynh
-        const newMapEnroll = new Map(enrolls.map(item => [item.ID, item]))
-        return result.ketqua_chitiet.flatMap(value => {
-
-            // map qua KQCT, lấy value của newMap = ghidanhid của KQCT
-            const data = newMapEnroll.get(value.GhiDanhID)
+        // tạo map với key là ghi danh ID, value là kết quả học tập
+        const newMapKQCT = new Map(result.ketqua_chitiet.map(item => [item.GhiDanhID, item]))
+        return enrolls.map(value => { // mỗi value ID (enroll) + thông tin học viên
+            const data = newMapKQCT.get(value.ID)
             if (!data) return null // không tồn tại data cho ghi danh id đó
             return {
-                ...mapStudent(data),
-                DiemDanh: value.DiemDanh,
-                NhanXetRieng: value.NhanXetRieng,
-                Diem: value.Diem
+                ...mapStudent(value),
+                DiemDanh: data.DiemDanh,
+                NhanXetRieng: data.NhanXetRieng,
+                Diem: data.Diem
             }
         }).filter(Boolean)
     }
@@ -101,8 +101,10 @@ export class SessionResultService {
                 throw new ConflictException(`Buổi học ID ${sessionId} đã hủy`)
 
             const isOverTime = DateHelper.TimeDiff(sessionDB.KetThucLuc)
-            if (isOverTime < 2880) // nhỏ hơn 48h
-                throw new ConflictException('Chỉ được mở khóa những buổi học quá hạn nộp kết quả')
+            // nhỏ hơn 48h và chưa submit
+            if (isOverTime < 2880 && sessionDB.TrangThai === 'SCHEDULED')
+                throw new ConflictException(
+                    'Chỉ được mở khóa những buổi học quá hạn nộp kết quả')
 
             const sessionUp = await tx.buoiHoc.update({
                 where: { ID: sessionId },

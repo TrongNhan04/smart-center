@@ -8,7 +8,7 @@ import {
 import { useEffect, useState } from "react";
 import type { GiaoDich, InvoiceDB } from "./InvoiceDTO";
 import { invoiceApi } from "../../api/invoiceApi";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import InvoiceModal from "./InvoiceModal";
 
 const { Title, Text } = Typography
@@ -189,8 +189,7 @@ const InvoiceDetail = () => {
           size="middle"
         >
           <Descriptions.Item label="Học viên">
-            <Link to={`/admin/students/${invoice.HocVienID}`}
-              style={{ fontWeight: 'bold' }}>{invoice.TenHocVien}</Link>
+           <Text strong style={{color:'#0d6efd'}}>{invoice.TenHocVien}</Text>
           </Descriptions.Item>
 
           <Descriptions.Item label="Số điện thoại">

@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import {
-  Card, Form, Input, Button, Upload, Table, Typography,Descriptions, 
+  Card, Form, Input, Button, Upload, Table, Typography, Descriptions,
   Row, Col, Radio, Space, InputNumber, Tooltip, Tag, message, notification,
 } from 'antd';
 import {
-  ArrowLeftOutlined, InboxOutlined, PhoneOutlined,
+  InboxOutlined, PhoneOutlined,
 } from '@ant-design/icons';
 import type { SessionResult, TSessionDetail } from '../session/SessionDTO';
 import { DateHelper } from '../common/date.helper';
@@ -13,7 +13,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import FileUpload from './FileUpload';
 import { useAuthStore } from '../../store/useAuthStore';
-import UnlockButton from './UnlockButton';
+import UnlockButton from './UnlockButton'
+import NavigateDrawer from './NavigateDrawer';
 
 const { Title, Text } = Typography
 const { TextArea } = Input
@@ -32,28 +33,35 @@ interface fileFormat {
 
 const SessionDetail = () => {
   const [form] = Form.useForm()
-  const { id } = useParams()
+  const { sessionId } = useParams()
   const navigate = useNavigate()
   const [session, setSession] = useState<TSessionDetail>()
   const [students, setStudents] = useState<SessionResult[]>([])
   const [fileList, setFileList] = useState<fileFormat[]>([])
   const [reload, setReload] = useState(0)// để con là bộ sưu tập biết mà tải lại
-  const sessionId = Number(id)
-  const fetchSession = async () => {
+  const [openDrawer, setOpenDrawer] = useState(false)
+  const isAdmin = useAuthStore(state => state.user?.role) === 'ADMIN'
+  const buoiHocId = Number(sessionId)
+  const fetchSession = async (id: number) => {
     try {
-      const res = await sessionApi.getDetailsById(sessionId)
+      const res = await sessionApi.getDetailsById(id)
       setSession(res.data)
       setStudents(res.data.ChiTietKetQua)
-
     } catch (error: any) {
       handelError(error)
     }
   }
 
+  // useEffect 1: id thay đổi thì fetch id mới
   useEffect(() => {
-    if (sessionId)
-      fetchSession()
-  }, [sessionId])
+    if (!buoiHocId) return
+    fetchSession(buoiHocId)
+  }, [buoiHocId])
+  // useEffect 2: session thay đổi thì đổ dữ liệu mới vào form
+  useEffect(() => {
+    if (session)
+      form.setFieldsValue(session)
+  }, [session, form])
 
   if (!session) return <div>Không tìm thấy buổi học</div>
   // Cấu hình cột cho Bảng Học Viên
@@ -70,7 +78,7 @@ const SessionDetail = () => {
       width: 180, render: (text: string) => <Text strong>{text}</Text>
     },
     { // điểm danh
-      title: 'Điểm danh', dataIndex: 'DiemDanh', key: 'DiemDanh', width: 280,
+      title: 'Điểm danh', dataIndex: 'DiemDanh', key: 'DiemDanh', width: 220,
       render: (_: any, record: SessionResult) =>
         <Radio.Group
           value={record.DiemDanh}
@@ -82,8 +90,9 @@ const SessionDetail = () => {
     },
     {// điểm số
       title: 'Điểm số', dataIndex: 'Diem', key: 'Diem', width: 100,
-      render: (_: any, record: SessionResult) =>
+      render: (value: any, record: SessionResult) =>
         <InputNumber
+          value={value}
           min={0} max={10}
           defaultValue={record.Diem}
           onChange={(val) => handleStudentChange(record.GhiDanhID, 'Diem', val)}
@@ -92,9 +101,9 @@ const SessionDetail = () => {
     },
     {// nhận xét riêng
       title: 'Nhận xét riêng', dataIndex: 'NhanXetRieng', key: 'NhanXetRieng',
-      render: (_: any, record: SessionResult) =>
+      render: (value: any, record: SessionResult) =>
         <Input
-          defaultValue={record.NhanXetRieng}
+          value={value}
           placeholder="Nhập nhận xét..."
           onChange={(e) => handleStudentChange(record.GhiDanhID, 'NhanXetRieng', e.target.value)}
           allowClear
@@ -118,7 +127,7 @@ const SessionDetail = () => {
       showProgress: true,
       pauseOnHover: true
     })
-    console.log('Có lỗi xảy ra: ', error?.response?.data?.message)
+    console.log('Có lỗi xảy ra: ', error)
   }
 
   // Hàm cập nhật state khi giáo viên thao tác trên bảng
@@ -142,12 +151,11 @@ const SessionDetail = () => {
           Diem: student.Diem ? Number(student.Diem) : null,
         }))
       }
-      //await new Promise(resolve => setTimeout(resolve, 1000))
 
       const isSubmit = type === 'SUBMITTED'
-      isSubmit ? await sessionApi.submitted(sessionId, payload) :
-        await sessionApi.saveDraft(sessionId, payload)
-      fetchSession()
+      isSubmit ? await sessionApi.submitted(buoiHocId, payload) :
+        await sessionApi.saveDraft(buoiHocId, payload)
+      fetchSession(buoiHocId)
       message.success('Thao tác thành công')
       // setFileList([])
       console.log('fileList', fileList)
@@ -169,8 +177,8 @@ const SessionDetail = () => {
           'Authorization': `Bearer ${token}`
         }
       })
-      onSuccess(res.data, file)
-      const resURL = {
+      onSuccess(res.data.data, file)
+      const resFile = {
         uid: file.uid,
         name: '',
         status: 'done' as trangThai,
@@ -178,8 +186,7 @@ const SessionDetail = () => {
         url: res.data.data.url,
         resource_type: res.data.data.resource_type
       }
-      setFileList(prev => [...prev, resURL])
-      // message.success('')
+      setFileList(prev => [...prev, resFile])
     } catch (error) {
       options.onError({ error })
       handelError(error)
@@ -204,7 +211,7 @@ const SessionDetail = () => {
     <div style={{ padding: 24, background: '#f0f2f5', minHeight: '100vh' }}>
 
       <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
-        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)} >Quay lại</Button>
+        <Button onClick={() => navigate(-1)} >Quay lại</Button>
         <Title level={3} style={{ margin: 0 }}>Báo cáo buổi học</Title>
 
         <UnlockButton
@@ -215,28 +222,22 @@ const SessionDetail = () => {
       </Row>
 
       <Form form={form} layout="vertical"
-        initialValues={session}
       >
         {/* Thông tin chung từ DB và nội dung buổi học */}
         <Card variant='borderless' title='Thông tin buổi học'
           style={{ marginBottom: 24, borderRadius: 8 }}
           styles={{
             header: { backgroundColor: '#f0f5ff', color: '#1d39c4' }
-          }}>
+          }}
+          extra={<Button onClick={() => setOpenDrawer(true)}>mở drawer</Button>}>
 
           <Descriptions bordered size="small"
             style={{ marginBottom: 24 }} column={{ xs: 1, sm: 2, md: 3 }}>
-
             <Descriptions.Item label="Lớp">{session.LopHoc}</Descriptions.Item>
-
             <Descriptions.Item label="Buổi số">{session.BuoiSo}</Descriptions.Item>
-
             <Descriptions.Item label="Ngày học">{ngayHoc}</Descriptions.Item>
-
             <Descriptions.Item label="Thời gian">{gioHoc}</Descriptions.Item>
-
             <Descriptions.Item label="Phòng">{session.PhongHoc ?? '-'}</Descriptions.Item>
-
             <Descriptions.Item label="Giáo viên">{session.GiaoVien}</Descriptions.Item>
           </Descriptions>
 
@@ -275,7 +276,7 @@ const SessionDetail = () => {
               return e?.fileList || []
             }}
           >
-            <Dragger multiple fileList={fileList}
+            <Dragger multiple fileList={fileList} disabled={isAdmin}
               customRequest={handleUpload} onRemove={handleRemoveFile}
               listType="picture" style={{ padding: 20 }}>
               <p className="ant-upload-drag-icon">
@@ -296,7 +297,7 @@ const SessionDetail = () => {
           variant='borderless' style={{ marginBottom: 24, borderRadius: 8 }}>
           <FileUpload
             getOldFile={handleGetOldFile}
-            sessionId={sessionId}
+            sessionId={buoiHocId}
             reload={reload}
           />
         </Card>
@@ -319,6 +320,10 @@ const SessionDetail = () => {
           />
         </Card>
       </Form>
+      <NavigateDrawer
+        onCancel={() => setOpenDrawer(false)}
+        open={openDrawer}
+      />
     </div>
   )
 }

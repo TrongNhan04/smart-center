@@ -35,7 +35,7 @@ export default function LoginScreen() {
     }
   };
 
-  return (<>
+  return (
     <KeyboardAvoidingView // bàn phím đẩy giao diện lên
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
@@ -90,7 +90,6 @@ export default function LoginScreen() {
         </View>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
-  </>
   );
 }
 

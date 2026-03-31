@@ -46,7 +46,7 @@ const TaskList = () => {
       // lưu id buổi học để biết buổi này có cần nhắc nhở không
       const newList = [...remindList, task.BuoiHocID]
       setRemindList(newList)
-      message.success('Đã gửi thông báo đến giáo viên!')
+      message.success('Đã tạo thông báo đến giáo viên!')
       localStorage.setItem('remindedTasks', JSON.stringify(newList))
     } catch (error) {
       handelError(error)
@@ -150,7 +150,7 @@ const TaskList = () => {
           dataSource={tasksToday}
           columns={columns}
           pagination={{ defaultPageSize: 10 }}
-          rowKey="ID"
+          rowKey="BuoiHocID"
           scroll={{ x: 1100, y: 408 }}
         />
       </Card>

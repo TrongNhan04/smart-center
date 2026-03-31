@@ -1,66 +1,29 @@
 import { useEffect, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import type { TeacherDB } from "./TeacherDTO"
-import type { ClassDB } from "../class/ClassDTO"
+import type { TeacherClass } from "../class/ClassDTO"
 import teacherApi from "../../api/teacherApi"
 import {
-  Avatar, Badge, Button, Card, Col, Descriptions, notification, Progress,
-  Row, Space, Statistic, Table, Tabs, Tag, Tooltip, Typography
+  Avatar, Button, Card, Col, Descriptions, notification, Progress,
+  Row, Skeleton, Space, Statistic, Table, Tabs, Tag, Tooltip, Typography
 } from "antd"
 import classApi from "../../api/classApi"
 import {
   ArrowLeftOutlined, BookOutlined, CalendarOutlined, ClockCircleOutlined,
-  EditOutlined, MailOutlined, PhoneOutlined, ReadOutlined
+  EditOutlined, InfoCircleOutlined, MailOutlined, PhoneOutlined, ReadOutlined
 } from "@ant-design/icons"
 import TeacherModal from "./TeacherModal"
-import { sessionApi } from "../../api/sessionApi"
-import type { SessionDB } from "../session/SessionDTO"
-import { DateHelper } from "../common/date.helper"
-import SessionAction from "../session/SessionAction"
-import SessionDrawer from "../session/SessionDrawer"
-
 const { Text, Title } = Typography
 
 const TeacherDetail = () => {
   const { id } = useParams()
-  const [teacher, setteacher] = useState<TeacherDB | null>(null)
-  const [classes, setClasses] = useState<ClassDB[]>([])
-  const [sessions, setSessions] = useState<SessionDB[]>([])
+  const [teacher, setTeacher] = useState<TeacherDB | null>(null)
+  const [classes, setClasses] = useState<TeacherClass[]>([])
+  // const [sessions, setSessions] = useState<SessionDB[]>([])
   const [openTeacherModal, setOpenTeacherModal] = useState(false)
-  const [openSsDrawer, setOpenSsDrawer] = useState(false)
-  const [sessionId, setSessionId] = useState<number | null>(null)
+  const [loading, setLoading] = useState(false)
   const teacherId = Number(id)
   const navigate = useNavigate() // làm nút quay lại
-
-  const fetchTeacher = async () => {
-    try {
-      const res = await teacherApi.findOne(teacherId)
-      setteacher(res.data)
-    } catch (error: any) {
-      handleError(error)
-      console.log("Có lỗi hàm fetchTeacher: ", error)
-    }
-  }
-
-  const fetchClasses = async () => {
-    try {
-      const res = await classApi.getByTeacherId(teacherId)
-      setClasses(res.data)
-    } catch (error: any) {
-      handleError(error)
-      console.log("Có lỗi hàm fetchClasses: ", error)
-    }
-  }
-
-  const fetchCompletedSS = async () => {
-    try {
-      const res = await sessionApi.getCompletedByTeacherId(teacherId)
-      setSessions(res.data)
-    } catch (error: any) {
-      handleError(error)
-      console.log("Có lỗi hàm fetchClasses: ", error)
-    }
-  }
 
   const handleError = (error: any) => {
     notification.error({
@@ -71,18 +34,25 @@ const TeacherDetail = () => {
     })
   }
 
-  useEffect(() => {
-    const initData = async () => {
-      try {
-        await Promise.all([
-          fetchTeacher(), fetchClasses(), fetchCompletedSS()
-        ])
-        // console.log('Data: ', teacher)
-
-      } catch (error) {
-        console.log("lỗi chạy useEffect: ", error)
-      }
+  const initData = async () => {
+    try {
+      setLoading(true)
+      await new Promise(resolve => setTimeout(resolve, 400))
+      const [teacherRes, classRes] = await Promise.all([
+        teacherApi.findOne(teacherId),
+        classApi.getByTeacherId(teacherId),
+      ])
+      setTeacher(teacherRes.data)
+      setClasses(classRes.data)
+    } catch (error) {
+      handleError(error)
     }
+    finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
     if (!teacherId || isNaN(teacherId)) {
       console.log("id không phải số nên teacherId lỗi!", teacherId)
       return
@@ -90,21 +60,22 @@ const TeacherDetail = () => {
     initData()
   }, [teacherId])
 
-  if (!teacher)
+  if (!teacher && !loading)
     return <div>Không tìm thấy giáo viên</div>
 
-  const statusColor: Record<string, { color: string, text: string }> = {
+  const statusColor: Record<string, { color?: string, text?: string }> = {
     ACTIVE: { color: 'green', text: 'Đang hoạt động' },
     INACTIVE: { color: 'error', text: 'Ngừng hoạt động' }
   }
-  const status = statusColor[teacher.TrangThai]
+  const status = teacher ? statusColor[teacher.TrangThai] : { color: 'default', text: '' }
+
   const columnsOfClass = [
     {// mã lớp + tên lớp 
       title: 'Lớp học', dataIndex: 'MaLopHoc', key: 'MaLopHoc', ellipsis: true,
-      render: (code: string, lophoc: ClassDB) => (
-        <Space orientation="vertical">
+      render: (code: string, lophoc: TeacherClass) => (
+        <Space orientation="vertical" size={0}>
           <Link to={`/admin/classes/${lophoc.ID}`}>{lophoc.TenLop}</Link>
-          <Text type="secondary" style={{ fontSize: 14 }}>{code}</Text>
+          <Text code style={{ fontSize: 14 }}>{code}</Text>
         </Space>
       )
     },
@@ -115,7 +86,7 @@ const TeacherDetail = () => {
     },
     { // lịch học
       title: 'Lịch học', dataIndex: 'LichHoc', key: 'LichHoc',
-      render: (timeTable: number[], lophoc: ClassDB) => {
+      render: (timeTable: number[], lophoc: TeacherClass) => {
         const dow = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
         const result = timeTable.map(m => dow[m]).join('-')
 
@@ -129,244 +100,176 @@ const TeacherDetail = () => {
         </Space>
       }
     },
-    { // sĩ số
-      title: 'Sĩ số', dataIndex: 'SiSo', key: 'SiSo',
-      render: (classSize: number, lophoc: ClassDB) => (
+    { // Tiến độ
+      title: 'Tiến độ', dataIndex: 'SoBuoiDaHoc', key: 'SoBuoiDaHoc',
+      render: (bdh: number, lophoc: TeacherClass) => (
         <>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span>{lophoc.TongGhiDanh}/{classSize}</span>
-            <small style={{ color: '#999' }}>HV</small>
+            <Text>{bdh}/{lophoc.TongSoBuoi}</Text>
+            <Text type="secondary">Buổi học</Text>
           </div>
           <Progress
-            percent={(lophoc.TongGhiDanh / classSize) * 100}
+            percent={(bdh / lophoc.TongSoBuoi) * 100}
             showInfo={false}
           />
         </>
       )
     },
-    { // trạng thái
-      title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai',
-      render: (value: string) => {
-        const statusMap: Record<string, { color: string, text: string }> = {
-          OPEN: { color: 'default', text: 'Tuyển sinh' },
-          RUNNING: { color: 'success', text: 'Đang hoạt động' },
-          CLOSED: { color: 'error', text: 'Đã đóng' }
-        }
-        // value là 1 trong 3 key đó
-        const status = statusMap[value]
-        return <Badge status={status.color as any} text={status.text} />
-      }
+    { //xem chi tiết
+      title: 'Thao tác', dataIndex: 'ChiTiet', key: 'ChiTiet',
+      align: 'center' as const,
+      render: (_: any, lophoc: TeacherClass) =>
+        <Tooltip title='Chi tiết tiến độ'>
+          <Button type="primary" size="small"
+            icon={<InfoCircleOutlined />}
+            // { path: `classes/:classId/sessions/:sessionId`, element: <SessionDetail /> },
+            onClick={() =>
+              navigate(`/admin/classes/${lophoc.ID}/sessions/${lophoc.IDBuoiDau}`)} />
+        </Tooltip>
     },
   ]
-
-  const columnsOfSS = [
-    {// Buổi số
-      title: 'Buổi số', dataIndex: 'BuoiSo', width: 120,
-      key: 'BuoiSo', align: 'center' as const,
-      render: (value: number) => value
-    },
-    {// mã lớp + tên lớp 
-      title: 'Lớp học', dataIndex: 'LopHocID', key: 'LopHocID',
-      render: (classId: number) => {
-        const className = classes.find(item => item.ID === classId)?.TenLop
-        return <Link to={`/admin/classes/${classId}`}>{className}</Link>
-      }
-    },
-    { // Thời gian
-      title: 'Thời gian', dataIndex: 'BatDauLuc',
-      key: 'BatDauLuc', //ellipsis: 
-      filters: [
-        { text: "Tháng 1", value: 0 }, { text: "Tháng 2", value: 1 },
-        { text: "Tháng 3", value: 2 }, { text: "Tháng 4", value: 3 },
-        { text: "Tháng 5", value: 4 }, { text: "Tháng 6", value: 5 },
-        { text: "Tháng 7", value: 6 }, { text: "Tháng 8", value: 7 },
-        { text: "Tháng 9", value: 8 }, { text: "Tháng 10", value: 9 },
-        { text: "Tháng 11", value: 10 }, { text: "Tháng 12", value: 11 },
-      ],
-      onFilter: (value: any, session: SessionDB) => {
-        return new Date(session.BatDauLuc).getMonth() === value
-      },
-      render: (value: string, session: SessionDB) => {
-        return <Space orientation="vertical" size={0}>
-          <Text strong>
-            <CalendarOutlined /> {new Date(value).toLocaleDateString()}
-          </Text>
-          <Text type="secondary" style={{ fontSize: '14px' }}>
-            <ClockCircleOutlined /> {DateHelper.ISOToHHMM
-              (value, session.KetThucLuc)}
-          </Text>
-        </Space>
-      }
-    },
-    { // Nội dung
-      title: 'Nội dung', dataIndex: 'ChuDe', key: 'ChuDe', ellipsis: true,
-      render: (topic: string, session: SessionDB) => {
-        return <Space orientation="vertical" size={0}>
-          <Text strong ellipsis={{ tooltip: topic }}>
-            {topic ?? `Chủ đề: chưa cập nhật...`}</Text>
-          <Text type="secondary" style={{ fontSize: '14px' }}>
-            {session.PhongHoc ?? `Chưa cập nhật`}
-          </Text>
-        </Space>
-      }
-    },
-    { // trạng thái
-      title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai',
-      width: 130, align: 'center' as const,
-      render: () => {
-        return <Badge status='success' text='Hoàn thành' />
-      }
-    },
-    {// thao tác
-      title: 'Thao tác', key: 'action', align: 'center' as const, width: 90,
-      render: (value: SessionDB) => <SessionAction
-        session={value}
-        unlock={() => { }}
-        onCancel={() => { }}
-        onOpenDrawer={() => { setOpenSsDrawer(true); setSessionId(value.ID) }}
-      />
-    }
-  ]
-
+  
   return (
-    // div này bọc toàn bộ nội dung trang chi tiết
-    <div style={{ minHeight: '88vh', background: '#f0f2f5' }}>
-      {/* Phần HEADER */}
-      <div style={{
-        background: '#fff', margin: '18px', padding: '18px',
-        borderBlock: '1px solid #e8e8e8', borderRadius: 10
-      }}>
-
-        {/* Tiêu đề, avata */}
+    <Skeleton loading={loading} active paragraph={{ rows: 6 }}>
+      {/* div này bọc toàn bộ nội dung trang chi tiết */}
+      <div style={{ minHeight: '89vh', background: '#f0f2f5' }}>
+        {/* Phần HEADER */}
         <div style={{
-          display: 'flex', justifyContent: 'space-between', 
-          alignItems: 'center'
+          background: '#fff', margin: '18px', padding: '18px',
+          borderBlock: '1px solid #e8e8e8', borderRadius: 10
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            {/* Nút quay lại */}
-            <Button icon={<ArrowLeftOutlined />}
-              onClick={() => navigate(-1)}>  Quay lại
-            </Button>
 
-            <Avatar shape="square" size={49} style={{ background: `#0d6efd` }}>
-              {teacher.MaGiaoVien}
-            </Avatar>
+          {/* Tiêu đề, avata */}
+          <div style={{
+            display: 'flex', justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              {/* Nút quay lại */}
+              <Button icon={<ArrowLeftOutlined />}
+                onClick={() => navigate(-1)}>
+              </Button>
 
-            <div>
-              <Title level={3} style={{ margin: 0 }}>
-                {teacher.HoTen.toUpperCase()}
-                <Tag color={status.color}
-                  style={{ marginLeft: 10, verticalAlign: 'middle' }}>
-                  {teacher.TrangThai}</Tag>
-              </Title>
+              <Avatar shape="square" size={49} style={{ background: `#0d6efd` }}>
+                {teacher?.MaGiaoVien}
+              </Avatar>
 
-              <Text type="secondary">Mã GV: {teacher.MaGiaoVien}</Text>
+              <div>
+                <Title level={3} style={{ margin: 0 }}>
+                  {teacher?.HoTen.toUpperCase()}
+                  <Tag color={status.color}
+                    style={{ marginLeft: 10, verticalAlign: 'middle' }}>
+                    {status.text}</Tag>
+                </Title>
+
+                <Text type="secondary">Mã GV: {teacher?.MaGiaoVien}</Text>
+              </div>
             </div>
+            <Tooltip title='Sửa thông tin'>
+              <Button type="primary" ghost icon={<EditOutlined />}
+                disabled={teacher?.TrangThai === 'INACTIVE'}
+                onClick={() => { setOpenTeacherModal(true) }}
+              />
+            </Tooltip>
           </div>
-          <Tooltip title='Sửa thông tin'>
-            <Button type="primary" ghost icon={<EditOutlined />}
-              disabled={teacher.TrangThai === 'INACTIVE'}
-              onClick={() => { setOpenTeacherModal(true) }}
-            />
-          </Tooltip>
-        </div>
-        <TeacherModal
-          open={openTeacherModal}
-          onCancel={() => setOpenTeacherModal(false)}
-          onSave={fetchTeacher}
-          editing={teacher}
-        />
-      </div>{/*  div của header */}
+          <TeacherModal
+            open={openTeacherModal}
+            onCancel={() => setOpenTeacherModal(false)}
+            onSave={initData}
+            editing={teacher!}
+          />
+        </div>{/*  div của header */}
 
-      {/* div của body */}
-      <div style={{ padding: '0px 18px 0px 18px' }}>
-        <Row gutter={18}>
-          {/* cột trái: bảng lớp học */}
-          <Col span={19}>
-            <Card>
-              <Tabs
-                defaultActiveKey="1"
-                items={[
-                  {
-                    key: '1',
-                    label: `Lớp được phân công (${classes.length})`,
-                    children: (
-                      <Table style={{ marginTop: 8 }}
-                        dataSource={classes}
-                        columns={columnsOfClass}
-                        pagination={{ defaultPageSize: 6 }}
-                        rowKey="ID"
-                        scroll={{ y: 280 }}
-                      />
-                    ),
-                  },
-                  {
-                    key: '2',
-                    label: `Các buổi đã dạy (${sessions.length})`,
-                    children: (
-                      <Table style={{ marginTop: 8 }}
-                        dataSource={sessions}
-                        columns={columnsOfSS}
-                        pagination={{ defaultPageSize: 8 }}
-                        rowKey="ID"
-                        scroll={{ y: 308 }}
-                      />
-                    ),
-                  }
-                ]} /> {/* kết thúc tab */}
-              <SessionDrawer
+        {/* div của body */}
+        <div style={{ padding: '0px 18px 0px 18px' }}>
+          <Row gutter={18}>
+            {/* cột trái: bảng lớp học */}
+            <Col span={19}>
+              <Card>
+                <Tabs
+                  defaultActiveKey="1"
+                  items={[
+                    {
+                      key: '1',
+                      label: `Lớp được phân công (${classes.length})`,
+                      children: (
+                        <Table style={{ marginTop: 8 }}
+                          dataSource={classes}
+                          columns={columnsOfClass}
+                          pagination={{ defaultPageSize: 6 }}
+                          rowKey="ID"
+                          scroll={{ y: 310 }}
+                        />
+                      ),
+                    },
+                    {
+                      key: '2',
+                      label: `Các buổi đã dạy ()`,
+                      children: (<></>
+                        // <Table style={{ marginTop: 8 }}
+                        //   dataSource={sessions}
+                        //   columns={columnsOfSS}
+                        //   pagination={{ defaultPageSize: 8 }}
+                        //   rowKey="ID"
+                        //   scroll={{ y: 308 }}
+                        // />
+                      ),
+                    }
+                  ]} /> {/* kết thúc tab */}
+                {/* <SessionDrawer
                 open={openSsDrawer}
                 onCancel={() => setOpenSsDrawer(false)}
                 sessionId={sessionId!}
-              />
-            </Card>
-          </Col>
+              /> */}
+              </Card>
+            </Col>
 
-          {/* Cột phải: chứa thông tin tổng quan */}
-          <Col span={5}>
-            <Card title="Thông tin giáo viên" style={{ marginBottom: 18 }}>
-              <Descriptions
-                column={1}
-                size="small"
-                colon={false}
-              >
-                <Descriptions.Item // email
-                  label={<span style={{ color: '#888' }}>
-                    <MailOutlined /> Email:</span>}
+            {/* Cột phải: chứa thông tin tổng quan */}
+            <Col span={5}>
+              <Card title="Thông tin giáo viên" style={{ marginBottom: 18 }}>
+                <Descriptions
+                  column={1}
+                  size="small"
+                  colon={false}
                 >
-                  <Text strong>{teacher.Email || 'Chưa cập nhật...'}</Text>
-                </Descriptions.Item>
+                  <Descriptions.Item // email
+                    label={<span style={{ color: '#888' }}>
+                      <MailOutlined /> Email:</span>}
+                  >
+                    <Text strong>{teacher?.Email || 'Chưa cập nhật...'}</Text>
+                  </Descriptions.Item>
 
-                <Descriptions.Item // SĐT
-                  label={<span style={{ color: '#888' }}>
-                    <PhoneOutlined /> SĐT:</span>}
-                >
-                  <Text strong>{teacher.DienThoai || 'Chưa cập nhật...'}</Text>
-                </Descriptions.Item>
+                  <Descriptions.Item // SĐT
+                    label={<span style={{ color: '#888' }}>
+                      <PhoneOutlined /> SĐT:</span>}
+                  >
+                    <Text strong>{teacher?.DienThoai || 'Chưa cập nhật...'}</Text>
+                  </Descriptions.Item>
 
-                <Descriptions.Item // Chuyên môn
-                  label={<span style={{ color: '#888' }}>
-                    <BookOutlined /> CM:</span>}
-                >{teacher.ChuyenMon || 'Chưa cập nhật...'}
-                </Descriptions.Item>
-              </Descriptions>
-            </Card>
+                  <Descriptions.Item // Chuyên môn
+                    label={<span style={{ color: '#888' }}>
+                      <BookOutlined /> CM:</span>}
+                  >{teacher?.ChuyenMon || 'Chưa cập nhật...'}
+                  </Descriptions.Item>
+                </Descriptions>
+              </Card>
 
-            {/* thống kê nhanh */}
-            <Card>
-              <Row gutter={16}>
-                {/* <Col span={12}> */}
-                <Statistic
-                  title="Số buổi đã dạy trong tháng"
-                  value={teacher.SoBuoiDaDay}
-                  prefix={<ReadOutlined />}
-                />
-              </Row>
-            </Card>
-          </Col>
-        </Row>
+              {/* thống kê nhanh */}
+              <Card>
+                <Row gutter={16}>
+                  {/* <Col span={12}> */}
+                  <Statistic
+                    title="Số buổi đã dạy trong tháng"
+                    value={teacher?.SoBuoiDaDay}
+                    prefix={<ReadOutlined />}
+                  />
+                </Row>
+              </Card>
+            </Col>
+          </Row>
+        </div>
       </div>
-    </div>
+    </Skeleton>
   )
 }
 

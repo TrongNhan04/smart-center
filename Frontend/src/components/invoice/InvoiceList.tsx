@@ -113,7 +113,7 @@ const InvoiceList = () => {
       title: 'Học viên', dataIndex: 'TenHocVien', //width: 220,
       key: 'TenHocVien', ellipsis: true,
       render: (name: string, invoice: InvoiceDB) =>
-        <Space orientation="vertical">
+        <Space orientation="vertical" size={0}>
           <Text><UserOutlined /> {name}</Text>
           <Text><PhoneOutlined /> {invoice.DienThoai}</Text>
         </Space>

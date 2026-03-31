@@ -114,7 +114,9 @@ export class SessionService {
     // số buổi mỗi tháng
     const perChunk = Math.ceil(totalSessions / durationMonths)
     // số buổi đã có trong danh sách buổi học của lớp
-    const currentCount = await this.prisma.buoiHoc.count({ where: { LopHocID: classId } })
+    const currentCount = await this.prisma.buoiHoc.count({
+      where: { LopHocID: classId, TrangThai: { not: 'CANCELLED' } }
+    })
 
     if (currentCount >= totalSessions)
       throw new ConflictException(`Đã đủ số buổi học của khóa (${totalSessions})`)
@@ -271,7 +273,7 @@ export class SessionService {
     return sessions
   }
 
-  // lấy thông tin buổi học
+  // lấy thông tin 1 buổi học
   async GetSession_Result(sessionId: number, userId: number | null) {
     if (userId) { // là giáo viên
       const teacherDB = await this.GetTeacherByUserId(userId)
@@ -287,7 +289,7 @@ export class SessionService {
         select: {
           ID: true, BuoiSo: true, ChuDe: true, PhongHoc: true,
           BatDauLuc: true, KetThucLuc: true, TrangThai: true,
-          ketqua_buoihoc: true, AdminMoKhoa:true, YeuCauMoKhoa:true,
+          ketqua_buoihoc: true, AdminMoKhoa: true, YeuCauMoKhoa: true,
           lophoc: {
             select: {
               TenLop: true,
@@ -304,7 +306,7 @@ export class SessionService {
       BatDauLuc: sessionDB.BatDauLuc, KetThucLuc: sessionDB.KetThucLuc,
       PhongHoc: sessionDB.PhongHoc, LopHoc: sessionDB.lophoc.TenLop,
       NhanXetChung: sessionDB.ketqua_buoihoc?.NhanXetChung,
-      GiaoVien: sessionDB.lophoc.giaovien.User.HoTen, YeuCauMoKhoa:sessionDB.YeuCauMoKhoa,
+      GiaoVien: sessionDB.lophoc.giaovien.User.HoTen, YeuCauMoKhoa: sessionDB.YeuCauMoKhoa,
       TrangThai: sessionDB.TrangThai, AdminMoKhoa: sessionDB.AdminMoKhoa,
       ChiTietKetQua: result
     }
@@ -406,6 +408,6 @@ export class SessionService {
         ID: excludeId ? { not: excludeId } : undefined
       }
     })
-    if (conflict) throw new BadRequestException(`${room} is used by other session at this time`)
+    if (conflict) throw new BadRequestException(`Phòng ${room} đã được sử dụng trong thời gian này`)
   }
 }

@@ -14,6 +14,7 @@ export interface SessionDB {
     LopHocID: number,
     BuoiSo: number,
     ChuDe: string,
+    NhanXetChung:string,
     BatDauLuc: string,
     KetThucLuc: string
     GiaoVienID: number

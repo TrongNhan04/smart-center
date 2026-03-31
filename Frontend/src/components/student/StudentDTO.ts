@@ -8,7 +8,7 @@ export interface StudentDto {
     phone: string,
     dob: string,
     address?: string
-    fee?: number 
+    fee?: number
 }
 
 export interface StudentDB {
@@ -23,7 +23,7 @@ export interface StudentDB {
     TrangThai: string
 }
 
-export interface StudentForCmb{
+export interface StudentForCmb {
     ID: number,
     MaHocVien: string,
     TenHocVien: string
@@ -40,3 +40,37 @@ export const mapDataStudent = (record: StudentDB):
         dob: record.NgaySinh,
         address: record.DiaChi
     })
+
+export interface ClassForStudent {
+    ID: number,
+    TenLop: string,
+    GiaoVien: string,
+    LichHoc: number[],
+    TuNgay: string,
+    DenNgay: string,
+    GioHoc: string,
+    TongSoBuoi: number,
+    BuoiDaHoc: number,
+    NgayGhiDanh: string
+    TrangThaiGD: string
+}
+
+//thống kê kết quả học tập 1 lớp mà học viên học
+export interface ClassResult {
+    LopHoc: string,
+    GiaoVien: string,
+    HocVien: string,
+    KetQua: Result[]
+}
+
+export interface Result {
+    ID: number, // id kết quả chi tiết
+    BuoiSo: number,
+    ChuDe?: string,
+    BatDauLuc: string,
+    GioHoc: string,
+    PhongHoc?: string,
+    NhanXet: string,
+    DiemDanh: boolean,
+    Diem?: number
+}
