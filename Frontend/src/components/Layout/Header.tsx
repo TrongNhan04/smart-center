@@ -13,13 +13,11 @@ const HeaderCN = () => {
   }
 
   return (
-    <>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <span>Xin chào, <b>{user?.full_name}</b> ({user?.role})</span>
-        <Button onClick={handleLogout} size='small'
-          type="primary">Đăng xuất</Button>
-      </div>
-    </>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10}}>
+      <span>Xin chào, <b>{user?.full_name}</b> ({user?.role})</span>
+      <Button onClick={handleLogout} size='small'
+        type="primary">Đăng xuất</Button>
+    </div>
   )
 }
 

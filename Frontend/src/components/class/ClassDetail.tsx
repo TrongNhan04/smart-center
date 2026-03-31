@@ -19,6 +19,7 @@ import ClassModal from "./ClassModal"
 import SessionAction from "../session/SessionAction"
 import SessionsModal from "../session/SessionsModal"
 import { useAuthStore } from "../../store/useAuthStore"
+import TabInfo from "./TabInfo"
 
 const { Title, Text } = Typography
 
@@ -58,15 +59,9 @@ const ClassDetail = () => {
   }
 
   useEffect(() => {
-    if (!classId || isNaN(classId)) {
-      console.log("id không phải số nên classId lỗi!", classId)
-      return
-    }
+    if (!classId || isNaN(classId)) return
     initData()
   }, [classId])
-
-  if (loading) return <Skeleton loading={loading} active paragraph={{ rows: 6 }}/>
-  if (!lophoc) return <div>Không tìm thấy lớp học</div>
 
   const dow = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
   const result = lophoc?.LichHoc.map(m => dow[m]).join('-')
@@ -230,188 +225,128 @@ const ClassDetail = () => {
 
   const handleBack = (pagination: any) => setSearchParam({ page: pagination.current })
 
+  if (loading) return <div style={{ minHeight: '89vh', background: '#f0f2f5' }}>
+    <Skeleton loading={loading} active paragraph={{ rows: 6 }} />
+  </div>
+  if (!lophoc) return <div style={{ minHeight: '89vh', background: '#f0f2f5' }}>
+    <div>Không tìm thấy lớp học</div>
+  </div>
+
   return (
-      // div này bọc toàn bộ nội dung trang chi tiết 
-      <div style={{ minHeight: '89vh', background: '#f0f2f5' }}>
-        {/* Phần HEADER */}
+    // div này bọc toàn bộ nội dung trang chi tiết 
+    <div style={{ minHeight: '89vh', background: '#f0f2f5' }}>
+      {/* Phần HEADER */}
+      <div style={{
+        background: '#fff', margin: '18px', padding: '16px 24px',
+        borderBlock: '1px solid #e8e8e8', borderRadius: 10
+      }}>
+
+        {/* Tiêu đề, avatar */}
         <div style={{
-          background: '#fff', margin: '18px', padding: '16px 24px',
-          borderBlock: '1px solid #e8e8e8', borderRadius: 10
+          display: 'flex', justifyContent: 'space-between',
+          alignItems: 'center',
         }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            {/* nút quay lại */}
+            <Button onClick={() => navigate(-1)}> Quay lại</Button>
 
-          {/* Tiêu đề, avatar */}
-          <div style={{
-            display: 'flex', justifyContent: 'space-between',
-            alignItems: 'center',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-              {/* nút quay lại */}
-              <Button onClick={() => navigate(-1)}> Quay lại</Button>
+            <Avatar shape="square" size={49}
+              style={{ background: `#0d6efd` }}
+            > {lophoc?.MaLopHoc.substring(0, 4)}
+            </Avatar>
 
-              <Avatar shape="square" size={49}
-                style={{ background: `#0d6efd` }}
-              > {lophoc?.MaLopHoc}
-              </Avatar>
-
-              <div>
-                <Title level={3} style={{ margin: 0 }}>
-                  {lophoc?.TenLop.toUpperCase()}
-                  <Tag color={status}
-                    style={{ marginLeft: 10, verticalAlign: 'middle' }}>
-                    {lophoc?.TrangThai}</Tag>
-                </Title>
-                <Text type="secondary">Mã LH: {lophoc?.MaLopHoc}</Text>
-              </div>
+            <div>
+              <Title level={3} style={{ margin: 0 }}>
+                LH. {lophoc?.TenLop.toUpperCase()}
+                <Tag color={status}
+                  style={{ marginLeft: 10, verticalAlign: 'middle' }}>
+                  {lophoc?.TrangThai}
+                </Tag>
+              </Title>
+              <Text type="secondary">Mã LH: {lophoc?.MaLopHoc}</Text>
             </div>
-            {/* là admin thì cho sửa */}
-            {isAdmin && <><Tooltip title='Sửa lớp học'>
-              <Button type="primary" ghost icon={<EditOutlined />}
-                disabled={lophoc?.TrangThai === 'CLOSED' || lophoc?.TrangThai === 'FINISHED'}
-                onClick={() => setOpenClassModal(true)}
-              />
-            </Tooltip>
-              <ClassModal
-                open={openClassModal}
-                onCancel={() => setOpenClassModal(false)}
-                onSave={(_) => initData()}
-                khoahocId={lophoc.KhoaHoc.ID}
-                editingClass={lophoc}
-              />
-            </>}
           </div>
-        </div>{/* kết thúc div của header */}
-
-        {/* div của body */}
-        <div style={{ padding: '0px 18px 0px 18px' }}>
-          <Row gutter={19}>
-            {/* cột trái: bảng buổi học và mô tả */}
-            <Col span={18}>
-              <Card>
-                <Tabs
-                  defaultActiveKey="1"
-                  tabBarExtraContent={ // 2 nút auto, manual
-                    isAdmin && <Space>
-                      <Popconfirm title="Xác nhận tạo buổi học tự động?"
-                        description='Tự động tạo buổi học trong 1 tháng'
-                        onConfirm={() => AutoGenerate(lophoc!.ID)}>
-                        <Button type="primary" icon={<PlusOutlined />}
-                          disabled={lophoc?.TrangThai === 'CLOSED'}
-                        >Tự động
-                        </Button>
-                      </Popconfirm>
-
-                      <Button type="default" icon={<PlusOutlined />}
-                        disabled={lophoc?.TrangThai === 'CLOSED'}
-                        onClick={() => setOpenSessionModal(true)}
-                      >Thủ công</Button>
-                      <SessionsModal
-                        lophoc={lophoc!}
-                        open={openSessionModal}
-                        onCancel={() => setOpenSessionModal(false)}
-                        onSave={initData}
-                      />
-                    </Space>
-                  }
-                  items={[
-                    { // table buổi học
-                      key: '1',
-                      label: `Danh sách buổi học (${sessions.length})`,
-                      children: (
-                        <Table style={{ marginTop: 8 }}
-                          dataSource={sessions}
-                          columns={filterColumns()}
-                          pagination={{
-                            current: currentPage,
-                            pageSize: 10
-                          }}
-                          onChange={handleBack}
-                          rowKey="ID"
-                          scroll={{ y: 320 }}
-                        />
-                      ),
-                    },
-                    {
-                      key: '2',
-                      label: 'Nội dung mô tả',
-                      children: (
-                        <Typography.Paragraph>
-                          &nbsp;&nbsp;&nbsp;&nbsp;{lophoc?.MoTa ?? `Chưa cập nhật...`}
-                        </Typography.Paragraph>
-                      ),
-                    }
-                  ]} /> {/* kết thúc tab */}
-              </Card>
-            </Col>
-
-            {/* Cột phải: chứa thông tin tổng quan */}
-            <Col span={6}>
-              {/* thông tin tổng quan  */}
-              <Card title="Thông tin chung" style={{ marginBottom: 18 }}>
-                <Descriptions column={1} size='small' colon={false} layout="horizontal" items={[
-                  { // khóa học
-                    label: <><span style={{ color: '#888' }}>
-                      <BookOutlined /> Khóa học: &nbsp;</span>
-                      {isAdmin ?
-                        <Link to={`/admin/courses/${lophoc?.KhoaHoc.ID}`}
-                          style={{ fontWeight: 'bold' }}>
-                          {lophoc?.KhoaHoc.TenKhoaHoc}</Link>
-                        : <Text strong>{lophoc?.KhoaHoc.TenKhoaHoc}</Text>
-                      }
-                    </>
-                  },
-                  { // giáo viên
-                    label: <><span style={{ color: '#888' }}>
-                      <UserOutlined /> Giáo viên: &nbsp;</span>
-                      {isAdmin ?
-                        <Link to={`/admin/teachers/${lophoc?.GiaoVien.ID}`}
-                          style={{ fontWeight: 'bold' }}>
-                          {lophoc?.GiaoVien.HoTen}</Link>
-                        : <Text strong>{lophoc?.GiaoVien.HoTen}</Text>
-                      }
-                    </>
-                  },
-                  { // khai giảng
-                    label: <><span style={{ color: '#888' }}>
-                      <CalendarOutlined /> Khai giảng: &nbsp;</span>
-                      <Space orientation="vertical" size={0}>
-                        <Text strong>
-                          {new Date(lophoc?.TuNgay).toLocaleDateString()}\
-                        </Text>
-                        <Text type="secondary">
-                          ({new Date(lophoc?.DenNgay).toLocaleDateString()})
-                        </Text>
-                      </Space>
-                    </>
-                  },
-                  { //lịch học
-                    label: <><span style={{ color: '#888' }}>
-                      <ClockCircleOutlined /> Lịch học: &nbsp;</span>
-                      <Space orientation="vertical" size={0}>
-                        <Text strong>{lophoc?.GioHoc} &nbsp;</Text>
-                        <Text type="secondary"> {`(${result})`}</Text>
-                      </Space>
-                    </>
-                  }
-                ]}>
-                </Descriptions>
-              </Card>
-
-              {/* thống kê nhanh */}
-              <Card >
-                <Statistic
-                  title="Tống học viên ghi danh"
-                  value={`${lophoc?.TongGhiDanh}/${lophoc?.SiSo}`}
-                  prefix={<TeamOutlined />}
-                />
-                <Progress
-                  percent={(lophoc!.TongGhiDanh / lophoc!.SiSo) * 100}
-                  showInfo={false}
-                />
-              </Card>
-            </Col>
-          </Row>
+          {/* là admin thì cho sửa */}
+          {isAdmin && <><Tooltip title='Sửa lớp học'>
+            <Button type="primary" ghost icon={<EditOutlined />}
+              disabled={lophoc?.TrangThai === 'CLOSED' || lophoc?.TrangThai === 'FINISHED'}
+              onClick={() => setOpenClassModal(true)}
+            />
+          </Tooltip>
+            <ClassModal
+              open={openClassModal}
+              onCancel={() => setOpenClassModal(false)}
+              onSave={(_) => initData()}
+              khoahocId={lophoc.KhoaHoc.ID}
+              editingClass={lophoc}
+            />
+          </>}
         </div>
+      </div>{/* kết thúc div của header */}
+
+      {/* div của body */}
+      <div style={{ padding: '0px 18px 0px 18px' }}>
+
+        <Card>
+          <Tabs
+            defaultActiveKey="1"
+            tabBarExtraContent={ // 2 nút auto, manual
+              isAdmin && <Space>
+                <Popconfirm title="Xác nhận tạo buổi học tự động?"
+                  description='Tự động tạo buổi học trong 1 tháng'
+                  onConfirm={() => AutoGenerate(lophoc.ID)}>
+                  <Button type="primary" icon={<PlusOutlined />}
+                    disabled={lophoc?.TrangThai === 'CLOSED'}
+                  >Tự động
+                  </Button>
+                </Popconfirm>
+
+                <Button type="default" icon={<PlusOutlined />}
+                  disabled={lophoc.TrangThai === 'CLOSED'}
+                  onClick={() => setOpenSessionModal(true)}
+                >Thủ công</Button>
+                <SessionsModal
+                  lophoc={lophoc}
+                  open={openSessionModal}
+                  onCancel={() => setOpenSessionModal(false)}
+                  onSave={initData}
+                />
+              </Space>
+            }
+            items={[
+              { // table buổi học
+                key: '1',
+                label: `Danh sách buổi học (${sessions.length})`,
+                children: (
+                  <Table style={{ marginTop: 8 }}
+                    dataSource={sessions}
+                    columns={filterColumns()}
+                    pagination={{
+                      current: currentPage,
+                      pageSize: 10
+                    }}
+                    onChange={handleBack}
+                    rowKey="ID"
+                    scroll={{ y: 320 }}
+                  />
+                ),
+              },
+              {
+                key: '2',
+                label: 'Danh sách học viên',
+                children: (
+                  <></>
+                ),
+              },
+              {
+                key: '3',
+                label: 'Thông tin chung',
+                children: (<TabInfo lophoc={lophoc}/>),
+              }
+            ]} /> {/* kết thúc tab */}
+        </Card>
       </div>
+    </div>
   )
 }
 

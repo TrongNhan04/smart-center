@@ -4,11 +4,10 @@ import type { ClassForStudent, StudentDB } from "./StudentDTO"
 import { studentApi } from "../../api/studentApi"
 import classApi from "../../api/classApi"
 import {
-  Avatar, Button, Card, notification, Progress, Space, Table, Tag, Tooltip, Typography
+  Avatar, Button, Card, notification, Progress, Skeleton, Space, Table, Tag, Tooltip, Typography
 } from "antd"
 import {
-  ArrowLeftOutlined, CalendarOutlined, ClockCircleOutlined, EditOutlined, 
-  InfoCircleOutlined,
+  CalendarOutlined, ClockCircleOutlined, EditOutlined, InfoCircleOutlined,
 } from "@ant-design/icons"
 import StudentModal from "./StudentModal"
 
@@ -20,6 +19,7 @@ const StudentDetail = () => {
   const [student, setStudent] = useState<StudentDB | null>(null)
   const [classes, setClasses] = useState<ClassForStudent[]>([])
   const [openStudentModal, setopenStudentModal] = useState(false)
+  const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
 
   const handleError = (error: any) => {
@@ -33,17 +33,19 @@ const StudentDetail = () => {
   }
 
   const initData = async () => {
-      try {
-        const [studentRes, classRes] = await Promise.all([
-          studentApi.findOne(studentId), 
-          classApi.getByStudentId(studentId)
-        ])
-        setStudent(studentRes.data)
-        setClasses(classRes.data)
-      } catch (error) {
-        handleError(error)
-      }
+    try {
+      setLoading(true)
+      const [studentRes, classRes] = await Promise.all([
+        studentApi.findOne(studentId),
+        classApi.getByStudentId(studentId)
+      ])
+      setStudent(studentRes.data)
+      setClasses(classRes.data)
+    } catch (error) {
+      handleError(error)
     }
+    finally { setLoading(false) }
+  }
 
   useEffect(() => {
     if (!studentId || isNaN(studentId)) {
@@ -53,14 +55,11 @@ const StudentDetail = () => {
     initData()
   }, [studentId])
 
-  if (!student)
-    return <div>Không tìm thấy học viên</div>
-
   const statusColor: Record<string, { color: string, text: string }> = {
     ACTIVE: { color: 'green', text: 'Đang hoạt động' },
     INACTIVE: { color: 'error', text: 'Ngừng hoạt động' }
   }
-  const status = statusColor[student.TrangThai]
+  const status = student ? statusColor[student.TrangThai] : { color: 'default', text: '' }
 
   const columnsOfClass = [
     {// mã lớp + tên lớp 
@@ -77,8 +76,8 @@ const StudentDetail = () => {
       key: 'GiaoVien', ellipsis: true
     },
     {
-      title:'Ngày nhập học', dataIndex:'NgayGhiDanh', key:'NgayGhiDanh',
-      align:'center' as const, render: (day: string) =>
+      title: 'Ngày nhập học', dataIndex: 'NgayGhiDanh', key: 'NgayGhiDanh',
+      align: 'center' as const, render: (day: string) =>
         <Text><CalendarOutlined /> {new Date(day).toLocaleDateString()}</Text>
     },
     { // lịch học
@@ -98,10 +97,10 @@ const StudentDetail = () => {
     },
     { // tiến độ
       title: 'Tiến độ', dataIndex: 'BuoiDaHoc', key: 'BuoiDaHoc',
-      render: (value:number, lophoc:ClassForStudent) => {
-        if(lophoc.TrangThaiGD === 'INACTIVE')
+      render: (value: number, lophoc: ClassForStudent) => {
+        if (lophoc.TrangThaiGD === 'INACTIVE')
           return <Text delete>Đã hủy ghi danh</Text>
-        return <> 
+        return <>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>{value}/{lophoc.TongSoBuoi}</span>
             <Text type="secondary">Buổi học</Text>
@@ -110,20 +109,29 @@ const StudentDetail = () => {
             percent={(value / lophoc.TongSoBuoi) * 100}
             showInfo={false}
           />
-        </> 
+        </>
       }
     },
     {
-      title:'Thao tác', dataIndex:'action', key:'action', align:'center' as const,
-      render: (_:any, lophoc:ClassForStudent) => <Button type="primary" 
-        icon={<InfoCircleOutlined/>} size="small" 
-        onClick={()=>navigate(`classes/${lophoc.ID}`)}> Chi tiết</Button>
+      title: 'Thao tác', dataIndex: 'action', key: 'action', align: 'center' as const,
+      render: (_: any, lophoc: ClassForStudent) => <Button type="primary"
+        icon={<InfoCircleOutlined />} size="small"
+        onClick={() => navigate(`classes/${lophoc.ID}`)}> Chi tiết</Button>
     }
   ]
 
+  if (loading)
+    return <div style={{ minHeight: '89vh', background: '#f0f2f5' }}>
+      <Skeleton loading={loading} active paragraph={{ rows: 6 }} />
+    </div>
+
+  if (!student) return <div style={{ minHeight: '89vh', background: '#f0f2f5' }}>
+    <div>Không tìm thấy học viên</div>
+  </div>
+
   return (
     // div này bọc toàn bộ nội dung trang chi tiết
-    <div style={{ minHeight: '88vh', background: '#f0f2f5' }}>
+    <div style={{ minHeight: '89vh', background: '#f0f2f5' }}>
       {/* Phần HEADER */}
       <div style={{
         background: '#fff', margin: '18px', padding: '16px 24px',
@@ -136,19 +144,16 @@ const StudentDetail = () => {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             {/* nút quay lại */}
-            <Button icon={<ArrowLeftOutlined />}
-              onClick={() => navigate(`/admin/students`)} > Quay lại
+            <Button onClick={() => navigate(`/admin/students`)} > Quay lại
             </Button>
 
-            <Avatar shape="square" size={49}
-              style={{ background: `#0d6efd` }}
-            >
-              {student.MaHocVien}
+            <Avatar shape="square" size={49} style={{ background: `#0d6efd` }}>
+              {student.MaHocVien.substring(0, 4)}
             </Avatar>
 
             <div>
               <Title level={3} style={{ margin: 0 }}>
-                {student.TenHocVien.toUpperCase()}
+                HV. {student.TenHocVien.toUpperCase()}
                 <Tag color={status.color}
                   style={{ marginLeft: 10, verticalAlign: 'middle' }}>
                   {student.TrangThai}</Tag>
@@ -186,7 +191,7 @@ const StudentDetail = () => {
         </Card>
       </div>
 
-      <Outlet/>
+      <Outlet />
     </div> // div của toàn bộ
   )
 }

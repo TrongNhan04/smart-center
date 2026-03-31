@@ -23,10 +23,14 @@ const CourseList = () => {
   const currentPage = Number(searchParam.get('page')) || 1
 
   const fetchCourses = async () => {
-    setLoading(true)
     try {
+      setLoading(true)
       // lấy dữ liệu từ API
-      const res = await courseApi.findMany()
+      
+      const [res] = await Promise.all([
+        courseApi.findMany(),
+        new Promise(resolve=>setTimeout(resolve,500))
+      ])
       setCourses(res.data)
     }
     catch (error: any) {

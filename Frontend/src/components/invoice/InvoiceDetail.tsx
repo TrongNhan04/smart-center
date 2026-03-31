@@ -1,5 +1,5 @@
 import {
-  ArrowLeftOutlined, MoneyCollectOutlined, RollbackOutlined
+  MoneyCollectOutlined, RollbackOutlined
 } from "@ant-design/icons";
 import {
   Card, Descriptions, Table, Divider, Typography, Row, Col, Statistic,
@@ -57,10 +57,6 @@ const InvoiceDetail = () => {
   const handleAddPayment = () => {
     setIsOpen(true)
     setIsReceipt(false)
-  }
-
-  const handleBack = () => {
-    navigate(-1)
   }
 
   if (!invoice) return
@@ -156,9 +152,7 @@ const InvoiceDetail = () => {
       <Card>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
 
-          <Button icon={<ArrowLeftOutlined />}
-            onClick={handleBack}
-          > Quay lại</Button>
+          <Button onClick={() => navigate(-1)}> Quay lại</Button>
 
           <Space>
             {/* <Button icon={<PrinterOutlined />}>In hóa đơn</Button> */}
@@ -189,7 +183,7 @@ const InvoiceDetail = () => {
           size="middle"
         >
           <Descriptions.Item label="Học viên">
-           <Text strong style={{color:'#0d6efd'}}>{invoice.TenHocVien}</Text>
+            <Text strong style={{ color: '#0d6efd' }}>{invoice.TenHocVien}</Text>
           </Descriptions.Item>
 
           <Descriptions.Item label="Số điện thoại">

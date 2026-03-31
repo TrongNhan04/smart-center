@@ -95,7 +95,7 @@ const NavigateDrawer = ({ open, onCancel }: Props) => {
           <div style={{ marginTop: 12, fontSize: 15, color: '#8c8c8c'}}>
             <Space orientation='vertical' size={0}>
               <Space><div style={{ width: 10, height: 10, backgroundColor: '#1890ff', borderRadius: '50%' }} /> Đang xem</Space>
-              <Space><div style={{ width: 10, height: 10, border: '1px solid #52c41a', borderRadius: '50%' }} /> Đã chốt sổ</Space>
+              <Space><div style={{ width: 10, height: 10, border: '1px solid #52c41a', borderRadius: '50%' }} /> Đã chốt kết quả</Space>
 
               <Space><div style={{ width: 10, height: 10, border: '1px solid #d9d9d9', borderRadius: '50%' }} /> Chưa chốt / Chưa học</Space>
               <Space><div style={{ width: 10, height: 10, border: '1px solid #ff4d4f', borderRadius: '50%' }} /> Đã hủy</Space>

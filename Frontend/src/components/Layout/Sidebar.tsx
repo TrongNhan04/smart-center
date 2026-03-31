@@ -98,7 +98,7 @@ const SidebarComponent = () => {
           background: colorBgContainer,
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center'
+          alignItems: 'center',
         }}>
           <Button
             className='toggle'

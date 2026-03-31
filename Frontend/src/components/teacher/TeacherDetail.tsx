@@ -9,8 +9,8 @@ import {
 } from "antd"
 import classApi from "../../api/classApi"
 import {
-  ArrowLeftOutlined, BookOutlined, CalendarOutlined, ClockCircleOutlined,
-  EditOutlined, InfoCircleOutlined, MailOutlined, PhoneOutlined, ReadOutlined
+  BookOutlined, CalendarOutlined, ClockCircleOutlined, EditOutlined,
+  InfoCircleOutlined, MailOutlined, PhoneOutlined, ReadOutlined
 } from "@ant-design/icons"
 import TeacherModal from "./TeacherModal"
 const { Text, Title } = Typography
@@ -19,9 +19,8 @@ const TeacherDetail = () => {
   const { id } = useParams()
   const [teacher, setTeacher] = useState<TeacherDB | null>(null)
   const [classes, setClasses] = useState<TeacherClass[]>([])
-  // const [sessions, setSessions] = useState<SessionDB[]>([])
   const [openTeacherModal, setOpenTeacherModal] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const teacherId = Number(id)
   const navigate = useNavigate() // làm nút quay lại
 
@@ -128,7 +127,16 @@ const TeacherDetail = () => {
         </Tooltip>
     },
   ]
-  
+
+  if (loading)
+    return <div style={{ minHeight: '89vh', background: '#f0f2f5' }}>
+      <Skeleton loading={loading} active paragraph={{ rows: 6 }} />
+    </div>
+
+  if (!teacher) return <div style={{ minHeight: '89vh', background: '#f0f2f5' }}>
+    <div>Không tìm thấy giáo viên</div>
+  </div>
+
   return (
     <Skeleton loading={loading} active paragraph={{ rows: 6 }}>
       {/* div này bọc toàn bộ nội dung trang chi tiết */}
@@ -146,17 +154,16 @@ const TeacherDetail = () => {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
               {/* Nút quay lại */}
-              <Button icon={<ArrowLeftOutlined />}
-                onClick={() => navigate(-1)}>
+              <Button onClick={() => navigate(-1)}> Quay lại
               </Button>
 
               <Avatar shape="square" size={49} style={{ background: `#0d6efd` }}>
-                {teacher?.MaGiaoVien}
+                {teacher?.MaGiaoVien.substring(0, 4)}
               </Avatar>
 
               <div>
                 <Title level={3} style={{ margin: 0 }}>
-                  {teacher?.HoTen.toUpperCase()}
+                  GV. {teacher?.HoTen.toUpperCase()}
                   <Tag color={status.color}
                     style={{ marginLeft: 10, verticalAlign: 'middle' }}>
                     {status.text}</Tag>

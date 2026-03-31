@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   Card, Form, Input, Button, Upload, Table, Typography, Descriptions,
   Row, Col, Radio, Space, InputNumber, Tooltip, Tag, message, notification,
+  Skeleton,
 } from 'antd';
 import {
   InboxOutlined, PhoneOutlined,
@@ -40,16 +41,19 @@ const SessionDetail = () => {
   const [fileList, setFileList] = useState<fileFormat[]>([])
   const [reload, setReload] = useState(0)// để con là bộ sưu tập biết mà tải lại
   const [openDrawer, setOpenDrawer] = useState(false)
+  const [loading, setLoading] = useState(true)
   const isAdmin = useAuthStore(state => state.user?.role) === 'ADMIN'
   const buoiHocId = Number(sessionId)
   const fetchSession = async (id: number) => {
     try {
+      setLoading(true)
       const res = await sessionApi.getDetailsById(id)
       setSession(res.data)
       setStudents(res.data.ChiTietKetQua)
     } catch (error: any) {
       handelError(error)
     }
+    finally{setLoading(false)}
   }
 
   // useEffect 1: id thay đổi thì fetch id mới
@@ -63,7 +67,6 @@ const SessionDetail = () => {
       form.setFieldsValue(session)
   }, [session, form])
 
-  if (!session) return <div>Không tìm thấy buổi học</div>
   // Cấu hình cột cho Bảng Học Viên
   const columns = [
     { // số tt
@@ -157,8 +160,6 @@ const SessionDetail = () => {
         await sessionApi.saveDraft(buoiHocId, payload)
       fetchSession(buoiHocId)
       message.success('Thao tác thành công')
-      // setFileList([])
-      console.log('fileList', fileList)
       setReload(prev => prev + 1)// tăng lên để con biết reload
     } catch (error) {
       handelError(error)
@@ -204,6 +205,15 @@ const SessionDetail = () => {
     setFileList(newFileList)
   }
 
+  if (loading)
+    return <div style={{ padding: 24, background: '#f0f2f5', minHeight: '100vh' }}>
+      <Skeleton loading={loading} active paragraph={{ rows: 6 }} />
+    </div>
+
+  if (!session) return <div style={{ padding: 24, background: '#f0f2f5', minHeight: '100vh' }}>
+      <div>Không tìm thấy buổi học</div>
+    </div>
+
   const ngayHoc = new Date(session.BatDauLuc).toLocaleDateString()
   const gioHoc = DateHelper.ISOToHHMM(session.BatDauLuc, session.KetThucLuc)
 
@@ -221,15 +231,18 @@ const SessionDetail = () => {
         />
       </Row>
 
-      <Form form={form} layout="vertical"
-      >
-        {/* Thông tin chung từ DB và nội dung buổi học */}
+      <Form form={form} layout="vertical">
+
+        {/* thông tin chung từ DB và nội dung buổi học */}
         <Card variant='borderless' title='Thông tin buổi học'
           style={{ marginBottom: 24, borderRadius: 8 }}
-          styles={{
-            header: { backgroundColor: '#f0f5ff', color: '#1d39c4' }
-          }}
-          extra={<Button onClick={() => setOpenDrawer(true)}>mở drawer</Button>}>
+          styles={{ header: { backgroundColor: '#f0f5ff', color: '#1d39c4' } }}
+          extra={
+            <Button onClick={() => setOpenDrawer(true)}
+            
+              style={{ backgroundColor: '#f0f5ff', color: '#1d39c4', fontWeight:'bold'}}
+            >Xem danh sách</Button>
+          }>
 
           <Descriptions bordered size="small"
             style={{ marginBottom: 24 }} column={{ xs: 1, sm: 2, md: 3 }}>
