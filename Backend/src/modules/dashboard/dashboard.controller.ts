@@ -25,11 +25,11 @@ export class DashboardController {
         return await this.dashboard.GetFinaceChart(yearNow)
     }
 
-    // lấy danh sách buổi học hôm nay
-    @Get('sessions')
-    async GetTodaySession() {
-        return await this.dashboard.GetTodaySession()
-    }
+    // // lấy danh sách buổi học hôm nay
+    // @Get('sessions')
+    // async GetTodaySession() {
+    //     return await this.dashboard.GetTodaySession()
+    // }
 
     // danh sách việc cần làm: các hóa đơn ACTIVE hết hạn, 
     // các lớp sắp hết buổi học cần tạo thêm, 

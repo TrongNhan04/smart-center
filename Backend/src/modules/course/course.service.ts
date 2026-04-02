@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { CourseQueryDTO, CreateCourseDTO, CourseUpdateDTO } from "./course.dto";
 import { Prisma } from "src/generated/prisma/client";
@@ -6,11 +6,7 @@ import { ClassService } from "../class/class.service";
 
 @Injectable()
 export class CourseService {
-    constructor(
-        private prismaService: PrismaService,
-        private classService: ClassService
-    ) { }
-
+    constructor(private prismaService: PrismaService) { }
     // tạo khóa học
     async CreateCourse(courseDTO: CreateCourseDTO) {
         // kiểm tra trùng mã khóa học
@@ -66,12 +62,12 @@ export class CourseService {
             where: { TrangThai: { not: 'INACTIVE' } },
             select: {
                 ID: true,
-                MaKhoaHoc:true,
+                MaKhoaHoc: true,
                 TenKhoaHoc: true,
-                ThoiGian:true,
-                HocPhi:true
+                ThoiGian: true,
+                HocPhi: true
             },
-            orderBy:{MaKhoaHoc:'asc'}
+            orderBy: { MaKhoaHoc: 'asc' }
         })
     }
 
@@ -124,8 +120,26 @@ export class CourseService {
 
     // lấy danh sách lớp học của khóa học
     async GetClassesByCourseId(courseId: number) {
-        await this.CourseIdValidator(courseId)
-        return await this.classService.GetClassesByCourseId(courseId)
+        const courseDB = await this.CourseIdValidator(courseId)
+        const classDB = await this.prismaService.lopHoc.findMany({
+            where: { KhoaHocID: courseDB.ID },
+            include: {
+                giaovien: { include: { User: true } },
+                _count: { select: { ghidanh: { where: { TrangThai: 'ACTIVE' } } } }
+            },
+            orderBy: { ID: 'desc' }
+        })
+        return classDB.map(lh => ({
+            ID: lh.ID, MaLopHoc: lh.MaLopHoc, TenLop: lh.TenLop,
+            GiaoVien: {
+                ID: lh.GiaoVienID,
+                HoTen: lh.giaovien.User.HoTen
+            },
+            PhongHoc: lh.PhongHoc, KhoaHocID: lh.KhoaHocID,
+            TuNgay: lh.TuNgay, DenNgay: lh.DenNgay, LichHoc: lh.LichHoc,
+            GioHoc: lh.GioBatDau + ' - ' + lh.GioKetThuc, SiSo: lh.SiSo,
+            TrangThai: lh.TrangThai, TongGhiDanh: lh._count.ghidanh
+        }))
     }
 
     //kiểm tra id khóa học
@@ -133,7 +147,7 @@ export class CourseService {
         const courseDB = await this.prismaService.khoaHoc.findUnique({
             where: { ID: courseId }
         })
-        if (!courseDB) throw new NotFoundException('Course not found')
+        if (!courseDB) throw new NotFoundException('Không tìm thấy khóa học')
         return courseDB
     }
 

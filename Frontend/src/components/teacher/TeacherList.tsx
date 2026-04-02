@@ -125,7 +125,7 @@ const TeacherList = () => {
     setIsOpen(true)
   }
 
-  const handleBack = (pagination: any) =>
+  const changeTablePage = (pagination: any) =>
     setSearchParam({ page: pagination.current })
 
   return (
@@ -181,7 +181,7 @@ const TeacherList = () => {
             current: currentPage,
             pageSize: 10
           }}
-          onChange={handleBack}
+          onChange={changeTablePage}
           rowKey="ID"
           scroll={{ x: 1100, y: 408 }}
         />

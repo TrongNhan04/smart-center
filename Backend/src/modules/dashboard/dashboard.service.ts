@@ -57,9 +57,14 @@ export class DashboardService {
                 sumOverdue += Number(item.TongTien) - Number(item.DaTra)
             }
         })
+        let profit = 0
+        if (!transactions.length) profit = 0
+        for (const item of transactions) {
+            const SoTien = Number(item._sum.SoTien)
+            if (item.LoaiGiaoDich === 'RECEIPT') profit += SoTien
+            else profit -= SoTien
+        }
 
-        const profit = Number(transactions[1]._sum.SoTien || 0) //RECEIPT
-            - Number(transactions[0]._sum.SoTien || 0) //PAYMENT
         return {
             TongHocVien: activeStudents,
             GhiDanhMoi: newEnrollments,
@@ -128,7 +133,7 @@ export class DashboardService {
         }))
     }
 
-    // lấy danh sách lớp gần hết buổi học hoặc cần sinh thêm buổi
+    // lấy danh sách lớp cần sinh thêm buổi
     async GetExpiringClasses() {
         const classDB = await this.prisma.lopHoc.findMany({
             where: { TrangThai: { not: 'CLOSED' } },
@@ -165,7 +170,6 @@ export class DashboardService {
 
     // lấy danh sách buổi học cần xử lý
     async GetPendingSessions() {
-        // const classDB = await this.GetExpiringClasses()
         const [requestUnlock, classDB, unSubmitted] = await Promise.all([
             // buổi học được yêu cầu mở khóa
             this.prisma.buoiHoc.findMany({
@@ -231,7 +235,7 @@ export class DashboardService {
         const classDB = await this.prisma.lopHoc.findFirst({
             where: { ID: body.classId, GiaoVienID: teacherId },
             select: {
-                ID:true, TenLop:true,
+                ID: true, TenLop: true,
                 giaovien: {
                     select: {
                         UserID: true,
@@ -244,7 +248,7 @@ export class DashboardService {
             data: {
                 UserID: classDB.giaovien.UserID,
                 TieuDe: "Thông báo hệ thống",
-NoiDung: `Nhắc nhở GV gửi kết quả buổi học, lớp ${classDB.TenLop} - buổi ${body.ssNumber}`,
+                NoiDung: `Nhắc nhở GV gửi kết quả buổi học, lớp ${classDB.TenLop} - buổi ${body.ssNumber}`,
                 Loai: 'SYSTERM_ARLERT',
                 DuLieu: {
                     classId: classDB.ID

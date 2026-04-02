@@ -41,17 +41,31 @@ export interface ClassForCmb {
     ID: number,
     MaLopHoc: string,
     TenLop: string,
-    HocPhi:number
+    HocPhi: number
     LichHoc: number[],
     GioHoc: string,
     SiSo: number,
     TongGhiDanh: number
 }
 
-export type TeacherClass = Omit<ClassDB,'GiaoVien'|'KhoaHoc'|'MoTa'> & {
-    IDBuoiDau:number
-    TongSoBuoi:number,
-    SoBuoiDaHoc:number
+// lớp cho giáo viên 
+export type TeacherClass = Omit<ClassDB, 'GiaoVien' | 'KhoaHoc' | 'MoTa'> & {
+    IDBuoiDau: number
+    TongSoBuoi: number,
+    SoBuoiDaHoc: number
+}
+
+// học viên của lớp
+export interface StuOfClass {
+    HocVienID: number,
+    MaHocVien: string,
+    TenHocVien: string,
+    NgaySinh: string,
+    DiaChi: string,
+    NgayNhapHoc: string,
+    PhuHuynh: string,
+    DienThoai: string,
+    HocPhi: number,
 }
 
 // để cho edit

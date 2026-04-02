@@ -1,7 +1,7 @@
 /**
  *  T extends Record<string, any>: T là 1 object bất kỳ
- *  originData: T -> originData là 1 object kiểu T
- *  newData: T -> là 1 object kiểu T
+ *  originData: T | originData là 1 object kiểu T
+ *  newData: T | newData là 1 object kiểu T
  *  trả về changes cũng là 1 object kiểu T
  */
 
@@ -12,7 +12,7 @@ export const getChangedValue = <T extends Record<string, any>>
     (originData: T, newData: T) => {
 
     // change là T nhưng không bắt buộc có đủ các phần tử
-    const changes: Partial<T> = {}
+    const changes: Partial<T> = {} // dùng Partial để các thuộc tính có thể null
     Object.keys(originData).forEach((key) => {
         // xem k là key của T
         const k = key as keyof T

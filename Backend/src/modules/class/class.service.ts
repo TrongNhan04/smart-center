@@ -125,7 +125,7 @@ export class ClassService {
     // lấy chi tiết lớp - phần trên
     async GetClassById(classId: number, userId: number | null) {
         const where: LopHocWhereUniqueInput = { ID: classId }
-        if (userId) // có giáo viên thì lấy lớp giáo viên
+        if (userId) // là giáo viên thì lấy lớp giáo viên
             where.giaovien = { UserID: userId }
 
         const classDB = await this.prismaService.lopHoc.findUnique({
@@ -162,26 +162,34 @@ export class ClassService {
         }
     }
 
-    // lấy danh sách lớp theo id khóa học
-    async GetClassesByCourseId(courseId: number) {
-        const classDB = await this.prismaService.lopHoc.findMany({
-            where: { KhoaHocID: courseId },
-            include: {
-                giaovien: { include: { User: true } },
-                _count: { select: { ghidanh: { where: { TrangThai: 'ACTIVE' } } } }
-            },
-            orderBy: { ID: 'desc' }
+    // lấy danh sách học viên của lớp
+    async GetStudentById(classId: number) {
+        const classDB = await this.ClassIDValidator(classId)
+        const enrolls = await this.prismaService.ghiDanh.findMany({
+            where: { LopHocID: classDB.ID, TrangThai: 'ACTIVE' },
+            select: {
+                NgayGhiDanh:true,
+                hocvien: {
+                    select:{
+                        ID: true, Parent:{select:{HoTen:true, DienThoai:true}},
+                        MaHocVien:true, TenHocVien:true, NgaySinh:true,
+                        DiaChi:true
+                    }
+                },
+                hoadon:{select:{TongTien:true}}
+            }, 
+            orderBy:{hocvien:{TenHocVien:'asc'}}
         })
-        return classDB.map(lh => ({
-            ID: lh.ID, MaLopHoc: lh.MaLopHoc, TenLop: lh.TenLop,
-            GiaoVien: {
-                ID: lh.GiaoVienID,
-                HoTen: lh.giaovien.User.HoTen
-            },
-            PhongHoc: lh.PhongHoc, KhoaHocID: lh.KhoaHocID,
-            TuNgay: lh.TuNgay, DenNgay: lh.DenNgay, LichHoc: lh.LichHoc,
-            GioHoc: lh.GioBatDau + ' - ' + lh.GioKetThuc, SiSo: lh.SiSo,
-            TrangThai: lh.TrangThai, TongGhiDanh: lh._count.ghidanh
+        return enrolls.map(stu => ({
+            HocVienID: stu.hocvien.ID, 
+            MaHocVien: stu.hocvien.MaHocVien,
+            TenHocVien: stu.hocvien.TenHocVien,
+            NgaySinh: stu.hocvien.NgaySinh, 
+            DiaChi: stu.hocvien.DiaChi,
+            NgayNhapHoc: stu.NgayGhiDanh,
+            PhuHuynh: stu.hocvien.Parent.HoTen, 
+            DienThoai: stu.hocvien.Parent.DienThoai,
+            HocPhi: stu.hoadon?.TongTien,  
         }))
     }
 
@@ -214,7 +222,6 @@ export class ClassService {
 
         // nếu đổi giáo viên thì kiểm tra gv có rảnh không
         if (up.teacherId) await this.ChangeTeacher(classId, up, classId)
-
         // nếu đổi phòng thì kiểm tra phòng có trống không
         if (up.room) await this.HasSameRoom(up, classDB.ID)
 
@@ -246,29 +253,23 @@ export class ClassService {
     // xóa mềm lớp học, hủy ghi danh và hủy các buổi học chưa diễn ra
     async DeleteClassByID(classId: number) {
         const classDB = await this.ClassIDValidator(classId)
-        if (classDB.TrangThai !== 'OPEN')
-            throw new BadRequestException('Không thể hủy lớp học này!')
-
-        await this.prismaService.$transaction(async tx => {
-            const now = new Date()
+        return await this.prismaService.$transaction(async tx => {
             await tx.lopHoc.update({
-                where: { ID: classId },
+                where: { ID: classDB.ID },
                 data: { TrangThai: 'CLOSED' }
             })
             await tx.ghiDanh.updateMany({
-                where: { LopHocID: classId, TrangThai: 'ACTIVE' },
+                where: { LopHocID: classDB.ID, TrangThai: 'ACTIVE' },
                 data: { TrangThai: 'INACTIVE' }
             })
             await tx.buoiHoc.updateMany({
                 where: {
-                    LopHocID: classId,
+                    LopHocID: classDB.ID,
                     TrangThai: 'SCHEDULED',
-                    // BatDauLuc: { gt: now }
                 },
                 data: { TrangThai: 'CANCELLED' }
             })
         })
-        return { msg: "Hủy lớp học thành công" }
     }
 
     // lấy danh sách lớp theo giáo viên - userId
@@ -406,7 +407,7 @@ export class ClassService {
     }
 
     // kiểm tra trùng phòng lớp
-    private async HasSameRoom(body: UpdateClassDTO | CreateClassDTO, 
+    private async HasSameRoom(body: UpdateClassDTO | CreateClassDTO,
         excludeClassId?: number) {
         if (!body.room) return
         const conflict = await this.prismaService.lopHoc.findMany({

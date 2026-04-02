@@ -1,6 +1,6 @@
 import {
-  Avatar, Badge, Button, Card, Col, Descriptions, message, Progress, Row,
-  Skeleton, Space, Statistic, Table, Tabs, Tag, Tooltip, Typography
+  Avatar, Badge, Button, Card, Progress, Skeleton, Space, Table, Tabs, Tag,
+  Tooltip, Typography
 } from "antd"
 import { useEffect, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
@@ -9,11 +9,12 @@ import type { ClassDB } from "../class/ClassDTO"
 import courseApi from "../../api/courseApi"
 import classApi from "../../api/classApi"
 import {
-  BookOutlined, CalendarOutlined, ClockCircleOutlined, DollarCircleOutlined,
-  EditOutlined, PlusOutlined, ReadOutlined, UserOutlined
+  CalendarOutlined, ClockCircleOutlined, EditOutlined, PlusOutlined,
 } from "@ant-design/icons"
 import CourseModal from "./CourseModal"
 import ClassModal from "../class/ClassModal"
+import { CatchError } from "../common/catch.error"
+import TabInfo from "./TabInfo"
 
 const { Title, Text } = Typography
 
@@ -28,38 +29,25 @@ const CourseDetail = () => {
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
 
-  const fetchCourse = async () => {
+  const initData = async () => {
     try {
-      const res = await courseApi.findOne(courseId)
-      setCourse(res.data)
+      setLoading(true)
+      const [courseRes, classRes] = await Promise.all([
+        courseApi.findOne(courseId),
+        classApi.getByCourseId(courseId)
+      ])
+      setCourse(courseRes.data)
+      setClasses(classRes.data)
     } catch (error: any) {
-      message.error("Có lỗi xảy ra!")
-      console.log("Có lỗi hàm fetchCourse: ", error)
+      // bắt lỗi từ backend
+      CatchError.HandleError(error)
     }
-  }
-
-  const fetchClasses = async () => {
-    try {
-      const res = await classApi.getByCourseId(courseId)
-      setClasses(res.data)
-    } catch (error) {
-      message.error("Có lỗi xảy ra!")
-      console.log("Có lỗi hàm fetchClasses: ", error)
-    }
+    finally { setLoading(false) }
   }
 
   useEffect(() => {
-    const initData = async () => {
-      try {
-        setLoading(true)
-        await Promise.all([fetchCourse(), fetchClasses()])
-      } catch (error) {
-        console.log("lỗi chạy useEffect: ", error)
-      }
-      finally { setLoading(false) }
-    }
-    if (!courseId || isNaN(courseId)) {
-      console.log("id không phải số nên courseId lỗi!", courseId)
+    if (!courseId) {
+      setLoading(false)
       return
     }
     initData()
@@ -67,20 +55,11 @@ const CourseDetail = () => {
 
   const SaveClassModal = (id: number) => {
     setClassId(id)
-    fetchClasses()
+    initData()
     setTimeout(() => {
       setClassId(null)
     }, 3000);
   }
-
-  // if (!course) return <div>Không tìm thấy khóa học</div>
-
-  const levelColor: Record<string, { color: string, text: string }> = {
-    BEGINER: { color: 'green', text: 'Sơ cấp' },
-    INTERMEDIATE: { color: 'geekblue', text: 'Trung cấp' },
-    ADVANCED: { color: 'orange', text: 'Nâng cao' }
-  }
-  const level = course ? levelColor[course.TrinhDo] : { color: 'default', text: '' }
 
   const statusColor: Record<string, { color: string, text: string }> = {
     DRAFT: { color: 'default', text: 'Chưa mở lớp' },
@@ -90,9 +69,9 @@ const CourseDetail = () => {
   const status = course ? statusColor[course.TrangThai] : { color: 'default', text: '' }
 
   // tính tổng số lớp đang mở
-  const openningClass = classes.filter(item => item.TrangThai !== 'CLOSED')
+  const openingClass = classes.filter(item => item.TrangThai !== 'CLOSED')
   // tính tổng học viên có ghi danh active của khóa
-  const totalStudentOfCourse = classes.reduce((sum, classOfCourse) => {
+  const totalStudent = classes.reduce((sum, classOfCourse) => {
     return sum + classOfCourse.TongGhiDanh
   }, 0)
 
@@ -166,9 +145,12 @@ const CourseDetail = () => {
       <Skeleton loading={loading} active paragraph={{ rows: 6 }} />
     </div>
 
-  if (!course) return <div style={{ minHeight: '89vh', background: '#f0f2f5' }}>
-      <div>Không tìm thấy khóa học</div>
-    </div>
+  if (!course) return <div style={{ padding: 24, minHeight: '89vh', background: '#f0f2f5' }}>
+    <Space orientation='vertical' size={3}>
+      <Title level={4}>Không tìm thấy khóa học</Title>
+      <Button onClick={() => navigate(-1)}>Quay lại</Button>
+    </Space>
+  </div>
 
   return (
     // div này bọc toàn bộ nội dung trang chi tiết */}
@@ -182,8 +164,7 @@ const CourseDetail = () => {
 
         {/* Tiêu đề, avata */}
         <div style={{
-          display: 'flex', justifyContent: 'space-between',
-          alignItems: 'center',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             {/* Nút quay lại */}
@@ -215,110 +196,62 @@ const CourseDetail = () => {
         <CourseModal
           open={openCourseModal}
           onCancel={() => setOpenCourseModal(false)}
-          onSave={fetchCourse}//Nếu bên trong Modal gọi onSave(105), 
-          // thì hàm cha sẽ nhận được fetchCourse(105)
+          onSave={initData}// chạy lại hàm
           editingCourse={course}
         />
       </div>{/*  div của header */}
 
       {/* div của body */}
       <div style={{ padding: '0px 18px 0px 18px' }}>
-        <Row gutter={19}>
-          {/* cột trái: bảng lớp học và mô tả */}
-          <Col span={19}>
-            <Card>
-              <Tabs
-                defaultActiveKey="1"
-                tabBarExtraContent={
-                  <Button type="primary" icon={<PlusOutlined />}
-                    disabled={course.TrangThai === 'INACTIVE'}
-                    onClick={() => setOpenClassModal(true)}
-                  >Mở lớp mới
-                  </Button>}
-                items={[
-                  {
-                    key: '1',
-                    label: `Danh sách lớp học (${classes.length})`,
-                    children: (
-                      <Table style={{ marginTop: 8 }}
-                        dataSource={classes}
-                        columns={columns}
-                        pagination={{ defaultPageSize: 6 }}
-                        rowKey="ID"
-                        scroll={{ y: 320 }}
-                        rowClassName={
-                          (record) =>
-                            record.ID === classId ? 'highlight-row' : ''
-                        }
-                      />
-                    ),
-                  },
-                  {
-                    key: '2',
-                    label: 'Nội dung mô tả',
-                    children: (
-                      <Typography.Paragraph>
-                        &nbsp;&nbsp;&nbsp;&nbsp;{course.MoTa ?? `Chưa cập nhật...`}
-                      </Typography.Paragraph>
-                    ),
-                  }
-                ]} /> {/* kết thúc tab */}
-            </Card>
-            <ClassModal
-              open={openClassModal}
-              onCancel={() => setOpenClassModal(false)}
-              khoahocId={Number(id)}
-              onSave={SaveClassModal}
-              editingClass={null!}
-            />
-          </Col>
-
-          {/* Cột phải: chứa thông tin tổng quan */}
-          <Col span={5}>
-            {/* thông tin tổng quan  */}
-            <Card title="Thông tin chung" style={{ marginBottom: 18 }}>
-              <Descriptions column={1} size='small' colon={false} layout="horizontal" items={[
-                {
-                  label: <><span style={{ color: '#888' }}>
-                    <DollarCircleOutlined /> Học phí: &nbsp; </span>
-                    <Text strong>{Number(course?.HocPhi).toLocaleString('vi-VN')} đ</Text></>
-                },
-                {
-                  label: <span style={{ color: '#888' }}><BookOutlined /> Trình độ: &nbsp;
-                    <Tag color={level.color}>{level.text.toLocaleUpperCase()}</Tag></span>
-                },
-                {
-                  label: <span style={{ color: '#888' }}><ClockCircleOutlined /> Thời lượng: &nbsp;
-                    <Text strong>{course?.ThoiGian} tháng </Text>({course?.TongSoBuoi} buổi)
-                  </span>
-                }
-              ]}>
-              </Descriptions>
-            </Card>
-
-            {/* thống kê nhanh */}
-            <Card>
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Statistic
-                    title="Lớp đang mở"
-                    value={openningClass.length}
-                    prefix={<ReadOutlined />}
+        <Card>
+          <Tabs
+            defaultActiveKey="1"
+            tabBarExtraContent={
+              <Button type="primary" icon={<PlusOutlined />}
+                disabled={course.TrangThai === 'INACTIVE'}
+                onClick={() => setOpenClassModal(true)}
+              >Mở lớp mới
+              </Button>}
+            items={[
+              {
+                key: '1',
+                label: `Danh sách lớp học (${classes.length})`,
+                children: (
+                  <Table style={{ marginTop: 8 }}
+                    dataSource={classes}
+                    columns={columns}
+                    pagination={{ defaultPageSize: 6 }}
+                    rowKey="ID"
+                    scroll={{ y: 320 }}
+                    rowClassName={
+                      (record) =>
+                        record.ID === classId ? 'highlight-row' : ''
+                    }
                   />
-                </Col>
-
-                <Col span={12}>
-                  <Statistic
-                    title="Tổng học viên"
-                    value={totalStudentOfCourse}
-                    prefix={<UserOutlined />}
-                  // valueStyle={{ color: '#3f8600' }}
+                ),
+              },
+              {
+                key: '2',
+                label: 'Thông tin chung',
+                children: (
+                  <TabInfo course={course}
+                    classes={openingClass.length}
+                    totalStu={totalStudent}
                   />
-                </Col>
-              </Row>
-            </Card>
-          </Col>
-        </Row>
+                ),
+              }
+            ]} /> {/* kết thúc tab */}
+        </Card>
+        <ClassModal
+          open={openClassModal}
+          onCancel={() => setOpenClassModal(false)}
+          khoahocId={Number(id)}
+          onSave={SaveClassModal}
+          editingClass={null!}
+        />
+
+        {/* </Col>
+        </Row> */}
       </div>
     </div>
   )

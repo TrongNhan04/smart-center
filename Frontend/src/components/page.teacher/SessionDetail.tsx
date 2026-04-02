@@ -53,12 +53,15 @@ const SessionDetail = () => {
     } catch (error: any) {
       handelError(error)
     }
-    finally{setLoading(false)}
+    finally { setLoading(false) }
   }
 
   // useEffect 1: id thay đổi thì fetch id mới
   useEffect(() => {
-    if (!buoiHocId) return
+    if (!buoiHocId) {
+      setLoading(false)
+      return
+    }
     fetchSession(buoiHocId)
   }, [buoiHocId])
   // useEffect 2: session thay đổi thì đổ dữ liệu mới vào form
@@ -211,8 +214,11 @@ const SessionDetail = () => {
     </div>
 
   if (!session) return <div style={{ padding: 24, background: '#f0f2f5', minHeight: '100vh' }}>
-      <div>Không tìm thấy buổi học</div>
-    </div>
+    <Space orientation='vertical' size={3}>
+      <Text>Không tìm thấy buổi học</Text>
+      <Button onClick={() => navigate(-1)}>Quay lại</Button>
+    </Space>
+  </div>
 
   const ngayHoc = new Date(session.BatDauLuc).toLocaleDateString()
   const gioHoc = DateHelper.ISOToHHMM(session.BatDauLuc, session.KetThucLuc)
@@ -239,8 +245,8 @@ const SessionDetail = () => {
           styles={{ header: { backgroundColor: '#f0f5ff', color: '#1d39c4' } }}
           extra={
             <Button onClick={() => setOpenDrawer(true)}
-            
-              style={{ backgroundColor: '#f0f5ff', color: '#1d39c4', fontWeight:'bold'}}
+
+              style={{ backgroundColor: '#f0f5ff', color: '#1d39c4', fontWeight: 'bold' }}
             >Xem danh sách</Button>
           }>
 

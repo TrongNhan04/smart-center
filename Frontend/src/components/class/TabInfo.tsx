@@ -72,8 +72,9 @@ const TabInfo = ({ lophoc }: Props) => {
           </Space>
         </Descriptions.Item>
 
-        {/* dùng span = 2 (hoặc 3) để trường mô tả ăn hết chiều ngang */}
-        <Descriptions.Item label="Mô tả chi tiết" span={2}>
+        {/* dùng span giống column để trường mô tả ăn hết chiều ngang */}
+        <Descriptions.Item label="Mô tả chi tiết"
+          span={{ xs: 1, sm: 1, md: 2, lg: 2, xl: 2 }}>
           <div style={{ whiteSpace: 'pre-wrap', color: '#595959' }}>
             {lophoc.MoTa ?? '-'}
           </div>

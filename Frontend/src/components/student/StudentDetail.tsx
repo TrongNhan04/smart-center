@@ -4,12 +4,13 @@ import type { ClassForStudent, StudentDB } from "./StudentDTO"
 import { studentApi } from "../../api/studentApi"
 import classApi from "../../api/classApi"
 import {
-  Avatar, Button, Card, notification, Progress, Skeleton, Space, Table, Tag, Tooltip, Typography
+  Avatar, Button, Card, notification, Progress, Skeleton, Space, Table, Tabs, Tag, Tooltip, Typography
 } from "antd"
 import {
   CalendarOutlined, ClockCircleOutlined, EditOutlined, InfoCircleOutlined,
 } from "@ant-design/icons"
 import StudentModal from "./StudentModal"
+import TabInfo from "./TabInfo"
 
 const { Text, Title } = Typography
 
@@ -179,19 +180,31 @@ const StudentDetail = () => {
 
       {/* div của body */}
       <div style={{ padding: '0px 18px 0px 18px' }}>
-        <Card title='Danh sách lớp ghi danh'>
-          <Table
-            //style={{ marginTop: 8 }}
-            dataSource={classes}
-            columns={columnsOfClass}
-            pagination={{ defaultPageSize: 5 }}
-            rowKey="ID"
-            scroll={{ y: 320 }}
-          />
+        <Card >
+          <Tabs
+            defaultActiveKey="1"
+            items={[
+              {
+                key: "1",
+                label: 'Lớp ghi danh',
+                children: (<Table
+                  dataSource={classes}
+                  columns={columnsOfClass}
+                  pagination={{ defaultPageSize: 5 }}
+                  rowKey="ID"
+                  scroll={{ y: 320 }}
+                />)
+              },
+              {
+                key:'2',
+                label:'Thông tin học viên',
+                children:(<TabInfo/>)
+              }
+            ]}
+          >
+          </Tabs>
         </Card>
       </div>
-
-      <Outlet />
     </div> // div của toàn bộ
   )
 }

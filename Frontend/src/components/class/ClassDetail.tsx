@@ -1,14 +1,13 @@
 import {
-  BookOutlined, CalendarOutlined, ClockCircleOutlined, EditOutlined,
-  InboxOutlined, PlusOutlined, TeamOutlined, UnlockOutlined, UserOutlined
+  CalendarOutlined, ClockCircleOutlined, EditOutlined, EnvironmentOutlined, InboxOutlined,
+  PlusOutlined, ReadFilled, ReadOutlined, UnlockOutlined
 }
   from "@ant-design/icons"
 import {
-  Avatar, Badge, Button, Card, Col, Descriptions, message, notification,
-  Popconfirm, Progress, Row, Skeleton, Space, Statistic, Table, Tabs, Tag, Tooltip,
-  Typography
+  Avatar, Badge, Button, Card, message, notification, Popconfirm, Skeleton,
+  Space, Table, Tabs, Tag, Tooltip, Typography
 } from "antd"
-import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom"
+import { useNavigate, useParams, useSearchParams } from "react-router-dom"
 import type { ClassDB } from "./ClassDTO"
 import { useEffect, useState } from "react"
 import classApi from "../../api/classApi"
@@ -20,6 +19,7 @@ import SessionAction from "../session/SessionAction"
 import SessionsModal from "../session/SessionsModal"
 import { useAuthStore } from "../../store/useAuthStore"
 import TabInfo from "./TabInfo"
+import TabStudent from "./TabStudent"
 
 const { Title, Text } = Typography
 
@@ -49,11 +49,11 @@ const ClassDetail = () => {
     } catch (error: any) {
       notification.error({
         title: 'Có lỗi xảy ra',
-        description: error.response.data.message,
+        description: error?.response?.data?.message,
         showProgress: true,
         pauseOnHover: true
       })
-      console.log("Có lỗi xảy ra", error.response.data.message)
+      console.log("Có lỗi xảy ra", error)
     }
     finally { setLoading(false) }
   }
@@ -63,14 +63,9 @@ const ClassDetail = () => {
     initData()
   }, [classId])
 
-  const dow = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
-  const result = lophoc?.LichHoc.map(m => dow[m]).join('-')
-
   const statusColor: Record<string, string> = {
-    OPEN: 'default',
-    RUNNING: 'processing',
-    CLOSED: 'error',
-    FINISHED: 'success'
+    OPEN: 'default', RUNNING: 'processing',
+    CLOSED: 'error', FINISHED: 'success'
   } // status cho tiêu đề
   const status = lophoc ? statusColor[lophoc.TrangThai] : 'default'
 
@@ -81,7 +76,7 @@ const ClassDetail = () => {
       render: (value: number) => value
     },
     { // Thời gian
-      title: 'Thời gian', dataIndex: 'BatDauLuc', width: 130,
+      title: 'Thời gian', dataIndex: 'BatDauLuc', width: 150,
       key: 'BatDauLuc', //ellipsis: 
       render: (value: string, session: SessionDB) => {
         return <Space orientation="vertical" size={0}>
@@ -99,10 +94,11 @@ const ClassDetail = () => {
       title: 'Nội dung', dataIndex: 'ChuDe', key: 'ChuDe', ellipsis: true,
       render: (topic: string, session: SessionDB) => {
         return <Space orientation="vertical" size={0}>
-          <Text strong >
-            {topic ?? `Chủ đề: chưa cập nhật...`}</Text>
-          <Text type="secondary" style={{ fontSize: '14px' }}>
-            {session.PhongHoc ?? `Chưa cập nhật`}
+          <Text >
+            <ReadOutlined /> {topic ?? `Chủ đề: chưa cập nhật...`}
+          </Text>
+          <Text >
+            <EnvironmentOutlined /> {session.PhongHoc ?? `Phòng: _`}
           </Text>
         </Space>
       }
@@ -181,21 +177,20 @@ const ClassDetail = () => {
       message.success(`Đã tạo thành công ${res.data.length} buổi học`)
     } catch (error: any) {
       // bắt lỗi từ backend
-      console.log("Có lỗi xảy ra: ", error.response.data.message)
-
       if (error.response) {
         const serverError = error.response.data
         // nếu là mảng lỗi thì lấy cái đầu tiên
         if (Array.isArray(serverError.message))
           message.error(serverError.message[0])
         else if (typeof serverError.message === 'string')
-          message.error({
-            content: serverError.message,
-            style: { marginTop: '10vh' },
-            duration: 6
+          notification.error({
+            title: 'Có lỗi xảy ra',
+            description: error?.response?.data?.message,
+            showProgress: true,
+            pauseOnHover: true
           })
         else
-          message.error("Có lỗi xảy ra")
+          console.log("Có lỗi xảy ra", error)
       }
     }
   }
@@ -223,7 +218,7 @@ const ClassDetail = () => {
     }
   }
 
-  const handleBack = (pagination: any) => setSearchParam({ page: pagination.current })
+  const changeTablePage = (pagination: any) => setSearchParam({ page: pagination.current })
 
   if (loading) return <div style={{ minHeight: '89vh', background: '#f0f2f5' }}>
     <Skeleton loading={loading} active paragraph={{ rows: 6 }} />
@@ -325,7 +320,7 @@ const ClassDetail = () => {
                       current: currentPage,
                       pageSize: 10
                     }}
-                    onChange={handleBack}
+                    onChange={changeTablePage}
                     rowKey="ID"
                     scroll={{ y: 320 }}
                   />
@@ -333,15 +328,13 @@ const ClassDetail = () => {
               },
               {
                 key: '2',
-                label: 'Danh sách học viên',
-                children: (
-                  <></>
-                ),
+                label: 'Danh sách học viên ',
+                children: (<TabStudent id={lophoc.ID} />),
               },
               {
                 key: '3',
                 label: 'Thông tin chung',
-                children: (<TabInfo lophoc={lophoc}/>),
+                children: (<TabInfo lophoc={lophoc} />),
               }
             ]} /> {/* kết thúc tab */}
         </Card>

@@ -3,7 +3,7 @@ import { type ReminderTeacher, type TaskDB } from "./DashboardDTO"
 import { Button, Card, message, notification, Popconfirm, Table, Tag } from "antd"
 import { useEffect, useState } from "react"
 import { dashboardApi } from "../../api/dashboardApi"
-import { BellOutlined, CheckCircleOutlined, CheckOutlined } from "@ant-design/icons"
+import { BellOutlined, CheckCircleOutlined, CheckOutlined, PlusCircleOutlined } from "@ant-design/icons"
 
 const TaskList = () => {
   const navigate = useNavigate()
@@ -16,7 +16,11 @@ const TaskList = () => {
   const fetchTasks = async () => {
     try {
       const res = await dashboardApi.getTasks()
-      setTasksToday(res.data)
+      const formatRes = res.data.map((item:TaskDB, index:number)=>({
+        index, // thêm index để không cảnh báo thiếu unique key
+        ...item 
+      }))
+      setTasksToday(formatRes)
     } catch (error) {
       handelError(error)
     }
@@ -128,7 +132,7 @@ const TaskList = () => {
           >{isReminded ? 'Đã nhắc' : 'Nhắc GV'}</Button>
         }
 
-        return <Button size="small"
+        return <Button size="small" icon={<PlusCircleOutlined/>}
           onClick={() => navigate(`/admin/classes/${task.LopHocID}`)}>
           Bổ sung
         </Button>
@@ -150,7 +154,7 @@ const TaskList = () => {
           dataSource={tasksToday}
           columns={columns}
           pagination={{ defaultPageSize: 10 }}
-          rowKey="BuoiHocID"
+          rowKey="index"
           scroll={{ x: 1100, y: 408 }}
         />
       </Card>

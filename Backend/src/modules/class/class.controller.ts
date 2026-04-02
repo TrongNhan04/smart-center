@@ -44,13 +44,13 @@ export class ClassController {
 
     // lấy chi tiết lớp - phần trên 
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles('ADMIN','TEACHER')
+    @Roles('ADMIN', 'TEACHER')
     @Get('admin/classes/:id')
     async GetClassById(
         @Req() req: RequestWithUser,
         @Param('id') classId: number) {
         const userId = req.user.role === 'TEACHER' ? req.user.userId : null
-        return await this.classService.GetClassById(+classId,userId)
+        return await this.classService.GetClassById(+classId, userId)
     }
 
     // cập nhật lớp theo trạng thái
@@ -72,16 +72,22 @@ export class ClassController {
 
     //  lấy danh sách buổi học của lớp - phần dưới
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles('ADMIN','TEACHER')
+    @Roles('ADMIN', 'TEACHER')
     @Get('admin/classes/:id/sessions')
     async GetSessionsByClassId(
-        @Req() req:RequestWithUser,
+        @Req() req: RequestWithUser,
         @Param('id') classId: number) {
         const userId = req.user.role === 'TEACHER' ? req.user.userId : null
         return await this.sessionService.GetSessionsByClassId(classId, userId)
     }
 
-    // tạo buổi học tự động - thủ công
+    // lấy danh sách học viên ACTIVE của lớp
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADMIN', 'TEACHER')
+    @Get('admin/classes/:id/students')
+    async GetStudentById(@Param('id') classId: number) {
+        return await this.classService.GetStudentById(+classId)
+    }
 
     //======================== TEACHER ========================
     // danh sách lớp giáo viên A đang dạy - xong
