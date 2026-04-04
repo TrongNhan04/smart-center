@@ -29,17 +29,7 @@ export class TeacherService {
     private async TeacherIdValidator(teacherId: number) {
         const teacherDB = await this.prismaService.giaoVien.findUnique({
             where: { ID: teacherId },
-            select: {
-                ID: true, MaGiaoVien: true, UserID: true,
-                ChuyenMon: true, TrangThai: true,
-                User: {
-                    select: {
-                        HoTen: true,
-                        Email: true,
-                        DienThoai: true
-                    }
-                }
-            }
+            include: { User: true }
         })
         if (!teacherDB) throw new NotFoundException('Không tìm thấy giáo viên')
         return teacherDB
@@ -68,7 +58,9 @@ export class TeacherService {
             const newTeacher = await tx.giaoVien.create({
                 data: {
                     MaGiaoVien: body.code,
+                    NgaySinh: body.dob,
                     ChuyenMon: body.major,
+                    DiaChi: body.address ? body.address : null,
                     UserID: newUser.ID
                 },
                 include: { User: true }
@@ -106,6 +98,8 @@ export class TeacherService {
             ID: item.ID,
             MaGiaoVien: item.MaGiaoVien,
             HoTen: item.User.HoTen,
+            NgaySinh: item.NgaySinh,
+            DiaChi: item.DiaChi,
             Email: item.User.Email,
             DienThoai: item.User.DienThoai,
             ChuyenMon: item.ChuyenMon,
@@ -144,8 +138,10 @@ export class TeacherService {
             ID: teacherDB.ID,
             MaGiaoVien: teacherDB.MaGiaoVien,
             HoTen: teacherDB.User.HoTen,
+            NgaySinh: teacherDB.NgaySinh,
             Email: teacherDB.User.Email,
             DienThoai: teacherDB.User.DienThoai,
+            DiaChi: teacherDB.DiaChi,
             ChuyenMon: teacherDB.ChuyenMon,
             TrangThai: teacherDB.TrangThai,
             SoBuoiDaDay: total
@@ -156,16 +152,22 @@ export class TeacherService {
     async UpdateTeacherByID(teacherId: number, body: UpdateTeacherDTO) {
         const teacherDB = await this.TeacherIdValidator(teacherId)
         const userDB = await this.prismaService.user.findUnique({
-            where: { ID: teacherDB.ID }
+            where: { ID: teacherDB.UserID }
         })
         if (!userDB) throw new NotFoundException('Không tìm thấy người dùng')
 
         const name = body.name ?? userDB.HoTen
         const major = body.major ?? teacherDB.ChuyenMon
+        const address = body.address ?? teacherDB.DiaChi
+        const dob = body.dob ?? teacherDB.NgaySinh
         await this.prismaService.$transaction([
             this.prismaService.giaoVien.update({
                 where: { ID: teacherDB.ID },
-                data: { ChuyenMon: major }
+                data: {
+                    ChuyenMon: major,
+                    DiaChi:address,
+                    NgaySinh: dob
+                }
             }),
             this.prismaService.user.update({
                 where: { ID: teacherDB.UserID },
@@ -210,8 +212,8 @@ export class TeacherService {
         const classDB = await this.prismaService.lopHoc.findMany({
             where: { GiaoVienID: teacherDB.ID },
             include: {
-                khoahoc: true, 
-                buoihoc: { select:{ID:true},orderBy: { BatDauLuc: 'asc' } },
+                khoahoc: true,
+                buoihoc: { select: { ID: true }, orderBy: { BatDauLuc: 'asc' } },
                 _count: {
                     select:
                     {
@@ -231,7 +233,7 @@ export class TeacherService {
             SiSo: lh.SiSo,
             TongSoBuoi: lh.khoahoc.TongSoBuoi,
             SoBuoiDaHoc: lh._count.buoihoc,
-            IDBuoiDau: lh.buoihoc.map(item=>item.ID)[0]
+            IDBuoiDau: lh.buoihoc.map(item => item.ID)[0]
         }))
     }
 

@@ -1,9 +1,6 @@
-import { Descriptions, Space, Typography, Progress, Tag } from 'antd';
+import { Descriptions, Space, Typography, Tag } from 'antd';
 import {
-  UserOutlined, ClockCircleOutlined, CalendarFilled, EnvironmentFilled,
-  ReadFilled,
-  DollarCircleFilled,
-  ReadOutlined
+  UserOutlined, CalendarFilled, DollarCircleFilled, ReadOutlined
 } from '@ant-design/icons';
 import type { CourseDB } from './CourseDTO';
 
@@ -28,12 +25,12 @@ const TabInfo = ({ course, classes, totalStu }: Props) => {
     <div style={{ padding: '16px 0' }}>
       <Descriptions
         // layout='vertical'
-        bordered
+        //bordered // ko có cái này thì tiêu đề: nội dung
         size="middle" // tùy kích cỡ màn hình mà hiển thị mấy cột
         column={{ xs: 1, sm: 1, md: 2, lg: 2, xl: 2 }}
         styles={{
-          label: { minWidth: 180 },
-          content: { minWidth: 180 }
+          label: { color: 'black' },
+          //content: { minWidth: 180 }
         }}
       >
         <Descriptions.Item label="Mã khóa học">
@@ -68,8 +65,8 @@ const TabInfo = ({ course, classes, totalStu }: Props) => {
           </Space>
         </Descriptions.Item>
 
-        <Descriptions.Item label="Lớp thuộc khóa">
-          <Space><ReadFilled style={{ color: 'burlywood' }} />{classes}lớp</Space>
+        <Descriptions.Item label="Số lớp học">
+          <Space><ReadOutlined style={{ color: 'purple' }} />{classes}lớp</Space>
         </Descriptions.Item>
 
         <Descriptions.Item label="Tổng học viên">
@@ -80,7 +77,7 @@ const TabInfo = ({ course, classes, totalStu }: Props) => {
         <Descriptions.Item label="Mô tả chi tiết"
           span={{ xs: 1, sm: 1, md: 2, lg: 2, xl: 2 }}>
           <div style={{ whiteSpace: 'pre-wrap', color: '#595959' }}>
-            {course.MoTa ?? '-'}
+            {course.MoTa ?? 'Chưa cập nhật'}
           </div>
         </Descriptions.Item>
 

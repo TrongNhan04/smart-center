@@ -6,13 +6,12 @@ import {
 } from "antd"
 import { invoiceApi } from "../../api/invoiceApi"
 import {
-  CalendarFilled,
-  CalendarOutlined, CheckCircleOutlined, PhoneFilled, PhoneOutlined, SearchOutlined,
+  CalendarFilled, CheckCircleOutlined, PhoneOutlined, SearchOutlined,
   UserOutlined
 } from "@ant-design/icons"
 import InvoiceAction from "./InvoiceAction"
 import InvoiceModal from "./InvoiceModal"
-import { useSearchParams } from "react-router-dom"
+import { Link, useSearchParams } from "react-router-dom"
 import { DateHelper } from "../common/date.helper"
 
 const { Text } = Typography
@@ -116,8 +115,10 @@ const InvoiceList = () => {
       key: 'TenHocVien', ellipsis: true,
       render: (name: string, invoice: InvoiceDB) =>
         <Space orientation="vertical" size={0}>
-          <Text style={{ color: '#187cff', fontWeight: 'bold' }}><UserOutlined /> {name}</Text>
-          <Text><PhoneFilled /> {invoice.DienThoai}</Text>
+          <Link to={`/admin/students/${invoice.HocVienID}`} style={{fontWeight:'bold'}}>
+            <UserOutlined /> {name}
+          </Link>
+          <Text><PhoneOutlined /> {invoice.DienThoai}</Text>
         </Space>
     },
     { // tổng tiền + còn nợ 
@@ -173,9 +174,9 @@ const InvoiceList = () => {
         new Date(invoice.NgayHetHan).getMonth() == value,
       render: (invoiceDate: string, invoice: InvoiceDB) => {
         // so sáng hiện tại với thời hạn -> phút
-        const overTime = DateHelper.TimeDiff(invoiceDate) 
-        const overDate = Math.floor(overTime / (24 * 60 )) // tính xem được mấy ngày 
-        const isCancelled = invoice.TrangThai === 'CANCELLED' 
+        const overTime = DateHelper.TimeDiff(invoiceDate)
+        const overDate = Math.floor(overTime / (24 * 60)) // tính xem được mấy ngày 
+        const isCancelled = invoice.TrangThai === 'CANCELLED'
         const isDebt = invoice.TongTien - invoice.DaTra
         let isOverTime_Debt = false
         if (overTime > 0 && isDebt && !isCancelled)
@@ -285,7 +286,7 @@ const InvoiceList = () => {
           pagination={{
             current: currentPage,
             pageSize: 12,
-            total: total
+            total: total// tổng từ backend
           }}
           onChange={handleChange}
           rowKey="ID"

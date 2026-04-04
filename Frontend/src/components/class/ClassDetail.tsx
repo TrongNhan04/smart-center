@@ -1,7 +1,6 @@
 import {
-  CalendarFilled,
-  CalendarOutlined, ClockCircleFilled, ClockCircleOutlined, EditOutlined, EnvironmentOutlined, InboxOutlined,
-  PlusOutlined, ReadFilled, ReadOutlined, UnlockOutlined
+  CalendarFilled, EditOutlined, InboxOutlined, PlusOutlined, ReadOutlined, 
+  UnlockOutlined
 }
   from "@ant-design/icons"
 import {
@@ -14,13 +13,13 @@ import { useEffect, useState } from "react"
 import classApi from "../../api/classApi"
 import { sessionApi } from "../../api/sessionApi"
 import type { SessionDB } from "../session/SessionDTO"
-import { DateHelper } from "../common/date.helper"
 import ClassModal from "./ClassModal"
 import SessionAction from "../session/SessionAction"
 import SessionsModal from "../session/SessionsModal"
 import { useAuthStore } from "../../store/useAuthStore"
 import TabInfo from "./TabInfo"
 import TabStudent from "./TabStudent"
+import { CatchError } from "../common/catch.error"
 
 const { Title, Text } = Typography
 
@@ -48,13 +47,7 @@ const ClassDetail = () => {
       setLopHoc(classRes.data)
       setSessions(sessionRes.data)
     } catch (error: any) {
-      notification.error({
-        title: 'Có lỗi xảy ra',
-        description: error?.response?.data?.message,
-        showProgress: true,
-        pauseOnHover: true
-      })
-      console.log("Có lỗi xảy ra", error)
+      CatchError.HandleError(error)
     }
     finally { setLoading(false) }
   }
@@ -79,7 +72,7 @@ const ClassDetail = () => {
     { // Thời gian
       title: 'Thời gian', dataIndex: 'BatDauLuc', width: 150,
       key: 'BatDauLuc', //ellipsis: 
-      render: (value: string, session: SessionDB) => {
+      render: (value: string) => {
         return <Space orientation="vertical" size={0}>
           <Text><CalendarFilled style={{ color: '#ff5d18' }} /> {new Date(value).toLocaleDateString()}</Text>
           {/* <Text><ClockCircleFilled /> {DateHelper.ISOToHHMM(value, session.KetThucLuc)}
@@ -102,7 +95,7 @@ const ClassDetail = () => {
         { text: 'Sắp tới', value: 'SCHEDULED' },
         { text: 'Hoàn thành', value: 'COMPLETED' },
         { text: 'Đã hủy', value: 'CANCELLED' },
-        { text: 'Chưa nộp KQ', value: 'UNSUBMIT' }
+        { text: 'Chưa chốt KQ', value: 'UNSUBMIT' }
       ], // value là của thằng filter
       onFilter: (value: any, session: SessionDB) => session.TrangThai === value,
       render: (value: string) => {
@@ -110,7 +103,7 @@ const ClassDetail = () => {
           SCHEDULED: { color: 'default', text: 'Sắp tới' },
           COMPLETED: { color: 'success', text: 'Hoàn thành' },
           CANCELLED: { color: 'error', text: 'Đã hủy' },
-          UNSUBMIT: { color: 'processing', text: 'Chưa nộp KQ' }
+          UNSUBMIT: { color: 'processing', text: 'Chưa chốt kết quả' }
         }
         // value là 1 trong 3 key đó
         const status = statusMap[value]

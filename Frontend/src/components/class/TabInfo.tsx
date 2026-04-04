@@ -1,7 +1,6 @@
 import { Descriptions, Space, Typography, Progress } from 'antd';
 import {
-  UserOutlined, ClockCircleOutlined, CalendarFilled, EnvironmentFilled,
-  ReadFilled
+  UserOutlined, CalendarFilled, EnvironmentFilled, ClockCircleFilled, BookFilled
 } from '@ant-design/icons';
 import type { ClassDB } from './ClassDTO';
 
@@ -21,9 +20,12 @@ const TabInfo = ({ lophoc }: Props) => {
   return (
     <div style={{ padding: '16px 0' }}>
       <Descriptions
-        bordered
+        // bordered
         size="middle" // tùy kích cỡ màn hình mà hiển thị mấy cột
         column={{ xs: 1, sm: 1, md: 2, lg: 2, xl: 2 }}
+        styles={{
+          label: { color: 'black' }
+        }}
       >
         <Descriptions.Item label="Mã lớp">
           <Text strong>{lophoc.MaLopHoc}</Text>
@@ -34,7 +36,7 @@ const TabInfo = ({ lophoc }: Props) => {
         </Descriptions.Item>
 
         <Descriptions.Item label="Khóa học">
-          <Space><ReadFilled style={{ color: '#8c8c8c' }} />
+          <Space><BookFilled style={{ color: 'purple' }} />
             {lophoc.KhoaHoc.TenKhoaHoc}</Space>
         </Descriptions.Item>
 
@@ -45,7 +47,7 @@ const TabInfo = ({ lophoc }: Props) => {
 
         <Descriptions.Item label="Phòng học">
           <Space><EnvironmentFilled style={{ color: '#ff4d4f' }} />
-            {lophoc.PhongHoc ?? '-'}</Space>
+            {lophoc.PhongHoc ?? 'Chưa cập nhật'}</Space>
         </Descriptions.Item>
 
         <Descriptions.Item label="Sĩ số">
@@ -66,18 +68,15 @@ const TabInfo = ({ lophoc }: Props) => {
         </Descriptions.Item>
 
         <Descriptions.Item label="Lịch học">
-          <Space orientation="vertical" size={2}>
-            {dow}
-            <Text type="secondary"><ClockCircleOutlined /> {lophoc.GioHoc}</Text>
+          <Space>
+            <Text ><ClockCircleFilled /> {dow} {lophoc.GioHoc}</Text>
           </Space>
         </Descriptions.Item>
 
         {/* dùng span giống column để trường mô tả ăn hết chiều ngang */}
         <Descriptions.Item label="Mô tả chi tiết"
           span={{ xs: 1, sm: 1, md: 2, lg: 2, xl: 2 }}>
-          <div style={{ whiteSpace: 'pre-wrap', color: '#595959' }}>
-            {lophoc.MoTa ?? '-'}
-          </div>
+          <Text>{lophoc.MoTa ?? 'Chưa cập nhật'}</Text>
         </Descriptions.Item>
 
       </Descriptions>

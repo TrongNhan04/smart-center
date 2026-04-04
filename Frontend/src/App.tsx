@@ -23,6 +23,7 @@ import MyClasses from "./components/page.teacher/MyClasses";
 import TeacherRoute from "./components/page.teacher/TeacherRoute";
 import SessionDetail from "./components/page.teacher/SessionDetail";
 import ThongKeDiHoc from "./components/student/ThongKeDiHoc";
+import SchedulePage from "./components/dashboard/SchedulePage";
 
 const router = createBrowserRouter([
   {
@@ -63,6 +64,7 @@ const router = createBrowserRouter([
 
           { path: 'dashboard', element: <Dashboard /> },
           { path: 'tasks', element: <TaskList /> },
+          { path: 'schedule', element: <SchedulePage/>},
 
           { path: 'courses', element: <CourseList /> },
           { path: 'courses/:id', element: <CourseDetail /> },

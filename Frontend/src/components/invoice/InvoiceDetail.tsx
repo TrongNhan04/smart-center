@@ -1,7 +1,6 @@
 import {
-  CalendarFilled,
-  MoneyCollectOutlined, PhoneFilled, ReadOutlined, RollbackOutlined,
-  UserOutlined
+  CalendarOutlined, ClockCircleOutlined, MoneyCollectOutlined, PhoneOutlined, 
+  ReadOutlined, RollbackOutlined, UserOutlined
 } from "@ant-design/icons";
 import {
   Card, Descriptions, Table, Divider, Typography, Row, Col, Statistic,
@@ -142,7 +141,10 @@ const InvoiceDetail = () => {
       width: 190,
       render: (value: string) => method[value]
     },
-    { title: 'Thu ngân', dataIndex: 'ThuNgan', key: 'ThuNgan', width: 220, },
+    {
+      title: 'Thu ngân', dataIndex: 'ThuNgan', key: 'ThuNgan', width: 220,
+      render: (name:string) => <Text><UserOutlined/> {name}</Text>
+    },
     {
       title: 'Ghi chú', dataIndex: 'GhiChu', key: 'GhiChu',
       render: (value: string) => !value || '' ? '-' : value
@@ -154,7 +156,7 @@ const InvoiceDetail = () => {
       <Card>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
           <Button onClick={() => navigate(-1)}> Quay lại</Button>
-          <Text style={{fontSize:24, fontWeight:'bold'}}> HÓA ĐƠN {invoice.MaHoaDon}</Text>
+          <Text style={{ fontSize: 24, fontWeight: 'bold' }}> HÓA ĐƠN {invoice.MaHoaDon}</Text>
           <Space>
             {/* <Button icon={<PrinterOutlined />}>In hóa đơn</Button> */}
             <Button type="primary" icon={<MoneyCollectOutlined />}
@@ -185,20 +187,20 @@ const InvoiceDetail = () => {
         >
           <Descriptions.Item label="Học viên">
             <Text strong style={{ color: '#0d6efd' }}>
-              <UserOutlined/> {invoice.TenHocVien}</Text>
+              <UserOutlined /> {invoice.TenHocVien}</Text>
           </Descriptions.Item>
 
           <Descriptions.Item label="Số điện thoại">
-            <Text ><PhoneFilled/> {invoice.DienThoai}</Text>
+            <Text ><PhoneOutlined /> {invoice.DienThoai}</Text>
           </Descriptions.Item>
 
           <Descriptions.Item label="Lớp học" >
-            <Text ><ReadOutlined/> {invoice.TenLop}</Text>
+            <Text ><ReadOutlined /> {invoice.TenLop}</Text>
           </Descriptions.Item>
 
           <Descriptions.Item label="Ngày phát hành">
             <Text >
-              <CalendarFilled style={{color:'#ff8818'}}/> {new Date(invoice.NgayPhatHanh).toLocaleDateString()}
+              <CalendarOutlined /> {new Date(invoice.NgayPhatHanh).toLocaleDateString()}
             </Text>
           </Descriptions.Item>
 
@@ -208,7 +210,7 @@ const InvoiceDetail = () => {
 
           <Descriptions.Item label="Hạn thanh toán">
             <Text type="danger" strong>
-              {new Date(invoice.NgayHetHan).toLocaleDateString()}
+              <ClockCircleOutlined /> {new Date(invoice.NgayHetHan).toLocaleDateString()}
             </Text>
           </Descriptions.Item>
         </Descriptions>

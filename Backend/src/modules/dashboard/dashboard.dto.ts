@@ -6,26 +6,26 @@
 import { IsNotEmpty } from "class-validator"
 
 export class RequestUnlockDTO {
-    id: number
-    lesson: number
-    room: string
-    teacher: string
-    reason: string
-    date: Date
+    id!: number
+    lesson!: number
+    room!: string
+    teacher!: string
+    reason!: string
+    date!: Date
 }
 
 export class UnsubmittedDTO {
-    id: number
-    lesson: number
-    room: string
-    teacher: string
+    id!: number
+    lesson!: number
+    room!: string
+    teacher!: string
 }
 
 export class RemindTeacher {
     @IsNotEmpty()
-    classId: number
+    classId!: number
 
-    ssNumber: string
+    ssNumber!: string
 }
 
 // export interface PendingSSDTO {

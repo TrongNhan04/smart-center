@@ -78,7 +78,6 @@ const StudentModal = ({ open, onSave, onCancel, editing }: Props) => {
     setLoading(true)
     try { // dữ liệu từ form (tiếng anh)
       const values: StudentDto = await form.validateFields()
-
       const payload: StudentDto = {
         ...values,
         fee: Number(values.fee)

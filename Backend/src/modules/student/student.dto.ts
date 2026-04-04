@@ -5,32 +5,32 @@ import { TrangThaiHV } from "src/generated/prisma/enums"
 export class CreateStudentDTO {
     @IsNotEmpty()
     @IsString()
-    code: string
+    code!: string 
 
     @IsNotEmpty()
     @IsInt()
-    classId: number
+    classId!: number 
 
     @IsNotEmpty()
     @IsString()
-    student: string
+    student!: string 
 
     @IsNotEmpty()
     @IsString()
-    parent: string
+    parent!: string 
 
     @IsNotEmpty()
     @IsEmail()
-    email: string
+    email!: string 
 
     @IsNotEmpty()
     @IsPhoneNumber('VN')
-    phone: string
+    phone!: string 
 
     @IsNotEmpty()
     @Type(() => Date)
     @IsDate()
-    dob: Date
+    dob: Date = new Date()
 
     @IsOptional()
     @IsString()
@@ -39,7 +39,7 @@ export class CreateStudentDTO {
     @IsNotEmpty()
     @IsNumber()
     @IsPositive()
-    fee: number
+    fee!: number 
 }
 
 export class QueryStudentDTO {

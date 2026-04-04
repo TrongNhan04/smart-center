@@ -1,5 +1,6 @@
 import {
-  MailOutlined, PhoneFilled, PlusOutlined, SearchOutlined, UserOutlined
+  CalendarFilled, MailFilled, PhoneFilled, PlusOutlined, SearchOutlined,
+  UserOutlined
 } from "@ant-design/icons"
 import {
   Badge, Button, Card, Col, Input, notification, Row, Select, Table, Typography
@@ -65,7 +66,13 @@ const TeacherList = () => {
       key: 'HoTen', ellipsis: true,
       render: (name: string, teacher: TeacherDB) =>
         <Link to={`/admin/teachers/${teacher.ID}`}
-          style={{ fontWeight: 'bold' }}><UserOutlined/> {name}</Link>
+          style={{ fontWeight: 'bold' }}><UserOutlined /> {name}</Link>
+    },
+    { // ngày sinh
+      title: 'Ngày sinh', dataIndex: 'NgaySinh', key: 'NgaySinh', //width: 100,
+      render: (dob: string) => <Text>
+        <Text><CalendarFilled style={{ color: '#ff7818' }} /> {new Date(dob).toLocaleDateString()}</Text>
+      </Text>
     },
     { //Điện thoại
       title: 'Điện thoại', dataIndex: 'DienThoai', key: 'DienThoai', //width: 100,
@@ -76,14 +83,10 @@ const TeacherList = () => {
     { // Email
       title: 'Email', dataIndex: 'Email', key: 'Email', //width: 120,
       render: (email: string) => <Text>
-        <MailOutlined style={{color:'#ff1818'}}/> {email}
+        {/* <MailOutlined style={{color:'#ff1818'}}/> {email} */}
+        <MailFilled style={{ color: '#188fff' }} /> {email}
       </Text>
     },
-    // { // Chuyên môn
-    //   title: 'Chuyên môn', dataIndex: 'ChuyenMon', key: 'ChuyenMon', //width: 170,
-    //   render: (value: string) => !value || "" ?
-    //     <Text type="secondary">-</Text> : value
-    // },
     { // trạng thái
       title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai', //width: 160,
       render: (value: string) => {

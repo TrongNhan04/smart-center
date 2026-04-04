@@ -22,14 +22,14 @@ enum Vaitro {
 }
 
 model User {
-  ID           Int     @id @default(autoincrement())
-  HoTen        String?
-  Email        String  @unique
-  DienThoai    String  @unique
-  MatKhauHash  String
-  PhaiDoiMK    Boolean @default(true) //bắt buộc đổi mật khẩu lần đầu đăng nhập
-  VaiTro       Vaitro
-  PhienBanToken Int    @default(0)
+  ID            Int     @id @default(autoincrement())
+  HoTen         String?
+  Email         String  @unique
+  DienThoai     String  @unique
+  MatKhauHash   String
+  PhaiDoiMK     Boolean @default(true) //bắt buộc đổi mật khẩu lần đầu đăng nhập
+  VaiTro        Vaitro
+  PhienBanToken Int     @default(0)
 
   CreatedAt DateTime @default(now()) @db.Timestamptz(3)
   UpdatedAt DateTime @updatedAt @db.Timestamptz(3)
@@ -52,8 +52,9 @@ model GiaoVien {
   MaGiaoVien String @unique
   UserID     Int    @unique
 
+  NgaySinh  DateTime    @db.Timestamptz(3)
+  DiaChi    String?
   ChuyenMon String?
-  GhiChu    String?
   TrangThai TrangThaiGV @default(ACTIVE) //thêm mới là ACTIVE
   CreatedAt DateTime    @default(now()) @db.Timestamptz(3)
   UpdatedAt DateTime    @updatedAt @db.Timestamptz(3)
@@ -204,11 +205,12 @@ model KetQua_BuoiHoc {
   UpdatedAt DateTime @updatedAt @db.Timestamptz(3)
 
   //Quan hệ
-  buoihoc        BuoiHoc          @relation(fields: [BuoiHocID], references: [ID])
-  giaovien       GiaoVien         @relation(fields: [GiaoVienID], references: [ID])
+  buoihoc        BuoiHoc              @relation(fields: [BuoiHocID], references: [ID])
+  giaovien       GiaoVien             @relation(fields: [GiaoVienID], references: [ID])
   ketqua_chitiet KetQua_ChiTiet[] //kết quả buổi học có nhiều kết quả chi tiết
-  tep_dinhkem TepDinhKem_BuoiHoc[] // 1 buổi học có thế có nhiều tệp đính kèm
+  tep_dinhkem    TepDinhKem_BuoiHoc[] // 1 buổi học có thế có nhiều tệp đính kèm
 }
+
 // ============ 8. TEPDINHKEM ============//
 
 model TepDinhKem_BuoiHoc {
@@ -221,8 +223,8 @@ model TepDinhKem_BuoiHoc {
 
   CreatedAt DateTime @default(now()) @db.Timestamptz(3)
   UpdatedAt DateTime @updatedAt @db.Timestamptz(3)
-  
-  ketqua_buoihoc KetQua_BuoiHoc @relation(fields: [KQBuoiHocID],references: [ID])
+
+  ketqua_buoihoc KetQua_BuoiHoc @relation(fields: [KQBuoiHocID], references: [ID])
 }
 
 // ============ 9. KETQUA_CHITIET ============//

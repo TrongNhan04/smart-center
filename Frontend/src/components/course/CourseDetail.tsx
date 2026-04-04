@@ -9,9 +9,7 @@ import type { ClassDB } from "../class/ClassDTO"
 import courseApi from "../../api/courseApi"
 import classApi from "../../api/classApi"
 import {
-  CalendarFilled,
-  CalendarOutlined, ClockCircleFilled, ClockCircleOutlined, EditOutlined, PlusOutlined,
-  ReadOutlined,
+  CalendarFilled, ClockCircleFilled, EditOutlined, PlusOutlined, ReadOutlined,
   UserOutlined,
 } from "@ant-design/icons"
 import CourseModal from "./CourseModal"
@@ -71,8 +69,6 @@ const CourseDetail = () => {
   }
   const status = course ? statusColor[course.TrangThai] : { color: 'default', text: '' }
 
-  // tính tổng số lớp đang mở
-  const openingClass = classes.filter(item => item.TrangThai !== 'CLOSED')
   // tính tổng học viên có ghi danh active của khóa
   const totalStudent = classes.reduce((sum, classOfCourse) => {
     return sum + classOfCourse.TongGhiDanh
@@ -238,7 +234,7 @@ const CourseDetail = () => {
                 label: 'Thông tin chung',
                 children: (
                   <TabInfo course={course}
-                    classes={openingClass.length}
+                    classes={classes.length}
                     totalStu={totalStudent}
                   />
                 ),

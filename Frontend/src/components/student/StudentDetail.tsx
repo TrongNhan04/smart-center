@@ -148,7 +148,7 @@ const StudentDetail = () => {
             <Button onClick={() => navigate(`/admin/students`)} > Quay lại
             </Button>
 
-            <Avatar shape="square" size={49} style={{ background: `#0d6efd` }}>
+            <Avatar shape="square" size={49} style={{ background: '#0d6efd' }}>
               {student.MaHocVien.substring(0, 4)}
             </Avatar>
 

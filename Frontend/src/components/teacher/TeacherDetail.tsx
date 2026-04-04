@@ -13,6 +13,7 @@ import {
 } from "@ant-design/icons"
 import TeacherModal from "./TeacherModal"
 import { CatchError } from "../common/catch.error"
+import TabInfo from "./TabInfo"
 const { Text, Title } = Typography
 
 const TeacherDetail = () => {
@@ -200,8 +201,7 @@ const TeacherDetail = () => {
                 {
                   key: '2',
                   label: `Thông tin chung`,
-                  children: (<></>
-                  ),
+                  children: (<TabInfo teacher={teacher}/>),
                 }
               ]} /> {/* kết thúc tab */}
           </Card>

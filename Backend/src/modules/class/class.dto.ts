@@ -5,30 +5,30 @@ import { TrangThaiLH } from "src/generated/prisma/enums";
 export class CreateClassDTO {
     @IsNotEmpty()
     @IsString()
-    code: string
+    code!: string
 
     @IsNotEmpty()
     @IsNumber()
-    courseId: number
+    courseId!: number
 
     @IsNotEmpty()
     @IsNumber()
-    teacherId: number
+    teacherId!: number
 
     @IsNotEmpty()
     @IsString()
     @MaxLength(150)
-    name: string
+    name!: string
 
     @IsNotEmpty()
     @Type(() => Date)
     @IsDate()
-    fromDate: Date
+    fromDate!: Date
 
     @IsNotEmpty()
     @Type(() => Date)
     @IsDate()
-    toDate: Date
+    toDate!: Date
 
     @ArrayNotEmpty()
     @IsArray()
@@ -36,24 +36,24 @@ export class CreateClassDTO {
     @IsInt({ each: true })// mỗi phần tử là số nguyên
     @Min(0, { each: true })// mỗi phần tử nhỏ nhất là 0 - chủ nhật
     @Max(6, { each: true })// mỗi phần tử lớn nhất là 6 - thứ 7
-    timeTable: number[]
+    timeTable!: number[]
 
     @IsNotEmpty()
     @IsString()
     @Matches(/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
         { message: 'Time must be in valid 24-hour format (HH:MM, e.g., 18:03)', })
-    startTime: string
+    startTime!: string
 
     @IsNotEmpty()
     @IsString()
     @Matches(/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
         { message: 'Time must be in valid 24-hour format (HH:MM, e.g., 18:03)', })
-    endTime: string
+    endTime!: string
 
     @IsNotEmpty()
     @IsInt()
     @Min(0)
-    classSize: number
+    classSize!: number
 
     @IsOptional()
     room?:string
@@ -129,10 +129,10 @@ export class SchechuleDTO{
     @IsNotEmpty()
     @Type(() => Date)
     @IsDate()
-    startDate: Date
+    startDate!: Date
 
     @IsNotEmpty()
     @Type(() => Date)
     @IsDate()
-    endDate: Date
+    endDate!: Date
 }

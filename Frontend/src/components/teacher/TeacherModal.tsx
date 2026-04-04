@@ -1,8 +1,9 @@
-import { Col, Form, Input, message, Modal, Row } from 'antd'
+import { Col, DatePicker, Form, Input, message, Modal, Row } from 'antd'
 import { useEffect, useState } from 'react'
 import { mapDataTeacher, type TeacherDB, type TeacherDto } from './TeacherDTO'
 import teacherApi from '../../api/teacherApi'
 import { getChangedValue } from '../common/utils'
+import dayjs from 'dayjs'
 
 interface Props {
   open: boolean
@@ -23,8 +24,7 @@ const TeacherModal = ({ open, onCancel, onSave, editing }: Props) => {
       const values: TeacherDto = await form.validateFields()
 
       await new Promise(resolve => setTimeout(resolve, 1000))
-
-      let res
+      let res = null
       if (isEdit) {
         const originData = mapDataTeacher(editing)
         const updateData = getChangedValue(originData, values)
@@ -32,10 +32,11 @@ const TeacherModal = ({ open, onCancel, onSave, editing }: Props) => {
           message.info('Không có thông tin nào thay đổi!')
           return
         }
+        console.log('updateData', updateData)
         res = await teacherApi.update(editing.ID, updateData)
       }
       else res = await teacherApi.create(values)
-      
+
       message.success(isEdit ? 'Cập nhật thành công' : 'Thêm mới thành công')
       onSave(res.data.ID)
       handleCancel()
@@ -68,7 +69,10 @@ const TeacherModal = ({ open, onCancel, onSave, editing }: Props) => {
     if (open) {
       if (editing) {
         const formData = mapDataTeacher(editing)
-        form.setFieldsValue(formData)
+        const formated = {
+          ...formData, dob:dayjs(formData.dob)
+        }
+        form.setFieldsValue(formated)
       }
       else
         form.resetFields()
@@ -91,6 +95,7 @@ const TeacherModal = ({ open, onCancel, onSave, editing }: Props) => {
       <Form form={form} layout="vertical">
         {/* Mã giáo viên, tên giáo viên*/}
         <Row gutter={16}>
+          {/* cột trái: mã gv, tên gv, ngày sinh */}
           <Col span={12}>
             <Form.Item // mã giáo viên
               label="Mã giáo viên"
@@ -100,9 +105,7 @@ const TeacherModal = ({ open, onCancel, onSave, editing }: Props) => {
               <Input disabled={isEdit}
                 placeholder="Vd: GV-101..." />
             </Form.Item>
-          </Col>
 
-          <Col span={12}>
             <Form.Item // tên giáo viên
               label="Tên giáo viên"
               name="name"
@@ -110,11 +113,21 @@ const TeacherModal = ({ open, onCancel, onSave, editing }: Props) => {
             >
               <Input placeholder=" tên giáo viên..." />
             </Form.Item>
-          </Col>
-        </Row>
 
-        {/* Email - điện thoại */}
-        <Row gutter={16}>
+            <Form.Item // ngày sinh
+              label="Ngày sinh"
+              name="dob"
+              rules={[{ required: true, message: 'Vui lòng chọn ngày sinh!' }]}
+            >
+              <DatePicker
+                style={{ width: '100%' }}
+                format="DD/MM/YYYY"
+              // placeholder={['Từ ngày', 'Đến ngày']}
+              />
+            </Form.Item>
+          </Col>
+
+          {/* cột phải: email, điện thoại, chuyên môn */}
           <Col span={12}>
             <Form.Item // Email
               label="Email"
@@ -126,9 +139,7 @@ const TeacherModal = ({ open, onCancel, onSave, editing }: Props) => {
             >
               <Input disabled={isEdit} type='email' placeholder="VD: vidu@gmail.com" />
             </Form.Item>
-          </Col>
 
-          <Col span={12}>
             <Form.Item // điện thoại
               label="Số điện thoại"
               name="phone"
@@ -139,17 +150,23 @@ const TeacherModal = ({ open, onCancel, onSave, editing }: Props) => {
                   message: 'Số điện thoại là số có 10 chữ số'
                 }
               ]}>
-
               <Input disabled={isEdit} placeholder='VD: 0123456789' />
+            </Form.Item>
+
+            <Form.Item // tên giáo viên
+              label="Chuyên môn"
+              name="major"
+            >
+              <Input placeholder="VD: Học thuật, giao tiếp,..." />
             </Form.Item>
           </Col>
         </Row>
 
-        {/* Chuyên môn */}
-        <Form.Item label="Chuyên môn" name="major">
+        {/* Địa chỉ */}
+        <Form.Item label="Địa chỉ" name="address">
           <Input.TextArea
             rows={4}
-            placeholder="Chuyên môn của giáo viên..."
+            placeholder="VD: Long Xuyên, An Giang..."
             showCount
             maxLength={100}
           />

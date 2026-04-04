@@ -4,15 +4,19 @@ export interface TeacherDto {
     name: string,
     phone: string,
     email: string,
-    major?: string
+    dob: string,
+    major?: string,
+    address?:string
 }
 
 export interface TeacherDB {
     ID: number,
     MaGiaoVien: string,
     HoTen: string,
+    NgaySinh: string,
     DienThoai: string,
     Email: string
+    DiaChi:string
     ChuyenMon: string,
     TrangThai: string
     SoBuoiDaDay: number
@@ -26,5 +30,7 @@ export const mapDataTeacher = (value: TeacherDB): TeacherDto => ({
     name: value.HoTen,
     phone: value.DienThoai,
     email: value.Email,
-    major: value.ChuyenMon
+    major: value.ChuyenMon,
+    dob: value.NgaySinh,
+    address: value.DiaChi
 })

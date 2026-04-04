@@ -19,19 +19,19 @@ export class CreateSessionDTO {
     @IsNotEmpty()
     @Type(() => Date)
     @IsDate()
-    date: Date
+    date!: Date
 
     @IsNotEmpty()
     @IsString()
     @Matches(/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
         { message: 'Time must be in valid 24-hour format (HH:MM, 18:03)', })
-    startAt: string
+    startAt!: string
 
     @IsNotEmpty()
     @IsString()
     @Matches(/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
         { message: 'Time must be in valid 24-hour format (HH:MM, 18:03)', })
-    endAt: string
+    endAt!: string
 
     @IsString()
     @IsOptional()
@@ -53,6 +53,6 @@ export class UpdateSessionDTO {
 }
 
 export class Pagination {
-    page: number
-    limit: number
+    page!: number
+    limit!: number
 }

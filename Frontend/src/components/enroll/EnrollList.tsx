@@ -88,14 +88,6 @@ const EnrollList = () => {
         <Link to={`/admin/students/${enroll.HocVienID}`}
           style={{ fontWeight: 'bold' }}><UserOutlined /> {name}</Link>
     },
-    { // tên lớp
-      title: 'Lớp học', dataIndex: 'TenLop', //width: 220,
-      key: 'TenLop', ellipsis: true,
-      render: (className: string) =>
-        <Space >
-          <ReadOutlined style={{ color: 'brown' }} />{className}
-        </Space>
-    },
     { // ngày ghi danh
       title: 'Ngày ghi danh', dataIndex: 'NgayGhiDanh',
       key: 'NgayGhiDanh', //width: 150,
@@ -109,9 +101,17 @@ const EnrollList = () => {
       ],
       onFilter: (value: any, enroll: EnrollDB) =>
         new Date(enroll.NgayGhiDanh).getMonth() === value,
-      render: (enrollDate: string) => <Text>
-        <CalendarFilled style={{color:'gray'}}/> {new Date(enrollDate).toLocaleDateString()}
+      render: (day: string) => <Text>
+       <Text><CalendarFilled style={{ color: '#ff7818' }} /> {new Date(day).toLocaleDateString()}</Text>
       </Text>
+    },
+    { // tên lớp
+      title: 'Lớp học', dataIndex: 'TenLop', //width: 220,
+      key: 'TenLop', ellipsis: true,
+      render: (className: string) =>
+        <Space >
+          <ReadOutlined style={{ color: 'brown' }} />{className}
+        </Space>
     },
     { // trạng thái
       title: 'Trạng thái GD', dataIndex: 'TrangThai',

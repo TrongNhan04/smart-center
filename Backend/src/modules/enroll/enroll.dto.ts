@@ -1,22 +1,21 @@
-import { Type } from "class-transformer";
-import { IsDate, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsPositive, Min } from "class-validator";
+import { IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsPositive, Min } from "class-validator";
 import { TrangThai_GD } from "src/generated/prisma/enums";
 
 export class CreateEnrollDTO {
     @IsNotEmpty()
     @IsInt()
     @Min(1)
-    studentId: number
+    studentId!: number
 
     @IsNotEmpty()
     @IsInt()
     @Min(1)
-    classId: number
+    classId!: number
 
     @IsNotEmpty()
     @IsNumber()
     @IsPositive()
-    fee: number
+    fee!: number
 }
 
 export class QueryEnrollDTO{

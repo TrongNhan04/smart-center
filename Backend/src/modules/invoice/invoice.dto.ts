@@ -2,7 +2,8 @@ import { IsEnum, IsNotEmpty, IsOptional, IsPositive, IsString } from "class-vali
 import { TrangThai_HD } from "src/generated/prisma/enums";
 
 export class QueryInvoiceDTO {
-    page: number
+    @IsNotEmpty()
+    page!: number
 
     @IsOptional()
     @IsEnum(TrangThai_HD)
@@ -16,7 +17,7 @@ export class QueryInvoiceDTO {
 }
 
 export class QueryTransaction {
-    page: number
+    page!: number
 
     @IsOptional()
     month?: number
@@ -28,11 +29,11 @@ export class QueryTransaction {
 export class CreateTransactionDTO {
     @IsNotEmpty()
     @IsPositive()
-    amount: number
+    amount!: number
 
     @IsNotEmpty()
     @IsString()
-    method: string
+    method!: string
 
     @IsOptional()
     @IsString()

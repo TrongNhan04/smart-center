@@ -4,30 +4,29 @@ import { TrangThaiKH } from "src/generated/prisma/enums"
 export class CreateCourseDTO{
     @IsNotEmpty()
     @IsString()
-    code: string // mã khóa học
+    code!: string // mã khóa học
 
     @IsNotEmpty()
     @IsString()
     @MaxLength(150)
-    name: string
+    name!: string
 
     @IsNotEmpty()
     @IsString()
-    level: string
+    level!: string
 
     @IsNotEmpty()
     @IsNumber()
-    @Min(1)
-    duration: number
+    duration!: number
 
     @IsNotEmpty()
     @IsInt()
-    totalSession: number
+    totalSession!: number
 
     @IsNotEmpty()
     @IsNumber()
     @IsPositive()
-    courseFee: number
+    courseFee!: number
 
     @IsOptional()
     @IsString()

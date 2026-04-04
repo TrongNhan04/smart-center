@@ -6,11 +6,7 @@ const teacherApi = {
         axiosClient.post(`admin/teachers`, body),
 
     update: (teacherId: number, body: Partial<TeacherDto>) => {
-        const payload = {
-            name: body.name,
-            major: body.major
-        }
-        return axiosClient.patch(`admin/teachers/${teacherId}`, payload)
+        return axiosClient.patch(`admin/teachers/${teacherId}`, body)
     },
 
     delete: (teacherId: number) =>

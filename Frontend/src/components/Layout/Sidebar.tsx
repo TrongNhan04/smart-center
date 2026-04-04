@@ -49,6 +49,7 @@ const SidebarComponent = () => {
 
   const items: MenuItem[] = isAdmin ? [
     getItem('Tổng quan', 'dashboard', <DashboardOutlined />),
+    getItem('Thời khóa biểu', 'schedule', <CalendarOutlined/>),
     getItem('Việc cần làm', 'tasks', <CheckSquareOutlined />),
     getItem('Đào tạo', 'train', <BookOutlined />, [
       getItem('Khóa học', 'courses'),

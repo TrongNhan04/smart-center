@@ -4,11 +4,12 @@ import {
   Space, Table, Tag, Typography
 } from 'antd';
 import courseApi from '../../api/courseApi';
-import { ClockCircleOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { ClockCircleFilled, ClockCircleOutlined, DollarCircleFilled, PlusOutlined, ReadOutlined, SearchOutlined } from '@ant-design/icons';
 import CourseAction from './CourseAction';
 import { type CourseDB } from './CourseDTO';
 import CourseModal from './CourseModal';
 import { Link, useSearchParams } from 'react-router-dom';
+import { CatchError } from '../common/catch.error';
 const { Text } = Typography
 
 const CourseList = () => {
@@ -25,22 +26,11 @@ const CourseList = () => {
   const fetchCourses = async () => {
     try {
       setLoading(true)
-      // lấy dữ liệu từ API
-      
-      const [res] = await Promise.all([
-        courseApi.findMany(),
-        new Promise(resolve=>setTimeout(resolve,500))
-      ])
+      const res = await courseApi.findMany()
       setCourses(res.data)
     }
     catch (error: any) {
-      notification.error({
-        title: 'Có lỗi xảy ra',
-        description: error?.response?.data?.message,
-        showProgress: true,
-        pauseOnHover: true
-      })
-      console.log(error?.response?.data?.message)
+      CatchError.HandleError(error)
     }
     finally {
       setLoading(false)
@@ -124,8 +114,7 @@ const CourseList = () => {
       key: 'TenKhoaHoc', ellipsis: true,
       render: (name: string, course: CourseDB) =>
         <Link to={`/admin/courses/${course.ID}`}
-          style={{ fontWeight: 'bold' }}>{name}</Link>
-      // <Text strong style={{ color: '#1890ff' }}>{name}</Text>
+          style={{ fontWeight: 'bold' }}><ReadOutlined/> {name}</Link>
     },
     { // trình độ
       title: 'Trình độ', dataIndex: 'TrinhDo', key: 'TrinhDo', width: 100,
@@ -146,16 +135,16 @@ const CourseList = () => {
       render: (fee: number) => {
         if (!fee) return <Text strong>0đ</Text>
         const amount = Number(fee)
-        return (<Space>
-          <Text strong>{amount.toLocaleString('vi-VN')} đ</Text>
-        </Space>)
+        return <Text>
+          <DollarCircleFilled style={{ color: '#52c41a' }} /> {amount.toLocaleString()}đ
+        </Text>
       }
     },
     { // thời gian
       title: 'Thời gian', dataIndex: 'ThoiGian', key: 'ThoiGian', width: 170,
       render: (month: number, courses: CourseDB) => (
         <Space>
-          <Text><ClockCircleOutlined /> {month} tháng</Text>
+          <Text><ClockCircleFilled /> {month} tháng</Text>
           <Text>({courses.TongSoBuoi} buổi)</Text>
         </Space>
       )

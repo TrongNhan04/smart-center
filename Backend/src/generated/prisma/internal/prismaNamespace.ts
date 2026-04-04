@@ -1437,8 +1437,9 @@ export const GiaoVienScalarFieldEnum = {
   ID: 'ID',
   MaGiaoVien: 'MaGiaoVien',
   UserID: 'UserID',
+  NgaySinh: 'NgaySinh',
+  DiaChi: 'DiaChi',
   ChuyenMon: 'ChuyenMon',
-  GhiChu: 'GhiChu',
   TrangThai: 'TrangThai',
   CreatedAt: 'CreatedAt',
   UpdatedAt: 'UpdatedAt'

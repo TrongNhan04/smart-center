@@ -1,6 +1,9 @@
-import { Button, Card, Descriptions, Divider, notification, Skeleton, Space, Table, Tag, Typography } from "antd"
+import {
+  Button, Card, Descriptions, Divider, notification, Skeleton, Space, Table, 
+  Tag, Typography
+} from "antd"
 import type { ClassResult, Result } from "./StudentDTO"
-import { CalendarFilled, CalendarOutlined, CheckCircleFilled, ClockCircleOutlined, CloseCircleFilled, EnvironmentOutlined, ReadFilled, ReadOutlined } from "@ant-design/icons"
+import { CalendarFilled, CheckCircleFilled, CloseCircleFilled, ReadFilled } from "@ant-design/icons"
 import { useNavigate, useParams } from "react-router-dom"
 import { useEffect, useState } from "react"
 import { studentApi } from "../../api/studentApi"
@@ -32,7 +35,7 @@ const ThongKeDiHoc = () => {
     } catch (error) {
       handleError(error)
     }
-    finally{setLoading(false)}
+    finally { setLoading(false) }
   }
 
   useEffect(() => {
@@ -49,7 +52,7 @@ const ThongKeDiHoc = () => {
       render: (value: string) => {
         //const className = classes.find(item => item.ID === session.LopHocID)
         return <Space orientation="vertical" size={0}>
-          <Text><ReadFilled style={{color:'#188bff'}}/> Chủ đề: {value ?? 'Chưa cập nhật...'}</Text>
+          <Text><ReadFilled style={{ color: '#188bff' }} /> Chủ đề: {value ?? 'Chưa cập nhật...'}</Text>
           {/* <Text><EnvironmentOutlined /> Phòng học: {result.PhongHoc ?? 'Chưa cập nhật...'}</Text> */}
         </Space>
       }
@@ -60,7 +63,7 @@ const ThongKeDiHoc = () => {
       render: (value: string) => {
         return <Space orientation="vertical" size={0}>
           <Text >
-            <CalendarFilled style={{color:'orange'}}/> {new Date(value).toLocaleDateString()}
+            <CalendarFilled style={{ color: 'orange' }} /> {new Date(value).toLocaleDateString()}
           </Text>
           {/* <Text type="secondary" style={{ fontSize: '14px' }}>
             <ClockCircleOutlined /> {result.GioHoc}
@@ -70,8 +73,8 @@ const ThongKeDiHoc = () => {
     },
 
     { // điểm danh
-      title: 'Điểm danh', dataIndex: 'DiemDanh', key: 'DiemDanh', 
-      width: 160, align:'center' as const,
+      title: 'Điểm danh', dataIndex: 'DiemDanh', key: 'DiemDanh',
+      width: 160, align: 'center' as const,
       filters: [
         { text: 'Có mặt', value: true },
         { text: 'Vắng mặt', value: false }
@@ -104,7 +107,7 @@ const ThongKeDiHoc = () => {
       <Button onClick={() => navigate(-1)}>Quay lại</Button>
     </Space>
   </div>
-  
+
   let present = 0
   let absent = 0
   for (const item of classResult.KetQua) {
@@ -126,11 +129,11 @@ const ThongKeDiHoc = () => {
           <Descriptions.Item label="Lớp">{classResult.LopHoc}</Descriptions.Item>
           <Descriptions.Item label="Giáo viên">{classResult.GiaoVien}</Descriptions.Item>
           <Descriptions.Item label="Có mặt">
-            <Text strong style={{ color: '#0d6efd' }}>
-              {present} buổi <CheckCircleFilled/></Text>
+            <Text strong style={{ color: '#52c41a' }}>
+              {present} buổi <CheckCircleFilled /></Text>
           </Descriptions.Item>
           <Descriptions.Item label="Vắng mặt">
-            <Text strong type="danger">{absent} buổi <CloseCircleFilled/></Text>
+            <Text strong type="danger">{absent} buổi <CloseCircleFilled /></Text>
           </Descriptions.Item>
           <Descriptions.Item label="Học viên">
             <Text strong >{classResult.HocVien}</Text>
@@ -142,7 +145,7 @@ const ThongKeDiHoc = () => {
         <Table
           columns={columnsOfSS}
           dataSource={classResult.KetQua}
-          pagination={{pageSize:12}}
+          pagination={{ pageSize: 12 }}
           rowKey={'ID'}
         />
       </Card>
