@@ -3,12 +3,14 @@ import type { EnrollDB } from "./EnrollDTO"
 import { enrollApi } from "../../api/enrollApi"
 import {
   Button, Card, Col, Input, message, notification, Popconfirm, Row,
-  Select, Table, Tag, Tooltip, Typography
+  Select, Space, Table, Tag, Tooltip, Typography
 } from "antd"
 import { Link, useSearchParams } from "react-router-dom"
 import {
+  CalendarFilled,
   CalendarOutlined, CheckCircleOutlined, CloseCircleOutlined,
-  DeleteOutlined, PlusOutlined, SearchOutlined
+  DeleteOutlined, PlusOutlined, ReadFilled, ReadOutlined, SearchOutlined,
+  UserOutlined
 } from "@ant-design/icons"
 import EnrollModal from "./EnrollModal"
 
@@ -79,18 +81,20 @@ const EnrollList = () => {
       key: 'MaHocVien', align: 'center' as const,
       render: (code: string) => <Text code>{code}</Text>
     },
-    { // tên học viên
-      title: 'Tên học viên', dataIndex: 'TenHocVien', //width: 220,
+    { // Học viên
+      title: 'Học viên', dataIndex: 'TenHocVien', //width: 220,
       key: 'TenHocVien', ellipsis: true,
       render: (name: string, enroll: EnrollDB) =>
         <Link to={`/admin/students/${enroll.HocVienID}`}
-          style={{ fontWeight: 'bold' }}>{name}</Link>
+          style={{ fontWeight: 'bold' }}><UserOutlined /> {name}</Link>
     },
     { // tên lớp
-      title: 'Lớp học', dataIndex: 'LopHocID', //width: 220,
-      key: 'LopHocID', ellipsis: true,
-      render: (classId: number, enroll: EnrollDB) =>
-        <Link to={`/admin/classes/${classId}`}>{enroll.TenLop}</Link>
+      title: 'Lớp học', dataIndex: 'TenLop', //width: 220,
+      key: 'TenLop', ellipsis: true,
+      render: (className: string) =>
+        <Space >
+          <ReadOutlined style={{ color: 'brown' }} />{className}
+        </Space>
     },
     { // ngày ghi danh
       title: 'Ngày ghi danh', dataIndex: 'NgayGhiDanh',
@@ -103,11 +107,10 @@ const EnrollList = () => {
         { text: "Tháng 9", value: 8 }, { text: "Tháng 10", value: 9 },
         { text: "Tháng 11", value: 10 }, { text: "Tháng 12", value: 11 },
       ],
-      onFilter: (value: any, enroll: EnrollDB) => {
-        return new Date(enroll.NgayGhiDanh).getMonth() === value
-      },
+      onFilter: (value: any, enroll: EnrollDB) =>
+        new Date(enroll.NgayGhiDanh).getMonth() === value,
       render: (enrollDate: string) => <Text>
-        <CalendarOutlined /> {new Date(enrollDate).toLocaleDateString()}
+        <CalendarFilled style={{color:'gray'}}/> {new Date(enrollDate).toLocaleDateString()}
       </Text>
     },
     { // trạng thái
@@ -191,7 +194,7 @@ const EnrollList = () => {
           columns={columns}
           loading={loading}
           rowClassName={
-            (record) => 
+            (record) =>
               record.ID === enrollId ? 'highlight-row' : ''
           }
           // pagination={{ defaultPageSize: 10 }}

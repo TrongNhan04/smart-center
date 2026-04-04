@@ -1,6 +1,7 @@
 import {
-  CalendarOutlined, ClockCircleOutlined, PlusOutlined,
-  SearchOutlined
+  CalendarFilled,
+  CalendarOutlined, ClockCircleFilled, ClockCircleOutlined, PlusOutlined, ReadOutlined, SearchOutlined,
+  UserOutlined
 } from "@ant-design/icons";
 import {
   Badge, Button, Card, Col, Input, message, Progress, Row, Select,
@@ -88,10 +89,9 @@ const ClassList = () => {
     {// mã lớp+tên lớp chung
       title: 'Lớp học', dataIndex: 'MaLopHoc', key: 'MaLopHoc ', ellipsis: true,
       render: (code: string, lophoc: ClassDB) => (
-        <Space orientation="vertical">
+        <Space orientation="vertical" size={0}>
           <Link to={`/admin/classes/${lophoc.ID}`}
-            style={{ fontWeight: 'bold' }}>
-            {lophoc.TenLop}</Link>
+            style={{ fontWeight: 'bold' }}><ReadOutlined/> {lophoc.TenLop}</Link>
           <Text code style={{ fontSize: 14 }}>{code}</Text>
         </Space>
       )
@@ -99,13 +99,13 @@ const ClassList = () => {
     { // giáo viên
       title: 'Giáo viên', dataIndex: ['GiaoVien', 'HoTen'],
       key: 'HoTen', ellipsis: true,
-      render: (name: string, lophoc: ClassDB) =>
-        <Link to={`/admin/teachers/${lophoc.GiaoVien.ID}`}>{name}</Link>
+      render: (name: string) =>
+        <Text><UserOutlined /> {name}</Text>
     },
     { // khai giảng = ngày bắt đầu
       title: 'Khai giảng', dataIndex: 'TuNgay', key: 'TuNgay', width: 130,
       render: (day: string) =>
-        <Text><CalendarOutlined /> {new Date(day).toLocaleDateString()}</Text>
+        <Text><CalendarFilled style={{ color: '#ff7818' }} /> {new Date(day).toLocaleDateString()}</Text>
     },
     { // lịch học
       title: 'Lịch học', dataIndex: 'LichHoc', key: 'LichHoc',
@@ -113,11 +113,9 @@ const ClassList = () => {
         const dow = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
         const result = schedule.map(m => dow[m]).join('-')
 
-        {/* orientation="vertical" giúp xếp chồng lên nhau */ }
         return <Space orientation="vertical" size={0}>
-          <Text strong><ClockCircleOutlined /> {lophoc.GioHoc}</Text>
-
-          <Text type="secondary" style={{ fontSize: '14px', display: 'block', textAlign: 'center' }}>
+          <Text><ClockCircleFilled /> {lophoc.GioHoc}</Text>
+          <Text style={{ fontSize: '14px', display: 'block', textAlign: 'center' }}>
             {result}
           </Text>
         </Space>
@@ -129,11 +127,12 @@ const ClassList = () => {
         <>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>{lophoc.TongGhiDanh}/{classSize}</span>
-            <small style={{ color: '#999' }}>Học viên</small>
+            <span>Học viên</span>
           </div>
           <Progress
             percent={(lophoc.TongGhiDanh / classSize) * 100}
             showInfo={false}
+            strokeColor={'green'}
           />
         </>
       )

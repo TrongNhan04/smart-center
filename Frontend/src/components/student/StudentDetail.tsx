@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react"
-import { Link, Outlet, useNavigate, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import type { ClassForStudent, StudentDB } from "./StudentDTO"
 import { studentApi } from "../../api/studentApi"
 import classApi from "../../api/classApi"
 import {
-  Avatar, Button, Card, notification, Progress, Skeleton, Space, Table, Tabs, Tag, Tooltip, Typography
+  Avatar, Button, Card, Progress, Skeleton, Space, Table, Tabs, Tag, Tooltip, Typography
 } from "antd"
 import {
-  CalendarOutlined, ClockCircleOutlined, EditOutlined, InfoCircleOutlined,
+  CalendarFilled, ClockCircleFilled, EditOutlined, InfoCircleOutlined, ReadOutlined,
+  UserOutlined,
 } from "@ant-design/icons"
 import StudentModal from "./StudentModal"
 import TabInfo from "./TabInfo"
+import { CatchError } from "../common/catch.error"
 
 const { Text, Title } = Typography
 
@@ -23,15 +25,6 @@ const StudentDetail = () => {
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
 
-  const handleError = (error: any) => {
-    notification.error({
-      title: 'Có lỗi xảy ra',
-      description: error?.response?.data?.message,
-      showProgress: true,
-      pauseOnHover: true
-    })
-    console.log(error)
-  }
 
   const initData = async () => {
     try {
@@ -43,7 +36,7 @@ const StudentDetail = () => {
       setStudent(studentRes.data)
       setClasses(classRes.data)
     } catch (error) {
-      handleError(error)
+      CatchError.HandleError(error)
     }
     finally { setLoading(false) }
   }
@@ -51,6 +44,7 @@ const StudentDetail = () => {
   useEffect(() => {
     if (!studentId || isNaN(studentId)) {
       console.log("id không phải số nên studentId lỗi!", studentId)
+      setLoading(false)
       return
     }
     initData()
@@ -63,23 +57,26 @@ const StudentDetail = () => {
   const status = student ? statusColor[student.TrangThai] : { color: 'default', text: '' }
 
   const columnsOfClass = [
-    {// mã lớp + tên lớp 
-      title: 'Lớp học', dataIndex: 'MaLopHoc', key: 'MaLopHoc', ellipsis: true,
-      render: (code: string, lophoc: ClassForStudent) => (
-        <Space orientation="vertical" size={0}>
-          <Link to={`/admin/classes/${lophoc.ID}`}>{lophoc.TenLop}</Link>
-          <Text type="secondary" style={{ fontSize: 14 }}>{code}</Text>
-        </Space>
+    {// mã lớp 
+      title: 'Mã lớp', dataIndex: 'MaLopHoc', key: 'MaLopHoc', width: 120,
+      align: 'center' as const, render: (code: string) => (
+        <Text code style={{ fontSize: 14 }}>{code}</Text>
       )
     },
-    { // giáo viên
-      title: 'Giáo viên', dataIndex: 'GiaoVien',
-      key: 'GiaoVien', ellipsis: true
+    { // tên lớp
+      title: 'Lớp', dataIndex: 'TenLop', key: 'TenLop', ellipsis: true,
+      render: (name: string, lophoc: ClassForStudent) =>
+        <Link to={`/admin/classes/${lophoc.ID}`} style={{ fontWeight: 'bold' }}>
+          <ReadOutlined /> {name}</Link>
     },
-    {
+    { // giáo viên
+      title: 'Giáo viên', dataIndex: 'GiaoVien', key: 'GiaoVien', ellipsis: true,
+      render: (name: string) => <Text><UserOutlined /> {name}</Text>
+    },
+    {// ngày nhập học
       title: 'Ngày nhập học', dataIndex: 'NgayGhiDanh', key: 'NgayGhiDanh',
       align: 'center' as const, render: (day: string) =>
-        <Text><CalendarOutlined /> {new Date(day).toLocaleDateString()}</Text>
+        <Text><CalendarFilled style={{ color: '#ff5d18' }} /> {new Date(day).toLocaleDateString()}</Text>
     },
     { // lịch học
       title: 'Lịch học', dataIndex: 'LichHoc', key: 'LichHoc', align: 'center' as const,
@@ -88,7 +85,7 @@ const StudentDetail = () => {
         const result = timeTable.map(m => dow[m]).join('-')
 
         return <Space orientation="vertical" size={0}>
-          <Text strong><ClockCircleOutlined /> {lophoc.GioHoc}</Text>
+          <Text ><ClockCircleFilled /> {lophoc.GioHoc}</Text>
           <Text type="secondary"
             style={{ fontSize: '14px', display: 'block', textAlign: 'center' }}>
             {result}
@@ -101,16 +98,16 @@ const StudentDetail = () => {
       render: (value: number, lophoc: ClassForStudent) => {
         if (lophoc.TrangThaiGD === 'INACTIVE')
           return <Text delete>Đã hủy ghi danh</Text>
-        return <>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span>{value}/{lophoc.TongSoBuoi}</span>
-            <Text type="secondary">Buổi học</Text>
-          </div>
-          <Progress
-            percent={(value / lophoc.TongSoBuoi) * 100}
-            showInfo={false}
-          />
-        </>
+
+        return <Space orientation="vertical" size={0}>
+          <Text>{value}/{lophoc.TongSoBuoi} BH &nbsp;
+            <Progress steps={4}
+              strokeColor={'#52c41a'}
+              percent={(value / lophoc.TongSoBuoi) * 100}
+              showInfo={false}
+            />
+          </Text>
+        </Space>
       }
     },
     {
@@ -126,8 +123,11 @@ const StudentDetail = () => {
       <Skeleton loading={loading} active paragraph={{ rows: 6 }} />
     </div>
 
-  if (!student) return <div style={{ minHeight: '89vh', background: '#f0f2f5' }}>
-    <div>Không tìm thấy học viên</div>
+  if (!student) return <div style={{ padding: 24, minHeight: '89vh', background: '#f0f2f5' }}>
+    <Space orientation='vertical' size={3}>
+      <Title level={4}>Không tìm thấy học viên</Title>
+      <Button onClick={() => navigate(-1)}>Quay lại</Button>
+    </Space>
   </div>
 
   return (
@@ -160,7 +160,7 @@ const StudentDetail = () => {
                   {student.TrangThai}</Tag>
               </Title>
 
-              <Text type="secondary">Mã HV: {student.MaHocVien}</Text>
+              <Text type="secondary">Mã: {student.MaHocVien}</Text>
             </div>
           </div>
           <Tooltip title='Sửa thông tin'>
@@ -196,9 +196,9 @@ const StudentDetail = () => {
                 />)
               },
               {
-                key:'2',
-                label:'Thông tin học viên',
-                children:(<TabInfo/>)
+                key: '2',
+                label: 'Thông tin chung',
+                children: (<TabInfo student={student} />)
               }
             ]}
           >

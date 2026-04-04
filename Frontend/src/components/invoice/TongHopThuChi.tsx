@@ -1,43 +1,38 @@
 import { useEffect, useState } from 'react'
 import {
-  Table, Tag, Typography, Card, Statistic, Row, Col, notification,
-  DatePicker
+  Table, Tag, Typography, Card, Statistic, Row, Col, DatePicker
 } from 'antd';
 import { Link, useSearchParams } from 'react-router-dom';
 import type { GiaoDich } from './InvoiceDTO';
 import { invoiceApi } from '../../api/invoiceApi';
 import dayjs from 'dayjs';
+import { UserOutlined } from '@ant-design/icons';
+import { CatchError } from '../common/catch.error';
 
-const { Title } = Typography
+const { Text, Title } = Typography
 
 const TongHopThuChi = () => {
   const [transactions, setTransactions] = useState<GiaoDich[]>([])
   const [searchParam, setSearchParam] = useSearchParams()
   const currentPage = Number(searchParam.get('page')) || 1
+  const currentMonth = Number(searchParam.get('month')) || new Date().getMonth()
   const [total, setTotal] = useState()
   const [selectedDate, setSelectedDate] = useState(dayjs())
-
   const fetchTransactions = async () => {
     try {
-      const month = selectedDate.month()
-      const year = selectedDate.year()
-      const res = await invoiceApi.getTransactions(currentPage, month, year)
+      const now = new Date()
+      const year = selectedDate ? selectedDate.year() : now.getFullYear()
+      const res = await invoiceApi.getTransactions(currentPage, currentMonth, year)
       setTransactions(res.data.items)
       setTotal(res.data.total)
     } catch (error: any) {
-      notification.error({
-        title: 'Có lỗi xảy ra',
-        description: error?.response?.data?.message,
-        showProgress: true,
-        pauseOnHover: true
-      })
-      console.log('Có lỗi xảy ra: ', error)
+      CatchError.HandleError(error)
     }
   }
 
   useEffect(() => {
     fetchTransactions()
-  }, [currentPage, selectedDate])
+  }, [currentPage, currentMonth])
 
   let tongThu = 0
   let tongChi = 0
@@ -48,7 +43,6 @@ const TongHopThuChi = () => {
   }
   const loiNhuan = tongThu - tongChi
 
-  // 3. CỘT CHO BẢNG GIAO DỊCH
   const columns = [
     { // mã giao dịch
       title: 'Mã GD', dataIndex: 'MaGD', key: 'maphieu', width: 100,
@@ -58,7 +52,7 @@ const TongHopThuChi = () => {
       sorter: (a: any, b: any) => new Date(a.NgayGD).getTime() - new Date(b.NgayGD).getTime(),
       render: (value: string) => new Date(value).toLocaleDateString()
     },
-    {
+    { // loại giao dịch
       title: 'Loại GD', dataIndex: 'LoaiGD', key: 'LoaiGD', width: 120,
       filters: [
         { text: 'Thu tiền', value: 'RECEIPT' },
@@ -71,9 +65,12 @@ const TongHopThuChi = () => {
         return <Tag color='red'> HOÀN TIỀN</Tag>
       }
     },
-    {
+    { // học viên
       title: 'Học viên', dataIndex: 'TenHocVien', key: 'TenHocVien',
-      render: (text: string) => text || '--',
+      render: (text: string) =>
+        <Text style={{ color: '#187cff', fontWeight: 'bold' }}>
+          <UserOutlined /> {text}
+        </Text>
     },
     {
       title: 'Nội dung', dataIndex: 'GhiChu', key: 'GhiChu',
@@ -110,22 +107,23 @@ const TongHopThuChi = () => {
           <Title level={3} style={{ margin: 0 }}>
             Tổng hợp tài chính
           </Title>
-          {/* <Text italic style={{ fontSize: 16 }}>
-            Tháng {month+1} / {now.getFullYear()}</Text> */}
           <DatePicker
             picker="month"
-            value={selectedDate}
+            //value={selectedDate}
             format={`MM/YYYY`}
-            onChange={(date:any) => setSelectedDate(date)}
+            onChange={(date: any) => {
+              setSelectedDate(date);
+              setSearchParam({month: date.month()})
+            }}
             style={{ marginTop: 8 }}
           />
         </Col>
-
-        <Col xs={24} md={16}>
+        
+        <Col xs={24} md={16}> 
           <Row gutter={16}>
             <Col xs={24} sm={8}>
               <Card variant="borderless">
-                <Statistic
+                <Statistic 
                   title="Tổng Thu"
                   value={tongThu}
                   suffix=" đ"
@@ -186,7 +184,7 @@ const TongHopThuChi = () => {
             total: total
           }}
           onChange={(pagination: any) =>
-            setSearchParam({ page: pagination.current })
+            setSearchParam({month:currentMonth.toString(), page: pagination.current })
           }
           scroll={{ y: 350 }}
           bordered

@@ -1,5 +1,5 @@
 import {
-  MailOutlined, PhoneOutlined, PlusOutlined, SearchOutlined
+  MailOutlined, PhoneFilled, PlusOutlined, SearchOutlined, UserOutlined
 } from "@ant-design/icons"
 import {
   Badge, Button, Card, Col, Input, notification, Row, Select, Table, Typography
@@ -61,34 +61,34 @@ const TeacherList = () => {
       render: (code: string) => <Text code>{code}</Text>
     },
     { // tên giáo viên
-      title: 'Tên giáo viên', dataIndex: 'HoTen', //width: 220,
+      title: 'Họ và tên', dataIndex: 'HoTen', //width: 220,
       key: 'HoTen', ellipsis: true,
       render: (name: string, teacher: TeacherDB) =>
         <Link to={`/admin/teachers/${teacher.ID}`}
-          style={{ fontWeight: 'bold' }}>{name}</Link>
+          style={{ fontWeight: 'bold' }}><UserOutlined/> {name}</Link>
     },
     { //Điện thoại
       title: 'Điện thoại', dataIndex: 'DienThoai', key: 'DienThoai', //width: 100,
       render: (phone: string) => <Text>
-        <PhoneOutlined /> {phone}
+        <PhoneFilled /> {phone}
       </Text>
     },
     { // Email
       title: 'Email', dataIndex: 'Email', key: 'Email', //width: 120,
       render: (email: string) => <Text>
-        <MailOutlined /> {email}
+        <MailOutlined style={{color:'#ff1818'}}/> {email}
       </Text>
     },
-    { // Chuyên môn
-      title: 'Chuyên môn', dataIndex: 'ChuyenMon', key: 'ChuyenMon', //width: 170,
-      render: (value: string) => !value || "" ?
-        <Text type="secondary">-</Text> : value
-    },
+    // { // Chuyên môn
+    //   title: 'Chuyên môn', dataIndex: 'ChuyenMon', key: 'ChuyenMon', //width: 170,
+    //   render: (value: string) => !value || "" ?
+    //     <Text type="secondary">-</Text> : value
+    // },
     { // trạng thái
       title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai', //width: 160,
       render: (value: string) => {
         const statusMap: Record<string, { color: string, text: string }> = {
-          ACTIVE: { color: 'success', text: 'Đang hoạt động' },
+          ACTIVE: { color: 'success', text: 'Hoạt động' },
           INACTIVE: { color: 'error', text: 'Ngừng hoạt động' }
         }
         // value là 1 trong 3 key đó

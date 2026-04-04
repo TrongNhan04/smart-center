@@ -1,5 +1,7 @@
 import {
-  MoneyCollectOutlined, RollbackOutlined
+  CalendarFilled,
+  MoneyCollectOutlined, PhoneFilled, ReadOutlined, RollbackOutlined,
+  UserOutlined
 } from "@ant-design/icons";
 import {
   Card, Descriptions, Table, Divider, Typography, Row, Col, Statistic,
@@ -151,9 +153,8 @@ const InvoiceDetail = () => {
     <div style={{ padding: 24 }}>
       <Card>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
-
           <Button onClick={() => navigate(-1)}> Quay lại</Button>
-
+          <Text style={{fontSize:24, fontWeight:'bold'}}> HÓA ĐƠN {invoice.MaHoaDon}</Text>
           <Space>
             {/* <Button icon={<PrinterOutlined />}>In hóa đơn</Button> */}
             <Button type="primary" icon={<MoneyCollectOutlined />}
@@ -183,20 +184,21 @@ const InvoiceDetail = () => {
           size="middle"
         >
           <Descriptions.Item label="Học viên">
-            <Text strong style={{ color: '#0d6efd' }}>{invoice.TenHocVien}</Text>
+            <Text strong style={{ color: '#0d6efd' }}>
+              <UserOutlined/> {invoice.TenHocVien}</Text>
           </Descriptions.Item>
 
           <Descriptions.Item label="Số điện thoại">
-            <Text >{invoice.DienThoai}</Text>
+            <Text ><PhoneFilled/> {invoice.DienThoai}</Text>
           </Descriptions.Item>
 
           <Descriptions.Item label="Lớp học" >
-            <Text >{invoice.TenLop}</Text>
+            <Text ><ReadOutlined/> {invoice.TenLop}</Text>
           </Descriptions.Item>
 
           <Descriptions.Item label="Ngày phát hành">
-            <Text strong>
-              {new Date(invoice.NgayPhatHanh).toLocaleDateString()}
+            <Text >
+              <CalendarFilled style={{color:'#ff8818'}}/> {new Date(invoice.NgayPhatHanh).toLocaleDateString()}
             </Text>
           </Descriptions.Item>
 

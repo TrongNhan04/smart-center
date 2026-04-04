@@ -2,7 +2,8 @@ import { Descriptions, Space, Typography, Progress, Tag } from 'antd';
 import {
   UserOutlined, ClockCircleOutlined, CalendarFilled, EnvironmentFilled,
   ReadFilled,
-  DollarCircleFilled
+  DollarCircleFilled,
+  ReadOutlined
 } from '@ant-design/icons';
 import type { CourseDB } from './CourseDTO';
 
@@ -10,7 +11,7 @@ const { Text } = Typography;
 
 interface Props {
   course: CourseDB
-  classes: number 
+  classes: number
   totalStu: number
 }
 
@@ -26,9 +27,14 @@ const TabInfo = ({ course, classes, totalStu }: Props) => {
   return (
     <div style={{ padding: '16px 0' }}>
       <Descriptions
+        // layout='vertical'
         bordered
         size="middle" // tùy kích cỡ màn hình mà hiển thị mấy cột
         column={{ xs: 1, sm: 1, md: 2, lg: 2, xl: 2 }}
+        styles={{
+          label: { minWidth: 180 },
+          content: { minWidth: 180 }
+        }}
       >
         <Descriptions.Item label="Mã khóa học">
           <Text strong>{course.MaKhoaHoc}</Text>
@@ -45,13 +51,13 @@ const TabInfo = ({ course, classes, totalStu }: Props) => {
         </Descriptions.Item>
 
         <Descriptions.Item label="Học phí">
-          <Text style={{ fontSize:15}} >
-            <DollarCircleFilled style={{color: '#52c41a'}}/> {Number(course.HocPhi).toLocaleString()}
+          <Text style={{ fontSize: 15 }} >
+            <DollarCircleFilled style={{ color: '#52c41a' }} /> {Number(course.HocPhi).toLocaleString()}đ
           </Text>
         </Descriptions.Item>
 
         <Descriptions.Item label="Thời gian đào tạo">
-          <Space><CalendarFilled style={{ color: '#1890ff' }} />
+          <Space><CalendarFilled style={{ color: '#ff8818' }} />
             {course.ThoiGian}tháng
           </Space>
         </Descriptions.Item>
@@ -63,11 +69,11 @@ const TabInfo = ({ course, classes, totalStu }: Props) => {
         </Descriptions.Item>
 
         <Descriptions.Item label="Lớp thuộc khóa">
-          <ReadFilled  style={{color:'gray'}}/> {classes}
+          <Space><ReadFilled style={{ color: 'burlywood' }} />{classes}lớp</Space>
         </Descriptions.Item>
 
         <Descriptions.Item label="Tổng học viên">
-          <UserOutlined/> {totalStu}
+          <Space><UserOutlined />{totalStu}</Space>
         </Descriptions.Item>
 
         {/* dùng span giống column để trường mô tả ăn hết chiều ngang */}

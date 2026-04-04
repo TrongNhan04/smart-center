@@ -1,49 +1,32 @@
 import {
-  Card, Avatar, Descriptions, Tag, Button, Typography, Space, Divider,
-  Row, Col, Badge
+  Card, Avatar, Descriptions, Tag, Typography, Space, Row, Col, Badge
 } from 'antd';
 import {
-  UserOutlined, MailOutlined, PhoneOutlined, EditOutlined, KeyOutlined,
-  EnvironmentOutlined, CalendarOutlined
+  UserOutlined, MailOutlined, PhoneOutlined, EnvironmentOutlined, CalendarOutlined
 } from '@ant-design/icons';
+import { useAuthStore } from '../../store/useAuthStore';
+import type { StudentDB } from './StudentDTO';
 
 const { Title, Text } = Typography;
 
-const TabInfo = () => {
-  // 1. MOCK DATA: Dữ liệu người dùng (Thường lấy từ useAuthStore hoặc API)
-  const user = {
-    hoTen: 'Nguyễn Văn Chí Thanh',
-    maNV: 'ADMIN-001',
-    email: 'thanh.nvcu@gmail.com',
-    soDienThoai: '090.xxx.xxxx',
-    chucVu: 'Quản trị viên cấp cao',
-    role: 'ADMIN', // Dùng để check quyền
-    trangThai: 'ACTIVE',
-    phongBan: 'Phòng Đào tạo',
-    ngayThamGia: '15/01/2024',
-    diaChi: 'Long Xuyên, An Giang',
-    // Avatar URL hoặc null
-    avatarUrl: `https://api.dicebear.com/8.x/notionists/svg?seed=ThanhNV`
-  };
+const TabInfo = ({ student }: { student: StudentDB }) => {
+
+  // avatarUrl: `https://api.dicebear.com/8.x/notionists/svg?seed=ThanhNV`
 
   // Định nghĩa màu sắc cho Role Tag
-  const roleMap: Record<string, { color: string, text: string }> = {
-    ADMIN: { color: 'red', text: 'Quản trị' },
-    TEACHER: { color: 'green', text: 'Giáo viên' },
-  };
-  const roleInfo = roleMap[user.role] || { color: 'default', text: user.role };
+
 
   return (
     <Card
       variant='borderless'
       style={{
-        //background: 'linear-gradient(135deg, #fff 0%, #e6f7ff 50%, #fff 100%)',
-        background: 'linear-gradient(135deg, #ffffff 0%, #bae7ff 50%, #ffffff 100%)',
+        background: 'linear-gradient(135deg, #fff 0%, #e6f7ff 50%, #fff 100%)',
+        //background: 'linear-gradient(135deg, #fff 0%, #bae7ff 50%, #ffffff 100%)',
         borderRadius: 12,
-        boxShadow: '0 4px 12px rgba(0,0,0,0.08)', // đổ bóng nhẹ cho sang
-        border:'1px solid #f0f0f0',
-        maxWidth: 600, // giới hạn chiều rộng để không bị giãn quá mức trên màn hình lớn
-        margin: '20px auto' // Căn giữa màn hình
+        boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+        border: '1px solid #f0f0f0',
+        maxWidth: 500, // giới hạn chiều rộng để không bị giãn quá mức 
+        margin: '20px auto' // căn giữa tabs
       }}
     >
       <Row gutter={32} align="middle">
@@ -51,22 +34,25 @@ const TabInfo = () => {
         <Col xs={24} sm={24} md={6}
           style={{ textAlign: 'center', borderRight: '1px solid #d9d9d9' }}>
           <Space orientation="vertical" size={16} style={{ width: '100%' }}>
-            
-            <Badge status="success" offset={[-10, 110]} dot>
-              <Avatar
-                size={120}
-                src={user.avatarUrl}
+                                          {/* x, y */}
+            <Badge status="success" offset={[-10, 90]} dot>
+              <Avatar // Badge bên ngoài để có chấm xanh 
+                size={95}
+                //src={user.avatarUrl}
                 icon={<UserOutlined />}
-                style={{ border: '4px solid #fff', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+                style={{
+                  border: '4px solid #fff', 
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                }}
               />
             </Badge>
 
             <div>
-              <Tag color={roleInfo.color} style={{ margin: 0, fontWeight: 600 }}>
-                {roleInfo.text.toLocaleUpperCase()}
+              <Tag color='blue' style={{ margin: 0, fontWeight: 600 }}>
+                HỌC VIÊN
               </Tag>
               <Text type="secondary" style={{ display: 'block', marginTop: 4, fontSize: 12 }}>
-                Mã: {user.maNV}
+                Mã: {student.MaHocVien}
               </Text>
             </div>
           </Space>
@@ -75,35 +61,35 @@ const TabInfo = () => {
         {/* cột phải thông tin chi tiết */}
         <Col xs={24} sm={24} md={18}>
           <div style={{ marginBottom: 16 }}>
-            <Title level={2} style={{ margin: 0 }}>
-              {user.hoTen}
+            <Title level={3} style={{ margin: 0 }}>
+              {student.TenHocVien}
             </Title>
             <Text type="secondary" style={{ fontSize: 16 }}>
-              {user.chucVu} 
+              Học viên
             </Text>
           </div>
 
           <Descriptions
             column={{ xs: 1, sm: 1, md: 1, lg: 1, xl: 1 }}
             size="middle"
-            colon={false} // Bỏ dấu hai chấm cho thoáng
+            // colon={false} // Bỏ dấu hai chấm cho thoáng
             labelStyle={{ color: '#888', minWidth: 100 }} // Style cho nhãn
             contentStyle={{ fontWeight: 500 }} // Style cho nội dung
           >
+            <Descriptions.Item label={<Space><CalendarOutlined /> Ngày sinh</Space>}>
+              {new Date(student.NgaySinh).toLocaleDateString()}
+            </Descriptions.Item>
+
             <Descriptions.Item label={<Space><MailOutlined /> Email</Space>}>
-              {user.email}
+              {student.Email}
             </Descriptions.Item>
 
             <Descriptions.Item label={<Space><PhoneOutlined /> Điện thoại</Space>}>
-              {user.soDienThoai}
+              {student.DienThoai}
             </Descriptions.Item>
 
-            <Descriptions.Item label={<Space><EnvironmentOutlined /> Địa điểm</Space>}>
-              {user.diaChi}
-            </Descriptions.Item>
-
-            <Descriptions.Item label={<Space><CalendarOutlined /> Gia nhập</Space>}>
-              {user.ngayThamGia}
+            <Descriptions.Item label={<Space><EnvironmentOutlined /> Địa chỉ</Space>}>
+              {student.DiaChi}
             </Descriptions.Item>
           </Descriptions>
         </Col>

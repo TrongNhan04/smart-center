@@ -1,4 +1,4 @@
-import { CalendarFilled, CalendarOutlined, DollarCircleFilled, DollarCircleOutlined, EnvironmentFilled, EnvironmentOutlined, PhoneFilled, PhoneOutlined, SearchOutlined } from "@ant-design/icons"
+import { CalendarFilled, CalendarOutlined, DollarCircleFilled, DollarCircleOutlined, EnvironmentFilled, EnvironmentOutlined, PhoneFilled, PhoneOutlined, SearchOutlined, UserOutlined } from "@ant-design/icons"
 import { Col, Input, notification, Row, Space, Table, Tooltip, Typography } from "antd"
 import { useEffect, useState } from "react"
 import type { StuOfClass } from "./ClassDTO"
@@ -47,7 +47,7 @@ const TabStudent = ({ id }: { id: number }) => {
       key: 'TenHocVien', ellipsis: true,
       render: (name: string, student: StuOfClass) =>
         <Link to={`/admin/students/${student.HocVienID}`}
-          style={{ fontWeight: 'bold' }}>{name}</Link>
+          style={{ fontWeight: 'bold' }}><UserOutlined/> {name}</Link>
     },
     { // ngày sinh
       title: 'Ngày sinh', dataIndex: 'NgaySinh', key: 'NgaySinh', //width: 100,

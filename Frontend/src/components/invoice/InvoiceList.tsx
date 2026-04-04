@@ -6,12 +6,14 @@ import {
 } from "antd"
 import { invoiceApi } from "../../api/invoiceApi"
 import {
-  CalendarOutlined, CheckCircleOutlined, PhoneOutlined, SearchOutlined,
+  CalendarFilled,
+  CalendarOutlined, CheckCircleOutlined, PhoneFilled, PhoneOutlined, SearchOutlined,
   UserOutlined
 } from "@ant-design/icons"
 import InvoiceAction from "./InvoiceAction"
 import InvoiceModal from "./InvoiceModal"
 import { useSearchParams } from "react-router-dom"
+import { DateHelper } from "../common/date.helper"
 
 const { Text } = Typography
 
@@ -114,8 +116,8 @@ const InvoiceList = () => {
       key: 'TenHocVien', ellipsis: true,
       render: (name: string, invoice: InvoiceDB) =>
         <Space orientation="vertical" size={0}>
-          <Text><UserOutlined /> {name}</Text>
-          <Text><PhoneOutlined /> {invoice.DienThoai}</Text>
+          <Text style={{ color: '#187cff', fontWeight: 'bold' }}><UserOutlined /> {name}</Text>
+          <Text><PhoneFilled /> {invoice.DienThoai}</Text>
         </Space>
     },
     { // tổng tiền + còn nợ 
@@ -169,25 +171,21 @@ const InvoiceList = () => {
       filters: months, // value là value của months
       onFilter: (value: any, invoice: InvoiceDB) =>
         new Date(invoice.NgayHetHan).getMonth() == value,
-
       render: (invoiceDate: string, invoice: InvoiceDB) => {
-        const dueDate = new Date(invoiceDate).getTime()
-        const overTime = now - dueDate
-        const overDate = Math.floor(overTime / (24 * 60 * 60 * 1000))
-        const isCancelled = invoice.TrangThai === 'CANCELLED'
-
-        if (isCancelled) return <Text > <CalendarOutlined />
-          {new Date(invoiceDate).toLocaleDateString()}</Text>
-
-        if (overTime > 0 && (invoice.TongTien - invoice.DaTra > 0))
-          return <Space orientation="vertical">
-            <Text > <CalendarOutlined />
-              {new Date(invoiceDate).toLocaleDateString()}</Text>
-            <Tag color='red'>Trễ {overDate} ngày</Tag>
-          </Space>
-        else
-          return <Text > <CalendarOutlined />
-            {new Date(invoiceDate).toLocaleDateString()}</Text>
+        // so sáng hiện tại với thời hạn -> phút
+        const overTime = DateHelper.TimeDiff(invoiceDate) 
+        const overDate = Math.floor(overTime / (24 * 60 )) // tính xem được mấy ngày 
+        const isCancelled = invoice.TrangThai === 'CANCELLED' 
+        const isDebt = invoice.TongTien - invoice.DaTra
+        let isOverTime_Debt = false
+        if (overTime > 0 && isDebt && !isCancelled)
+          isOverTime_Debt = true
+        return <Space orientation="vertical">
+          <Text >
+            <CalendarFilled style={{ color: 'gray' }} /> {new Date(invoiceDate).toLocaleDateString()}
+          </Text>
+          {isOverTime_Debt && <Tag color='red'>Trễ {overDate} ngày</Tag>}
+        </Space>
       }
     },
     {// trạng thái
@@ -202,7 +200,7 @@ const InvoiceList = () => {
         const { DaTra, TongTien, NgayHetHan, TrangThai } = invoice
         const ConNo = TongTien - DaTra > 0
         const HetHan = new Date(NgayHetHan).getTime()
-        const isActive = TrangThai==='ACTIVE'
+        const isActive = TrangThai === 'ACTIVE'
         switch (value) {
           case 'Paid': return TongTien == DaTra && isActive
           case 'Part': return DaTra > 0 && ConNo && isActive

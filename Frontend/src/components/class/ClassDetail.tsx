@@ -1,5 +1,6 @@
 import {
-  CalendarOutlined, ClockCircleOutlined, EditOutlined, EnvironmentOutlined, InboxOutlined,
+  CalendarFilled,
+  CalendarOutlined, ClockCircleFilled, ClockCircleOutlined, EditOutlined, EnvironmentOutlined, InboxOutlined,
   PlusOutlined, ReadFilled, ReadOutlined, UnlockOutlined
 }
   from "@ant-design/icons"
@@ -80,26 +81,17 @@ const ClassDetail = () => {
       key: 'BatDauLuc', //ellipsis: 
       render: (value: string, session: SessionDB) => {
         return <Space orientation="vertical" size={0}>
-          <Text strong>
-            <CalendarOutlined /> {new Date(value).toLocaleDateString()}
-          </Text>
-          <Text type="secondary" style={{ fontSize: '14px' }}>
-            <ClockCircleOutlined /> {DateHelper.ISOToHHMM
-              (value, session.KetThucLuc)}
-          </Text>
+          <Text><CalendarFilled style={{ color: '#ff5d18' }} /> {new Date(value).toLocaleDateString()}</Text>
+          {/* <Text><ClockCircleFilled /> {DateHelper.ISOToHHMM(value, session.KetThucLuc)}
+          </Text> */}
         </Space>
       }
     },
     { // Nội dung
       title: 'Nội dung', dataIndex: 'ChuDe', key: 'ChuDe', ellipsis: true,
-      render: (topic: string, session: SessionDB) => {
+      render: (topic: string) => {
         return <Space orientation="vertical" size={0}>
-          <Text >
-            <ReadOutlined /> {topic ?? `Chủ đề: chưa cập nhật...`}
-          </Text>
-          <Text >
-            <EnvironmentOutlined /> {session.PhongHoc ?? `Phòng: _`}
-          </Text>
+          <Text ><ReadOutlined style={{color:'brown'}}/> {topic ?? `Chủ đề: chưa cập nhật...`} </Text>
         </Space>
       }
     },
@@ -220,11 +212,16 @@ const ClassDetail = () => {
 
   const changeTablePage = (pagination: any) => setSearchParam({ page: pagination.current })
 
-  if (loading) return <div style={{ minHeight: '89vh', background: '#f0f2f5' }}>
-    <Skeleton loading={loading} active paragraph={{ rows: 6 }} />
-  </div>
-  if (!lophoc) return <div style={{ minHeight: '89vh', background: '#f0f2f5' }}>
-    <div>Không tìm thấy lớp học</div>
+  if (loading)
+    return <div style={{ minHeight: '89vh', background: '#f0f2f5' }}>
+      <Skeleton loading={loading} active paragraph={{ rows: 6 }} />
+    </div>
+
+  if (!lophoc) return <div style={{ padding: 24, minHeight: '89vh', background: '#f0f2f5' }}>
+    <Space orientation='vertical' size={3}>
+      <Title level={4}>Không tìm thấy lớp học</Title>
+      <Button onClick={() => navigate(-1)}>Quay lại</Button>
+    </Space>
   </div>
 
   return (
@@ -258,7 +255,7 @@ const ClassDetail = () => {
                   {lophoc?.TrangThai}
                 </Tag>
               </Title>
-              <Text type="secondary">Mã LH: {lophoc?.MaLopHoc}</Text>
+              <Text type="secondary">Mã: {lophoc?.MaLopHoc}</Text>
             </div>
           </div>
           {/* là admin thì cho sửa */}

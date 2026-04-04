@@ -160,7 +160,7 @@ const ClassModal = ({ open, onCancel, khoahocId, onSave,
   }
 
   const handleCancel = () => { form.resetFields(); onCancel() }
-  const { value: initCourseId } = courseOption.find(
+  const initCourseId = courseOption.find(
     f => f.value === khoahocId) || {}
 
   return (

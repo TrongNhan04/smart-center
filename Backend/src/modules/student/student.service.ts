@@ -7,6 +7,7 @@ import { EnrollService } from "../enroll/enroll.service";
 import { InvoiceService } from "../invoice/invoice.service";
 import { NotifyService } from "../notify/notify.service";
 import { DateHelper } from "src/common/date.helper";
+import e from "express";
 
 @Injectable()
 export class StudentService {
@@ -202,12 +203,12 @@ export class StudentService {
     async GetClassesByStudentID(studentId: number) {
         const studentDB = await this.StudentIdValidator(studentId)
         const enrollDB = await this.prismaService.ghiDanh.findMany({
-            where: { HocVienID: studentDB.ID, TrangThai:'ACTIVE' },
+            where: { HocVienID: studentDB.ID, TrangThai: 'ACTIVE' },
             select: {
-                NgayGhiDanh: true, TrangThai:true,
+                NgayGhiDanh: true, TrangThai: true,
                 lophoc: {
                     select: {
-                        ID: true, MaLopHoc: true, TenLop: true, 
+                        ID: true, MaLopHoc: true, TenLop: true,
                         LichHoc: true, TuNgay: true, DenNgay: true,
                         GioBatDau: true, GioKetThuc: true,
                         GiaoVienID: true,
@@ -217,21 +218,23 @@ export class StudentService {
                             select: { buoihoc: { where: { TrangThai: 'COMPLETED' } } }
                         },
                     }
-                }
+                },
+                ketqua_chitiet: { select: { DiemDanh: true } }
             }
         })
-        if (!enrollDB) return []
+
         return enrollDB.map(lh => ({
             ID: lh.lophoc.ID, MaLopHoc: lh.lophoc.MaLopHoc,
             TenLop: lh.lophoc.TenLop,
             GiaoVien: lh.lophoc.giaovien.User.HoTen,
-            LichHoc: lh.lophoc.LichHoc, 
-            TuNgay: lh.lophoc.TuNgay, 
+            LichHoc: lh.lophoc.LichHoc,
+            TuNgay: lh.lophoc.TuNgay,
             GioHoc: lh.lophoc.GioBatDau + ' - ' + lh.lophoc.GioKetThuc,
             TongSoBuoi: lh.lophoc.khoahoc.TongSoBuoi,
             BuoiDaHoc: lh.lophoc._count.buoihoc,
             NgayGhiDanh: lh.NgayGhiDanh,
-            TrangThaiGD: lh.TrangThai
+            TrangThaiGD: lh.TrangThai,
+            DiemDanh: lh.ketqua_chitiet
         }))
     }
 
@@ -241,7 +244,7 @@ export class StudentService {
         const classDB = await this.prismaService.lopHoc.findUnique({
             where: { ID: classId },
             select: {
-                TenLop: true,
+                TenLop: true, GioBatDau:true, GioKetThuc:true, PhongHoc:true,
                 giaovien: {
                     select: { User: { select: { HoTen: true } } }
                 }
@@ -254,7 +257,7 @@ export class StudentService {
             },
             orderBy: { ketqua_buoihoc: { buoihoc: { BatDauLuc: 'asc' } } },
             select: {
-                ID: true, NhanXetRieng: true, DiemDanh: true, Diem: true,
+                ID: true, NhanXetRieng: true, DiemDanh: true, Diem: true, 
                 ketqua_buoihoc: {
                     select: {
                         NhanXetChung: true,
@@ -266,14 +269,14 @@ export class StudentService {
         return {
             LopHoc: classDB.TenLop,
             GiaoVien: classDB.giaovien.User.HoTen,
+            GioHoc: classDB.GioBatDau + '-' + classDB.GioKetThuc,
+            PhongHoc: classDB.PhongHoc,
             HocVien: studentDB.TenHocVien,
             KetQua: result.map(item => ({
                 ID: item.ID, // id kết quả chi tiết
                 BuoiSo: item.ketqua_buoihoc.buoihoc.BuoiSo,
                 ChuDe: item.ketqua_buoihoc.buoihoc.ChuDe,
                 BatDauLuc: item.ketqua_buoihoc.buoihoc.BatDauLuc,
-                GioHoc: DateHelper.ISOToHHMM(item.ketqua_buoihoc.buoihoc.BatDauLuc, item.ketqua_buoihoc.buoihoc.KetThucLuc),
-                PhongHoc: item.ketqua_buoihoc.buoihoc.PhongHoc,
                 NhanXet: item.NhanXetRieng || item.ketqua_buoihoc.NhanXetChung,
                 DiemDanh: item.DiemDanh,
                 Diem: item.Diem

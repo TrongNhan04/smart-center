@@ -1,4 +1,3 @@
-
 import {
   Row, Col, Card, Statistic, Typography, notification
 } from 'antd';
@@ -74,6 +73,8 @@ const Dashboard = () => {
     ],
   }
 
+  const month = new Date().getMonth() + 1
+
   return (
     <div style={{ padding: 24, background: '#f0f2f5', minHeight: '91vh' }}>
       <AntTilte level={3} style={{ marginTop: 0, marginBottom: 24 }}>Tổng quan Trung tâm</AntTilte>
@@ -92,7 +93,7 @@ const Dashboard = () => {
 
         <Col xs={24} sm={12} md={6}>
           <Card variant='borderless' style={{ borderRadius: 8 }}>
-            <Statistic title="Ghi danh mới (Tháng này)"
+            <Statistic title={`Ghi danh mới tháng ${month}`}
               value={sumaries?.GhiDanhMoi}
               prefix={<UsergroupAddOutlined />}
               styles={{ content: { color: '#52c41a' } }} />
@@ -103,7 +104,7 @@ const Dashboard = () => {
         <Col xs={24} sm={12} md={6}>
           <Card variant='borderless'
             style={{ borderRadius: 8, background: '#eaffeb' }}>
-            <Statistic title="Lợi nhuận (Tháng này)"
+            <Statistic title={`Lợi nhuận tháng ${month}`}
               value={sumaries?.LoiNhuan}
               prefix={<DollarOutlined />} suffix="đ"
               styles={{ content: { color: '#149744' } }} />

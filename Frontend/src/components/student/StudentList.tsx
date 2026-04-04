@@ -1,12 +1,11 @@
-import { Badge, Button, Card, Col, Input, notification, Row, Select, Table, Typography } from "antd"
+import { Badge, Button, Card, Col, Input, notification, Row, Select, Space, Table, Typography } from "antd"
 import { useEffect, useState } from "react"
 import type { StudentDB } from "./StudentDTO"
 import { studentApi } from "../../api/studentApi"
 import { Link, useSearchParams } from "react-router-dom"
-import { CalendarOutlined, EnvironmentOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons"
+import { CalendarFilled, EnvironmentFilled, PlusOutlined, SearchOutlined, UserOutlined } from "@ant-design/icons"
 import StudentModal from "./StudentModal"
 import StudentAction from "./StudentAction"
-
 
 const { Text } = Typography
 const StudentList = () => {
@@ -50,24 +49,24 @@ const StudentList = () => {
       render: (code: string) => <Text code>{code}</Text>
     },
     { // tên học viên
-      title: 'Tên học viên', dataIndex: 'TenHocVien', //width: 220,
+      title: 'Họ và tên', dataIndex: 'TenHocVien', //width: 220,
       key: 'TenHocVien', ellipsis: true,
       render: (name: string, student: StudentDB) =>
         <Link to={`/admin/students/${student.ID}`}
-          style={{ fontWeight: 'bold' }}>{name}</Link>
+          style={{ fontWeight: 'bold' }}><UserOutlined/> {name}</Link>
     },
     { // ngày sinh
       title: 'Ngày sinh', dataIndex: 'NgaySinh', key: 'NgaySinh', //width: 100,
       render: (dob: string) => <Text>
-        <CalendarOutlined /> {new Date(dob).toLocaleDateString()}
+        <CalendarFilled style={{color:'gray'}}/> {new Date(dob).toLocaleDateString()}
       </Text>
     },
     { // địa chỉ
       title: 'Địa chỉ', dataIndex: 'DiaChi', key: 'DiaChi', ellipsis: true,
-      render: (address: string) => !address || "" ?
-        "-" : <Text>
-          <EnvironmentOutlined /> {address}
-        </Text>
+      render: (address: string) => <Space>
+        <EnvironmentFilled style={{color:'#ff1818'}}/>
+        {!address || '' ? '_' : address}
+      </Space>
     },
     { // trạng thái
       title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai', //width: 160,

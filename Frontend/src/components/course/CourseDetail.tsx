@@ -9,7 +9,10 @@ import type { ClassDB } from "../class/ClassDTO"
 import courseApi from "../../api/courseApi"
 import classApi from "../../api/classApi"
 import {
-  CalendarOutlined, ClockCircleOutlined, EditOutlined, PlusOutlined,
+  CalendarFilled,
+  CalendarOutlined, ClockCircleFilled, ClockCircleOutlined, EditOutlined, PlusOutlined,
+  ReadOutlined,
+  UserOutlined,
 } from "@ant-design/icons"
 import CourseModal from "./CourseModal"
 import ClassModal from "../class/ClassModal"
@@ -76,23 +79,25 @@ const CourseDetail = () => {
   }, 0)
 
   const columns = [
-    {// mã lớp + tên lớp 
-      title: 'Lớp học', dataIndex: 'MaLopHoc', key: 'MaLopHoc',
-      render: (code: string, lophoc: ClassDB) => (
-        <Space orientation="vertical">
-          <Link to={`/admin/classes/${lophoc.ID}`}>{lophoc.TenLop}</Link>
-          <Text type="secondary" style={{ fontSize: 14 }}>{code}</Text>
-        </Space>
-      )
+    {// mã lớp 
+      title: 'Mã lớp', dataIndex: 'MaLopHoc', key: 'MaLopHoc', width: 120,
+      align: 'center' as const, render: (code: string) =>
+        <Text code style={{ fontSize: 14 }}>{code}</Text>
+    },
+    { // tên lớp
+      title: 'Lớp', dataIndex: 'TenLop', key: 'TenLop', ellipsis: true,
+      render: (name: string, lophoc: ClassDB) =>
+        <Link to={`/admin/classes/${lophoc.ID}`} style={{ fontWeight: 'bold' }}>
+          <ReadOutlined /> {name} </Link>
     },
     { // giáo viên
-      title: 'Giáo viên', dataIndex: ['GiaoVien', 'HoTen'],
-      key: 'HoTen', ellipsis: true
+      title: 'Giáo viên', dataIndex: ['GiaoVien', 'HoTen'], key: 'HoTen', ellipsis: true,
+      render: (name:string) =><Text><UserOutlined/> {name}</Text>
     },
     { // khai giảng = ngày bắt đầu
       title: 'Khai giảng', dataIndex: 'TuNgay', key: 'TuNgay', width: 130,
       render: (day: string) =>
-        <Text><CalendarOutlined /> {new Date(day).toLocaleDateString()}</Text>
+        <Text><CalendarFilled style={{color:'#ff5d18'}}/> {new Date(day).toLocaleDateString()}</Text>
     },
     { // lịch học
       title: 'Lịch học', dataIndex: 'LichHoc', key: 'LichHoc',
@@ -100,10 +105,8 @@ const CourseDetail = () => {
         const dow = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
         const result = schedule.map(m => dow[m]).join('-')
 
-        {/* orientation="vertical" giúp xếp chồng lên nhau */ }
         return <Space orientation="vertical" size={0}>
-          <Text strong><ClockCircleOutlined /> {lophoc.GioHoc}</Text>
-
+          <Text ><ClockCircleFilled /> {lophoc.GioHoc}</Text>
           <Text type="secondary" style={{ fontSize: '14px', display: 'block', textAlign: 'center' }}>
             {result}
           </Text>
@@ -116,7 +119,7 @@ const CourseDetail = () => {
         <>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>{lophoc.TongGhiDanh}/{classSize}</span>
-            <small style={{ color: '#999' }}>HV</small>
+            <span style={{ color: '#999' }}>Học viên</span>
           </div>
           <Progress
             percent={(lophoc.TongGhiDanh / classSize) * 100}
@@ -183,7 +186,7 @@ const CourseDetail = () => {
                   {course.TrangThai}</Tag>
               </Title>
 
-              <Text type="secondary">Mã KH: {course.MaKhoaHoc}</Text>
+              <Text type="secondary">Mã: {course.MaKhoaHoc}</Text>
             </div>
           </div>
           <Tooltip title='Sửa khóa học'>
