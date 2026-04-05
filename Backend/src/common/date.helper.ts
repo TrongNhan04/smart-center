@@ -78,7 +78,7 @@ export class DateHelper {
     static ISOToHHMM(start: Date, end: Date) {
         return start.toLocaleTimeString('vi-VN',
             { hour: '2-digit', minute: '2-digit' })
-            + '-' + end.toLocaleTimeString('vi-VN',
+            + ' - ' + end.toLocaleTimeString('vi-VN',
                 { hour: '2-digit', minute: '2-digit' })
     }
 }

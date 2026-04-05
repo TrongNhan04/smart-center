@@ -2,17 +2,16 @@ import { useEffect, useState } from "react"
 import type { EnrollDB } from "./EnrollDTO"
 import { enrollApi } from "../../api/enrollApi"
 import {
-  Button, Card, Col, Input, message, notification, Popconfirm, Row,
-  Select, Space, Table, Tag, Tooltip, Typography
+  Button, Card, Col, Input, message, Popconfirm, Row, Select, Space, Table,
+  Tag, Tooltip, Typography
 } from "antd"
 import { Link, useSearchParams } from "react-router-dom"
 import {
-  CalendarFilled,
-  CalendarOutlined, CheckCircleOutlined, CloseCircleOutlined,
-  DeleteOutlined, PlusOutlined, ReadFilled, ReadOutlined, SearchOutlined,
-  UserOutlined
+  CalendarFilled, CheckCircleOutlined, CloseCircleOutlined, DeleteOutlined,
+  PlusOutlined, ReadOutlined, SearchOutlined, UserOutlined
 } from "@ant-design/icons"
 import EnrollModal from "./EnrollModal"
+import { CatchError } from "../common/catch.error"
 
 const { Text } = Typography
 
@@ -31,7 +30,7 @@ const EnrollList = () => {
       const res = await enrollApi.findMany(keyword, filterStatus)
       setEnrolls(res.data)
     } catch (error: any) {
-      handelError(error)
+      CatchError.HandleError(error)
     }
     finally {
       setLoading(false)
@@ -48,7 +47,7 @@ const EnrollList = () => {
       message.success('Thao tác thành công')
       handleSaveModal(enrollId)
     } catch (error) {
-      handelError(error)
+      CatchError.HandleError(error)
     }
   }
 
@@ -61,17 +60,7 @@ const EnrollList = () => {
     }, 3000)
   }
 
-  const handelError = (error: any) => {
-    notification.error({
-      title: 'Có lỗi xảy ra',
-      description: error.response.data.message,
-      showProgress: true,
-      pauseOnHover: true
-    })
-    console.log('Có lỗi xảy ra: ', error.response.data.message)
-  }
-
-  const handleBack = (pagination: any) => {
+  const changeTablePage = (pagination: any) => {
     setSearchParam({ page: pagination.current })
   }
 
@@ -102,7 +91,7 @@ const EnrollList = () => {
       onFilter: (value: any, enroll: EnrollDB) =>
         new Date(enroll.NgayGhiDanh).getMonth() === value,
       render: (day: string) => <Text>
-       <Text><CalendarFilled style={{ color: '#ff7818' }} /> {new Date(day).toLocaleDateString()}</Text>
+        <Text><CalendarFilled style={{ color: '#ff7818' }} /> {new Date(day).toLocaleDateString()}</Text>
       </Text>
     },
     { // tên lớp
@@ -202,7 +191,7 @@ const EnrollList = () => {
             current: currentPage,
             pageSize: 20
           }}
-          onChange={handleBack}
+          onChange={changeTablePage}
           rowKey="ID"
           scroll={{ x: 1100, y: 408 }}
         />

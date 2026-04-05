@@ -24,6 +24,7 @@ export class DashboardService {
     // số hóa đơn còn hiệu lực nhưng vừa nợ vừa quá hạn
     async GetSumaries(month: number, year: number) {
         const now = new Date()
+        console.log(month,year)
         const m = month ?? now.getMonth()
         const y = year ?? now.getFullYear()
         const { start, end } = DateHelper.GetStartEndOfMonth(new Date(y, m))
@@ -104,32 +105,36 @@ export class DashboardService {
         return this.MergeData(receipts, payments, enrolls)
     }
 
-    // lấy danh sách buổi học hôm nay
-    async GetTodaySession() {
-        const { start, end } = DateHelper.GetStartEndOfDay(new Date())
+    // lấy danh sách buổi học trong 1 tháng
+    async GetSessionOfMonth(month: number, year: number) {
+        const date = new Date(year,month)
+        const { start, end } = DateHelper.GetStartEndOfMonth(date)
         const sessionDB = await this.prisma.buoiHoc.findMany({
             where: {
                 BatDauLuc: { gte: start },
-                KetThucLuc: { lt: end }
+                KetThucLuc: { lt: end },
+                TrangThai: { not: 'CANCELLED' }
             },
             select: {
-                BatDauLuc: true, KetThucLuc: true, PhongHoc: true,
+                ID: true, BuoiSo: true, 
+                BatDauLuc: true, KetThucLuc: true,
                 lophoc: {
                     select: {
-                        TenLop: true,
-                        giaovien: { select: { User: { select: { HoTen: true } } } }
-                    }
+                        TenLop: true, PhongHoc:true,
+                        _count: { select: { ghidanh: { where: { TrangThai: 'ACTIVE' } } } }
+                    },
                 },
-                TrangThai: true
             },
-            orderBy: { BatDauLuc: 'asc' }, take: 5
+            orderBy: { BatDauLuc: 'asc' }
         })
-        return sessionDB.map(sm => ({
-            ThoiGian: DateHelper.ISOToHHMM(sm.BatDauLuc, sm.KetThucLuc),
-            TenLop: sm.lophoc.TenLop,
-            GiaoVien: sm.lophoc.giaovien.User.HoTen,
-            PhongHoc: sm.PhongHoc,
-            TrangThai: sm.TrangThai
+        return sessionDB.map(item => ({
+            ID: item.ID, // id buổi học
+            TenLop: item.lophoc.TenLop,
+            BuoiSo: item.BuoiSo,
+            NgayHoc: item.BatDauLuc.toISOString().slice(0,10),
+            GioHoc: DateHelper.ISOToHHMM(item.BatDauLuc, item.KetThucLuc),
+            PhongHoc: item.lophoc.PhongHoc,
+            TongGhiDanh: item.lophoc._count.ghidanh
         }))
     }
 

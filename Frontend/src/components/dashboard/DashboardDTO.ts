@@ -14,16 +14,8 @@ export interface FinanceChart {
     GhiDanhMoi: number
 }
 
-export interface SessionToday {
-    ThoiGian: string
-    TenLop: string,
-    GiaoVien: string,
-    PhongHoc: string,
-    TrangThai: string
-}
-
 export interface TaskDB {
-    BuoiHocID:number,
+    BuoiHocID: number,
     BuoiSo: number,
     LopHocID: number,
     TenLop: string,
@@ -34,7 +26,18 @@ export interface TaskDB {
     Loai: string
 }
 
-export interface ReminderTeacher{
+export interface ReminderTeacher {
     classId: number,
     ssNumber: number
+}
+
+// dto cho trang thời khóa biểu
+export interface ClassSchedule {
+    ID: number, // id buổi học
+    TenLop: string,
+    BuoiSo: number,
+    NgayHoc: string,
+    GioHoc: string,
+    PhongHoc: string,
+    TongGhiDanh: number
 }

@@ -14,7 +14,7 @@ export class DashboardController {
     // lấy tổng học viên, ghi danh mới, tổng thực thu
     // và số hóa đơn còn hiệu lực nhưng quá hạn và còn nợ trong tháng
     @Get('sumaries')
-    async GetSumaries(@Query() q:{m:number, y:number}) {
+    async GetSumaries(@Query() q: { m: number, y: number }) {
         return this.dashboard.GetSumaries(q.m, q.y)
     }
 
@@ -25,34 +25,26 @@ export class DashboardController {
         return await this.dashboard.GetFinaceChart(yearNow)
     }
 
-    // // lấy danh sách buổi học hôm nay
-    // @Get('sessions')
-    // async GetTodaySession() {
-    //     return await this.dashboard.GetTodaySession()
-    // }
+    //lấy danh sách buổi học trong 1 tháng
+    @Get('sessions')
+    async GetTodaySession(@Query() q: { month: number, year: number }) {
+        return await this.dashboard.GetSessionOfMonth(+q.month, +q.year)
+    }
 
     // danh sách việc cần làm: các hóa đơn ACTIVE hết hạn, 
     // các lớp sắp hết buổi học cần tạo thêm, 
     // yêu cầu mở khóa buổi học, các buổi học đã kết thúc 
     // > 48h chưa SUBMITTED
     @Get('tasks')
-    async GetTasks(){
-        // const [classes, sessions] = await Promise.all([
-        //     // this.dashboard.GetOverdueInvoices(),
-        //     this.dashboard.GetExpiringClasses(),
-        //     this.dashboard.GetPendingSessions()
-        // ])
-        const sessions = await this.dashboard.GetPendingSessions()
-        return sessions
-        // ... = lấy phần ruột
-        // return [...classes, ...sessions]
+    async GetTasks() {
+        return await this.dashboard.GetPendingSessions()
     }
 
     // gửi thông báo nhắc nhở giáo viên
     @Post('teachers/:id/reminders')
     async RemindTeacher(
         @Param('id') teacherId: number,
-        @Body() body: RemindTeacher){
+        @Body() body: RemindTeacher) {
         return await this.dashboard.RemindTeacher(+teacherId, body)
     }
 }

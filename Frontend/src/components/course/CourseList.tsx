@@ -4,7 +4,7 @@ import {
   Space, Table, Tag, Typography
 } from 'antd';
 import courseApi from '../../api/courseApi';
-import { ClockCircleFilled, ClockCircleOutlined, DollarCircleFilled, PlusOutlined, ReadOutlined, SearchOutlined } from '@ant-design/icons';
+import { ClockCircleFilled, DollarCircleFilled, PlusOutlined, ReadOutlined, SearchOutlined } from '@ant-design/icons';
 import CourseAction from './CourseAction';
 import { type CourseDB } from './CourseDTO';
 import CourseModal from './CourseModal';

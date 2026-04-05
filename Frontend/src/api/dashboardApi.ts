@@ -6,7 +6,16 @@ export const dashboardApi = {
 
     getCharts: () => axiosClient.get('dashboards/charts'),
 
-    getSessions: () => axiosClient.get('dashboards/sessions'),
+    getSessionsOfMonth: (month: number, year: number) => {
+        const params = {
+            month: month,
+            year: year
+        }
+        return axiosClient.get('dashboards/sessions', {
+            params: params
+        })
+    },
+        
 
     getTasks: () => axiosClient.get(`dashboards/tasks`),
 

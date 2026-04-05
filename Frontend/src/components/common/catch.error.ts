@@ -6,8 +6,6 @@ import { message, notification } from "antd"
 export class CatchError {
     static HandleError(error:any) {
       console.log('Có lỗi xảy ra',error)
-      notification.error({title: 'Có lỗi xảy ra'})
-
       // bắt lỗi từ backend
       if (error.response) {
         const serverError = error.response?.data
@@ -24,5 +22,6 @@ export class CatchError {
         else
           console.log("Có lỗi xảy ra", error)
       }
+      else notification.error({title: 'Có lỗi xảy ra'})
     }
 }
