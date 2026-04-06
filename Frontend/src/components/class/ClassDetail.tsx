@@ -1,11 +1,11 @@
 import {
-  CalendarFilled, EditOutlined, InboxOutlined, PlusOutlined, ReadOutlined, 
+  CalendarFilled, EditOutlined, InboxOutlined, PlusOutlined, ReadOutlined,
   UnlockOutlined
 }
   from "@ant-design/icons"
 import {
-  Avatar, Badge, Button, Card, message, notification, Popconfirm, Skeleton,
-  Space, Table, Tabs, Tag, Tooltip, Typography
+  Avatar, Badge, Button, Card, message, Popconfirm, Skeleton, Space, Table,
+  Tabs, Tag, Tooltip, Typography
 } from "antd"
 import { useNavigate, useParams, useSearchParams } from "react-router-dom"
 import type { ClassDB } from "./ClassDTO"
@@ -24,8 +24,8 @@ import { CatchError } from "../common/catch.error"
 const { Title, Text } = Typography
 
 const ClassDetail = () => {
-  const { id } = useParams()
-  const classId = Number(id)
+  const { classId } = useParams()
+  const lopHocId = Number(classId)
   const [lophoc, setLopHoc] = useState<ClassDB | null>(null)
   const [sessions, setSessions] = useState<SessionDB[]>([])
   const [openClassModal, setOpenClassModal] = useState(false)
@@ -41,8 +41,8 @@ const ClassDetail = () => {
     try {
       setLoading(true)
       const [classRes, sessionRes] = await Promise.all([
-        classApi.findOne(classId),
-        sessionApi.getByClassId(classId)
+        classApi.findOne(lopHocId),
+        sessionApi.getByClassId(lopHocId)
       ])
       setLopHoc(classRes.data)
       setSessions(sessionRes.data)
@@ -53,9 +53,9 @@ const ClassDetail = () => {
   }
 
   useEffect(() => {
-    if (!classId || isNaN(classId)) return
+    if (!lopHocId || isNaN(lopHocId)) return
     initData()
-  }, [classId])
+  }, [lopHocId])
 
   const statusColor: Record<string, string> = {
     OPEN: 'default', RUNNING: 'processing',
@@ -84,7 +84,7 @@ const ClassDetail = () => {
       title: 'Nội dung', dataIndex: 'ChuDe', key: 'ChuDe', ellipsis: true,
       render: (topic: string) => {
         return <Space orientation="vertical" size={0}>
-          <Text ><ReadOutlined style={{color:'brown'}}/> {topic ?? `Chủ đề: chưa cập nhật...`} </Text>
+          <Text ><ReadOutlined style={{ color: '#187cff' }} /> {topic ?? `Chủ đề: chưa cập nhật...`} </Text>
         </Space>
       }
     },
@@ -144,7 +144,7 @@ const ClassDetail = () => {
           unlock={handleUnlock}
           onCancel={handleCancel}
         />
-          : <Button onClick={() => navigate(`/teacher/sessions/${value.ID}`)}>
+          : <Button onClick={() => navigate(`sessions/${value.ID}`)}>
             Xem chi tiết</Button>
       }
     }
@@ -155,40 +155,23 @@ const ClassDetail = () => {
     return columns.filter(item => item.key !== 'AdminMoKhoa')
   }
 
-  const AutoGenerate = async (classId: number) => {
+  const AutoGenerate = async (lopHocId: number) => {
     try {
-      const res = await sessionApi.generateAuto(classId)
+      const res = await sessionApi.generateAuto(lopHocId)
       initData()
       message.success(`Đã tạo thành công ${res.data.length} buổi học`)
     } catch (error: any) {
-      // bắt lỗi từ backend
-      if (error.response) {
-        const serverError = error.response.data
-        // nếu là mảng lỗi thì lấy cái đầu tiên
-        if (Array.isArray(serverError.message))
-          message.error(serverError.message[0])
-        else if (typeof serverError.message === 'string')
-          notification.error({
-            title: 'Có lỗi xảy ra',
-            description: error?.response?.data?.message,
-            showProgress: true,
-            pauseOnHover: true
-          })
-        else
-          console.log("Có lỗi xảy ra", error)
-      }
+      CatchError.HandleError(error)
     }
   }
 
   const handleUnlock = async (sessionId: number) => {
     try {
       await sessionApi.unlock(sessionId)
-      // console.log('res của unlock: ', res.data)
       message.success('Thao tác thành công')
       initData()
     } catch (error) {
-      message.error('Có lỗi xảy ra')
-      console.log('Có lỗi xảy ra: ', error)
+      CatchError.HandleError(error)
     }
   }
 
@@ -198,8 +181,7 @@ const ClassDetail = () => {
       message.success('Thao tác thành công')
       initData()
     } catch (error: any) {
-      message.error('Có lỗi xảy ra')
-      console.log('Có lỗi xảy ra: ', error?.response?.data?.message)
+      CatchError.HandleError(error)
     }
   }
 
@@ -318,8 +300,8 @@ const ClassDetail = () => {
               },
               {
                 key: '2',
-                label: 'Danh sách học viên ',
-                children: (<TabStudent id={lophoc.ID} />),
+                label: `Danh sách học viên`,
+                children: (<TabStudent id={lophoc.ID}/>),
               },
               {
                 key: '3',

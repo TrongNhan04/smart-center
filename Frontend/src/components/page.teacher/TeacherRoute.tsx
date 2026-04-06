@@ -2,10 +2,10 @@ import { Navigate, Outlet, useParams } from "react-router-dom"
 import { useAuthStore } from "../../store/useAuthStore"
 
 const TeacherRoute = () => {
-  const {id} = useParams()
+  const {classId} = useParams()
   const user = useAuthStore(state=>state.user)
-  const classId = Number(id)
-  if(!user?.classes.includes(classId))
+  const lopHocId = Number(classId)
+  if(!user?.classes.includes(lopHocId))
     return <Navigate to='/404'/>
   return <Outlet/>
 }

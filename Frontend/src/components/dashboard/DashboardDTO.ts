@@ -6,11 +6,23 @@ export interface Summaries {
     TongNoQuaHan: number
 }
 
-export interface FinanceChart {
-    Thang: number,
-    TongThu: number,
-    TongChi: number,
-    LoiNhuan: number,
+// export interface FinanceChart {
+//     Thang: number,
+//     TongThu: number,
+//     TongChi: number,
+//     LoiNhuan: number,
+//     GhiDanhMoi: number
+// }
+
+export interface ReveueChart {
+    LopHocID: number,
+    MaLopHoc: string,
+    TenLop: string,
+    DoanhThu: number
+}
+
+export interface EnrollChart{
+    Thang:string,
     GhiDanhMoi: number
 }
 

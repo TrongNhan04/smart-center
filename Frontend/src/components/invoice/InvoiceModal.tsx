@@ -1,7 +1,11 @@
-import { Alert, Button, Form, Input, InputNumber, message, Modal, notification, Select, Typography } from "antd"
+import {
+  Alert, Button, Form, Input, InputNumber, message, Modal, Select,
+  Typography
+} from "antd"
 import type { InvoiceDB } from "./InvoiceDTO"
 import { useState } from "react"
 import { invoiceApi } from "../../api/invoiceApi"
+import { CatchError } from "../common/catch.error"
 
 interface Props {
   open: boolean,
@@ -33,7 +37,7 @@ const InvoiceModal = ({ open, onCancel, invoice, onSave, isReceipt }: Props) => 
       // const { amount, reason } = values
       console.log("values: ", values)
       await new Promise(resolve => setTimeout(resolve, 1000))
-      
+
       const res = isReceipt ?
         await invoiceApi.createReceipt(invoice.ID, values)
         : await invoiceApi.createPayment(invoice.ID, values)
@@ -41,21 +45,11 @@ const InvoiceModal = ({ open, onCancel, invoice, onSave, isReceipt }: Props) => 
       onSave(res.data.ID)
       handleCancel()
     } catch (error) {
-      handleError(error)
+      CatchError.HandleError(error)
     }
     finally {
       setLoading(false)
     }
-  }
-
-  const handleError = (error: any) => {
-    notification.error({
-      title: 'Có lỗi xảy ra',
-      description: error.response.data.message,
-      showProgress: true,
-      pauseOnHover: true
-    })
-    console.log("Có lỗi xảy ra", error.response.data.message)
   }
 
   const handlePayFull = () => {
@@ -130,7 +124,7 @@ const InvoiceModal = ({ open, onCancel, invoice, onSave, isReceipt }: Props) => 
 
         <Form.Item // phương thức
           label="Phương thức" name="method"
-          rules={[{required:true, message:'Chọn phương thức thanh toán!'}]}
+          rules={[{ required: true, message: 'Chọn phương thức thanh toán!' }]}
         >
           <Select
             options={[

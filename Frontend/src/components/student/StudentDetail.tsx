@@ -145,7 +145,7 @@ const StudentDetail = () => {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             {/* nút quay lại */}
-            <Button onClick={() => navigate(`/admin/students`)} > Quay lại
+            <Button onClick={() => navigate(-1)} > Quay lại
             </Button>
 
             <Avatar shape="square" size={49} style={{ background: '#0d6efd' }}>

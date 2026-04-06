@@ -1,4 +1,4 @@
-import { Alert, Form, Input, InputNumber, message, Modal, notification, Select } from "antd"
+import { Alert, Form, Input, InputNumber, message, Modal, Select } from "antd"
 import { useEffect, useState } from "react"
 import type { ClassForCmb } from "../class/ClassDTO"
 import type { StudentForCmb } from "../student/StudentDTO"
@@ -6,6 +6,7 @@ import classApi from "../../api/classApi"
 import type { EnrollDto } from "./EnrollDTO"
 import { enrollApi } from "../../api/enrollApi"
 import { studentApi } from "../../api/studentApi"
+import { CatchError } from "../common/catch.error"
 
 interface Props {
   open: boolean,
@@ -19,15 +20,6 @@ const EnrollModal = ({ open, onCancel, onSave }: Props) => {
   const [classes, setClasses] = useState<ClassForCmb[]>([])
   const [students, setStudents] = useState<StudentForCmb[]>([])
 
-  const handleError = (error: any) => {
-    notification.error({
-      title: 'Có lỗi xảy ra',
-      description: error.response.data.message,
-      showProgress: true,
-      pauseOnHover: true
-    })
-    console.log("Có lỗi xảy ra", error)
-  }
   const fetchClasses_Students = async () => {
     try {
       const [classRes, studentRes] = await Promise.all([
@@ -37,7 +29,7 @@ const EnrollModal = ({ open, onCancel, onSave }: Props) => {
       setClasses(classRes.data)
       setStudents(studentRes.data)
     } catch (error) {
-      handleError(error)
+      CatchError.HandleError(error)
     }
   }
   useEffect(() => {
@@ -83,19 +75,7 @@ const EnrollModal = ({ open, onCancel, onSave }: Props) => {
       handleCancel()
     }
     catch (error: any) {
-      // bắt lỗi từ backend
-      console.log("Có lỗi xảy ra: ", error.response.data.message)
-
-      if (error.response) {
-        const serverError = error.response.data
-        // nếu là mảng lỗi thì lấy cái đầu tiên
-        if (Array.isArray(serverError.message))
-          message.error(serverError.message[0])
-        else if (typeof serverError.message === 'string')
-          handleError(error)
-        else
-          message.error("Có lỗi xảy ra")
-      }
+      CatchError.HandleError(error)
     } finally {
       setLoading(false)
     }
@@ -158,7 +138,6 @@ const EnrollModal = ({ open, onCancel, onSave }: Props) => {
                 (option?.label ?? '').toLowerCase()
                   .includes(input.toLowerCase())
             }}
-            //onChange={handleClassChange}
           />
         </Form.Item>
     

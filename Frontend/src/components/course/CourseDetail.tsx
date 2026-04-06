@@ -40,7 +40,6 @@ const CourseDetail = () => {
       setCourse(courseRes.data)
       setClasses(classRes.data)
     } catch (error: any) {
-      // bắt lỗi từ backend
       CatchError.HandleError(error)
     }
     finally { setLoading(false) }

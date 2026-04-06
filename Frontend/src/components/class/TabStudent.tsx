@@ -1,5 +1,8 @@
-import { CalendarFilled, CalendarOutlined, DollarCircleFilled, DollarCircleOutlined, EnvironmentFilled, EnvironmentOutlined, PhoneFilled, PhoneOutlined, SearchOutlined, UserOutlined } from "@ant-design/icons"
-import { Col, Input, notification, Row, Space, Table, Tooltip, Typography } from "antd"
+import {
+  CalendarFilled, CalendarOutlined, DollarCircleFilled, EnvironmentFilled,
+  PhoneFilled, SearchOutlined, UserOutlined
+} from "@ant-design/icons"
+import { Col, Input, Row, Space, Table, Tooltip, Typography } from "antd"
 import { useEffect, useState } from "react"
 import type { StuOfClass } from "./ClassDTO"
 import { Link } from "react-router-dom"
@@ -7,8 +10,11 @@ import classApi from "../../api/classApi"
 import { CatchError } from "../common/catch.error"
 
 const { Text } = Typography
+interface Props {
+  id:number
+}
 
-const TabStudent = ({ id }: { id: number }) => {
+const TabStudent = ({id}:Props) => {
   const [students, setStudents] = useState<StuOfClass[]>([])
   const [loading, setLoading] = useState(false)
   const [searchText, setSearchText] = useState('')
@@ -47,7 +53,7 @@ const TabStudent = ({ id }: { id: number }) => {
       key: 'TenHocVien', ellipsis: true,
       render: (name: string, student: StuOfClass) =>
         <Link to={`/admin/students/${student.HocVienID}`}
-          style={{ fontWeight: 'bold' }}><UserOutlined/> {name}</Link>
+          style={{ fontWeight: 'bold' }}><UserOutlined /> {name}</Link>
     },
     { // ngày sinh
       title: 'Ngày sinh', dataIndex: 'NgaySinh', key: 'NgaySinh', //width: 100,
@@ -78,10 +84,10 @@ const TabStudent = ({ id }: { id: number }) => {
     },
     { // học phí
       title: 'Học phí', dataIndex: 'HocPhi', key: 'HocPhi', //width: 100,
-      render: (fee: string) => {
+      align: 'center' as const, render: (fee: string) => {
         const hocPhi = Number(fee) ?? 0
         return <Text style={{ color: '#47b410' }}>
-          <DollarCircleFilled /> {hocPhi.toLocaleString()}</Text>
+          <DollarCircleFilled /> {hocPhi.toLocaleString()}đ</Text>
       }
     },
   ]

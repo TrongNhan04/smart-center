@@ -1,12 +1,12 @@
 import {
   List, Card, Progress, Typography, Space, Tag, Divider, Row, Col,
-  notification
 } from 'antd';
-import { TeamOutlined, CalendarOutlined } from '@ant-design/icons';
+import { TeamOutlined, CalendarOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import type { TeacherClass } from '../class/ClassDTO';
 import classApi from '../../api/classApi';
+import { CatchError } from '../common/catch.error';
 
 const { Text, Title } = Typography;
 
@@ -18,13 +18,7 @@ const MyClasses = () => {
       const res = await classApi.getByUserId()
       setClasses(res.data)
     } catch (error: any) {
-      notification.error({
-        title: 'Có lỗi xảy ra',
-        description: error.response.data.message,
-        showProgress: true,
-        pauseOnHover: true
-      })
-      console.log("Có lỗi xảy ra", error.response.data.message)
+      CatchError.HandleError(error)
     }
   }
 
@@ -55,11 +49,11 @@ const MyClasses = () => {
       <List
         grid={{
           gutter: [24, 8], // Khoảng cách giữa các thẻ
-          xs: 1,      // Điện thoại: 1 cột
+          xs: 1,      // Điện thoại: 1 cột, phân chia = kích cỡ màn hình
           sm: 1,      // Tablet nhỏ: 1 cột
           md: 2,      // Tablet lớn: 2 cột
           lg: 3,      // Desktop: 3 cột
-          xl: 3,
+          xl: 3,      // Màn hình rộng: 3 cột
           xxl: 4,     // Màn hình siêu rộng: 4 cột
         }}
         dataSource={classes}
@@ -100,7 +94,7 @@ const MyClasses = () => {
                       <TeamOutlined style={{ color: '#8c8c8c' }} />
                       <Text>{item.TongGhiDanh} học viên</Text>
                     </Space>
-                    <Text type="secondary">{item.PhongHoc}</Text>
+                    <Text ><EnvironmentOutlined/> {item.PhongHoc??'_'}</Text>
                   </Space>
 
                   <div>

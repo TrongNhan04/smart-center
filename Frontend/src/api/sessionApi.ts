@@ -2,11 +2,11 @@ import axiosClient from "../components/AxiosClient";
 import type { SessionDto, TSessionDetail } from "../components/session/SessionDTO";
 
 export const sessionApi = {
-    getByClassId: (classId: number) =>
-        axiosClient.get(`admin/classes/${classId}/sessions`),
-
     getDetailsById: (sessionId: number) =>
         axiosClient.get(`sessions/${sessionId}`),
+
+    getByClassId: (classId: number) =>
+        axiosClient.get(`admin/classes/${classId}/sessions`),
 
     getCompletedByTeacherId: (teacherId: number) =>
         axiosClient.get(`admin/teachers/${teacherId}/sessions-completed`),

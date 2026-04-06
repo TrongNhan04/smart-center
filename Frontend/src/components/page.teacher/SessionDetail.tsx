@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import {
   Card, Form, Input, Button, Upload, Table, Typography, Descriptions,
-  Row, Col, Radio, Space, InputNumber, Tooltip, Tag, message, notification,
+  Row, Col, Radio, Space, InputNumber, Tooltip, Tag, message,
   Skeleton,
 } from 'antd';
 import {
-  InboxOutlined, PhoneOutlined,
+  CalendarFilled, ClockCircleFilled, EnvironmentFilled,
+  InboxOutlined, PhoneOutlined, ReadFilled, UserOutlined,
 } from '@ant-design/icons';
 import type { SessionResult, TSessionDetail } from '../session/SessionDTO';
 import { DateHelper } from '../common/date.helper';
@@ -16,6 +17,7 @@ import FileUpload from './FileUpload';
 import { useAuthStore } from '../../store/useAuthStore';
 import UnlockButton from './UnlockButton'
 import NavigateDrawer from './NavigateDrawer';
+import { CatchError } from '../common/catch.error';
 
 const { Title, Text } = Typography
 const { TextArea } = Input
@@ -51,7 +53,7 @@ const SessionDetail = () => {
       setSession(res.data)
       setStudents(res.data.ChiTietKetQua)
     } catch (error: any) {
-      handelError(error)
+      CatchError.HandleError(error)
     }
     finally { setLoading(false) }
   }
@@ -63,6 +65,8 @@ const SessionDetail = () => {
       return
     }
     fetchSession(buoiHocId)
+    // form.setFieldsValue(session) ở đây thì chạy lần đầu không có dữ liệu
+    // vì fetchSession async chạy chưa xong thì đã set form value
   }, [buoiHocId])
   // useEffect 2: session thay đổi thì đổ dữ liệu mới vào form
   useEffect(() => {
@@ -126,16 +130,6 @@ const SessionDetail = () => {
     },
   ]
 
-  const handelError = (error: any) => {
-    notification.error({
-      title: 'Có lỗi xảy ra',
-      description: error?.response?.data?.message,
-      showProgress: true,
-      pauseOnHover: true
-    })
-    console.log('Có lỗi xảy ra: ', error)
-  }
-
   // Hàm cập nhật state khi giáo viên thao tác trên bảng
   const handleStudentChange = (id: number, field: string, value: any) => {
     const updatedStudents = students.map(stu =>
@@ -165,7 +159,7 @@ const SessionDetail = () => {
       message.success('Thao tác thành công')
       setReload(prev => prev + 1)// tăng lên để con biết reload
     } catch (error) {
-      handelError(error)
+      CatchError.HandleError(error)
     }
   }
 
@@ -193,7 +187,7 @@ const SessionDetail = () => {
       setFileList(prev => [...prev, resFile])
     } catch (error) {
       options.onError({ error })
-      handelError(error)
+      CatchError.HandleError(error)
     }
   }
 
@@ -250,14 +244,28 @@ const SessionDetail = () => {
             >Xem danh sách</Button>
           }>
 
-          <Descriptions bordered size="small"
-            style={{ marginBottom: 24 }} column={{ xs: 1, sm: 2, md: 3 }}>
-            <Descriptions.Item label="Lớp">{session.LopHoc}</Descriptions.Item>
-            <Descriptions.Item label="Buổi số">{session.BuoiSo}</Descriptions.Item>
-            <Descriptions.Item label="Ngày học">{ngayHoc}</Descriptions.Item>
-            <Descriptions.Item label="Thời gian">{gioHoc}</Descriptions.Item>
-            <Descriptions.Item label="Phòng">{session.PhongHoc ?? '-'}</Descriptions.Item>
-            <Descriptions.Item label="Giáo viên">{session.GiaoVien}</Descriptions.Item>
+          <Descriptions size="small"
+            style={{ marginBottom: 24 }}
+            styles={{ label: { color: 'black' } }}
+            column={{ xs: 1, sm: 2, md: 3 }}>
+            <Descriptions.Item label="Lớp">
+              <Text><ReadFilled style={{ color: '#187cff' }} /> {session.LopHoc}</Text>
+            </Descriptions.Item>
+            <Descriptions.Item label="Buổi số"><Text>{session.BuoiSo}</Text></Descriptions.Item>
+            <Descriptions.Item label="Ngày học">
+              <Text><CalendarFilled style={{ color: '#ff8818' }} /> {ngayHoc}</Text>
+            </Descriptions.Item>
+            <Descriptions.Item label="Giáo viên">
+              <Text><UserOutlined /> {session.GiaoVien}</Text>
+            </Descriptions.Item>
+            <Descriptions.Item label="Phòng">
+              <Text>
+                <EnvironmentFilled style={{ color: '#ff1818' }} /> {session.PhongHoc ?? '_'}
+              </Text>
+            </Descriptions.Item>
+            <Descriptions.Item label="Thời gian">
+              <Text><ClockCircleFilled /> {gioHoc}</Text>
+            </Descriptions.Item>
           </Descriptions>
 
           <Row gutter={24}>

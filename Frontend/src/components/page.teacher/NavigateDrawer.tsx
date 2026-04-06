@@ -1,8 +1,10 @@
-import { Button, Space, Typography, notification, Drawer, Divider } from 'antd';
+import { Button, Space, Typography, Drawer, Divider } from 'antd';
 import { useEffect, useState } from 'react';
 import type { SessionDB } from '../session/SessionDTO';
 import { sessionApi } from '../../api/sessionApi';
 import { useNavigate, useParams } from 'react-router-dom';
+import { CatchError } from '../common/catch.error';
+import { useAuthStore } from '../../store/useAuthStore';
 
 const { Text } = Typography
 interface Props {
@@ -15,21 +17,18 @@ const NavigateDrawer = ({ open, onCancel }: Props) => {
   const { classId, sessionId } = useParams()
   const [sessions, setSessions] = useState<SessionDB[]>([])
   const lopHocId = Number(classId)
-
+  const user = useAuthStore(state=>state.user)
+  const role = user?.role.toLowerCase()
   const fetchData = async () => {
     try {
       const res = await sessionApi.getByClassId(lopHocId)
       setSessions(res.data)
     } catch (error: any) {
-      notification.error({
-        title: 'Có lỗi xảy ra',
-        description: error?.response?.data?.message,
-        showProgress: true,
-        pauseOnHover: true
-      })
-      console.log("Có lỗi xảy ra", error)
+      CatchError.HandleError(error)
     }
   }
+
+
 
   useEffect(() => {
     fetchData()
@@ -81,7 +80,7 @@ const NavigateDrawer = ({ open, onCancel }: Props) => {
                   }}
 
                   onClick={() => {
-                    navigate(`/admin/classes/${classId}/sessions/${item.ID}`);
+                    navigate(`/${role}/classes/${classId}/sessions/${item.ID}`);
                     onCancel()
                   }}
                 >

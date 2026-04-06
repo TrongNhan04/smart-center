@@ -15,7 +15,10 @@ const TongHopThuChi = () => {
   const [transactions, setTransactions] = useState<GiaoDich[]>([])
   const [searchParam, setSearchParam] = useSearchParams()
   const currentPage = Number(searchParam.get('page')) || 1
-  const currentMonth = Number(searchParam.get('month')) || new Date().getMonth()
+
+  const currentMonth = searchParam.get('month') ?
+    Number(searchParam.get('month')) : new Date().getMonth()
+
   const [total, setTotal] = useState()
   const [selectedDate, setSelectedDate] = useState(dayjs())
   const fetchTransactions = async () => {
@@ -96,12 +99,12 @@ const TongHopThuChi = () => {
   ]
 
   return (
-    <div style={{ padding: 24, background: "#f5f7fa", minHeight: "90vh" }}>
+    <div style={{ padding: 24, background: "#f0f2f5", minHeight: "90vh" }}>
 
       {/* HEADER + SUMMARY */}
       <Row
         gutter={[16, 16]} align="middle"
-        justify="space-between" style={{ marginBottom: 24 }}
+        justify="space-between" style={{ marginBottom: 20 }}
       >
         <Col xs={24} md={8} style={{ textAlign: 'center' }}>
           <Title level={3} style={{ margin: 0 }}>
@@ -113,17 +116,17 @@ const TongHopThuChi = () => {
             format={`MM/YYYY`}
             onChange={(date: any) => {
               setSelectedDate(date);
-              setSearchParam({month: date.month()})
+              setSearchParam({ month: date.month() })
             }}
             style={{ marginTop: 8 }}
           />
         </Col>
-        
-        <Col xs={24} md={16}> 
+
+        <Col xs={24} md={16}>
           <Row gutter={16}>
             <Col xs={24} sm={8}>
               <Card variant="borderless">
-                <Statistic 
+                <Statistic
                   title="Tổng Thu"
                   value={tongThu}
                   suffix=" đ"
@@ -161,7 +164,7 @@ const TongHopThuChi = () => {
                   suffix=" đ"
                   styles={{
                     content: {
-                      color: "#1890ff",
+                      color: "#1677ff",
                       fontWeight: 600,
                     },
                   }}
@@ -172,8 +175,11 @@ const TongHopThuChi = () => {
         </Col>
       </Row>
 
-      {/* BẢNG GIAO DỊCH */}
-      <Card variant="borderless">
+      {/* bảng giao dịch */}
+      <Card variant="borderless"
+        title='Lịch sử giao dịch'
+        styles={{ header: { backgroundColor: '#f0f5ff', color: '#1d39c4' } }}
+      >
         <Table
           columns={columns}
           dataSource={transactions}
@@ -184,9 +190,9 @@ const TongHopThuChi = () => {
             total: total
           }}
           onChange={(pagination: any) =>
-            setSearchParam({month:currentMonth.toString(), page: pagination.current })
+            setSearchParam({ month: currentMonth.toString(), page: pagination.current })
           }
-          scroll={{ y: 350 }}
+          scroll={{ y: 300 }}
           bordered
         />
       </Card>

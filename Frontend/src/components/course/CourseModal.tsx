@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import courseApi, { } from '../../api/courseApi';
 import { mapDataCourse, type CourseDB, type CourseDto } from './CourseDTO';
 import { getChangedValue } from '../common/utils';
+import { CatchError } from '../common/catch.error';
 
 interface Props {
   open: boolean,
@@ -41,19 +42,7 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: Props) => {
       handleCancel()
     }
     catch (error: any) {
-      // bắt lỗi từ backend
-      console.log("Có lỗi xảy ra: ", error)
-
-      if (error.response) {
-        const serverError = error.response.data
-        // nếu là mảng lỗi thì lấy cái đầu tiên
-        if (Array.isArray(serverError.message))
-          message.error(serverError.message[0])
-        else if (typeof serverError.message === 'string')
-          message.error(serverError.message)
-        else
-          message.error("Có lỗi xảy ra")
-      }
+      CatchError.HandleError(error)
     } finally {
       setLoading(false)
     }
@@ -65,14 +54,15 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: Props) => {
   }
 
   useEffect(() => {
-    if (open) {
-      if (editingCourse) {
-        const formData = mapDataCourse(editingCourse)
-        form.setFieldsValue(formData)
-      }
-      else
-        form.resetFields()
+    if (!open) return
+    
+    if (editingCourse) {
+      const formData = mapDataCourse(editingCourse)
+      form.setFieldsValue(formData)
     }
+    else
+      form.resetFields()
+
   }, [open, form, editingCourse])
 
   return (

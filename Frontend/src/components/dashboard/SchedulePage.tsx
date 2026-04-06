@@ -110,13 +110,13 @@ const SchedulePage = () => {
 
         <Col xs={24} lg={6}>
           <Card
-            title={`Thời khóa biểu ngày ${selectedDate.format('DD/MM/YYYY')}`}
+            title={`Thời khóa biểu ${selectedDate.format('DD/MM/YYYY')}`}
             variant="borderless"
             styles={{ header: { backgroundColor: '#f0f5ff', color: '#1d39c4' } }}
           >
             {classOfDate.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '40px 0', color: '#8c8c8c' }}>
-                Hôm nay không có lịch học
+                Chưa có lịch học
               </div>
             ) : (
               <List
@@ -135,7 +135,7 @@ const SchedulePage = () => {
                   >
                     <div style={{ width: '100%' }}>
                       <Row justify="space-between" align="middle" style={{ marginBottom: 8 }}>
-                        <Title level={5} style={{ margin: 0, color: '#262626' }}>{item.TenLop}</Title>
+                        <Title level={5} style={{ margin: 0}}>{item.TenLop}</Title>
                       </Row>
 
                       <Space orientation="vertical" size={1} style={{ width: '100%' }}>
@@ -143,7 +143,7 @@ const SchedulePage = () => {
                           <ClockCircleOutlined /> Thời gian: <Text strong>{item.GioHoc}</Text>
                         </Text>
                         <Text >
-                          <EnvironmentOutlined /> Phòng học: <Text strong>{item.PhongHoc}</Text>
+                          <EnvironmentOutlined /> Phòng học: <Text strong>{item.PhongHoc ?? '_'}</Text>
                         </Text>
                         <Text >
                           <UserOutlined /> Học viên: <Text strong>{item.TongGhiDanh}</Text>

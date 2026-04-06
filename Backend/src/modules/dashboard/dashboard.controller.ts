@@ -11,8 +11,9 @@ import { RemindTeacher } from "./dashboard.dto";
 export class DashboardController {
     constructor(private dashboard: DashboardService) { }
 
-    // lấy tổng học viên, ghi danh mới, tổng thực thu
-    // và số hóa đơn còn hiệu lực nhưng quá hạn và còn nợ trong tháng
+    // lấy tổng học viên đang học 
+    // ghi danh mới, lợi nhuận (thu-chi)
+    // và số hóa đơn còn hiệu lực đã quá hạn và còn nợ trong tháng
     @Get('sumaries')
     async GetSumaries(@Query() q: { m: number, y: number }) {
         return this.dashboard.GetSumaries(q.m, q.y)
@@ -22,7 +23,14 @@ export class DashboardController {
     @Get('charts')
     async GetFinaceChart(@Query('year') year?: number) {
         const yearNow = year ? year : new Date().getFullYear()
-        return await this.dashboard.GetFinaceChart(yearNow)
+        const [ghiDanh, lopHoc] = await Promise.all([
+            this.dashboard.GetFinaceChart(yearNow), // data cho biểu đồ ghi danh
+            this.dashboard.GetHighestRevenue()// biểu đồ doanh thu
+        ])
+        return {
+            GhiDanh: ghiDanh,
+            LopHoc: lopHoc
+        }
     }
 
     //lấy danh sách buổi học trong 1 tháng

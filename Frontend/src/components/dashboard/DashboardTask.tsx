@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { dashboardApi } from '../../api/dashboardApi';
 import { useEffect, useState } from 'react';
 import { type TaskDB } from './DashboardDTO';
+import { CatchError } from '../common/catch.error';
 
 const DashboardTask = () => {
   const navigate = useNavigate()
@@ -14,13 +15,7 @@ const DashboardTask = () => {
       const res = await dashboardApi.getTasks()
       setTasksToday(res.data)
     } catch (error: any) {
-      notification.error({
-        title: 'Có lỗi xảy ra',
-        description: error?.response?.data?.message,
-        showProgress: true,
-        pauseOnHover: true
-      })
-      console.log('Có lỗi xảy ra: ', error?.response?.data?.message)
+      CatchError.HandleError(error)
     }
   }
 

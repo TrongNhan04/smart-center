@@ -1,15 +1,16 @@
-import { Button, notification, Popconfirm, Space } from "antd"
+import { Button, Popconfirm, Space } from "antd"
 import type { TSessionDetail } from "../session/SessionDTO"
 import { CheckCircleOutlined, SaveOutlined } from "@ant-design/icons"
 import { DateHelper } from "../common/date.helper"
 import { useState } from "react"
 import teacherApi from "../../api/teacherApi"
 import { useAuthStore } from "../../store/useAuthStore"
+import { CatchError } from "../common/catch.error"
 
 interface Props {
   session: TSessionDetail
   onSave: (type: 'DRAFT' | 'SUBMITTED') => void
-  onReload: (id:number) => void
+  onReload: (id: number) => void
 }
 
 const UnlockButton = ({ session, onSave, onReload }: Props) => {
@@ -25,28 +26,19 @@ const UnlockButton = ({ session, onSave, onReload }: Props) => {
       await teacherApi.requestUnlock(session.ID, reason)
       onReload(session.ID)
     } catch (error) {
-      handelError(error)
+      CatchError.HandleError(error)
     }
-    finally{
+    finally {
       setLoadingRequest(false)
     }
-  }
-
-  const handelError = (error: any) => {
-    notification.error({
-      title: 'Có lỗi xảy ra',
-      description: error?.response?.data?.message,
-      showProgress: true,
-      pauseOnHover: true
-    })
-    console.log(error)
   }
 
   const timeLeft = DateHelper.TimeDiff(session.KetThucLuc)
   // cần mở khóa khi: admin không mở khóa và
   // đã qua 48h hoặc đã submit trước đó
-  const isNeedUnlock = !session.AdminMoKhoa && (timeLeft > 2880 || session.TrangThai === 'COMPLETED')
-  
+  const isNeedUnlock = !session.AdminMoKhoa &&
+    (timeLeft > 2880 || session.TrangThai === 'COMPLETED')
+
   const handleSaveDraft = () => {
     setLoadingDraft(true)
     setTimeout(() => {
@@ -61,14 +53,14 @@ const UnlockButton = ({ session, onSave, onReload }: Props) => {
       setLoadingSubmit(false)
     }, 1000);
     onSave('SUBMITTED')
-  }  
+  }
 
   if (session.TrangThai === 'CANCELLED' || isAdmin)
     return <Button type="default" disabled>
       Không thể thao tác
     </Button>
   // đã gửi yêu cầu nhưng admin chưa mở khóa
-  else if (session.YeuCauMoKhoa && !session.AdminMoKhoa){
+  else if (session.YeuCauMoKhoa && !session.AdminMoKhoa) {
     return <Button
       type="primary"
       style={{ backgroundColor: '#2fb058', color: '#fff' }}
@@ -78,14 +70,14 @@ const UnlockButton = ({ session, onSave, onReload }: Props) => {
     </Button>
   }
 
-  else if (isNeedUnlock){
+  else if (isNeedUnlock) {
     return <Button type="primary"
       onClick={handleSendRequest} loading={loadingRequest}
     >
       Gửi yêu cầu mở khóa
     </Button>
   }
-    
+
   return (
     <Space>
       <Button size="middle" icon={<SaveOutlined />} loading={loadingDraft}

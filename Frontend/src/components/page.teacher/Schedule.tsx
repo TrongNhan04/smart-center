@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Card, Typography, Button, Space, Tag, Row, Col, notification } from 'antd';
+import { Card, Typography, Button, Space, Tag, Row, Col } from 'antd';
 import { LeftOutlined, RightOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/vi'; // Import tiếng Việt cho dayjs
 import type { ScheduleOW } from '../session/SessionDTO';
 import teacherApi from '../../api/teacherApi';
 import { useNavigate } from 'react-router-dom';
+import { CatchError } from '../common/catch.error';
 
 // tiếng Việt để thứ 2 là ngày đầu tuần
 dayjs.locale('vi')
@@ -24,15 +25,8 @@ const Schedule = () => {
       const endDate = startOfWeek.add(1, 'week').toDate()
       const res = await teacherApi.getSchedule(startDate, endDate)
       setScheduleOW(res.data)
-      // console.log(res.data)
     } catch (error: any) {
-      notification.error({
-        title: 'Có lỗi xảy ra',
-        description: error.response.data.message,
-        showProgress: true,
-        pauseOnHover: true
-      })
-      console.log("Có lỗi xảy ra", error.response.data.message)
+      CatchError.HandleError(error)
     }
   }
 
@@ -47,14 +41,12 @@ const Schedule = () => {
   // nút chọn tuần trước dựa vào state cũ
   const handlePrevWeek = () => setStartOfWeek(prev => prev.subtract(1, 'week'))
 
-  // tạo mảng 7 ngày cho tuần hiện tại: từ t2 đến cn
+  // tạo mảng 7 ngày cho tuần hiện tại: từ t2 đến cn tuần này
   const weekDays = Array.from({ length: 7 }).map((_, index) => startOfWeek.add(index, 'day'))
 
   // tìm buổi học theo ngày
-  const getClassesForDay = (date: Dayjs) => {
-    const a = scheduleOW.filter(item => item.NgayHoc === date.format('YYYY-MM-DD'))
-    return a
-  }
+  const getClassesForDay = (date: Dayjs) =>
+    scheduleOW.filter(item => item.NgayHoc === date.format('YYYY-MM-DD'))
 
   return (
     <div style={{ padding: 16, background: '#f0f2f5', minHeight: '90vh' }}>
@@ -105,7 +97,7 @@ const Schedule = () => {
               variant='borderless'
               style={{
                 flex: '1 1 0', // Ép 7 cột chia đều không gian
-                minWidth: '180px', 
+                minWidth: '180px',
                 // minHeight: '100px',
                 borderRadius: 8,
                 borderTop: isToday ? '4px solid #1890ff'
@@ -127,8 +119,8 @@ const Schedule = () => {
                 <Space orientation="vertical" style={{ width: '100%' }}>
                   {dailyClasses.map(buoihoc => (
                     // Thẻ div đại diện cho 1 ca học
-                    <div 
-                      onClick={()=>navigate(`/teacher/sessions/${buoihoc.ID}`)}
+                    <div
+                      onClick={() => navigate(`/teacher/sessions/${buoihoc.ID}`)}
                       key={buoihoc.ID}
                       style={{
                         padding: 8,

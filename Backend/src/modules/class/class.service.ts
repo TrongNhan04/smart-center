@@ -291,7 +291,7 @@ export class ClassService {
                         buoihoc: { where: { TrangThai: 'COMPLETED' } }
                     }
                 }
-            }
+            }, orderBy:{CreatedAt:'desc'}
         })
         if (classDB.length == 0) return []
         return classDB.map(lh => ({
@@ -300,7 +300,7 @@ export class ClassService {
             TuNgay: lh.TuNgay,
             GioHoc: lh.GioBatDau + ' - ' + lh.GioKetThuc,
             TrangThai: lh.TrangThai, TongGhiDanh: lh._count.ghidanh,
-            TongSoBuoi: lh.khoahoc.TongSoBuoi, BuoiDaHoc: lh._count.buoihoc
+            TongSoBuoi: lh.khoahoc.TongSoBuoi, SoBuoiDaHoc: lh._count.buoihoc
         }))
     }
 

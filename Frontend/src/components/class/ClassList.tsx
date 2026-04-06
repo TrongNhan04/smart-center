@@ -1,6 +1,5 @@
 import {
-  CalendarFilled,
-  CalendarOutlined, ClockCircleFilled, ClockCircleOutlined, PlusOutlined, ReadOutlined, SearchOutlined,
+  CalendarFilled, ClockCircleFilled, PlusOutlined, ReadOutlined, SearchOutlined,
   UserOutlined
 } from "@ant-design/icons";
 import {
@@ -13,6 +12,7 @@ import classApi from "../../api/classApi";
 import ClassModal from "./ClassModal";
 import ClassAction from "./ClassAction";
 import { Link, useSearchParams } from "react-router-dom";
+import { CatchError } from "../common/catch.error";
 const { Text } = Typography
 
 const ClassList = () => {
@@ -32,8 +32,7 @@ const ClassList = () => {
       const res = await classApi.findMany()
       setClasses(res.data)
     } catch (error) {
-      message.error("Có lỗi xảy ra!")
-      console.log("Có lỗi hàm fetchClasses: ", error)
+      CatchError.HandleError(error)
     }
     finally {
       setLoading(false)

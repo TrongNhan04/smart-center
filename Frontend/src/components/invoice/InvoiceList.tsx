@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react"
 import type { InvoiceDB } from "./InvoiceDTO"
 import {
-  Badge, Card, Col, Input, notification, Row, Select, Space, Table, Tag,
-  Typography
+  Badge, Card, Col, Input, Row, Select, Space, Table, Tag, Typography
 } from "antd"
 import { invoiceApi } from "../../api/invoiceApi"
 import {
@@ -13,6 +12,7 @@ import InvoiceAction from "./InvoiceAction"
 import InvoiceModal from "./InvoiceModal"
 import { Link, useSearchParams } from "react-router-dom"
 import { DateHelper } from "../common/date.helper"
+import { CatchError } from "../common/catch.error"
 
 const { Text } = Typography
 
@@ -42,7 +42,7 @@ const InvoiceList = () => {
       setInvoices(res.data.items)
       setTotal(res.data.total)
     } catch (error: any) {
-      handelError(error)
+      CatchError.HandleError(error)
     }
     finally {
       setLoading(false)
@@ -59,16 +59,6 @@ const InvoiceList = () => {
     setTimeout(() => {
       setInvoiceId(null)
     }, 3000)
-  }
-
-  const handelError = (error: any) => {
-    notification.error({
-      title: 'Có lỗi xảy ra',
-      description: error.response.data.message,
-      showProgress: true,
-      pauseOnHover: true
-    })
-    console.log('Có lỗi xảy ra: ', error.response.data.message)
   }
 
   const handleOpenReceipt = (invoice: InvoiceDB) => {
@@ -115,7 +105,7 @@ const InvoiceList = () => {
       key: 'TenHocVien', ellipsis: true,
       render: (name: string, invoice: InvoiceDB) =>
         <Space orientation="vertical" size={0}>
-          <Link to={`/admin/students/${invoice.HocVienID}`} style={{fontWeight:'bold'}}>
+          <Link to={`/admin/students/${invoice.HocVienID}`} style={{ fontWeight: 'bold' }}>
             <UserOutlined /> {name}
           </Link>
           <Text><PhoneOutlined /> {invoice.DienThoai}</Text>

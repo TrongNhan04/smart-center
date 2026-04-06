@@ -42,26 +42,6 @@ export class ClassController {
         return await this.classService.GetDataForCmb()
     }
 
-    // lấy chi tiết lớp - phần trên 
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles('ADMIN', 'TEACHER')
-    @Get('admin/classes/:id')
-    async GetClassById(
-        @Req() req: RequestWithUser,
-        @Param('id') classId: number) {
-        const userId = req.user.role === 'TEACHER' ? req.user.userId : null
-        return await this.classService.GetClassById(+classId, userId)
-    }
-
-    // cập nhật lớp theo trạng thái
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles('ADMIN')
-    @Patch('admin/classes/:id')
-    async UpdateClassById(@Param('id') classId: number,
-        @Body() body: UpdateClassDTO) {
-        return await this.classService.UpdateClassById(+classId, body)
-    }
-
     // xóa mềm lớp học
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
@@ -87,6 +67,26 @@ export class ClassController {
     @Get('admin/classes/:id/students')
     async GetStudentById(@Param('id') classId: number) {
         return await this.classService.GetStudentById(+classId)
+    }
+
+    // lấy chi tiết lớp - phần trên 
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADMIN', 'TEACHER')
+    @Get('admin/classes/:id')
+    async GetClassById(
+        @Req() req: RequestWithUser,
+        @Param('id') classId: number) {
+        const userId = req.user.role === 'TEACHER' ? req.user.userId : null
+        return await this.classService.GetClassById(+classId, userId)
+    }
+
+    // cập nhật lớp theo trạng thái
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADMIN')
+    @Patch('admin/classes/:id')
+    async UpdateClassById(@Param('id') classId: number,
+        @Body() body: UpdateClassDTO) {
+        return await this.classService.UpdateClassById(+classId, body)
     }
 
     //======================== TEACHER ========================

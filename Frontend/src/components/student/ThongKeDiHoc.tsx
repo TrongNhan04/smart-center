@@ -1,12 +1,12 @@
 import {
-  Button, Card, Descriptions, Divider, notification, Skeleton, Space, Table, 
-  Tag, Typography
+  Button, Card, Descriptions, Divider, Skeleton, Space, Table, Tag, Typography
 } from "antd"
 import type { ClassResult, Result } from "./StudentDTO"
-import { CalendarFilled, CheckCircleFilled, CloseCircleFilled, ReadFilled } from "@ant-design/icons"
+import { CalendarFilled, CheckCircleFilled, ClockCircleFilled, CloseCircleFilled, EnvironmentFilled, ReadFilled, ReadOutlined } from "@ant-design/icons"
 import { useNavigate, useParams } from "react-router-dom"
 import { useEffect, useState } from "react"
 import { studentApi } from "../../api/studentApi"
+import { CatchError } from "../common/catch.error"
 
 const { Text, Title } = Typography
 
@@ -16,16 +16,6 @@ const ThongKeDiHoc = () => {
   const [classResult, SetclassResult] = useState<ClassResult>()
   const [loading, setLoading] = useState(true)
 
-  const handleError = (error: any) => {
-    notification.error({
-      title: 'Có lỗi xảy ra',
-      description: error?.response?.data?.message,
-      showProgress: true,
-      pauseOnHover: true
-    })
-    console.log(error)
-  }
-
   const fetchData = async () => {
     try {
       setLoading(true)
@@ -33,7 +23,7 @@ const ThongKeDiHoc = () => {
         (Number(studentId), Number(classId))
       SetclassResult(res.data)
     } catch (error) {
-      handleError(error)
+      CatchError.HandleError(error)
     }
     finally { setLoading(false) }
   }
@@ -118,16 +108,33 @@ const ThongKeDiHoc = () => {
   }
   return (
     <div style={{ padding: 24, background: '#f0f2f5', minHeight: '100vh' }}>
-      <Button onClick={() => navigate(`/admin/students/${studentId}`)}>Quay lại</Button>
+
       <Card variant='borderless' title='Kết quả học tập'
-        style={{ marginTop: 18, marginBottom: 24, borderRadius: 8 }}
+        style={{ marginBottom: 24, borderRadius: 8 }}
+        extra={
+          <Button
+            // style={:{}}
+            onClick={() => navigate(-1)}>
+            Quay lại</Button>}
         styles={{
           header: { backgroundColor: '#f0f5ff', color: '#1d39c4' }
         }}>
-        <Descriptions bordered size="small"
-          style={{ marginBottom: 24 }} column={2}>
-          <Descriptions.Item label="Lớp">{classResult.LopHoc}</Descriptions.Item>
+        <Descriptions size="small"
+          style={{ marginBottom: 24 }} column={2}
+          styles={{ label: { color: 'black' } }}>
+          <Descriptions.Item label="Lớp">
+            <Text strong style={{ color: '#1677ff' }}>
+              <ReadOutlined /> {classResult.LopHoc}</Text>
+          </Descriptions.Item>
           <Descriptions.Item label="Giáo viên">{classResult.GiaoVien}</Descriptions.Item>
+          <Descriptions.Item label="Phòng">
+            <Text>
+              <EnvironmentFilled style={{ color: '#ff4d4f' }} /> {classResult.PhongHoc ?? '_'}
+            </Text>
+          </Descriptions.Item>
+          <Descriptions.Item label="Thời gian">
+            <Text><ClockCircleFilled /> {classResult.GioHoc}</Text>
+          </Descriptions.Item>
           <Descriptions.Item label="Có mặt">
             <Text strong style={{ color: '#52c41a' }}>
               {present} buổi <CheckCircleFilled /></Text>
@@ -140,7 +147,6 @@ const ThongKeDiHoc = () => {
           </Descriptions.Item>
         </Descriptions>
         <Divider />
-
 
         <Table
           columns={columnsOfSS}

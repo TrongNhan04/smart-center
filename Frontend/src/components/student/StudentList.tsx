@@ -64,7 +64,7 @@ const StudentList = () => {
     { // địa chỉ
       title: 'Địa chỉ', dataIndex: 'DiaChi', key: 'DiaChi', ellipsis: true,
       render: (address: string) => <Space>
-        <EnvironmentFilled style={{color:'#ff1818'}}/>
+        <EnvironmentFilled style={{color:'#ff4d4f'}}/>
         {!address || '' ? '_' : address}
       </Space>
     },

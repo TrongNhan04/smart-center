@@ -1,6 +1,7 @@
-import { Space, Image, notification } from "antd"
+import { Space, Image } from "antd"
 import { useEffect, useState } from "react"
 import { sessionApi } from "../../api/sessionApi"
+import { CatchError } from "../common/catch.error"
 
 interface Props {
   sessionId: number
@@ -33,7 +34,7 @@ const FileUpload = ({ sessionId, reload, getOldFile }: Props) => {
       }))
       getOldFile(formated)
     } catch (error) {
-      handelError(error)
+      CatchError.HandleError(error)
     }
   }
 
@@ -41,16 +42,6 @@ const FileUpload = ({ sessionId, reload, getOldFile }: Props) => {
     if (!sessionId) return
     fetchFileUpload()
   }, [sessionId, reload])
-
-  const handelError = (error: any) => {
-    notification.error({
-      title: 'Có lỗi xảy ra',
-      description: error?.response?.data?.message,
-      showProgress: true,
-      pauseOnHover: true
-    })
-    console.log('Có lỗi xảy ra: ', error?.response?.data?.message)
-  }
 
   const images: fileFormat[] = []
   const videos: fileFormat[] = []

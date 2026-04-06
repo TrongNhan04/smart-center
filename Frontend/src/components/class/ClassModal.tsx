@@ -1,7 +1,6 @@
 import {
   Modal, Form, Input, Select, DatePicker, TimePicker, InputNumber,
   Row, Col, message,
-  notification,
 } from 'antd';
 import { useEffect, useState } from 'react';
 import courseApi from '../../api/courseApi';
@@ -13,6 +12,7 @@ import { mapDataClass, type ClassDB, type ClassDto } from './ClassDTO';
 import { DateHelper } from '../common/date.helper';
 import type { TeacherForCmb } from '../teacher/TeacherDTO';
 import { getChangedValue } from '../common/utils';
+import { CatchError } from '../common/catch.error';
 
 const { RangePicker } = DatePicker
 
@@ -45,8 +45,7 @@ const ClassModal = ({ open, onCancel, khoahocId, onSave,
         setTeachers(teacherRes.data)
       }
       catch (error: any) {
-        message.error("Có lỗi xuất hiện")
-        console.log("Lỗi: ", error.response.data.message)
+        CatchError.HandleError(error)
       }
     }
     fetchCourse_Teacher()
@@ -54,26 +53,26 @@ const ClassModal = ({ open, onCancel, khoahocId, onSave,
 
   // useEffect 2 load dữ liệu khi mở form
   useEffect(() => {
-    if (open) {
-      if (editingClass) {
-        // từ tiếng việt thành tiếng anh
-        const record = mapDataClass(editingClass)
-        // tách fromDate, toDate, startTime, endTime ra riêng 
-        const { fromDate, toDate, startTime, endTime, ...rest } = record
-        const formData = {
-          ...rest,
-          // gộp thành fromToDate 
-          fromToDate: [dayjs(fromDate), dayjs(toDate)],
-          // format từ string thành dayjs để hiện lên form
-          startTime: DateHelper.ConvertHourStrToDayJS(startTime),
-          endTime: DateHelper.ConvertHourStrToDayJS(endTime),
-        }
+    if (!open) return // không mở thì thoát
 
-        form.setFieldsValue(formData)
+    if (editingClass) {
+      // từ tiếng việt thành tiếng anh
+      const record = mapDataClass(editingClass)
+      // tách fromDate, toDate, startTime, endTime ra riêng 
+      const { fromDate, toDate, startTime, endTime, ...rest } = record
+      const formData = {
+        ...rest,
+        // gộp thành fromToDate 
+        fromToDate: [dayjs(fromDate), dayjs(toDate)],
+        // format từ string thành dayjs để hiện lên form
+        startTime: DateHelper.ConvertHourStrToDayJS(startTime),
+        endTime: DateHelper.ConvertHourStrToDayJS(endTime),
       }
-      else
-        form.resetFields()
+      form.setFieldsValue(formData)
     }
+    else
+      form.resetFields()
+
   }, [open, form, editingClass])
 
   const daysOfWeek = [
@@ -92,16 +91,6 @@ const ClassModal = ({ open, onCancel, khoahocId, onSave,
     label: `${item.MaGiaoVien} - ` + item.HoTen,
     value: item.ID,
   }))
-
-  const handleError = (error: any) => {
-    notification.error({
-      title: 'Có lỗi xảy ra',
-      description: error.response.data.message,
-      showProgress: true,
-      pauseOnHover: true
-    })
-    console.log("Có lỗi xảy ra", error?.response?.data?.message)
-  }
 
   const handleSubmit = async () => {
     setLoading(true)
@@ -141,18 +130,7 @@ const ClassModal = ({ open, onCancel, khoahocId, onSave,
       handleCancel()
     }
     catch (error: any) {
-      console.log("Có lỗi xảy ra: ", error)
-
-      if (error.response) {
-        const serverError = error.response.data
-        // nếu là mảng lỗi thì lấy cái đầu tiên
-        if (Array.isArray(serverError.message))
-          message.error(serverError.message[0])
-        else if (typeof serverError.message === 'string')
-          handleError(error)
-        else
-          message.error("Có lỗi xảy ra")
-      }
+      CatchError.HandleError(error)
     }
     finally {
       setLoading(false)
@@ -183,7 +161,7 @@ const ClassModal = ({ open, onCancel, khoahocId, onSave,
           initialValues={{ courseId: initCourseId }}
         >
           <Row gutter={16}>
-            {/* Cột trái */}
+            {/* Cột trái khóa học, mã, tên lớp, giáo viên */}
             <Col span={12}>
               <Form.Item // tên khóa học
                 label="Khóa học"
@@ -236,7 +214,7 @@ const ClassModal = ({ open, onCancel, khoahocId, onSave,
               </Form.Item>
             </Col>
 
-            {/* Cột phải */}
+            {/* Cột phải: thời gian, lịch học, giờ học, sĩ số, phòng học */}
             <Col span={12}>
               <Form.Item // thời gian học
                 label="Thời gian học"
@@ -305,7 +283,6 @@ const ClassModal = ({ open, onCancel, khoahocId, onSave,
                 </Col>
               </Row>
 
-              {/* {isEdit ? */}
               <Row gutter={8}>
                 <Col span={12}>
                   <Form.Item // sĩ số

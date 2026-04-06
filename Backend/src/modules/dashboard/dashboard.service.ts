@@ -24,7 +24,6 @@ export class DashboardService {
     // số hóa đơn còn hiệu lực nhưng vừa nợ vừa quá hạn
     async GetSumaries(month: number, year: number) {
         const now = new Date()
-        console.log(month,year)
         const m = month ?? now.getMonth()
         const y = year ?? now.getFullYear()
         const { start, end } = DateHelper.GetStartEndOfMonth(new Date(y, m))
@@ -105,9 +104,29 @@ export class DashboardService {
         return this.MergeData(receipts, payments, enrolls)
     }
 
+    // lấy 12 lớp có doanh thu cao nhất
+    async GetHighestRevenue() {
+        const classDB = await this.prisma.lopHoc.findMany({
+            select: {
+                ID: true, MaLopHoc:true, TenLop:true,
+                ghidanh: { select: { hoadon: true } }
+            }
+        })
+        return classDB.map(item => ({
+            LopHocID: item.ID,
+            MaLopHoc: item.MaLopHoc,
+            TenLop: item.TenLop,
+            DoanhThu: item.ghidanh.reduce((sum, item) => {
+                return sum += Number(item.hoadon?.DaTra)
+            }, 0)
+        }))
+        .sort((a,b)=>b.DoanhThu-a.DoanhThu).slice(0,12)
+        // tăng là a-b, giảm là b-a
+    }
+
     // lấy danh sách buổi học trong 1 tháng
     async GetSessionOfMonth(month: number, year: number) {
-        const date = new Date(year,month)
+        const date = new Date(year, month)
         const { start, end } = DateHelper.GetStartEndOfMonth(date)
         const sessionDB = await this.prisma.buoiHoc.findMany({
             where: {
@@ -116,11 +135,11 @@ export class DashboardService {
                 TrangThai: { not: 'CANCELLED' }
             },
             select: {
-                ID: true, BuoiSo: true, 
+                ID: true, BuoiSo: true,
                 BatDauLuc: true, KetThucLuc: true,
                 lophoc: {
                     select: {
-                        TenLop: true, PhongHoc:true,
+                        TenLop: true, PhongHoc: true,
                         _count: { select: { ghidanh: { where: { TrangThai: 'ACTIVE' } } } }
                     },
                 },
@@ -131,7 +150,7 @@ export class DashboardService {
             ID: item.ID, // id buổi học
             TenLop: item.lophoc.TenLop,
             BuoiSo: item.BuoiSo,
-            NgayHoc: item.BatDauLuc.toISOString().slice(0,10),
+            NgayHoc: item.BatDauLuc.toISOString().slice(0, 10),
             GioHoc: DateHelper.ISOToHHMM(item.BatDauLuc, item.KetThucLuc),
             PhongHoc: item.lophoc.PhongHoc,
             TongGhiDanh: item.lophoc._count.ghidanh
@@ -147,9 +166,7 @@ export class DashboardService {
                 _count: { select: { buoihoc: true } } // lấy tổng buổi đã tạo
             },
         })
-
         const alert: lophoc[] = []
-
         for (var lh of classDB) {
             const future = await this.prisma.buoiHoc.count({
                 where: { LopHocID: lh.ID, TrangThai: 'SCHEDULED' }
@@ -157,17 +174,15 @@ export class DashboardService {
 
             const total = lh.khoahoc.TongSoBuoi
             const created = lh._count.buoihoc // số buổi học đã tạo gồm chưa học hoặc đã học
-
-            if (future <= 3) { // còn 3 buổi chưa học
-                if (created < total) { // số buổi đã tạo nhỏ hơn tổng số buổi
-                    alert.push({ // => auto nhắc tạo thêm buổi
-                        LopHocID: lh.ID,
-                        TenLop: lh.TenLop,
-                        GiaoVienID: lh.GiaoVienID,
-                        Loai: 'CREATE_MORE',
-                        LoiNhan: `Lịch học của lớp sắp hết. Đã tạo ${created}/${total} buổi học`
-                    })
-                }
+            // còn 3 buổi chưa học và số buổi đã tạo nhỏ hơn tổng số buổi
+            if (future <= 3 && created < total) {
+                alert.push({ // => auto nhắc tạo thêm buổi
+                    LopHocID: lh.ID,
+                    TenLop: lh.TenLop,
+                    GiaoVienID: lh.GiaoVienID,
+                    Loai: 'CREATE_MORE',
+                    LoiNhan: `Lịch học của lớp sắp hết. Đã tạo ${created}/${total} buổi học`
+                })
             }
         }
         return alert
@@ -267,13 +282,13 @@ export class DashboardService {
     private MergeData(receipts: MonthlyData[], payments: MonthlyData[],
         enrolls: MonthlyData[]
     ) {
-        const listReceipt = new Map(receipts.map(
-            rm => [rm.month, Number(rm.amount)]
-        ))
+        // const listReceipt = new Map(receipts.map(
+        //     rm => [rm.month, Number(rm.amount)]
+        // ))
 
-        const listPayment = new Map(payments.map(
-            pm => [pm.month, Number(pm.amount)]
-        ))
+        // const listPayment = new Map(payments.map(
+        //     pm => [pm.month, Number(pm.amount)]
+        // ))
 
         const listEnroll = new Map(enrolls.map(
             em => [em.month, Number(em.amount)]
@@ -282,14 +297,14 @@ export class DashboardService {
         const months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 
         return months.map(m => {
-            const r = listReceipt.get(m) ?? 0
-            const p = listPayment.get(m) ?? 0
+            // const r = listReceipt.get(m) ?? 0
+            // const p = listPayment.get(m) ?? 0
             const e = listEnroll.get(m) ?? 0
             return {
                 Thang: `T${m}`,
-                TongThu: r,
-                TongChi: p,
-                LoiNhuan: r - p,
+                // TongThu: r,
+                // TongChi: p,
+                // LoiNhuan: r - p,
                 GhiDanhMoi: e
             }
         })

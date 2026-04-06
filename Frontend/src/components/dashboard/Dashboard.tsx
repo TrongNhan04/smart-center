@@ -1,5 +1,5 @@
 import {
-  Row, Col, Card, Statistic, Typography, notification
+  Row, Col, Card, Statistic, Typography, Tag,
 } from 'antd';
 import {
   UserOutlined, UsergroupAddOutlined, DollarOutlined, WarningOutlined,
@@ -10,18 +10,22 @@ import {
 } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
 import { useEffect, useState } from 'react';
-import type { FinanceChart, Summaries } from './DashboardDTO';
+import type { EnrollChart, ReveueChart, Summaries } from './DashboardDTO';
 import { dashboardApi } from '../../api/dashboardApi';
+import { CatchError } from '../common/catch.error';
 
 // Đăng ký các thành phần của Chart.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement,
   PointElement, Title, Tooltip, Legend)
 
-const {Text, Title:AntTilte } = Typography
+const { Text, } = Typography
 
 const Dashboard = () => {
   const [sumaries, setSumaries] = useState<Summaries>()
-  const [financeChart, setFinanceChart] = useState<FinanceChart[]>([])
+  //const [financeChart, setFinanceChart] = useState<FinanceChart[]>([])
+  const [enrollChart, setEnrollChart] = useState<EnrollChart[]>([])
+  const [revueneChart, setRevueneChart] = useState<ReveueChart[]>([])
+
   const fetchDashboard = async () => {
     try {
       const [sumaryRes, chartRes] = await Promise.all([
@@ -29,15 +33,10 @@ const Dashboard = () => {
         dashboardApi.getCharts(),
       ])
       setSumaries(sumaryRes.data)
-      setFinanceChart(chartRes.data)
+      setEnrollChart(chartRes.data.GhiDanh)
+      setRevueneChart(chartRes.data.LopHoc)
     } catch (error: any) {
-      notification.error({
-        title: 'Có lỗi xảy ra',
-        description: error?.response?.data?.message,
-        showProgress: true,
-        pauseOnHover: true
-      })
-      console.log('Có lỗi xảy ra: ', error?.response?.data?.message)
+      CatchError.HandleError(error)
     }
   }
 
@@ -45,20 +44,16 @@ const Dashboard = () => {
     fetchDashboard()
   }, [])
 
-  const months = financeChart.map(m => m.Thang) || []
-
-  // Data Biểu đồ Thu - Chi (Bar Chart)
-  const thuChiData = {
-    labels: months,
+  const months = enrollChart.map(m => m.Thang) || []
+  const classCode = revueneChart.map(item => item.MaLopHoc)
+  // biểu đồ các lớp có doanh thu cao
+  const revueneData = {
+    labels: classCode,
     datasets: [
       {
-        label: 'Tổng Thu', data: financeChart.map(m => m.TongThu),
+        label: 'Doanh Thu', data: revueneChart.map(item => item.DoanhThu),
         backgroundColor: '#52c41a'
       },
-      {
-        label: 'Tổng Chi', data: financeChart.map(m => m.TongChi),
-        backgroundColor: '#ff4d4f'
-      }
     ],
   }
 
@@ -67,7 +62,7 @@ const Dashboard = () => {
     labels: months,
     datasets: [
       {
-        label: 'Học viên mới', data: financeChart.map(m => m.GhiDanhMoi),
+        label: 'Ghi danh mới', data: enrollChart.map(m => m.GhiDanhMoi),
         borderColor: '#1890ff', tension: 0.3, fill: false
       }
     ],
@@ -76,11 +71,10 @@ const Dashboard = () => {
   const month = new Date().getMonth() + 1
 
   return (
-    <div style={{ padding: 24, background: '#f0f2f5', minHeight: '91vh' }}>
-      <AntTilte level={3} style={{ marginTop: 0, marginBottom: 24 }}>Tổng quan Trung tâm</AntTilte>
+    <div style={{ padding: 16, background: '#f0f2f5', minHeight: '91vh' }}>
 
-      {/* TẦNG 1: 4 THẺ THỐNG KÊ */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+      {/* 4 thẻ thống kê: học viên, ghi danh, lợi nhuận và công nợ */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
         <Col xs={24} sm={12} md={6}>
           <Card variant='borderless' style={{ borderRadius: 8 }}>
             <Statistic title="Học viên đang học"
@@ -129,24 +123,13 @@ const Dashboard = () => {
         </Col>
       </Row>
 
-      {/* TẦNG 2: BIỂU ĐỒ */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+      {/* 2 biểu đồ: doanh thu lớp và ghi danh mới */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
         <Col xs={24} lg={14}>
-          <Card title="Doanh thu & Chi phí (12 tháng)" variant='borderless'
+          <Card title="Các lớp có danh thu cao nhất (12 lớp)" variant='borderless'
             style={{ borderRadius: 8, height: '100%' }}
-            // extra={
-            //   <Select
-            //     allowClear style={{ width: 130 }}
-            //     onChange={(handleSelectedMonth)}
-            //     options={[
-            //       { label: 'Tháng 1 - 6', value: 0 },
-            //       { label: 'Tháng 7 - 12', value: 1 },
-            //       { label: 'Cả năm', value: 2 }
-            //     ]}
-            //   />
-            // }
           >
-            <Bar data={thuChiData} height={300}
+            <Bar data={revueneData} height={300}
               options={{ responsive: true, maintainAspectRatio: false }}
             />
           </Card>
@@ -160,48 +143,36 @@ const Dashboard = () => {
           </Card>
         </Col>
       </Row>
+      <Card
+        variant="borderless"
+        style={{ borderRadius: 8 }}
+        styles={{ body: { padding: '10px 24px' } }}
+      >
+        <Text strong type='secondary'
+          style={{ justifyContent: 'center', marginBottom: 4, display:'flex' }}>
+          CHÚ THÍCH MÃ LỚP</Text>
+        <Row gutter={[16, 12]} >
+          {revueneChart.map((item,index) => (
+            <Col xs={24} sm={12} md={8} lg={6} xl={4} key={item.MaLopHoc}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Tag color="blue" style={{ minWidth: 80, textAlign: 'center', margin: 0 }}>
+                  {index+1}. {item.MaLopHoc}
+                </Tag>
+                <Text
+                  style={{ fontSize: 13, flex: 1 }}
+                  // ellipsis giúp hiện dấu ... khi tên quá dài,
+                  // đưa chuột lại gần thì hiện đầy đủ trên tooltip
+                  ellipsis={{ tooltip: item.TenLop }}
+                >
+                  {item.TenLop}
+                </Text>
+              </div>
+            </Col>
+          ))}
+        </Row>
+      </Card>
     </div>
   )
 }
 
 export default Dashboard
-
-// const handleSelectedMonth = (value: number) => {
-  //   switch (value) {
-  //     case 0:
-  //       return setLabelChart(months?.slice(0, 6) || [])
-  //     case 1:
-  //       return setLabelChart(months?.slice(6, 12) || [])
-  //     case 2:
-  //       return setLabelChart(months || [])
-  //   }
-  // }
-
-  // <List
-  //             dataSource={todos}
-  //             renderItem={item => (
-  //               <List.Item
-  //                 style={{
-  //                   padding: '12px 16px',
-  //                   marginBottom: 10,
-  //                   borderRadius: 6,
-  //                   //background: item.done ? '#fafafa' : '#fff', // Xong rồi thì nền xám nhạt
-  //                   border: '1px solid #f0f0f0',
-  //                   // ĐÂY LÀ ĐIỂM NHẤN: Viền trái Đỏ (Gấp), Xanh (Bình thường), Xám (Đã xong)
-  //                   // borderLeft: `4px solid ${item.done ? '#d9d9d9' : (item.urgent ? '#ff4d4f' : '#1890ff')}`
-  //                   borderLeft: `4px solid #1890ff`
-  //                 }}
-  //               >
-  //                 <Checkbox 
-  //                 //defaultChecked={item.done}
-  //                 >
-  //                   <Text 
-  //                   // style={{ color: item.done ? '#bfbfbf' : 'inherit' }}
-  //                   >
-  //                     {/* {item.task} */}
-  //                   </Text>
-  //                 </Checkbox>
-  //                 {/* {item.urgent && !item.done && <Tag color="error">Gấp</Tag>} */}
-  //               </List.Item>
-  //             )}
-  //           />

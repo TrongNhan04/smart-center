@@ -116,6 +116,7 @@ export class InvoiceService {
         const mapData = invoiceDB.map(item => ({
             ID: item.ID,
             MaHoaDon: item.MaHoaDon,
+            HocVienID: item.HocVienID,
             TenHocVien: item.hocvien.TenHocVien,
             TenLop: item.ghidanh?.lophoc.TenLop ?? null,
             DienThoai: item.hocvien.Parent.DienThoai,

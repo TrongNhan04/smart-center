@@ -1,16 +1,17 @@
 import {
-  CalendarOutlined, ClockCircleOutlined, MoneyCollectOutlined, PhoneOutlined, 
+  CalendarOutlined, ClockCircleFilled, ClockCircleOutlined, MoneyCollectOutlined, PhoneOutlined, 
   ReadOutlined, RollbackOutlined, UserOutlined
 } from "@ant-design/icons";
 import {
   Card, Descriptions, Table, Divider, Typography, Row, Col, Statistic,
-  Space, Button, notification, Tag,
+  Space, Button, Tag,
 } from "antd";
 import { useEffect, useState } from "react";
 import type { GiaoDich, InvoiceDB } from "./InvoiceDTO";
 import { invoiceApi } from "../../api/invoiceApi";
 import { useNavigate, useParams } from "react-router-dom";
 import InvoiceModal from "./InvoiceModal";
+import { CatchError } from "../common/catch.error";
 
 const { Title, Text } = Typography
 
@@ -32,23 +33,13 @@ const InvoiceDetail = () => {
       setInvoice(invoiceRes.data)
       setTransactions(transactionRes.data)
     } catch (error) {
-      handleError(error)
+      CatchError.HandleError(error)
     }
   }
 
   useEffect(() => {
     fetchDetail()
   }, [invoiceId])
-
-  const handleError = (error: any) => {
-    notification.error({
-      title: 'Có lỗi xảy ra',
-      description: error.response.data.message,
-      showProgress: true,
-      pauseOnHover: true
-    })
-    console.log("Có lỗi xảy ra", error.response.data.message)
-  }
 
   const hanldeAddReceipt = () => {
     setIsOpen(true)
@@ -186,7 +177,7 @@ const InvoiceDetail = () => {
           size="middle"
         >
           <Descriptions.Item label="Học viên">
-            <Text strong style={{ color: '#0d6efd' }}>
+            <Text strong style={{ color: '#1677ff' }}>
               <UserOutlined /> {invoice.TenHocVien}</Text>
           </Descriptions.Item>
 
@@ -209,8 +200,8 @@ const InvoiceDetail = () => {
           </Descriptions.Item>
 
           <Descriptions.Item label="Hạn thanh toán">
-            <Text type="danger" strong>
-              <ClockCircleOutlined /> {new Date(invoice.NgayHetHan).toLocaleDateString()}
+            <Text strong>
+              <ClockCircleFilled /> {new Date(invoice.NgayHetHan).toLocaleDateString()}
             </Text>
           </Descriptions.Item>
         </Descriptions>
@@ -243,7 +234,7 @@ const InvoiceDetail = () => {
               value={tongThu}
               // precision={0}
               styles={{
-                content: { color: 'blue' }
+                content: { color: '#1677ff' }
               }}
               formatter={(value) => {
                 const total = Number(value)
@@ -259,7 +250,7 @@ const InvoiceDetail = () => {
               value={tongHoan}
               // precision={0}
               styles={{
-                content: { color: 'red' }
+                content: { color: '#ff4d4f' }
               }}
               formatter={(value) => {
                 const total = Number(value)
