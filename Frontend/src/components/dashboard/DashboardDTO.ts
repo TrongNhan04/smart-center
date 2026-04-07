@@ -46,6 +46,7 @@ export interface ReminderTeacher {
 // dto cho trang thời khóa biểu
 export interface ClassSchedule {
     ID: number, // id buổi học
+    LopHocID: number,
     TenLop: string,
     BuoiSo: number,
     NgayHoc: string,

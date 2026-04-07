@@ -18,12 +18,12 @@ import TongHopThuChi from "./components/invoice/TongHopThuChi";
 import Dashboard from "./components/dashboard/Dashboard";
 import TaskList from "./components/dashboard/TaskList";
 import Profile from "./components/account/Profile";
-import Schedule from "./components/page.teacher/Schedule";
 import MyClasses from "./components/page.teacher/MyClasses";
 import TeacherRoute from "./components/page.teacher/TeacherRoute";
 import SessionDetail from "./components/page.teacher/SessionDetail";
 import ThongKeDiHoc from "./components/student/ThongKeDiHoc";
 import SchedulePage from "./components/dashboard/SchedulePage";
+import ScheduleTeacher from "./components/page.teacher/ScheduleTeacher";
 
 const router = createBrowserRouter([
   {
@@ -38,14 +38,15 @@ const router = createBrowserRouter([
         element: <SidebarComponent />,
         children: [
           { index: true, element: <Navigate to="schedules" replace /> },
-          { path: 'schedules', element: <Schedule /> },
+          { path: 'schedules', element: <ScheduleTeacher /> },
           { path: 'classes', element: <MyClasses /> },
           {
             path: 'classes/:classId',
             element: <TeacherRoute />,
             children: [
               { index: true, element: <ClassDetail /> },
-              {path:'sessions/:sessionId', element: <SessionDetail />}
+              { path: 'sessions/:sessionId', element: <SessionDetail /> },
+              { path: 'students/:studentId', element:<ThongKeDiHoc/> }
             ]
           },
           // { path: '',  },
@@ -65,7 +66,7 @@ const router = createBrowserRouter([
 
           { path: 'dashboard', element: <Dashboard /> },
           { path: 'tasks', element: <TaskList /> },
-          { path: 'schedule', element: <SchedulePage/>},
+          { path: 'schedule', element: <SchedulePage /> },
 
           { path: 'courses', element: <CourseList /> },
           { path: 'courses/:id', element: <CourseDetail /> },

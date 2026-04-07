@@ -1,5 +1,5 @@
 import {
-  CalendarFilled, EditOutlined, InboxOutlined, PlusOutlined, ReadOutlined,
+  CalendarFilled, EditOutlined, InboxOutlined, InfoCircleOutlined, PlusOutlined, ReadOutlined,
   UnlockOutlined
 }
   from "@ant-design/icons"
@@ -34,6 +34,7 @@ const ClassDetail = () => {
   const navigate = useNavigate()
   const [searchParam, setSearchParam] = useSearchParams()
   const currentPage = Number(searchParam.get('page')) || 1
+  const currentTab = searchParam.get('tab') || 'sessions'
   const user = useAuthStore(state => state.user)
   const isAdmin = user?.role === 'ADMIN'
 
@@ -144,8 +145,9 @@ const ClassDetail = () => {
           unlock={handleUnlock}
           onCancel={handleCancel}
         />
-          : <Button onClick={() => navigate(`sessions/${value.ID}`)}>
-            Xem chi tiết</Button>
+          : <Button icon={<InfoCircleOutlined />} size="small" type="primary"
+            onClick={() => navigate(`sessions/${value.ID}`)}>
+            Chi tiết</Button>
       }
     }
   ]
@@ -185,7 +187,8 @@ const ClassDetail = () => {
     }
   }
 
-  const changeTablePage = (pagination: any) => setSearchParam({ page: pagination.current })
+  const changeTablePage = (pagination: any) =>
+    setSearchParam({ tab: currentTab, page: pagination.current })
 
   if (loading)
     return <div style={{ minHeight: '89vh', background: '#f0f2f5' }}>
@@ -256,7 +259,8 @@ const ClassDetail = () => {
 
         <Card>
           <Tabs
-            defaultActiveKey="1"
+            onChange={(key) => setSearchParam({ tab: key })}
+            activeKey={currentTab}
             tabBarExtraContent={ // 2 nút auto, manual
               isAdmin && <Space>
                 <Popconfirm title="Xác nhận tạo buổi học tự động?"
@@ -282,7 +286,7 @@ const ClassDetail = () => {
             }
             items={[
               { // table buổi học
-                key: '1',
+                key: 'sessions',
                 label: `Danh sách buổi học (${sessions.length})`,
                 children: (
                   <Table style={{ marginTop: 8 }}
@@ -299,12 +303,12 @@ const ClassDetail = () => {
                 ),
               },
               {
-                key: '2',
+                key: 'students',
                 label: `Danh sách học viên`,
-                children: (<TabStudent id={lophoc.ID}/>),
+                children: (<TabStudent id={lophoc.ID} />),
               },
               {
-                key: '3',
+                key: 'info',
                 label: 'Thông tin chung',
                 children: (<TabInfo lophoc={lophoc} />),
               }

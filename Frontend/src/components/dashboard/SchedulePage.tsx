@@ -7,6 +7,7 @@ import type { ClassSchedule } from "./DashboardDTO"
 import { ClockCircleOutlined, EnvironmentOutlined, UserOutlined } from "@ant-design/icons"
 import { CatchError } from "../common/catch.error"
 import { dashboardApi } from "../../api/dashboardApi"
+import { useNavigate } from "react-router-dom"
 
 const { Text, Title } = Typography
 
@@ -36,10 +37,11 @@ const SchedulePage = () => {
   const [scheduleData, setScheduleData] = useState<ClassSchedule[]>([])
   // lưu ngày tháng trước đó
   const currentMonthRef = useRef<Dayjs | null>(null)
+  const navigate = useNavigate()
 
   const fetchSession = async () => {
     try {
-      const isSameMonth = currentMonthRef.current?.isSame(selectedDate,'month')
+      const isSameMonth = currentMonthRef.current?.isSame(selectedDate, 'month')
       // nếu chọn ngày có tháng khác tháng trước đó thì mới call api
       if (isSameMonth) return
       const res = await dashboardApi.getSessionsOfMonth(
@@ -124,18 +126,22 @@ const SchedulePage = () => {
                 dataSource={classOfDate}
                 renderItem={item => (
                   <List.Item
+                    onClick={
+                      () => navigate(`/admin/classes/${item.LopHocID}/sessions/${item.ID}`)
+                    }
                     style={{
                       padding: '16px',
                       marginBottom: 12,
                       background: '#f0f5ff',
                       borderRadius: 8,
                       border: '1px solid #f0f0f0',
-                      borderLeft: `5px solid #1890ff`
+                      borderLeft: `5px solid #1890ff`,
+                      cursor:'pointer'
                     }}
                   >
                     <div style={{ width: '100%' }}>
                       <Row justify="space-between" align="middle" style={{ marginBottom: 8 }}>
-                        <Title level={5} style={{ margin: 0}}>{item.TenLop}</Title>
+                        <Title level={5} style={{ margin: 0 }}>{item.TenLop}</Title>
                       </Row>
 
                       <Space orientation="vertical" size={1} style={{ width: '100%' }}>

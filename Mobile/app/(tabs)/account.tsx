@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 import { Avatar, Button, Divider, List, Modal, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import mobileApi from '../api';
@@ -152,8 +152,8 @@ const AccountScreen = () => {
           contentContainerStyle={styles.modalContainer}
           visible={visible} onDismiss={hideModal} style={{ justifyContent: 'center' }}
         >
-          <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+          {/* <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}> */}
 
             <Text variant='titleLarge' style={styles.modalTitle}>
               Cập nhật tài khoản
@@ -190,7 +190,7 @@ const AccountScreen = () => {
               </Button>
             </View>
 
-          </KeyboardAvoidingView>
+          {/* </KeyboardAvoidingView> */}
         </Modal>
       {/* </Portal> */}
 

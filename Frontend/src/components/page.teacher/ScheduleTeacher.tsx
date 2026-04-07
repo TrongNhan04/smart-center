@@ -13,7 +13,7 @@ dayjs.locale('vi')
 
 const { Title, Text } = Typography
 
-const Schedule = () => {
+const ScheduleTeacher = () => {
   const navigate = useNavigate()
   //lưu ngày bắt đầu của tuần này
   const [startOfWeek, setStartOfWeek] = useState<Dayjs>(dayjs().startOf('week'))
@@ -120,7 +120,7 @@ const Schedule = () => {
                   {dailyClasses.map(buoihoc => (
                     // Thẻ div đại diện cho 1 ca học
                     <div
-                      onClick={() => navigate(`/teacher/sessions/${buoihoc.ID}`)}
+                      onClick={() => navigate(`/teacher/classes/${buoihoc.LopHocID}/sessions/${buoihoc.ID}`)}
                       key={buoihoc.ID}
                       style={{
                         padding: 8,
@@ -182,4 +182,4 @@ const Schedule = () => {
   )
 }
 
-export default Schedule;
+export default ScheduleTeacher;

@@ -20,6 +20,7 @@ export default function LoginScreen() {
     try {
       setLoading(true)
       const payload = { email, password }
+      console.log(payload)
       const res = await mobileApi.login(payload)
       Alert.alert('Thông báo', 'Đăng nhập thành công!');
       login(res.data.user, res.data.access_token)
@@ -53,7 +54,7 @@ export default function LoginScreen() {
             label="Email của bạn"
             mode="outlined"
             value={email} // nhét email vào để gõ 1 chữ, onChangeText chạy
-            onChangeText={setEmail}// setEmail lại, rereander 
+            onChangeText={setEmail}// gõ chữ nào lưu lại chữ đó trong state email
             style={styles.input}// hiển thị chữ vừa gõ
             autoCapitalize="none"
             activeOutlineColor='#3498db'
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#ffffff',
-    //justifyContent: 'center',
+    justifyContent: 'center',
     padding: 20,
   },
   formContainer: {

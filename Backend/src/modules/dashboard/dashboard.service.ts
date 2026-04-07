@@ -121,7 +121,7 @@ export class DashboardService {
             }, 0)
         }))
         .sort((a,b)=>b.DoanhThu-a.DoanhThu).slice(0,12)
-        // tăng là a-b, giảm là b-a
+        //tăng là a-b, giảm là b-a, cắt lấy 12 tử
     }
 
     // lấy danh sách buổi học trong 1 tháng
@@ -139,7 +139,7 @@ export class DashboardService {
                 BatDauLuc: true, KetThucLuc: true,
                 lophoc: {
                     select: {
-                        TenLop: true, PhongHoc: true,
+                        ID:true, TenLop: true, PhongHoc: true,
                         _count: { select: { ghidanh: { where: { TrangThai: 'ACTIVE' } } } }
                     },
                 },
@@ -148,6 +148,7 @@ export class DashboardService {
         })
         return sessionDB.map(item => ({
             ID: item.ID, // id buổi học
+            LopHocID:item.lophoc.ID,
             TenLop: item.lophoc.TenLop,
             BuoiSo: item.BuoiSo,
             NgayHoc: item.BatDauLuc.toISOString().slice(0, 10),

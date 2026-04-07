@@ -4,6 +4,7 @@ import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guard/roles.guard";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { CreateStudentDTO, QueryStudentDTO, UpdateStudentDTO } from "./student.dto";
+import { MustChangePWGuard } from "src/auth/guard/must-change-pw.guard";
 
 @Controller('admin/students')
 export class StudentController {
@@ -50,8 +51,8 @@ export class StudentController {
     }
 
     // thống kê kết quả học tập 1 lớp mà học viên học
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles('ADMIN')
+    @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
+    @Roles('ADMIN','TEACHER')
     @Get(':id/classes/:classId')
     async GetClassResultById(
         @Param('id') studentId: number,

@@ -55,14 +55,13 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: Props) => {
 
   useEffect(() => {
     if (!open) return
-    
+
     if (editingCourse) {
       const formData = mapDataCourse(editingCourse)
       form.setFieldsValue(formData)
     }
     else
       form.resetFields()
-
   }, [open, form, editingCourse])
 
   return (
@@ -141,7 +140,7 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: Props) => {
         {/* Thời gian (trái) - Tổng số buổi (phải) */}
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item
+            <Form.Item // thời gian
               label="Thời gian đào tạo"
               name="duration"
               rules={[{ required: true, message: 'Nhập thời gian đào tạo!' }]}
@@ -158,7 +157,7 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: Props) => {
           </Col>
 
           <Col span={12}>
-            <Form.Item
+            <Form.Item // tổng số buổi
               label="Tổng số buổi học"
               name="totalSession"
               rules={[{ required: true, message: 'Nhập tổng số buổi!' }]}

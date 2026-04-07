@@ -19,9 +19,9 @@ export class DashboardController {
         return this.dashboard.GetSumaries(q.m, q.y)
     }
 
-    // lấy dữ liệu thu - chi, ghi danh mới theo tháng để vẽ biểu đồ
+    // lấy dữ liệu doanh thu theo lớp, ghi danh mới theo tháng để vẽ biểu đồ
     @Get('charts')
-    async GetFinaceChart(@Query('year') year?: number) {
+    async GetChart(@Query('year') year?: number) {
         const yearNow = year ? year : new Date().getFullYear()
         const [ghiDanh, lopHoc] = await Promise.all([
             this.dashboard.GetFinaceChart(yearNow), // data cho biểu đồ ghi danh

@@ -1,24 +1,28 @@
 import {
   CalendarFilled, CalendarOutlined, DollarCircleFilled, EnvironmentFilled,
+  InfoCircleOutlined,
   PhoneFilled, SearchOutlined, UserOutlined
 } from "@ant-design/icons"
-import { Col, Input, Row, Space, Table, Tooltip, Typography } from "antd"
+import { Button, Col, Input, Row, Space, Table, Tooltip, Typography } from "antd"
 import { useEffect, useState } from "react"
 import type { StuOfClass } from "./ClassDTO"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import classApi from "../../api/classApi"
 import { CatchError } from "../common/catch.error"
+import { useAuthStore } from "../../store/useAuthStore"
 
 const { Text } = Typography
 interface Props {
-  id:number
+  id: number
 }
 
-const TabStudent = ({id}:Props) => {
+const TabStudent = ({ id }: Props) => {
   const [students, setStudents] = useState<StuOfClass[]>([])
   const [loading, setLoading] = useState(false)
   const [searchText, setSearchText] = useState('')
+  const navigate = useNavigate()
   const classId = Number(id)
+  const isAmin = useAuthStore(state => state.user?.role) === 'ADMIN'
   const fetchStuOfClass = async () => {
     try {
       setLoading(true)
@@ -51,9 +55,11 @@ const TabStudent = ({id}:Props) => {
     { // tên học viên
       title: 'Tên học viên', dataIndex: 'TenHocVien', //width: 220,
       key: 'TenHocVien', ellipsis: true,
-      render: (name: string, student: StuOfClass) =>
-        <Link to={`/admin/students/${student.HocVienID}`}
+      render: (name: string, student: StuOfClass) => {
+        return isAmin ? <Link to={`/admin/students/${student.HocVienID}`}
           style={{ fontWeight: 'bold' }}><UserOutlined /> {name}</Link>
+          : <Text strong style={{ color: '#1890ff' }}><UserOutlined /> {name}</Text>
+      }
     },
     { // ngày sinh
       title: 'Ngày sinh', dataIndex: 'NgaySinh', key: 'NgaySinh', //width: 100,
@@ -90,7 +96,20 @@ const TabStudent = ({id}:Props) => {
           <DollarCircleFilled /> {hocPhi.toLocaleString()}đ</Text>
       }
     },
+    { // thao tác của giáo viên
+      title: 'Thao tác', key: 'ThaoTac', align: 'center' as const,
+      render: (_: any, stu: StuOfClass) => <Button
+        icon={<InfoCircleOutlined/>}
+        style={{ backgroundColor: '#2fb058', color: '#fff'}}
+        onClick={() => navigate(`students/${stu.HocVienID}`)}>
+        Tiến độ
+      </Button>
+    }
   ]
+
+  const filterColumns = isAmin ?
+    columns.filter(item => item.key !== 'ThaoTac')
+    : columns.filter(item => item.key !== 'HocPhi')
 
   return (
     <div>{/* ô tìm kiếm và bộ lọc */}
@@ -117,7 +136,7 @@ const TabStudent = ({id}:Props) => {
       {/* Bảng hiển thị dữ liệu */}
       <Table
         dataSource={filteredData}
-        columns={columns}
+        columns={filterColumns}
         loading={loading}
         pagination={{ defaultPageSize: 10 }}
         rowKey="HocVienID"
