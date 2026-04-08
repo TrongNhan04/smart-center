@@ -5,8 +5,8 @@ import {
   TouchableWithoutFeedback, View
 } from 'react-native';
 import { Button, Text, TextInput } from 'react-native-paper';
-import mobileApi from './api';
-import useAuthStore from './authStore';
+import mobileApi from '../api';
+import useAuthStore from '../authStore';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -20,7 +20,6 @@ export default function LoginScreen() {
     try {
       setLoading(true)
       const payload = { email, password }
-      console.log(payload)
       const res = await mobileApi.login(payload)
       Alert.alert('Thông báo', 'Đăng nhập thành công!');
       login(res.data.user, res.data.access_token)
@@ -86,8 +85,6 @@ export default function LoginScreen() {
           >
             Đăng Nhập
           </Button>
-
-
         </View>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>

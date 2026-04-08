@@ -1,21 +1,9 @@
+import NotisDB from '@/types/tabs.notis.dto';
 import React, { useEffect, useState } from 'react';
-import { Alert, FlatList, StyleSheet, View } from 'react-native';
-import { Divider, List, Text } from 'react-native-paper';
+import { Alert, FlatList, View } from 'react-native';
+import { Avatar, Divider, IconButton, List, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import mobileApi from '../api';
-
-interface NotisDB {
-  ID: string,
-  TieuDe: string,
-  NoiDung: string,
-  Loai: string,
-  DuLieu: JSON,
-  DaDoc: boolean,
-  Icon?: string,
-  IconColor: string,
-  CreatedAt: string
-}
-
 
 const Notis = () => {
   const [notifications, setNotifications] = useState<NotisDB[]>([])
@@ -24,7 +12,6 @@ const Notis = () => {
   const fetchNotis = async () => {
     try {
       const res = await mobileApi.getNotis()
-
       const formated = res.data.items.map((item: NotisDB) => {
         let icon = ''
         let iconColor = ''
@@ -54,7 +41,6 @@ const Notis = () => {
       })
 
       setNotifications(formated)
-      // console.log(res.data.items)
     } catch (error) {
       Alert.alert('Thông báo', 'Lỗi tải thông báo!');
       console.log('Có lỗi xảy ra: ', error)
@@ -65,68 +51,121 @@ const Notis = () => {
     fetchNotis()
   }, [])
 
+  const formatTime = (str: string) => new Date(str)
+    .toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })
+    .replace('-', '/')
+
   const handleRefresh = async () => {
     setRefresh(true)
     await fetchNotis()
     setRefresh(false)
   }
 
-  const renderItem = ({ item }: any) => (
-    <List.Item
-      title={item.TieuDe} 
-      titleStyle={{ fontWeight: item.DaDoc ? 'normal' : 'bold' }}
-      // description={`${item.NoiDung}\n${item.CreatedAt}`}
-      description={`${item.NoiDung}`}
-      descriptionNumberOfLines={2} // tối đa 2 dòng
+  const handleReadNotis = async (id?: number) => {
+    try {
+      if(id) await mobileApi.readOneNotis(id)
+      else await mobileApi.readAllNotis()
+      fetchNotis()
+    } catch (error) {
+      Alert.alert('Thông báo', 'Lỗi tải thông báo!');
+      console.log('Có lỗi xảy ra: ', error)
+    }
+  }
 
-      left={props => (
-        <List.Icon {...props} icon={item.Icon} color={item.IconColor}
-        />
-      )}
+  const renderItem = ({ item }: any) => {
+    return (
+      <List.Item
+        key={item.ID}
+        onPress={() => handleReadNotis(item.ID)}
+        title={item.TieuDe}
+        titleStyle={{
+          fontWeight: item.DaDoc ? '400' : 'bold',
+          color: item.DaDoc ? '#595959' : '#1a1a1a'
+        }}
+        description={item.NoiDung}
+        descriptionNumberOfLines={2}
 
-      style={{ backgroundColor: item.DaDoc ? '#fff' : '#f0f8ff' }}
-    />
-  )
+        // dùng avatar.icon để có hình tròn bao quanh icon
+        left={props => (
+          <View style={{ justifyContent: 'center', paddingLeft: 8 }}>
+            <Avatar.Icon
+              {...props} icon={item.Icon || 'bell-outline'}
+              size={40} color="#fff"
+              style={{ backgroundColor: item.IconColor || '#3498db' }}
+            />
+          </View>
+        )}
+
+        // right này của listItem để hiển thị ngày có thông báo
+        right={() => (
+          <View style={{
+            justifyContent: 'center', alignItems: 'flex-end',
+            paddingRight: 8
+          }}>
+            <Text variant="labelMedium"
+              style={{
+                fontWeight: item.DaDoc ? '400' : 'bold',
+                color: item.DaDoc ? '#595959' : '#1a1a1a',
+                marginBottom: 4
+              }}>
+              {formatTime(item.ThoiGian) || 'Vừa xong'}
+            </Text>
+          </View>
+        )}
+
+        //đổi màu nhẹ cho tin chưa đọc
+        style={{
+          backgroundColor: item.DaDoc ? '#fff' : '#f0f7ff',
+          paddingVertical: 8
+        }}
+      />
+    );
+  };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text variant="titleLarge" style={{ padding: 23, fontWeight: 'bold' }}>
-        Thông báo
-      </Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+      {/* Header có thêm nút đánh dấu đã đọc hết */}
+      <View style={{
+        flexDirection: 'row', justifyContent: 'space-between',
+        alignItems: 'center', paddingRight: 8
+      }}>
+        <Text variant="headlineSmall"
+          style={{ padding: 20, fontWeight: 'bold' }}>
+          Thông báo
+        </Text>
+        <IconButton
+          icon="check-all"
+          size={20}
+          onPress={() => handleReadNotis()}
+        />
+      </View>
+      <Divider/>
+
       <FlatList
         data={notifications}
         renderItem={renderItem}
-        keyExtractor={item => item.ID}
-        ItemSeparatorComponent={() => <Divider />}
+        keyExtractor={item => item.ID.toString()}
+        ItemSeparatorComponent={() =>
+          <Divider style={{ backgroundColor: '#f0f0f0' }} />}
 
         refreshing={refresh}
         onRefresh={handleRefresh}
 
+        // múa may 1 xíu nếu không có thông báo nào hết
         ListEmptyComponent={
-          <View>
-            <Text style={{ color: 'gray' }}>Không có thông báo nào</Text>
+          <View style={{ flex: 1, alignItems: 'center', marginTop: 100, gap: 12 }}>
+            <Avatar.Icon
+              icon="bell-off-outline" size={80}
+              style={{ backgroundColor: '#f5f5f5' }} color="#d9d9d9"
+            />
+            <Text variant="bodyLarge" style={{ color: '#bfbfbf' }}>
+              Bạn không có thông báo nào
+            </Text>
           </View>
         }
       />
     </SafeAreaView>
-  )
+  );
 }
 
 export default Notis
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    // alignItems: 'center',
-    // justifyContent: 'center'
-  },
-  // text: {
-  //   color: #25292e
-  // },
-  // button: {
-  //   fontSize: 20,
-  //   textDecorationLine: 'underline',
-  //   color: '#25292e'
-  // }
-})

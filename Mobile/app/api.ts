@@ -7,6 +7,11 @@ const mobileApi = {
 
     getNotis: () => axiosClient.get(`notifications`),
 
+    readOneNotis: (notisId: number) =>
+        axiosClient.patch(`notifications/${notisId}`),
+
+    readAllNotis: () => axiosClient.patch('notifications'),
+
     updateProfile: (body: any) => axiosClient.patch('auth/profile', body),
 
     getDashboard: (studentId: any) =>

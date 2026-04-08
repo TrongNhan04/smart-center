@@ -34,7 +34,6 @@ export class SessionResultService {
     async SubmittedResult(userId: number, sessionId: number, body: SessionsResultDTO) {
         // validate quyền và lấy thông tin
         const { sessionDB, teacherId } = await this.SessionAcsessValidate(userId, sessionId)
-
         // check thời gian cho lưu THẬT
         // const minutesLeftEnd = DateHelper.TimeDiff(sessionDB.KetThucLuc)
         // if (!sessionDB.AdminMoKhoa) {
@@ -235,11 +234,11 @@ export class SessionResultService {
             })
             // gửi toàn bộ mảng upsertResultDetail cho  promise.all
             await Promise.all(upsertResultDetail)
-            // Nếu là SUBMITTED -> Cập nhật trạng thái buổi học 
+
             const data: BuoiHocUpdateInput = {
                 ChuDe: body.ChuDe
             }
-
+            // Nếu là SUBMITTED -> Cập nhật trạng thái buổi học 
             if (status === 'SUBMITTED') {
                 data.AdminMoKhoa = false // submit thì tắt ưu tiên nếu có
                 data.TrangThai = 'COMPLETED' // update trạng thái buổi học
@@ -256,8 +255,6 @@ export class SessionResultService {
                 where: { ID: sessionDB.ID },
                 data: data
             })
-
-            return { message: status === 'DRAFT' ? "Lưu nháp" : "Lưu thật" }
         })
     }
 
@@ -265,13 +262,22 @@ export class SessionResultService {
     private async SessionAcsessValidate(userId: number, sessionId: number) {
         const teacherDB = await this.GetTeacherByUserId(userId)
         const sessionDB = await this.prisma.buoiHoc.findUnique({
-            where: { ID: sessionId, lophoc: { GiaoVienID: teacherDB.ID } }
+            where: { ID: sessionId, lophoc: { GiaoVienID: teacherDB.ID } },
+            include: { lophoc: true },
+            omit: { CreatedAt: true, UpdatedAt: true }
         })
         if (!sessionDB) throw new NotFoundException
             ('Không tìm thấy buổi học hoặc từ chối truy cập')
         if (sessionDB.TrangThai === 'CANCELLED')
             throw new ConflictException(`Buổi học đã hủy`)
-        return { sessionDB, teacherId: teacherDB.ID }
+        const {lophoc, ...rest} = sessionDB // tách ra để lấy tên lớp
+        return {
+            sessionDB: {
+                ...rest,
+                LopHoc: lophoc.TenLop
+            },
+            teacherId: teacherDB.ID
+        }
     }
 
     // kiểm tra id buổi học

@@ -1,49 +1,16 @@
+import StudentDashboard from '@/types/tabs.index.dto';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
-import { Avatar, Card, Divider, List, SegmentedButtons, Text } from 'react-native-paper';
+import { Alert, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { Avatar, Card, Chip, Icon, ProgressBar, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import mobileApi from '../api';
 import useAuthStore from '../authStore';
-
-interface StudentDashboard {
-  ID: string
-  HocVien: string
-  BuoiHocKe: BuoiHocKe
-  KetQuaGanNhat: KetQuaGanNhat[]
-  HoaDon: HoaDon
-}
-
-interface BuoiHocKe {
-  BuoiSo: number
-  PhongHoc: string
-  NgayHoc: string
-  GioHoc: string
-  Lop: string
-  GiaoVien: string
-}
-
-interface KetQuaGanNhat {
-  BuoiSo: number
-  NgayHoc: string
-  ChuDe: string
-  LopHoc: string
-  TongSoBuoi: string
-  NhanXetCon: string | null
-  DiemDanh: boolean
-  Diem: number
-}
-
-interface HoaDon {
-  SoHDChuaTra: number
-  ThoiHan: string // ISO date string
-}
 
 export default function Index() {
   const user = useAuthStore(state => state.user)
   const children = user?.children
   const [students, setStudents] = useState<StudentDashboard[]>([])
-  const [selectedStuId, setSelectedStuId] = useState('')
-
+  const [selectedStuId, setSelectedStuId] = useState(-1)
   const [refresh, setRefresh] = useState(false)
   const fetchData = async () => {
     try {
@@ -51,10 +18,14 @@ export default function Index() {
       const res = await Promise.all(
         children.map(childId => mobileApi.getDashboard(childId))
       )
-      // console.log(res.map(item=>item.data))
-      setStudents(res.map(item => item.data))
+      const data = res.map(item => item.data)
+      setStudents(data)
+      // nếu chưa chọn ai và có dữ liệu thì chọn em đầu tiên
+      if (selectedStuId === -1 && res.length > 0)
+        setSelectedStuId(data[0].ID)
     } catch (error) {
-
+      Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
+      console.log('Có lỗi xảy ra: ', error)
     }
   }
 
@@ -67,6 +38,7 @@ export default function Index() {
   const nextSession = stuData?.BuoiHocKe
   const lastestResult = stuData?.KetQuaGanNhat
   const debtInvoice = stuData?.HoaDon
+  
   const handleRefresh = async () => {
     setRefresh(true)
     await fetchData()
@@ -80,89 +52,185 @@ export default function Index() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={{ padding: 16 }}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 10 }}
+        refreshControl={
+          <RefreshControl refreshing={refresh}
+            onRefresh={handleRefresh} />
+        }>
 
-        {/* 1. CHỌN HỌC VIÊN (Dạng nút phân đoạn nhìn rất hiện đại) */}
-        <Text variant="titleMedium" style={{ marginBottom: 12, fontWeight: 'bold' }}>
-          Chọn học viên:
+        <Text variant="headlineSmall" style={styles.headerTitle}>
+          Trang chủ
         </Text>
-        <SegmentedButtons
-          value={selectedStuId}
-          onValueChange={(value) => setSelectedStuId(value)}
-          buttons={students.map(stu => ({
-            value: stu.ID.toString(),
-            label: stu.HocVien,
-            icon: selectedStuId === stu.ID ? 'check' : 'account-outline'
-          }))}
-          style={{ marginBottom: 20 }}
-        />
 
-        {/* 2. BUỔI HỌC KẾ TIẾP (Màu xanh dương - Blue) */}
-        <Card style={styles.card} mode="elevated">
-          <Card.Title
-            title="Lịch học sắp tới"
-            subtitle={nextSession ? nextSession.Lop : "Chưa có lịch"}
-            left={(props) => <Avatar.Icon {...props} icon="calendar-clock" color="#3498db" />}
-          />
-          <Divider />
-          {nextSession ? (
-            <Card.Content style={{ paddingTop: 10 }}>
-              <List.Item
-                title={`${nextSession.NgayHoc} | ${nextSession.GioHoc}`}
-                description={`Giáo viên: ${nextSession.GiaoVien} (Buổi số: ${nextSession.BuoiSo})`}
-                left={props => <List.Icon {...props} icon="clock-outline" />}
-              />
+        {/* Chọn học viên */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.studentSelector}
+        >
+          {students?.map(stu => (
+            <Chip
+              key={stu.ID}
+              selected={selectedStuId === stu.ID}
+              onPress={() => setSelectedStuId(stu.ID)}
+              icon={() =>
+                <Icon
+                  source='account-school'
+                  size={20}
+                  color={selectedStuId === stu.ID ? '#fff' : '#3498db'}
+                />
+              }
+              style={[styles.chip,
+              // chip được chọn NỀN xanh, ko chọn NỀN trắng
+              { backgroundColor: selectedStuId === stu.ID ? '#3498db' : '#fff' }
+              ]}
+              textStyle={{ // được chọn CHỮ trắng, ko chọn CHỮ xanh
+                color: selectedStuId === stu.ID ? '#fff' : '#3498db'
+              }}
+              showSelectedCheck={false}
+            >
+              {stu.HocVien}
+            </Chip>
+          ))}
+        </ScrollView>
+
+        <View style={{ paddingHorizontal: 16 }}>
+
+          {/* buổi học kế tiếp */}
+          <Card mode="elevated" style={{ backgroundColor: '#e3f2fd', }}>
+            <Card.Title
+              title="Buổi học sắp tới"
+              titleVariant="titleLarge"
+              left={(props) =>
+                <Avatar.Icon {...props} icon="calendar-clock" />}
+            />
+            <Card.Content>
+              {nextSession ? (<>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                  <Icon source="google-classroom" size={20} color="#3498db" />
+                  <Text variant="titleMedium"
+                    style={{ color: '#3498db', marginLeft: 8 }}>
+                    {nextSession.Lop}
+                  </Text>
+                </View>
+
+                <Text variant="bodyMedium" style={{ marginBottom: 8 }}>
+                  Buổi {nextSession.BuoiSo}:
+                  {nextSession.ChuDe ?? "Chưa có chủ đề"}
+                </Text>
+
+                {/* Hàng chứa Giờ và Ngày */}
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 8 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                    <Icon source="clock-outline" size={18} />
+                    <Text variant="bodyMedium">{nextSession.GioHoc}</Text>
+                  </View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                    <Icon source="calendar-month" size={18} />
+                    <Text variant="bodyMedium">{formatThoiGian(nextSession.NgayHoc)}</Text>
+                  </View>
+                </View>
+
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <Icon source="account-tie" size={18} />
+                  <Text variant="bodyMedium">Giáo viên: {nextSession.GiaoVien}</Text>
+                </View>
+              </>)
+                :
+                <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
+                  Chưa có lịch học mới</Text>
+              }
             </Card.Content>
-          ) : (
-            <Card.Content><Text style={styles.emptyText}>Hiện chưa có lịch học mới</Text></Card.Content>
-          )}
-        </Card>
+          </Card>
 
-        {/* 3. KẾT QUẢ GẦN NHẤT (Màu xanh lá - Green) */}
-        <Card style={styles.card}>
-          <Card.Title
-            title="Kết quả học tập"
-            left={(props) => <Avatar.Icon {...props} icon="chart-line" color="#28a745" />}
-          />
-          <Divider />
+          {/* kết quả gần nhất */}
           {lastestResult?.length ? (
             lastestResult.map((item, index) => (
-              <View key={index}>
-                <List.Item
-                  title={`${item.LopHoc} (Buổi ${item.BuoiSo}/${item.TongSoBuoi})`}
-                  description={`Điểm: ${item.Diem ?? '_'} | Điểm danh: ${item.DiemDanh}\nNhận xét: ${item.NhanXetCon || 'Không có'}`}
-                  descriptionNumberOfLines={3}
-                  left={props => <List.Icon {...props} icon="numeric" />}
+              <Card key={index} mode="elevated"
+                style={{ marginTop: 16, backgroundColor: '#e8f5e9' }}>
+                <Card.Title
+                  title="Kết quả học tập"
+                  titleVariant="titleLarge"
+                  left={(props) => <Avatar.Icon {...props} icon="school" />}
                 />
-                {index < lastestResult.length - 1 && <Divider />}
-              </View>
+                <Card.Content>
+                  <View style={{
+                    flexDirection: 'row', justifyContent: 'space-between',
+                    alignItems: 'center', marginBottom: 8
+                  }}>
+                    <Icon source="google-classroom" size={20} />
+
+                    <Text variant="titleMedium"
+                      style={{ flex: 1, marginLeft: 8 }}>{item.LopHoc}</Text>
+
+                    <Text variant="titleMedium"
+                      style={{ color: item.DiemDanh ? '#2ecc71' : '#e74c3c' }}>
+                      {item.DiemDanh ? 'Có mặt' : 'Vắng'}
+                    </Text>
+                  </View>
+
+                  {/* Thanh Tiến Độ */}
+                  <View style={{ marginVertical: 8 }}>
+                    <View
+                      style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
+                      <Text variant="bodyMedium">Tiến độ lớp học</Text>
+                      <Text variant="bodyMedium">{item.BuoiSo}/{item.TongSoBuoi}</Text>
+                    </View>
+                    <ProgressBar progress={item.BuoiSo / item.TongSoBuoi} color="#3498db" style={{ height: 6, borderRadius: 3 }} />
+                  </View>
+
+                  <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 6, marginTop: 8 }}>
+                    <Icon source="comment-text-outline" size={18}  />
+                    <Text variant="bodyMedium" style={{ flex: 1, color: '#34495e' }}>
+                      Nhận xét của giáo viên: {item.NhanXetCon || 'Chưa có nhận xét.'}
+                    </Text>
+                  </View>
+                </Card.Content>
+              </Card>
             ))
           ) : (
-            <Card.Content><Text style={styles.emptyText}>Chưa có dữ liệu kết quả</Text></Card.Content>
+            <Card mode="elevated">
+              <Card.Title title="Kết quả học tập" titleVariant="titleLarge"
+                left={(props) => <Avatar.Icon {...props} icon="school" />} />
+              <Card.Content>
+                <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
+                  Chưa có kết quả</Text>
+              </Card.Content>
+            </Card>
           )}
-        </Card>
 
-        {/* 4. HÓA ĐƠN (Màu đỏ - Red) */}
-        <Card style={[styles.card, { borderColor: debtInvoice ? '#dc3545' : '#ccc', borderWidth: debtInvoice ? 1 : 0 }]}>
-          <Card.Title
-            title="Học phí"
-            left={(props) => <Avatar.Icon {...props} icon="cash-multiple" color={debtInvoice ? "#dc3545" : "#6c757d"} />}
-          />
-          <Divider />
-          <Card.Content style={{ paddingTop: 10 }}>
-            {debtInvoice ? (
-              <List.Item
-                title={`${debtInvoice.SoHDChuaTra} khoản chưa thanh toán`}
-                titleStyle={{ color: '#dc3545', fontWeight: 'bold' }}
-                description={`Hạn chót: ${formatThoiGian(debtInvoice.ThoiHan)}`}
-                left={props => <List.Icon {...props} icon="alert-circle-outline" color="#dc3545" />}
-              />
-            ) : (
-              <Text style={styles.emptyText}>Học phí đã đóng đầy đủ</Text>
-            )}
-          </Card.Content>
-        </Card>
-
+          {/* Hóa đơn nợ */}
+          <Card mode="elevated" style={{ marginTop: 16, backgroundColor: '#fff7e6' }} >
+            <Card.Title
+              title="Thông tin học phí"
+              titleVariant="titleLarge"
+              left={(props) => <Avatar.Icon {...props} icon="cash-multiple" />}
+            />
+            <Card.Content>
+              {debtInvoice ? (
+                <View style={{ gap: 8 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Icon source="alert-circle-outline" size={20} color="#FA8C16" />
+                    <Text variant="titleMedium" style={{ color: '#FA8C16' }}>
+                      Còn {debtInvoice.SoHDChuaTra} khoản chưa thanh toán
+                    </Text>
+                  </View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Icon source="calendar-alert" size={18} />
+                    <Text variant="bodyMedium">Hạn thanh toán: {formatThoiGian(debtInvoice.ThoiHan)}</Text>
+                  </View>
+                </View>
+              ) : (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <Icon source="check-circle-outline" size={20} color="#27ae60" />
+                  <Text variant="titleMedium" style={{ color: '#27ae60' }}>
+                    Đã hoàn thành toàn bộ học phí
+                  </Text>
+                </View>
+              )}
+            </Card.Content>
+          </Card>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -170,122 +238,17 @@ export default function Index() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#f5f7fa',
+    flex: 1, backgroundColor: '#f0f2f5'
   },
-  card: {
-    marginBottom: 20,
-    backgroundColor: '#fff',
+  headerTitle: {
+    paddingHorizontal: 23, paddingTop: 10,
+    fontWeight: 'bold', color: '#2c3e50'
   },
-  emptyText: {
-    padding: 10,
-    color: 'gray',
-    fontStyle: 'italic',
-    textAlign: 'center'
-  }
+  studentSelector: {
+    paddingLeft: 16, marginVertical: 15,
+    flexDirection: 'row'
+  },
+  chip: {
+    marginRight: 8, height: 40
+  },
 });
-
-// const renderItem = ({ item }: { item: StudentDashboard }) => (
-//   <Card style={styles.card}>
-//     <Card.Title
-//       title={item.HocVien || 'Chưa cập nhật'}
-//       titleStyle={{ fontWeight: 'bold', fontSize: 18, color: '#2c3e50' }}
-//       left={(props) => <Avatar.Text {...props}
-//         label={item.HocVien ? item.HocVien.charAt(0) : 'HV'} size={40} />}
-//     />
-//     <Divider />
-//     <Card.Content style={{ paddingHorizontal: 0 }}>
-//       {/* {item.BuoiHocKe ? */}
-//         <List.Item
-//           title={`Sắp tới: ${item.BuoiHocKe?.Lop} (Buổi ${item.BuoiHocKe?.BuoiSo})`}
-//           titleStyle={{ fontWeight: 'bold' }}
-//           description={`${formatThoiGian(item.BuoiHocKe?.NgayHoc)} | ${item.BuoiHocKe?.GioHoc}\nGV: ${item.BuoiHocKe?.GiaoVien}`}
-//           descriptionNumberOfLines={2}
-//           left={props => <List.Icon {...props} icon="calendar-clock" color="#3498db" />}
-//         />
-//       {/* } */}
-//       <Divider />
-//       <List.Item
-//         title={`Điểm: ${item.KetQuaGanNhat?.Diem} - ${item.KetQuaGanNhat?.DiemDanh ? 'Có mặt' : 'Vắng'}`}
-//         titleStyle={{ color: '#28a745', fontWeight: 'bold' }}
-//         description={`Ngày ${formatThoiGian(item.KetQuaGanNhat?.Ngay)}\nNhận xét: ${item.KetQuaGanNhat?.NhanXetCon || item.KetQuaGanNhat?.NhanXetLop}`}
-//         descriptionNumberOfLines={3}
-//         left={props => <List.Icon {...props} icon="clipboard-check-outline" color="#28a745" />}
-//       />
-//       <Divider />
-//       <List.Item
-//         title={
-//           item.HoaDon?.SoHDChuaTra > 0 ?
-//             `Nợ ${item.HoaDon?.SoHDChuaTra} Hóa đơn` : 'Đã đóng đủ học phí'}
-//         titleStyle={{
-//           color: item.HoaDon?.SoHDChuaTra > 0 ? '#dc3545' : 'gray',
-//           fontWeight: 'bold'
-//         }}
-//         description={
-//           item.HoaDon?.SoHDChuaTra > 0 ?
-//             `Hạn chót: ${formatThoiGian(item.HoaDon?.ThoiHan)}` : 'Không có khoản thu nào'}
-//         left={props => <List.Icon {...props} icon="receipt"
-//           color={item.HoaDon?.SoHDChuaTra > 0 ? "#dc3545" : "gray"} />}
-//       />
-//     </Card.Content>
-//   </Card>
-//   // <Text>Test</Text>
-// );
-
-
-// <SafeAreaView style={styles.container}>
-//       <Text variant="titleLarge" style={{ padding: 23, fontWeight: 'bold' }}>
-//         Trang chủ
-//       </Text>
-
-//       {students?.map(stu => <Button key={stu.ID}
-//         onPress={() => setSelectedStuId(stu.ID)}>
-//         <Text className="font-medium">{stu.HocVien}</Text>
-//       </Button>)
-//       }
-
-//       {/* buổi học kế */}
-//       {nextSession ?
-//         <Card>
-//           <Text>Buổi học sắp tới</Text>
-//           <Text>Buổi học: {nextSession.BuoiSo}</Text>
-//           <Text>Lớp: {nextSession.Lop}</Text>
-//           <Text>Giáo viên: {nextSession.GiaoVien}</Text>
-//           <Text>Ngày học: {formatThoiGian(nextSession.NgayHoc)}</Text>
-//           <Text>Giờ học: {nextSession.GioHoc}</Text>
-          
-//         </Card>
-
-//         : <Card>
-//           <Text>Chưa có lịch học</Text>
-//         </Card>}
-
-//       {/* các kết quả gần nhất */}
-//       {lastestResult?.length ?
-//         lastestResult.map(item => <Card>
-//           <Text>Lớp học gần đây: {item.LopHoc}</Text>
-//           <Text>Tiến độ: {item.BuoiSo}/{item.TongSoBuoi}</Text>
-//           <Text>Bài học trước: {item.ChuDe}</Text>
-//           <Text>Điểm danh: {item.DiemDanh} |
-//             Điểm: {item.Diem ?? '_'}</Text>
-
-//           <Text>Nhận xét của giáo viên: {item.NhanXetCon ?? 'Không có'} </Text>
-//           <Text>Ngày học: {formatThoiGian(item.NgayHoc)}</Text>
-//         </Card>)
-        
-//         : <Card>
-//           <Text>Chưa có kết quả gần nhất</Text>
-//         </Card>}
-
-//       {/* hóa đơn còn nợ */}
-//       {debtInvoice ?
-//         <Card>
-//           <Text>Nhắc nhở học phí</Text>
-//           <Text>Hạn thanh toán: {formatThoiGian(debtInvoice.ThoiHan)}</Text>
-//           <Text>{debtInvoice.SoHDChuaTra} khoản chưa thanh toán</Text>
-//         </Card>
-
-//         : <Card>
-//           <Text>Không có hóa đơn cần thanh toán</Text>
-//         </Card>}
-//     </SafeAreaView>

@@ -61,7 +61,7 @@ const AccountScreen = () => {
               onPress: () => {
                 hideModal(); // Đóng modal hiện tại
                 logout(); // Xóa data
-                router.replace('/login'); // Chuyển trang
+                router.replace('/(auth)/login'); // Chuyển trang
               }
             }
           ],
@@ -144,7 +144,6 @@ const AccountScreen = () => {
         >Đăng xuất
         </Button>
       </View>
-
 
       {/* dùng portal thì phải có <PaperProvider> */}
       {/* <Portal> */}

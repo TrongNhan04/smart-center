@@ -78,7 +78,8 @@ export class AppParentService {
     let KetQuaGanNhat: any[] = []
     if (nextSS)
       BuoiHocKe = {
-        ID: nextSS.ID, BuoiSo: nextSS.BuoiSo, PhongHoc: nextSS.PhongHoc ?? '',
+        ID: nextSS.ID, BuoiSo: nextSS.BuoiSo,
+        ChuDe: nextSS.ChuDe,
         NgayHoc: nextSS.BatDauLuc,
         GioHoc: DateHelper.ISOToHHMM(nextSS.BatDauLuc, nextSS.KetThucLuc),
         Lop: nextSS.lophoc.TenLop,
@@ -93,16 +94,14 @@ export class AppParentService {
           TongSoBuoi: item.lophoc.khoahoc.TongSoBuoi,
           NgayHoc: item.ketqua_chitiet[0]?.ketqua_buoihoc.buoihoc.BatDauLuc,
           ChuDe: item.ketqua_chitiet[0]?.ketqua_buoihoc.buoihoc.ChuDe,
-          NhanXetCon: item.ketqua_chitiet[0]?.NhanXetRieng,
+          NhanXetCon: item.ketqua_chitiet[0]?.NhanXetRieng ??
+            item.ketqua_chitiet[0].ketqua_buoihoc.NhanXetChung,
           DiemDanh: item.ketqua_chitiet[0]?.DiemDanh,
           Diem: item.ketqua_chitiet[0]?.Diem,
         })
       }
     }
-
-
     const invoiceFilter = invoice.filter(f => f.DaTra < f.TongTien)
-
     return {
       ID: studentDB.ID.toString(),
       HocVien: studentDB.TenHocVien,

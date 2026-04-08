@@ -30,10 +30,11 @@ export class NotifyService {
         let client: Prisma.TransactionClient | null = null
         if (tx) client = tx
         else client = this.prisma
+        const dateStr = session.BatDauLuc.toLocaleDateString()
         const notionData = listParentID.map(id => ({
             UserID: id,
             TieuDe: 'Kết quả học tập mới',
-            NoiDung: `Kết quả buổi học ngày ${session.BatDauLuc.toLocaleDateString()}`,
+            NoiDung: `Kết quả buổi học số ${session.BuoiSo} ngày ${dateStr} - Lớp học: ${session.LopHoc}`,
             Loai: 'SESSION_RESULT',
             DuLieu: {
                 sessionId: session.ID,
@@ -49,13 +50,12 @@ export class NotifyService {
     async GetMyNotification(userId: number, page: number = 1) {
         // const take = 10 // lấy bao nhiêu
         // const skip = (page - 1) * take // bỏ bao nhiêu
-
         const [items, total, unReadCount] = await this.prisma.$transaction([
             // lấy danh sách thông báo theo phân trang
             this.prisma.thongBao.findMany({
                 where: { UserID: userId },
                 orderBy: { CreatedAt: 'desc' },// lấy tin mới nhất
-                omit: { UserID:true, UpdatedAt: true },
+                omit: { UserID: true, UpdatedAt: true },
                 // take: take,
                 // skip: skip
             }),
@@ -64,15 +64,18 @@ export class NotifyService {
             // tổng số lượng thông báo chưa đọc
             this.prisma.thongBao.count({ where: { UserID: userId, DaDoc: false } })
         ])
-        return { items, total, unReadCount }
+        return {
+            items: items.map(i => ({...i, ThoiGian:i.CreatedAt})),
+            total, unReadCount
+        }
     }
 
     // đánh dấu đã đọc 
     async MaskAsRead(userId: number, notifyId: number) {
-        await this.NotifyValidator(userId, notifyId)
+        const { UserID, ID } = await this.NotifyValidator(userId, notifyId)
         return await this.prisma.thongBao.update({
             where: {
-                UserID: userId, ID: notifyId
+                UserID: UserID, ID: ID
             },
             data: { DaDoc: true }
         })
@@ -80,13 +83,12 @@ export class NotifyService {
 
     // đánh dấu đọc tất cả
     async MaskAllRead(userId: number) {
-        await this.prisma.thongBao.updateMany({
+        return await this.prisma.thongBao.updateMany({
             where: {
                 UserID: userId, DaDoc: false
             },
             data: { DaDoc: true }
         })
-        return { msg: "successful" }
     }
 
     // thông báo hủy buổi học có tx?
@@ -99,7 +101,7 @@ export class NotifyService {
 
         const title = "Thông báo hủy buổi học"
         const dateStr = session.BatDauLuc.toLocaleDateString('vi-VN')
-        const body = `Lớp ${session.lophoc.MaLopHoc} - Buổi ngày ${dateStr} đã bị hủy. Lý do: ${reason}`
+        const body = `Lớp ${session.lophoc.TenLop} - Buổi ${session.BuoiSo} ngày ${dateStr} đã hủy vì: ${reason}`
 
         const notisData = userId.map(id => ({
             UserID: id,
