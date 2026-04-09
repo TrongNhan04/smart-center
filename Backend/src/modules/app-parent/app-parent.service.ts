@@ -11,19 +11,6 @@ export class AppParentService {
     private prisma: PrismaService
   ) { }
 
-  // lấy thông tin tài khoản + danh sách con
-  async GetProfile(userId: number) {
-    return await this.prisma.user.findUnique({
-      where: { ID: userId },
-      select: {
-        Email: true, DienThoai: true, HoTen: true,
-        HocVien: {
-          select: { ID: true, TenHocVien: true }
-        }
-      }
-    })
-  }
-
   // Tab trang chủ: buổi học sắp tới, kết quả gần nhất,
   //  nhắc đóng học phí chưa thanh toán của HỌC VIÊN
   async GetDashboard(userId: number, studentId: number) {
@@ -35,12 +22,7 @@ export class AppParentService {
           BatDauLuc: { gte: new Date() },
           TrangThai: 'SCHEDULED',
           lophoc: {
-            ghidanh: {
-              some: {
-                HocVienID: studentDB.ID,
-                TrangThai: 'ACTIVE'
-              }
-            }
+            ghidanh: { some: { HocVienID: studentDB.ID, TrangThai: 'ACTIVE' } }
           }
         },
         orderBy: { BatDauLuc: 'asc' },
@@ -71,7 +53,8 @@ export class AppParentService {
       }),
       //lấy số hóa đơn chưa thanh toán
       this.prisma.hoaDon.findMany({
-        where: { ghidanh: { HocVienID: studentDB.ID } }
+        where: { ghidanh: { HocVienID: studentDB.ID } },
+        orderBy: { ThoiHan: 'asc' } // lấy gần nhất
       })
     ])
     let BuoiHocKe: {} | null = null
@@ -114,33 +97,62 @@ export class AppParentService {
     }
   }
 
-  // lấy danh sách buổi học của học viên
-  async GetSessionByStudentID(userId: number, studentId: number, p: Pagination) {
-    const take = +p.limit
-    const skip = (+p.page - 1) * (+p.limit)
-    await this.StudentValidator(userId, studentId)
-    const sessionDB = await this.prisma.buoiHoc.findMany({
-      where: {
-        lophoc: {
+  // lấy danh sách lớp học của con
+  async GetClassesByStuId(userId: number, studentId: number) {
+    const studentDB = await this.StudentValidator(userId, studentId)
+    const [classDB, result] = await Promise.all([
+      this.prisma.lopHoc.findMany({
+        where: { // lớp học viên học
           ghidanh: {
-            some: {
-              HocVienID: studentId
-            }
+            some: { HocVienID: studentDB.ID, TrangThai: 'ACTIVE' }
           }
+        },
+        include: {
+          khoahoc: { select: { TongSoBuoi: true } },
+          giaovien: { select: { User: { select: { HoTen: true } } } },
+          _count: { select: { buoihoc: { where: { TrangThai: 'COMPLETED' } } } }
         }
-      },
-      take: take, skip: skip,
-      orderBy: { BatDauLuc: 'asc' }
-    })
+      }), // kết quả của học viên
+      this.prisma.ketQua_ChiTiet.findMany({
+        where: { ghidanh: { HocVienID: studentDB.ID } },
+        select: { 
+          ID: true, DiemDanh: true,
+          ghidanh: { select: { LopHocID: true } }
+        }
+      })
+    ])
+    const mapClass = new Map(classDB.map(item => [item.ID, item]))
+    const reduceResult = result.reduce((store: any, item) => {
+      const classId = item.ghidanh.LopHocID // láy id lớp
 
-    return {
-      sessionDB: sessionDB.map(sm => ({
-        id: sm.ID, session: sm.BuoiSo, topic: sm.ChuDe,
-        date: sm.BatDauLuc.toLocaleDateString(),
-        time: DateHelper.ISOToHHMM(sm.BatDauLuc, sm.KetThucLuc)
-      })),
-      total: sessionDB.length
-    }
+      if (!store[classId]) // nếu chưa có store của id lớp đó thì tạo mới
+        store[classId] = {
+          LopHocID: classId,
+          CoMat: 0,
+          Vang: 0
+        }
+
+      if (item.DiemDanh) store[classId].CoMat++
+      else store[classId].Vang++
+      return store
+    }, {}) // để [] thì có sẽ có nhiều phần tử null
+    // chuyển từ obj -> arr
+    const lastResult = Object.values(reduceResult)
+    return lastResult.map((item: any) => {
+      const classInfo = mapClass.get(item.LopHocID)
+      return {
+        ID: classInfo?.ID,
+        MaLop: classInfo?.MaLopHoc,
+        TenLop: classInfo?.TenLop,
+        GiaoVien: classInfo?.giaovien.User.HoTen,
+        LichHoc: classInfo?.LichHoc,
+        GioHoc: classInfo?.GioBatDau + ' - ' + classInfo?.GioKetThuc,
+        SoBuoiDaHoc: classInfo?._count.buoihoc,
+        TongSoBuoi: classInfo?.khoahoc.TongSoBuoi,
+        CoMat: item.CoMat,
+        Vang: item.Vang
+      }
+    })
   }
 
   // tab buổi học phần trên: đtb, %tham gia, biểu đồ
@@ -260,7 +272,6 @@ export class AppParentService {
             }
           }
         }
-
       }
     })
     if (!detail) throw new NotFoundException('Student\'s result not found')

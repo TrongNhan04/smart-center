@@ -1,7 +1,8 @@
-import { IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, MaxLength, Min } from "class-validator"
+import { Type } from "class-transformer"
+import { IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, MaxLength, Min, ValidateNested } from "class-validator"
 import { TrangThaiKH } from "src/generated/prisma/enums"
 
-export class CreateCourseDTO{
+export class CreateCourseDTO {
     @IsNotEmpty()
     @IsString()
     code!: string // mã khóa học
@@ -31,19 +32,32 @@ export class CreateCourseDTO{
     @IsOptional()
     @IsString()
     description?: string
+
+    @IsNotEmpty()
+    @ValidateNested({ each: true })
+    @Type(() => DeCuong) // 
+    syllabus!: DeCuong[]
 }
 
-export class CourseQueryDTO{
+export class DeCuong {
+    @IsNotEmpty()
+    ThuTu!: number
+
+    @IsNotEmpty()
+    ChuDe!: string
+}
+
+export class CourseQueryDTO {
     // @IsEnum(TrangThaiKH)
     @IsOptional()
     status?: TrangThaiKH
 
     @IsOptional()
     @IsString()
-    q?:string //câu truy vấn
+    q?: string //câu truy vấn
 }
 
-export class CourseUpdateDTO{
+export class CourseUpdateDTO {
     @IsOptional()
     @IsString()
     @MaxLength(150)

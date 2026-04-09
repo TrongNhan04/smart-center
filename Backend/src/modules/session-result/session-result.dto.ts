@@ -4,14 +4,14 @@ import { IsArray, IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Mi
 export class ResultDetailDTO {
     @IsNotEmpty()
     @IsNumber()
-    GhiDanhID: number
+    GhiDanhID!: number
 
     @IsOptional()
     @IsString()
     NhanXetRieng?: string
 
     @IsBoolean()
-    DiemDanh: boolean
+    DiemDanh!: boolean
 
     @IsOptional()
     @IsNumber()
@@ -21,8 +21,9 @@ export class ResultDetailDTO {
 
 //đinh nghĩa lớp cha
 export class SessionsResultDTO {
+    @IsNotEmpty()
     @IsString()
-    ChuDe: string
+    ChuDe!: string
 
     @IsOptional()
     @IsString()
@@ -32,21 +33,21 @@ export class SessionsResultDTO {
     @IsString()
     BaiTapVeNha?: string
 
+    @IsNotEmpty()
     @IsString()
-    NhanXetChung: string
-
+    NhanXetChung!: string
 
     @IsOptional()
-    TepDinhKem: FileAttach[]
+    TepDinhKem!: FileAttach[]
 
     @IsArray()
-    @ValidateNested({ each: true })
+    @ValidateNested({ each: true }) // kiểm tra các con bên trong
     @Type(() => ResultDetailDTO)
-    ChiTietKetQua: ResultDetailDTO[]
+    ChiTietKetQua!: ResultDetailDTO[]
 }
 
 export class FileAttach {
-    public_id: string
-    url: string
-    resource_type: string
+    public_id!: string
+    url!: string
+    resource_type!: string
 }

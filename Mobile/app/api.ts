@@ -14,8 +14,11 @@ const mobileApi = {
 
     updateProfile: (body: any) => axiosClient.patch('auth/profile', body),
 
-    getDashboard: (studentId: any) =>
-        axiosClient.get(`parents/students/${studentId}/dashboard`)
+    getDashboard: (studentId: number) =>
+        axiosClient.get(`parents/students/${studentId}/dashboard`),
+
+    getClassByStuId: (id:number) => 
+        axiosClient.get(`parents/students/${id}/classes`),
 }
 
 export default mobileApi

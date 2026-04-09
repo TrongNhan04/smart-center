@@ -2,33 +2,45 @@ import { ConflictException, Injectable, NotFoundException } from "@nestjs/common
 import { PrismaService } from "src/prisma/prisma.service";
 import { CourseQueryDTO, CreateCourseDTO, CourseUpdateDTO } from "./course.dto";
 import { Prisma } from "src/generated/prisma/client";
-import { ClassService } from "../class/class.service";
+import { DeCuongCreateManyInput, DeCuongCreateManyKhoahocInput } from "src/generated/prisma/models";
 
 @Injectable()
 export class CourseService {
-    constructor(private prismaService: PrismaService) { }
+    constructor(private prismaSv: PrismaService) { }
     // tạo khóa học
     async CreateCourse(courseDTO: CreateCourseDTO) {
-        // kiểm tra trùng mã khóa học
-        await this.ValidateCourse(courseDTO.code)
+        const courseDB = await this.prismaSv.khoaHoc.findUnique({
+            where: { MaKhoaHoc: courseDTO.code }
+        })
+        if (courseDB)
+            throw new ConflictException('Mã khóa học đã tồn tại!')
 
         const name = courseDTO.name.trim()
         const level = courseDTO.level.trim()
 
-        return await this.prismaService.khoaHoc.create({
-            data: {
-                MaKhoaHoc: courseDTO.code,
-                TenKhoaHoc: name,
-                TrinhDo: level,
-                ThoiGian: courseDTO.duration,
-                HocPhi: courseDTO.courseFee,
-                TongSoBuoi: courseDTO.totalSession,
-                MoTa: courseDTO.description
-            },
-            omit: { // bỏ những trường nào
-                CreatedAt: true,
-                UpdatedAt: true
-            }
+        return await this.prismaSv.$transaction(async (tx) => {
+            const newCourse = await tx.khoaHoc.create({
+                data: {
+                    MaKhoaHoc: courseDTO.code,
+                    TenKhoaHoc: name,
+                    TrinhDo: level,
+                    ThoiGian: courseDTO.duration,
+                    HocPhi: courseDTO.courseFee,
+                    TongSoBuoi: courseDTO.totalSession,
+                    MoTa: courseDTO.description
+                },
+            })
+            const data: DeCuongCreateManyInput[] = courseDTO.syllabus.map(
+                item => ({
+                    KhoaHocID: newCourse.ID,
+                    ThuTu: item.ThuTu,
+                    ChuDe: item.ChuDe
+                })
+            ).splice(0,newCourse.TongSoBuoi)
+            await tx.deCuong.createMany({
+                data: data
+            })
+            return {ID: newCourse.ID}
         })
     }
 
@@ -47,7 +59,7 @@ export class CourseService {
             ]
         }
         // tìm theo bộ lọc ở trên
-        return await this.prismaService.khoaHoc.findMany({
+        return await this.prismaSv.khoaHoc.findMany({
             where,
             omit: {
                 CreatedAt: true,
@@ -58,7 +70,7 @@ export class CourseService {
     }
 
     async GetDataForCmb() {
-        return await this.prismaService.khoaHoc.findMany({
+        return await this.prismaSv.khoaHoc.findMany({
             where: { TrangThai: { not: 'INACTIVE' } },
             select: {
                 ID: true,
@@ -91,7 +103,7 @@ export class CourseService {
             data.MoTa = courseUpdate.description
         }
 
-        return await this.prismaService.khoaHoc.update({
+        return await this.prismaSv.khoaHoc.update({
             where: { ID: courseId },
             data,
             select: { ID: true }
@@ -101,7 +113,7 @@ export class CourseService {
     // xóa mềm khóa học
     async DeleteCouresByID(courseId: number) {
         const courseDB = await this.CourseIdValidator(courseId)
-        return await this.prismaService.khoaHoc.update({
+        return await this.prismaSv.khoaHoc.update({
             where: { ID: courseDB.ID },
             data: { TrangThai: 'INACTIVE' },
             omit: { CreatedAt: true, UpdatedAt: true }
@@ -111,7 +123,7 @@ export class CourseService {
     // khôi phục khóa học
     async RestoreCourseById(courseId: number) {
         const courseDB = await this.CourseIdValidator(courseId)
-        return await this.prismaService.khoaHoc.update({
+        return await this.prismaSv.khoaHoc.update({
             where: { ID: courseDB.ID, TrangThai: 'INACTIVE' },
             data: { TrangThai: 'ACTIVE' },
             omit: { CreatedAt: true, UpdatedAt: true }
@@ -121,7 +133,7 @@ export class CourseService {
     // lấy danh sách lớp học của khóa học
     async GetClassesByCourseId(courseId: number) {
         const courseDB = await this.CourseIdValidator(courseId)
-        const classDB = await this.prismaService.lopHoc.findMany({
+        const classDB = await this.prismaSv.lopHoc.findMany({
             where: { KhoaHocID: courseDB.ID },
             include: {
                 giaovien: { include: { User: true } },
@@ -144,20 +156,10 @@ export class CourseService {
 
     //kiểm tra id khóa học
     private async CourseIdValidator(courseId: number) {
-        const courseDB = await this.prismaService.khoaHoc.findUnique({
+        const courseDB = await this.prismaSv.khoaHoc.findUnique({
             where: { ID: courseId }
         })
         if (!courseDB) throw new NotFoundException('Không tìm thấy khóa học')
-        return courseDB
-    }
-
-    // kiểm tra trùng mã khóa học
-    private async ValidateCourse(courseCode: string) {
-        const courseDB = await this.prismaService.khoaHoc.findUnique({
-            where: { MaKhoaHoc: courseCode }
-        })
-        if (courseDB)
-            throw new ConflictException('Mã khóa học đã tồn tại!')
         return courseDB
     }
 }

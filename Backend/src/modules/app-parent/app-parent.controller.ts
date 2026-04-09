@@ -19,12 +19,6 @@ export class AppParentController {
     // đăng xuất | đăng nhập - auth service
     // đổi tên | mật khẩu - auth service
 
-    // lấy thông tin tài khoản + danh sách con
-    @Get('children')
-    async GetProfile(@Req() req: RequestWithUser) {
-        return await this.appParent.GetProfile(+req.user.userId)
-    }
-
     // Tab trang chủ: buổi học sắp tới, 
     // kết quả gần nhất, số hóa đơn nợ của con 
     @Get('students/:id/dashboard')
@@ -33,14 +27,13 @@ export class AppParentController {
         return await this.appParent.GetDashboard(+req.user.userId, +studentId)
     }
 
-    // Tab lịch học lấy danh sách buổi học của con
-    @Get('students/:id/sessions')
-    async GetSessionByStudentID(@Req() req: RequestWithUser,
-        @Param('id') studentId: number,
-        @Query() p: Pagination) {
-        return await this.appParent.GetSessionByStudentID(
-            +req.user.userId, studentId, p
-        )
+    // Tab lớp học: lấy danh sách lớp học của con
+    @Get('students/:id/classes')
+    async GetClassesByStuId(
+        @Req() req: RequestWithUser,
+        @Param('id') studentId: number) {
+        const userId = req.user.userId
+        return await this.appParent.GetClassesByStuId(+userId, +studentId)
     }
 
     // Tab học tập: biểu đồ điểm 5-7 buổi gần nhất 

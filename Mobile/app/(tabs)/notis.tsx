@@ -113,7 +113,7 @@ const Notis = () => {
           </View>
         )}
 
-        //đổi màu nhẹ cho tin chưa đọc
+        //đổi màu cho tin chưa đọc
         style={{
           backgroundColor: item.DaDoc ? '#fff' : '#f0f7ff',
           paddingVertical: 8

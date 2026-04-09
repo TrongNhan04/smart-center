@@ -55,6 +55,7 @@ export const ModelName = {
   GiaoVien: 'GiaoVien',
   HocVien: 'HocVien',
   KhoaHoc: 'KhoaHoc',
+  DeCuong: 'DeCuong',
   LopHoc: 'LopHoc',
   BuoiHoc: 'BuoiHoc',
   KetQua_BuoiHoc: 'KetQua_BuoiHoc',
@@ -144,6 +145,16 @@ export const KhoaHocScalarFieldEnum = {
 } as const
 
 export type KhoaHocScalarFieldEnum = (typeof KhoaHocScalarFieldEnum)[keyof typeof KhoaHocScalarFieldEnum]
+
+
+export const DeCuongScalarFieldEnum = {
+  ID: 'ID',
+  KhoaHocID: 'KhoaHocID',
+  ThuTu: 'ThuTu',
+  ChuDe: 'ChuDe'
+} as const
+
+export type DeCuongScalarFieldEnum = (typeof DeCuongScalarFieldEnum)[keyof typeof DeCuongScalarFieldEnum]
 
 
 export const LopHocScalarFieldEnum = {

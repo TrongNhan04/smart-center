@@ -164,7 +164,7 @@ export class SessionResultService {
             }
             if (body.TepDinhKem) // có tệp đính kèm
                 updateData.tep_dinhkem = {
-                    deleteMany: {}, // xóa những thằng cũ
+                    deleteMany: {}, // xóa những thằng cũ và tạo lại thằngs mới
                     create: body.TepDinhKem.map(file => ({
                         TepID: file.public_id,
                         URL: file.url,
@@ -175,7 +175,7 @@ export class SessionResultService {
             // Upsert bảng KetQua_BH và quan hệ 1-n của nó là tệp đính kèm
             const sessionResult = await tx.ketQua_BuoiHoc.upsert({
                 where: { BuoiHocID: sessionDB.ID },
-                update: updateData,
+                update: updateData, // update ở trên
                 create: { // không có thì create
                     BuoiHocID: sessionDB.ID, GiaoVienID: teacherId,
                     NoiDungBaiHoc: body.NoiDungBaiHoc,

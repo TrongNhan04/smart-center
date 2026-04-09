@@ -277,6 +277,7 @@ export type KhoaHocWhereInput = {
   CreatedAt?: Prisma.DateTimeFilter<"KhoaHoc"> | Date | string
   UpdatedAt?: Prisma.DateTimeFilter<"KhoaHoc"> | Date | string
   lophoc?: Prisma.LopHocListRelationFilter
+  decuong?: Prisma.DeCuongListRelationFilter
 }
 
 export type KhoaHocOrderByWithRelationInput = {
@@ -292,6 +293,7 @@ export type KhoaHocOrderByWithRelationInput = {
   CreatedAt?: Prisma.SortOrder
   UpdatedAt?: Prisma.SortOrder
   lophoc?: Prisma.LopHocOrderByRelationAggregateInput
+  decuong?: Prisma.DeCuongOrderByRelationAggregateInput
 }
 
 export type KhoaHocWhereUniqueInput = Prisma.AtLeast<{
@@ -310,6 +312,7 @@ export type KhoaHocWhereUniqueInput = Prisma.AtLeast<{
   CreatedAt?: Prisma.DateTimeFilter<"KhoaHoc"> | Date | string
   UpdatedAt?: Prisma.DateTimeFilter<"KhoaHoc"> | Date | string
   lophoc?: Prisma.LopHocListRelationFilter
+  decuong?: Prisma.DeCuongListRelationFilter
 }, "ID" | "MaKhoaHoc">
 
 export type KhoaHocOrderByWithAggregationInput = {
@@ -360,6 +363,7 @@ export type KhoaHocCreateInput = {
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   lophoc?: Prisma.LopHocCreateNestedManyWithoutKhoahocInput
+  decuong?: Prisma.DeCuongCreateNestedManyWithoutKhoahocInput
 }
 
 export type KhoaHocUncheckedCreateInput = {
@@ -375,6 +379,7 @@ export type KhoaHocUncheckedCreateInput = {
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   lophoc?: Prisma.LopHocUncheckedCreateNestedManyWithoutKhoahocInput
+  decuong?: Prisma.DeCuongUncheckedCreateNestedManyWithoutKhoahocInput
 }
 
 export type KhoaHocUpdateInput = {
@@ -389,6 +394,7 @@ export type KhoaHocUpdateInput = {
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lophoc?: Prisma.LopHocUpdateManyWithoutKhoahocNestedInput
+  decuong?: Prisma.DeCuongUpdateManyWithoutKhoahocNestedInput
 }
 
 export type KhoaHocUncheckedUpdateInput = {
@@ -404,6 +410,7 @@ export type KhoaHocUncheckedUpdateInput = {
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lophoc?: Prisma.LopHocUncheckedUpdateManyWithoutKhoahocNestedInput
+  decuong?: Prisma.DeCuongUncheckedUpdateManyWithoutKhoahocNestedInput
 }
 
 export type KhoaHocCreateManyInput = {
@@ -520,6 +527,20 @@ export type EnumTrangThaiKHFieldUpdateOperationsInput = {
   set?: $Enums.TrangThaiKH
 }
 
+export type KhoaHocCreateNestedOneWithoutDecuongInput = {
+  create?: Prisma.XOR<Prisma.KhoaHocCreateWithoutDecuongInput, Prisma.KhoaHocUncheckedCreateWithoutDecuongInput>
+  connectOrCreate?: Prisma.KhoaHocCreateOrConnectWithoutDecuongInput
+  connect?: Prisma.KhoaHocWhereUniqueInput
+}
+
+export type KhoaHocUpdateOneRequiredWithoutDecuongNestedInput = {
+  create?: Prisma.XOR<Prisma.KhoaHocCreateWithoutDecuongInput, Prisma.KhoaHocUncheckedCreateWithoutDecuongInput>
+  connectOrCreate?: Prisma.KhoaHocCreateOrConnectWithoutDecuongInput
+  upsert?: Prisma.KhoaHocUpsertWithoutDecuongInput
+  connect?: Prisma.KhoaHocWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.KhoaHocUpdateToOneWithWhereWithoutDecuongInput, Prisma.KhoaHocUpdateWithoutDecuongInput>, Prisma.KhoaHocUncheckedUpdateWithoutDecuongInput>
+}
+
 export type KhoaHocCreateNestedOneWithoutLophocInput = {
   create?: Prisma.XOR<Prisma.KhoaHocCreateWithoutLophocInput, Prisma.KhoaHocUncheckedCreateWithoutLophocInput>
   connectOrCreate?: Prisma.KhoaHocCreateOrConnectWithoutLophocInput
@@ -534,6 +555,80 @@ export type KhoaHocUpdateOneRequiredWithoutLophocNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.KhoaHocUpdateToOneWithWhereWithoutLophocInput, Prisma.KhoaHocUpdateWithoutLophocInput>, Prisma.KhoaHocUncheckedUpdateWithoutLophocInput>
 }
 
+export type KhoaHocCreateWithoutDecuongInput = {
+  MaKhoaHoc: string
+  TenKhoaHoc: string
+  TrinhDo: string
+  ThoiGian: number
+  TongSoBuoi: number
+  HocPhi: runtime.Decimal | runtime.DecimalJsLike | number | string
+  TrangThai?: $Enums.TrangThaiKH
+  MoTa?: string | null
+  CreatedAt?: Date | string
+  UpdatedAt?: Date | string
+  lophoc?: Prisma.LopHocCreateNestedManyWithoutKhoahocInput
+}
+
+export type KhoaHocUncheckedCreateWithoutDecuongInput = {
+  ID?: number
+  MaKhoaHoc: string
+  TenKhoaHoc: string
+  TrinhDo: string
+  ThoiGian: number
+  TongSoBuoi: number
+  HocPhi: runtime.Decimal | runtime.DecimalJsLike | number | string
+  TrangThai?: $Enums.TrangThaiKH
+  MoTa?: string | null
+  CreatedAt?: Date | string
+  UpdatedAt?: Date | string
+  lophoc?: Prisma.LopHocUncheckedCreateNestedManyWithoutKhoahocInput
+}
+
+export type KhoaHocCreateOrConnectWithoutDecuongInput = {
+  where: Prisma.KhoaHocWhereUniqueInput
+  create: Prisma.XOR<Prisma.KhoaHocCreateWithoutDecuongInput, Prisma.KhoaHocUncheckedCreateWithoutDecuongInput>
+}
+
+export type KhoaHocUpsertWithoutDecuongInput = {
+  update: Prisma.XOR<Prisma.KhoaHocUpdateWithoutDecuongInput, Prisma.KhoaHocUncheckedUpdateWithoutDecuongInput>
+  create: Prisma.XOR<Prisma.KhoaHocCreateWithoutDecuongInput, Prisma.KhoaHocUncheckedCreateWithoutDecuongInput>
+  where?: Prisma.KhoaHocWhereInput
+}
+
+export type KhoaHocUpdateToOneWithWhereWithoutDecuongInput = {
+  where?: Prisma.KhoaHocWhereInput
+  data: Prisma.XOR<Prisma.KhoaHocUpdateWithoutDecuongInput, Prisma.KhoaHocUncheckedUpdateWithoutDecuongInput>
+}
+
+export type KhoaHocUpdateWithoutDecuongInput = {
+  MaKhoaHoc?: Prisma.StringFieldUpdateOperationsInput | string
+  TenKhoaHoc?: Prisma.StringFieldUpdateOperationsInput | string
+  TrinhDo?: Prisma.StringFieldUpdateOperationsInput | string
+  ThoiGian?: Prisma.IntFieldUpdateOperationsInput | number
+  TongSoBuoi?: Prisma.IntFieldUpdateOperationsInput | number
+  HocPhi?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  TrangThai?: Prisma.EnumTrangThaiKHFieldUpdateOperationsInput | $Enums.TrangThaiKH
+  MoTa?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lophoc?: Prisma.LopHocUpdateManyWithoutKhoahocNestedInput
+}
+
+export type KhoaHocUncheckedUpdateWithoutDecuongInput = {
+  ID?: Prisma.IntFieldUpdateOperationsInput | number
+  MaKhoaHoc?: Prisma.StringFieldUpdateOperationsInput | string
+  TenKhoaHoc?: Prisma.StringFieldUpdateOperationsInput | string
+  TrinhDo?: Prisma.StringFieldUpdateOperationsInput | string
+  ThoiGian?: Prisma.IntFieldUpdateOperationsInput | number
+  TongSoBuoi?: Prisma.IntFieldUpdateOperationsInput | number
+  HocPhi?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  TrangThai?: Prisma.EnumTrangThaiKHFieldUpdateOperationsInput | $Enums.TrangThaiKH
+  MoTa?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lophoc?: Prisma.LopHocUncheckedUpdateManyWithoutKhoahocNestedInput
+}
+
 export type KhoaHocCreateWithoutLophocInput = {
   MaKhoaHoc: string
   TenKhoaHoc: string
@@ -545,6 +640,7 @@ export type KhoaHocCreateWithoutLophocInput = {
   MoTa?: string | null
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
+  decuong?: Prisma.DeCuongCreateNestedManyWithoutKhoahocInput
 }
 
 export type KhoaHocUncheckedCreateWithoutLophocInput = {
@@ -559,6 +655,7 @@ export type KhoaHocUncheckedCreateWithoutLophocInput = {
   MoTa?: string | null
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
+  decuong?: Prisma.DeCuongUncheckedCreateNestedManyWithoutKhoahocInput
 }
 
 export type KhoaHocCreateOrConnectWithoutLophocInput = {
@@ -588,6 +685,7 @@ export type KhoaHocUpdateWithoutLophocInput = {
   MoTa?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  decuong?: Prisma.DeCuongUpdateManyWithoutKhoahocNestedInput
 }
 
 export type KhoaHocUncheckedUpdateWithoutLophocInput = {
@@ -602,6 +700,7 @@ export type KhoaHocUncheckedUpdateWithoutLophocInput = {
   MoTa?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  decuong?: Prisma.DeCuongUncheckedUpdateManyWithoutKhoahocNestedInput
 }
 
 
@@ -611,10 +710,12 @@ export type KhoaHocUncheckedUpdateWithoutLophocInput = {
 
 export type KhoaHocCountOutputType = {
   lophoc: number
+  decuong: number
 }
 
 export type KhoaHocCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   lophoc?: boolean | KhoaHocCountOutputTypeCountLophocArgs
+  decuong?: boolean | KhoaHocCountOutputTypeCountDecuongArgs
 }
 
 /**
@@ -634,6 +735,13 @@ export type KhoaHocCountOutputTypeCountLophocArgs<ExtArgs extends runtime.Types.
   where?: Prisma.LopHocWhereInput
 }
 
+/**
+ * KhoaHocCountOutputType without action
+ */
+export type KhoaHocCountOutputTypeCountDecuongArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DeCuongWhereInput
+}
+
 
 export type KhoaHocSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   ID?: boolean
@@ -648,6 +756,7 @@ export type KhoaHocSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   CreatedAt?: boolean
   UpdatedAt?: boolean
   lophoc?: boolean | Prisma.KhoaHoc$lophocArgs<ExtArgs>
+  decuong?: boolean | Prisma.KhoaHoc$decuongArgs<ExtArgs>
   _count?: boolean | Prisma.KhoaHocCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["khoaHoc"]>
 
@@ -696,6 +805,7 @@ export type KhoaHocSelectScalar = {
 export type KhoaHocOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"ID" | "MaKhoaHoc" | "TenKhoaHoc" | "TrinhDo" | "ThoiGian" | "TongSoBuoi" | "HocPhi" | "TrangThai" | "MoTa" | "CreatedAt" | "UpdatedAt", ExtArgs["result"]["khoaHoc"]>
 export type KhoaHocInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   lophoc?: boolean | Prisma.KhoaHoc$lophocArgs<ExtArgs>
+  decuong?: boolean | Prisma.KhoaHoc$decuongArgs<ExtArgs>
   _count?: boolean | Prisma.KhoaHocCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type KhoaHocIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -705,6 +815,7 @@ export type $KhoaHocPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   name: "KhoaHoc"
   objects: {
     lophoc: Prisma.$LopHocPayload<ExtArgs>[]
+    decuong: Prisma.$DeCuongPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     ID: number
@@ -1113,6 +1224,7 @@ readonly fields: KhoaHocFieldRefs;
 export interface Prisma__KhoaHocClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   lophoc<T extends Prisma.KhoaHoc$lophocArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.KhoaHoc$lophocArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LopHocPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  decuong<T extends Prisma.KhoaHoc$decuongArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.KhoaHoc$decuongArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeCuongPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1567,6 +1679,30 @@ export type KhoaHoc$lophocArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.LopHocScalarFieldEnum | Prisma.LopHocScalarFieldEnum[]
+}
+
+/**
+ * KhoaHoc.decuong
+ */
+export type KhoaHoc$decuongArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DeCuong
+   */
+  select?: Prisma.DeCuongSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DeCuong
+   */
+  omit?: Prisma.DeCuongOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DeCuongInclude<ExtArgs> | null
+  where?: Prisma.DeCuongWhereInput
+  orderBy?: Prisma.DeCuongOrderByWithRelationInput | Prisma.DeCuongOrderByWithRelationInput[]
+  cursor?: Prisma.DeCuongWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DeCuongScalarFieldEnum | Prisma.DeCuongScalarFieldEnum[]
 }
 
 /**

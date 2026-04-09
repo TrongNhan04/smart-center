@@ -7,7 +7,13 @@ export interface CourseDto {
   duration: number,
   courseFee: number,
   totalSession: number,
+  syllabus?: Syllabus[]
   description?: string | null
+}
+
+export interface Syllabus {
+  ThuTu: number,
+  NoiDung: string
 }
 
 // cho table hiển thị

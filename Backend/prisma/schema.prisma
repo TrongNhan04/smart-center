@@ -118,9 +118,22 @@ model KhoaHoc {
 
   //Quan hệ
   lophoc LopHoc[] //khóa học có nhiều lớp học
+  decuong DeCuong[] // lớp học có nhiều đề cương
 }
 
-// ============ 5. LOPHOC ============//
+// ============ 5. DECUONG ============//
+model DeCuong {
+  ID        Int @id @default(autoincrement())
+  KhoaHocID Int
+
+  ThuTu Int
+  ChuDe String
+
+  // quan hệ
+  khoahoc KhoaHoc @relation(fields: [KhoaHocID], references: [ID])
+}
+
+// ============ 6. LOPHOC ============//
 enum TrangThaiLH {
   OPEN
   RUNNING
@@ -154,7 +167,7 @@ model LopHoc {
   ghidanh  GhiDanh[] // lớp học có nhiều học viên ghi danh
 }
 
-// ============ 6. BUOIHOC ============//
+// ============ 7. BUOIHOC ============//
 enum TrangThaiBH {
   SCHEDULED
   COMPLETED
@@ -185,7 +198,7 @@ model BuoiHoc {
   @@unique([LopHocID, BatDauLuc]) //một lớp học không có hai buổi học cùng ngày + giờ bắt đầu
 }
 
-// ============ 7. KETQUA_BUOIHOC ============//
+// ============ 8. KETQUA_BUOIHOC ============//
 enum TrangThai_KQBH {
   DRAFT
   SUBMITTED
@@ -211,7 +224,7 @@ model KetQua_BuoiHoc {
   tep_dinhkem    TepDinhKem_BuoiHoc[] // 1 buổi học có thế có nhiều tệp đính kèm
 }
 
-// ============ 8. TEPDINHKEM ============//
+// ============ 9. TEPDINHKEM ============//
 
 model TepDinhKem_BuoiHoc {
   ID          Int @id @default(autoincrement())
@@ -227,7 +240,7 @@ model TepDinhKem_BuoiHoc {
   ketqua_buoihoc KetQua_BuoiHoc @relation(fields: [KQBuoiHocID], references: [ID])
 }
 
-// ============ 9. KETQUA_CHITIET ============//
+// ============ 10. KETQUA_CHITIET ============//
 model KetQua_ChiTiet {
   ID           Int      @id @default(autoincrement())
   KetQuaID     Int
@@ -245,7 +258,7 @@ model KetQua_ChiTiet {
   @@unique([KetQuaID, GhiDanhID]) //một kết quả buổi học chỉ có một chi tiết cho mỗi ghi danh 
 }
 
-// ============ 10. GHIDANH ============//
+// ============ 11. GHIDANH ============//
 enum TrangThai_GD {
   ACTIVE
   INACTIVE
@@ -268,7 +281,7 @@ model GhiDanh {
   hoadon         HoaDon? //1 ghi danh có 1 hóa đơn
 }
 
-// ============ 11. HOADON  ============//
+// ============ 12. HOADON  ============//
 enum TrangThai_HD {
   ACTIVE
   CANCELLED
@@ -295,7 +308,7 @@ model HoaDon {
   giaodich GiaoDich[] //hóa đơn có nhiều giao dich
 }
 
-// ============ 12. GIAODICH  ============//
+// ============ 13. GIAODICH  ============//
 model GiaoDich {
   ID       Int  @id @default(autoincrement())
   UserID   Int
@@ -316,7 +329,7 @@ model GiaoDich {
   user   User    @relation(fields: [UserID], references: [ID])
 }
 
-// ============ 13. THONGBAO  ============//
+// ============ 14. THONGBAO  ============//
 model ThongBao {
   ID Int @id @default(autoincrement())
 
@@ -332,23 +345,3 @@ model ThongBao {
   //quan hệ
   User User @relation(fields: [UserID], references: [ID])
 }
-
-// ============ 13. PHIEU THU - CHI  ============//
-// model PhieuChi {
-//   ID       Int  @id @default(autoincrement())
-//   HoaDonID Int? @unique
-
-//   MaPhieuChi String   @unique
-//   SoTien     Decimal  @db.Decimal(10, 2)
-//   LyDo       String
-//   UserID     Int
-//   NgayChi    DateTime @db.Timestamptz(3)
-//   PhuongThuc String?
-
-//   CreatedAt DateTime @default(now()) @db.Timestamptz(3)
-//   UpdatedAt DateTime @updatedAt()
-
-//   //quan hệ
-//   hoadon HoaDon? @relation(fields: [HoaDonID], references: [ID])
-//   user   User    @relation(fields: [UserID], references: [ID])
-// }

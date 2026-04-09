@@ -38,6 +38,11 @@ export type HocVien = Prisma.HocVienModel
  */
 export type KhoaHoc = Prisma.KhoaHocModel
 /**
+ * Model DeCuong
+ * 
+ */
+export type DeCuong = Prisma.DeCuongModel
+/**
  * Model LopHoc
  * 
  */

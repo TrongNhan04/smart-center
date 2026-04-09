@@ -1,15 +1,12 @@
-import { Redirect } from 'expo-router'
 import React from 'react'
-import useAuthStore from './authStore'
+import { ActivityIndicator, View } from 'react-native'
 
 const Index = () => {
-  const token = useAuthStore(state => state.access_token)
-  
-  if(token) // có token thì vào
-    return <Redirect href={`/(tabs)`}/>
-
-  // không có token thì login
-  return <Redirect href={`/login`}/>
+  return (
+    <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
+      <ActivityIndicator size="large" color="#3498db" />
+    </View>
+  )
 }
 
 export default Index

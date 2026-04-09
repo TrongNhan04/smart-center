@@ -38,7 +38,7 @@ export default function Index() {
   const nextSession = stuData?.BuoiHocKe
   const lastestResult = stuData?.KetQuaGanNhat
   const debtInvoice = stuData?.HoaDon
-  
+
   const handleRefresh = async () => {
     setRefresh(true)
     await fetchData()
@@ -57,11 +57,7 @@ export default function Index() {
           <RefreshControl refreshing={refresh}
             onRefresh={handleRefresh} />
         }>
-
-        <Text variant="headlineSmall" style={styles.headerTitle}>
-          Trang chủ
-        </Text>
-
+          
         {/* Chọn học viên */}
         <ScrollView
           horizontal
@@ -180,7 +176,7 @@ export default function Index() {
                   </View>
 
                   <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 6, marginTop: 8 }}>
-                    <Icon source="comment-text-outline" size={18}  />
+                    <Icon source="comment-text-outline" size={18} />
                     <Text variant="bodyMedium" style={{ flex: 1, color: '#34495e' }}>
                       Nhận xét của giáo viên: {item.NhanXetCon || 'Chưa có nhận xét.'}
                     </Text>
@@ -245,7 +241,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold', color: '#2c3e50'
   },
   studentSelector: {
-    paddingLeft: 16, marginVertical: 15,
+    paddingLeft: 16, 
+    marginVertical: 15,
     flexDirection: 'row'
   },
   chip: {

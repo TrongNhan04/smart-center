@@ -388,6 +388,7 @@ export const ModelName = {
   GiaoVien: 'GiaoVien',
   HocVien: 'HocVien',
   KhoaHoc: 'KhoaHoc',
+  DeCuong: 'DeCuong',
   LopHoc: 'LopHoc',
   BuoiHoc: 'BuoiHoc',
   KetQua_BuoiHoc: 'KetQua_BuoiHoc',
@@ -412,7 +413,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "giaoVien" | "hocVien" | "khoaHoc" | "lopHoc" | "buoiHoc" | "ketQua_BuoiHoc" | "tepDinhKem_BuoiHoc" | "ketQua_ChiTiet" | "ghiDanh" | "hoaDon" | "giaoDich" | "thongBao"
+    modelProps: "user" | "giaoVien" | "hocVien" | "khoaHoc" | "deCuong" | "lopHoc" | "buoiHoc" | "ketQua_BuoiHoc" | "tepDinhKem_BuoiHoc" | "ketQua_ChiTiet" | "ghiDanh" | "hoaDon" | "giaoDich" | "thongBao"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -709,6 +710,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.KhoaHocCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.KhoaHocCountAggregateOutputType> | number
+        }
+      }
+    }
+    DeCuong: {
+      payload: Prisma.$DeCuongPayload<ExtArgs>
+      fields: Prisma.DeCuongFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DeCuongFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeCuongPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DeCuongFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeCuongPayload>
+        }
+        findFirst: {
+          args: Prisma.DeCuongFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeCuongPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DeCuongFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeCuongPayload>
+        }
+        findMany: {
+          args: Prisma.DeCuongFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeCuongPayload>[]
+        }
+        create: {
+          args: Prisma.DeCuongCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeCuongPayload>
+        }
+        createMany: {
+          args: Prisma.DeCuongCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DeCuongCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeCuongPayload>[]
+        }
+        delete: {
+          args: Prisma.DeCuongDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeCuongPayload>
+        }
+        update: {
+          args: Prisma.DeCuongUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeCuongPayload>
+        }
+        deleteMany: {
+          args: Prisma.DeCuongDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DeCuongUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DeCuongUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeCuongPayload>[]
+        }
+        upsert: {
+          args: Prisma.DeCuongUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeCuongPayload>
+        }
+        aggregate: {
+          args: Prisma.DeCuongAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDeCuong>
+        }
+        groupBy: {
+          args: Prisma.DeCuongGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DeCuongGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DeCuongCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DeCuongCountAggregateOutputType> | number
         }
       }
     }
@@ -1481,6 +1556,16 @@ export const KhoaHocScalarFieldEnum = {
 export type KhoaHocScalarFieldEnum = (typeof KhoaHocScalarFieldEnum)[keyof typeof KhoaHocScalarFieldEnum]
 
 
+export const DeCuongScalarFieldEnum = {
+  ID: 'ID',
+  KhoaHocID: 'KhoaHocID',
+  ThuTu: 'ThuTu',
+  ChuDe: 'ChuDe'
+} as const
+
+export type DeCuongScalarFieldEnum = (typeof DeCuongScalarFieldEnum)[keyof typeof DeCuongScalarFieldEnum]
+
+
 export const LopHocScalarFieldEnum = {
   ID: 'ID',
   MaLopHoc: 'MaLopHoc',
@@ -1989,6 +2074,7 @@ export type GlobalOmitConfig = {
   giaoVien?: Prisma.GiaoVienOmit
   hocVien?: Prisma.HocVienOmit
   khoaHoc?: Prisma.KhoaHocOmit
+  deCuong?: Prisma.DeCuongOmit
   lopHoc?: Prisma.LopHocOmit
   buoiHoc?: Prisma.BuoiHocOmit
   ketQua_BuoiHoc?: Prisma.KetQua_BuoiHocOmit
