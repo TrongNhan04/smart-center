@@ -57,7 +57,7 @@ export default function Index() {
           <RefreshControl refreshing={refresh}
             onRefresh={handleRefresh} />
         }>
-          
+
         {/* Chọn học viên */}
         <ScrollView
           horizontal
@@ -116,7 +116,10 @@ export default function Index() {
                 </Text>
 
                 {/* Hàng chứa Giờ và Ngày */}
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 8 }}>
+                <View style={{
+                  flexDirection: 'row', alignItems: 'center',
+                  gap: 16, marginBottom: 8
+                }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                     <Icon source="clock-outline" size={18} />
                     <Text variant="bodyMedium">{nextSession.GioHoc}</Text>
@@ -241,7 +244,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold', color: '#2c3e50'
   },
   studentSelector: {
-    paddingLeft: 16, 
+    paddingLeft: 16,
     marginVertical: 15,
     flexDirection: 'row'
   },

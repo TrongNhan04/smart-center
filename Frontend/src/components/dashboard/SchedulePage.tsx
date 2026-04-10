@@ -39,22 +39,23 @@ const SchedulePage = () => {
   const currentMonthRef = useRef<Dayjs | null>(null)
   const navigate = useNavigate()
 
-  const fetchSession = async () => {
-    try {
-      const isSameMonth = currentMonthRef.current?.isSame(selectedDate, 'month')
-      // nếu chọn ngày có tháng khác tháng trước đó thì mới call api
-      if (isSameMonth) return
-      const res = await dashboardApi.getSessionsOfMonth(
-        selectedDate.month(),
-        selectedDate.year()
-      )
-      setScheduleData(res.data)
-    } catch (error) {
-      CatchError.HandleError(error)
-    }
-  }
-
   useEffect(() => {
+
+    const fetchSession = async () => {
+      try {
+        const isSameMonth = currentMonthRef.current?.isSame(selectedDate, 'month')
+        // nếu chọn ngày có tháng khác tháng trước đó thì mới call api
+        if (isSameMonth) return
+        const res = await dashboardApi.getSessionsOfMonth(
+          selectedDate.month(),
+          selectedDate.year()
+        )
+        setScheduleData(res.data)
+      } catch (error) {
+        CatchError.HandleError(error)
+      }
+    }
+
     fetchSession()
     // currentMonthRef = ngày trước đó của selectedDate trước khi rerender
     currentMonthRef.current = selectedDate
@@ -136,7 +137,7 @@ const SchedulePage = () => {
                       borderRadius: 8,
                       border: '1px solid #f0f0f0',
                       borderLeft: `5px solid #1890ff`,
-                      cursor:'pointer'
+                      cursor: 'pointer'
                     }}
                   >
                     <div style={{ width: '100%' }}>
@@ -168,3 +169,36 @@ const SchedulePage = () => {
 }
 
 export default SchedulePage
+
+
+// useEffect(() => {
+//   let ignore = false; // Biến cờ để chống Race Condition
+
+//   const fetchSession = async () => {
+//     try {
+//       const isSameMonth = currentMonthRef.current?.isSame(selectedDate, 'month');
+      
+//       // Nếu cùng tháng thì thôi, và cập nhật Ref ngay để lần sau ko lọt vào đây
+//       if (isSameMonth) return;
+
+//       const res = await dashboardApi.getSessionsOfMonth(
+//         selectedDate.month(),
+//         selectedDate.year()
+//       );
+
+//       // Chỉ set data nếu đây là yêu cầu mới nhất
+//       if (!ignore) {
+//         setScheduleData(res.data);
+//         currentMonthRef.current = selectedDate; // Chỉ cập nhật Ref khi fetch xong/thay đổi tháng
+//       }
+//     } catch (error) {
+//       if (!ignore) CatchError.HandleError(error);
+//     }
+//   };
+
+//   fetchSession();
+
+//   return () => {
+//     ignore = true; // Khi selectedDate thay đổi lần nữa, yêu cầu cũ sẽ bị bỏ qua
+//   };
+// }, [selectedDate]);

@@ -85,6 +85,7 @@ export class CourseUpdateDTO {
     description?: string
 
     @IsOptional()
-    @IsEnum(TrangThaiKH)
-    status?: TrangThaiKH
+    @ValidateNested({ each: true })
+    @Type(() => DeCuong) // 
+    syllabus?: DeCuong[]
 }

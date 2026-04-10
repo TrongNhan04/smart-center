@@ -17,7 +17,7 @@ export const getChangedValue = <T extends Record<string, any>>
         const k = key as keyof T
         if (!isEqual(originData[key], newData[key]))
         {
-            console.log('key:', originData[key])
+            console.log('key:', key)
             changes[k] = newData[key]
         }
     })

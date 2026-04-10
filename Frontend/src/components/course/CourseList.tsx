@@ -75,13 +75,7 @@ const CourseList = () => {
       message.success('Khôi phục thành công')
       handleSaveModal(course.ID)
     } catch (error: any) {
-      notification.error({
-        title: 'Có lỗi xảy ra',
-        description: error.response.data.message,
-        showProgress: true,
-        pauseOnHover: true
-      })
-      console.log("Có lỗi xảy ra", error.response.data.message)
+      CatchError.HandleError(error)
     }
   }
 
@@ -91,13 +85,7 @@ const CourseList = () => {
       message.success('Thao tác thành công')
       handleSaveModal(id)
     } catch (error: any) {
-      notification.error({
-        title: 'Có lỗi xảy ra',
-        description: error.response.data.message,
-        showProgress: true,
-        pauseOnHover: true
-      })
-      console.log("Có lỗi xảy ra: ", error.response.data.message)
+      CatchError.HandleError(error)
     }
   }
 

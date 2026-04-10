@@ -7,13 +7,13 @@ export interface CourseDto {
   duration: number,
   courseFee: number,
   totalSession: number,
-  syllabus?: Syllabus[]
+  syllabus?: string
   description?: string | null
 }
 
 export interface Syllabus {
   ThuTu: number,
-  NoiDung: string
+  ChuDe: string
 }
 
 // cho table hiển thị
@@ -26,6 +26,7 @@ export interface CourseDB {
   ThoiGian: number,
   TongSoBuoi: number,
   TrangThai: string,
+  decuong: Syllabus[] // include với course nên chữ thường
   MoTa?: string,
 }
 
@@ -34,6 +35,10 @@ export type CourseForCmb = Pick<CourseDB,
 
 // từ table tiếng việt thành form tiếng anh
 export const mapDataCourse = (record: CourseDB): CourseDto => {
+  let deCuongDB = ''
+  if (record.decuong.length)
+    deCuongDB = record.decuong.map
+      (item => item.ThuTu + ' ' + item.ChuDe).join('\n')
   return {
     // id: record.ID, không cần id vì form ko có id
     code: record.MaKhoaHoc,
@@ -42,6 +47,7 @@ export const mapDataCourse = (record: CourseDB): CourseDto => {
     courseFee: Number(record.HocPhi),
     duration: record.ThoiGian,
     totalSession: record.TongSoBuoi,
-    description: record.MoTa
+    description: record.MoTa,
+    syllabus: deCuongDB
   }
 }

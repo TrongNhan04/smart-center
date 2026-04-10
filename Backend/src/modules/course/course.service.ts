@@ -36,11 +36,11 @@ export class CourseService {
                     ThuTu: item.ThuTu,
                     ChuDe: item.ChuDe
                 })
-            ).splice(0,newCourse.TongSoBuoi)
+            ).splice(0, newCourse.TongSoBuoi)
             await tx.deCuong.createMany({
                 data: data
             })
-            return {ID: newCourse.ID}
+            return { ID: newCourse.ID }
         })
     }
 
@@ -59,12 +59,14 @@ export class CourseService {
             ]
         }
         // tìm theo bộ lọc ở trên
-        return await this.prismaSv.khoaHoc.findMany({
+        return  await this.prismaSv.khoaHoc.findMany({
             where,
-            omit: {
-                CreatedAt: true,
-                UpdatedAt: true
+            include: {
+                decuong: {
+                    select: { ThuTu: true, ChuDe: true }
+                }
             },
+            omit: { CreatedAt: true, UpdatedAt: true },
             orderBy: { ID: 'desc' }
         })
     }
@@ -73,11 +75,8 @@ export class CourseService {
         return await this.prismaSv.khoaHoc.findMany({
             where: { TrangThai: { not: 'INACTIVE' } },
             select: {
-                ID: true,
-                MaKhoaHoc: true,
-                TenKhoaHoc: true,
-                ThoiGian: true,
-                HocPhi: true
+                ID: true, MaKhoaHoc: true, TenKhoaHoc: true,
+                ThoiGian: true, HocPhi: true
             },
             orderBy: { MaKhoaHoc: 'asc' }
         })
@@ -85,27 +84,45 @@ export class CourseService {
 
     // lấy chi tiết 1 khóa học
     async GetCourseById(id: number) {
-        return await this.CourseIdValidator(id)
+        const courseDB = await this.CourseIdValidator(id)
+        const syllabusDB = await this.prismaSv.deCuong.findMany({
+            where: { KhoaHocID: courseDB.ID },
+            omit: { KhoaHocID: true }
+        })
+        // dùng decuong để khớp với hàm khác có include decuong
+        return { ...courseDB, decuong: syllabusDB }
     }
 
     // cập nhật khóa học theo trạng thái
     async UpdateCourseById(courseId: number, courseUpdate: CourseUpdateDTO) {
         const courseDB = await this.CourseIdValidator(courseId)
-        //tạo data cho update
-        const data: Prisma.KhoaHocUpdateInput = {}
 
-        if (courseDB.TrangThai !== 'INACTIVE') {
-            data.TenKhoaHoc = courseUpdate.name
-            data.TrinhDo = courseUpdate.level
-            data.TongSoBuoi = courseUpdate.totalSession
-            data.ThoiGian = courseUpdate.duration
-            data.HocPhi = courseUpdate.courseFee
-            data.MoTa = courseUpdate.description
+        if (courseDB.TrangThai === 'INACTIVE')
+            throw new ConflictException('Không thể cập nhật khóa học')
+
+        //tạo data cho update
+        const updateData: Prisma.KhoaHocUpdateInput = {
+            TenKhoaHoc: courseUpdate.name,
+            TrinhDo: courseUpdate.level,
+            TongSoBuoi: courseUpdate.totalSession,
+            ThoiGian: courseUpdate.duration,
+            HocPhi: courseUpdate.courseFee,
+            MoTa: courseUpdate.description,
+        }
+        if (courseUpdate.syllabus) {
+            updateData.decuong = {
+                deleteMany: {}, // xóa hết cái cũ
+                // tạo cái mới
+                create: courseUpdate.syllabus.map(item => ({
+                    ThuTu: item.ThuTu,
+                    ChuDe: item.ChuDe
+                }))
+            }
         }
 
         return await this.prismaSv.khoaHoc.update({
             where: { ID: courseId },
-            data,
+            data: updateData,
             select: { ID: true }
         })
     }
@@ -157,7 +174,8 @@ export class CourseService {
     //kiểm tra id khóa học
     private async CourseIdValidator(courseId: number) {
         const courseDB = await this.prismaSv.khoaHoc.findUnique({
-            where: { ID: courseId }
+            where: { ID: courseId },
+            omit: { CreatedAt: true, UpdatedAt: true }
         })
         if (!courseDB) throw new NotFoundException('Không tìm thấy khóa học')
         return courseDB

@@ -59,13 +59,14 @@ const AccountScreen = () => {
             {
               text: 'OK',
               onPress: () => {
-                hideModal(); // Đóng modal hiện tại
-                logout(); // Xóa data
-                router.replace('/(auth)/login'); // Chuyển trang
+                hideModal()// Đóng modal hiện tại
+                logout()// xóa token và user
+                router.replace('/(auth)/login')// đá về login
               }
             }
           ],
-          { cancelable: false } // KHÓA: Không cho người dùng bấm ra ngoài khoảng không để tắt thông báo
+          // không cho user bấm ra ngoài khoảng không để tắt thông báo
+          { cancelable: false } 
         );
       }
       hideModal()
@@ -95,7 +96,8 @@ const AccountScreen = () => {
       <View style={styles.header}>
 
         <Avatar.Text size={80} label={avatarLabel}
-          style={{ backgroundColor: '#3498db' }} />
+          style={{ backgroundColor: '#3498db' }}
+          labelStyle = {{color:'#f0f0f0'}} />
 
         <Text variant="headlineSmall" style={styles.nameText}>
           {user?.full_name || 'Người dùng ẩn danh'}
@@ -145,8 +147,6 @@ const AccountScreen = () => {
         </Button>
       </View>
 
-      {/* dùng portal thì phải có <PaperProvider> */}
-      {/* <Portal> */}
         <Modal
           contentContainerStyle={styles.modalContainer}
           visible={visible} onDismiss={hideModal} style={{ justifyContent: 'center' }}
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     paddingVertical: 30,
-    backgroundColor: '#f8f9fa', // Nền xám nhạt cho khu vực avatar nổi bật
+    backgroundColor: '#f8f9fa', 
   },
   nameText: {
     fontWeight: 'bold',

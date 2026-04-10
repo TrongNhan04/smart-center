@@ -1,7 +1,7 @@
-import { Modal, Form, Input, InputNumber, Select, Row, Col, message } from 'antd';
+import { Modal, Form, Input, InputNumber, Select, Row, Col, message, Alert } from 'antd';
 import { useEffect, useState } from 'react';
 import courseApi, { } from '../../api/courseApi';
-import { mapDataCourse, type CourseDB, type CourseDto } from './CourseDTO';
+import { mapDataCourse, type CourseDB } from './CourseDTO';
 import { getChangedValue } from '../common/utils';
 import { CatchError } from '../common/catch.error';
 
@@ -16,7 +16,6 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: Props) => {
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
   const isEdit = editingCourse ? true : false
-  // const [isopen, setIsOpen] = useState(false)
 
   const handleOK = async () => {
     setLoading(true)
@@ -24,15 +23,16 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: Props) => {
       // dữ liệu từ form (tiếng anh)
       const values = await form.validateFields()
       await new Promise(resolve => setTimeout(resolve, 1000))
-
-      const formatedSyllabus = values.syllabus
+      // xóa số 
+      const formatedSyllabus = () => values.syllabus
         .split('\n') // cắt mỗi ông theo dòng
-        .filter((line: string) => line.trim() !== '') // rỗng thì bỏ
+        .filter((line: string) => line.trim() !== '') // ông nào rỗng thì bỏ
         .map((line: string, index: number) => ({
           ThuTu: index + 1,
-          ChuDe: line
+          // xóa số đầu chuỗi và space
+          ChuDe: line.replace(/^\d+/, '').trim()
         }))
-      const newValues = { ...values, syllabus: formatedSyllabus }
+      const newValues = { ...values, syllabus: formatedSyllabus() }
 
       let payload
       if (isEdit) {
@@ -42,7 +42,9 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: Props) => {
           message.info('Không có thông tin nào thay đổi!')
           return
         }
-        payload = await courseApi.update(editingCourse.ID, updateData)
+        console.log({ syllabus: formatedSyllabus() })
+        payload = await courseApi.update
+          (editingCourse.ID, { ...updateData, syllabus: formatedSyllabus() })
       }
       else payload = await courseApi.create(newValues)
 
@@ -65,7 +67,7 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: Props) => {
 
   useEffect(() => {
     if (!open) return
-
+    // console.log()
     if (editingCourse) {
       const formData = mapDataCourse(editingCourse)
       form.setFieldsValue(formData)
@@ -80,20 +82,12 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: Props) => {
       open={open}
       onCancel={handleCancel}
       onOk={handleOK}
-      width={800}
+      width={900}
       okText="Lưu lại"
       cancelText="Hủy bỏ"
       centered // canh giữa màn hình
       maskClosable={false}
       confirmLoading={loading}
-    // footer={(_: any, { OkBtn, CancelBtn }) => (
-    //   <>
-    //     <Button onClick={() => setIsOpen(true)}>Đề cương</Button>
-    //     <CancelBtn />
-    //     <OkBtn />
-    //   </>
-    // )
-    // }
     >
       <Form form={form} layout="vertical">
         {/* Mã khóa học (trái) - Tên khóa học (phải) */}
@@ -187,7 +181,7 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: Props) => {
             <Form.Item // mô tả
               label="Mô tả chi tiết" name="description">
               <Input.TextArea
-                rows={4}
+                rows={6}
                 placeholder="Chi tiết khóa học, lộ trình, yêu cầu đầu vào..."
                 showCount
                 maxLength={500}
@@ -196,8 +190,17 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: Props) => {
           </Col>
 
           <Col span={10}>
+            <Alert
+            title="Vui lòng liệt kê các chủ đề theo thứ tự từ 
+trên xuống dưới, mỗi chủ đề một dòng."
+              //title="Lưu ý về đề cương"
+              // description=
+              type="warning"
+              showIcon
+              style={{ marginBottom: 10 }}
+            />
             <Form.Item // đề cương
-              label="Đề cương" name="syllabus"
+              name="syllabus"
               rules={[{ required: true, message: 'Vui lòng nhập đề cương' }]}>
               <Input.TextArea
                 rows={16}
@@ -208,9 +211,50 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: Props) => {
           </Col>
         </Row>
       </Form>
-      {/* <Syllabus open={isopen} onCancel={() => setIsOpen(false)} /> */}
     </Modal>
   )
 }
 
 export default CourseModal
+
+
+// Chào hỏi và giới thiệu bản thân
+// Bảng chữ cái và phát âm cơ bản
+// Số đếm và ngày tháng
+// Đại từ nhân xưng và động từ “to be”
+// Gia đình và bạn bè
+// Nghề nghiệp và nơi làm việc
+// Thì hiện tại đơn (Present Simple)
+// Thói quen hằng ngày
+// Sở thích và giải trí
+// Mô tả người và ngoại hình
+// Địa điểm trong thành phố
+// Chỉ đường và hỏi đường
+// Thì hiện tại tiếp diễn (Present Continuous)
+// Hoạt động đang diễn ra
+// Thức ăn và đồ uống
+// Gọi món và giao tiếp nhà hàng
+// Thì quá khứ đơn (Past Simple)
+// Kể về trải nghiệm trong quá khứ
+// Du lịch và kỳ nghỉ
+// Đặt phòng khách sạn và vé máy bay
+// So sánh hơn và so sánh nhất
+// Mua sắm và giá cả
+// Sức khỏe và cơ thể
+// Đi khám bệnh và mô tả triệu chứng
+// Thì tương lai (will / going to)
+// Kế hoạch và dự định
+// Thời tiết và môi trường
+// Công nghệ và mạng xã hội
+// Giao tiếp qua điện thoại
+// Viết email cơ bản
+// Câu điều kiện loại 1
+// Giải quyết vấn đề và đưa ra lời khuyên
+// Câu bị động (Passive Voice)
+// Tin tức và truyền thông
+// Phỏng vấn xin việc
+// Kỹ năng thuyết trình cơ bản
+// Thành ngữ và cụm động từ (Phrasal verbs)
+// Ôn tập ngữ pháp tổng hợp
+// Luyện nghe và phản xạ giao tiếp
+// Kiểm tra và tổng kết khóa học

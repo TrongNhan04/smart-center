@@ -6,12 +6,14 @@ const TabLayout = () => {
   // anh mày quản lý màn hình mấy thằng tab
   return (
     <Tabs
-      screenOptions={{ tabBarActiveTintColor: '#2596be' }}
+      screenOptions={{
+        tabBarActiveTintColor: '#3498db',
+        headerShown:false
+      }}
     >
       <Tabs.Screen name='index'
         options={{
           title: 'Trang chủ',
-          headerShown: false,
           tabBarIcon: ({ focused, color }) => (
             <Ionicons name={focused ? 'home-sharp' : 'home-outline'}
               color={color} size={24}
@@ -22,7 +24,6 @@ const TabLayout = () => {
       <Tabs.Screen name='class'
         options={{
           title: 'Lớp học',
-          headerShown: false,
           tabBarIcon: ({ focused, color }) => (
             <Ionicons name={focused ? 'school-sharp' : 'school-outline'}
               color={color} size={24}
@@ -34,7 +35,6 @@ const TabLayout = () => {
       <Tabs.Screen name='notis'
         options={{
           title: 'Thông báo',
-          headerShown: false,
           tabBarIcon: ({ focused, color }) => (
             <Ionicons
               name={focused ? 'notifications-sharp' : 'notifications-outline'}
@@ -47,7 +47,6 @@ const TabLayout = () => {
       <Tabs.Screen name='account'
         options={{
           title: 'Tài khoản',
-          headerShown: false,
           tabBarIcon: ({ focused, color }) => (
             <Ionicons
               name={focused ? 'person-sharp' : 'person-outline'}

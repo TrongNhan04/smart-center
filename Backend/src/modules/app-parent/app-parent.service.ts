@@ -136,6 +136,7 @@ export class AppParentService {
       else store[classId].Vang++
       return store
     }, {}) // để [] thì có sẽ có nhiều phần tử null
+    
     // chuyển từ obj -> arr
     const lastResult = Object.values(reduceResult)
     return lastResult.map((item: any) => {

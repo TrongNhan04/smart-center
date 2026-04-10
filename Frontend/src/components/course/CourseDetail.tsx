@@ -29,7 +29,6 @@ const CourseDetail = () => {
   const [classId, setClassId] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
-
   const initData = async () => {
     try {
       setLoading(true)
@@ -247,9 +246,6 @@ const CourseDetail = () => {
           onSave={SaveClassModal}
           editingClass={null!}
         />
-
-        {/* </Col>
-        </Row> */}
       </div>
     </div>
   )
