@@ -18,8 +18,9 @@ const ClassAction = ({ lophoc, onEdit, onSoftDelete }: Props) => {
         {/* Nút sửa  */}
         <Tooltip title="Sửa & xem chi tiết">
           <Button
+          
             size="small"
-            type="primary"
+            type="link"
             icon={<EditOutlined />}
             onClick={() => onEdit(lophoc)}
           >

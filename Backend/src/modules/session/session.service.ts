@@ -99,47 +99,50 @@ export class SessionService {
   async AutoGenerateSession(classId: number) {
     const classDB = await this.prisma.lopHoc.findUnique({
       where: { ID: classId },
-      select: {// lịch học 0..6 theo getDay(), giờ học "18:03"
-        ID: true, TuNgay: true, DenNgay: true,
-        LichHoc: true, GioBatDau: true, PhongHoc: true,
-        GioKetThuc: true, TrangThai: true,
-        khoahoc: { select: { TongSoBuoi: true, ThoiGian: true } }
+      include: {
+        khoahoc: {
+          select: {
+            TongSoBuoi: true, ThoiGian: true,
+            decuong: { select: { ThuTu: true, ChuDe: true } }
+          }
+        }
       }
     })
     if (!classDB) throw new NotFoundException('Không tìm thấy lớp học');
+    if (classDB.TrangThai === 'CLOSED')
+      throw new ConflictException('Lớp đã đóng')
 
     const totalSessions = classDB.khoahoc.TongSoBuoi;
-    const durationMonths = classDB.khoahoc.ThoiGian;
-
-    // số buổi mỗi tháng
-    const perChunk = Math.ceil(totalSessions / durationMonths)
     // số buổi đã có trong danh sách buổi học của lớp
     const currentCount = await this.prisma.buoiHoc.count({
       where: { LopHocID: classId, TrangThai: { not: 'CANCELLED' } }
     })
 
-    if (currentCount >= totalSessions)
-      throw new ConflictException(`Đã đủ số buổi học của khóa (${totalSessions})`)
-    //số buổi cần sinh = MIN của số buổi mỗi tháng và số buổi còn lại
-    const need = Math.min(perChunk, totalSessions - currentCount)
+    if (currentCount >= totalSessions) throw new ConflictException(`Đã đủ số buổi học của khóa (${totalSessions})`)
+    //số buổi cần sinh tổng số buổi trừ số buổi hiện có
+    const need = totalSessions - currentCount
 
-    // xác định ngày của buổi cuối trong danh sách buổi học
-    const last = await this.prisma.buoiHoc.findFirst({
+    // xác định ngày của buổi cuối cùng trong danh sách buổi học
+    const lastDate = await this.prisma.buoiHoc.findFirst({
       where: { LopHocID: classId, TrangThai: { not: 'CANCELLED' } },
       orderBy: { BatDauLuc: 'desc' },
       select: { BatDauLuc: true }
     })
     // xác định ngày bắt đầu dò để buổi học đúng lịch học
-    let xday = last ? last.BatDauLuc : classDB.TuNgay //gán giá trị cho xday
-    if (last) xday.setDate(xday.getDate() + 1)//dò từ ngày tiếp theo buổi cuối
+    let xday = lastDate ? lastDate.BatDauLuc : classDB.TuNgay
+    if (lastDate) xday.setDate(xday.getDate() + 1)//dò từ ngày tiếp theo buổi cuối
 
     const endDate = classDB.DenNgay
     if (xday > endDate) throw new ConflictException('Không thể tạo thêm buổi học!')
 
     // Mảng danh sách buổi học để đưa cho createMany()
     const data: Prisma.BuoiHocCreateManyInput[] = []
-    let buoiSo = currentCount + 1
 
+    const newMapSyllabus = new Map // tạo 1 map đề cương
+      (classDB.khoahoc.decuong.map((item, index) => [index + 1, item]))
+    let thuTuDeCuong = currentCount + 1 // lấy thứ tự đề cương từ buổi hiện có + 1
+    // xday <= end endDate để xét trong ngày cuối
+    // data.length < need để khi length = need thì dừng
     while (xday <= endDate && data.length < need) {
       const dow = xday.getDay() // 0..6
       if (classDB.LichHoc.includes(dow)) {
@@ -154,23 +157,25 @@ export class SessionService {
             LopHocID: { not: classDB.ID }
           }
         })
-        // từ (1) -> phòng lớp khác khác null và phòng buổi học 
-        // giống lớp khác thì conflict
+        // từ (1) -> phòng lớp mình != null và lớp khác có buổi học 
+        // mà phòng học giống phòng lớp mình thì bỏ
         if (classDB.PhongHoc && conflict?.PhongHoc === classDB.PhongHoc)
           console.log(`bỏ ngày ${xday.toLocaleString()} vì trùng lịch học với buổi học ID: ${conflict.ID}`)
         else {
           data.push({
-            LopHocID: classId, BuoiSo: buoiSo++,
-            BatDauLuc: startAt, KetThucLuc: endAt, PhongHoc: classDB.PhongHoc
+            LopHocID: classId, PhongHoc: classDB.PhongHoc,
+            BuoiSo: newMapSyllabus.get(thuTuDeCuong)?.ThuTu || thuTuDeCuong,
+            ChuDe: newMapSyllabus.get(thuTuDeCuong)?.ChuDe,
+            BatDauLuc: startAt, KetThucLuc: endAt,
           })
         }
+        thuTuDeCuong++ // tăng bên trong if mới được
       }
       xday.setDate(xday.getDate() + 1);
     }
     if (data.length === 0) throw new BadRequestException
       ('Không có buổi học mới nào phù hợp với lịch học')
-
-    return await this.prisma.buoiHoc.createManyAndReturn({
+    return await this.prisma.buoiHoc.createMany({
       data, skipDuplicates: true
     })
   }
@@ -211,8 +216,8 @@ export class SessionService {
       })
       if (duplicate) throw new ConflictException
         (`Trùng lịch học với buổi số ${duplicate.BuoiSo} lớp ${duplicate.lophoc.TenLop}`)
-      // kiểm tra giáo viên lớp mình có trùng buổi học với LỚP KHÁC
-      await this.CheckTeacherFree(classId, body)
+      // // kiểm tra giáo viên lớp mình có trùng buổi học với LỚP KHÁC
+      // await this.CheckTeacherFree(classId, body)
       // BuoiSo = max + 1 
       const max = await tx.buoiHoc.findFirst({
         where: { LopHocID: classId },

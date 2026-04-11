@@ -123,7 +123,7 @@ const Notis = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }} edges={['top']}>
       {/* Header có thêm nút đánh dấu đã đọc hết */}
       <View style={{
         flexDirection: 'row', justifyContent: 'space-between',

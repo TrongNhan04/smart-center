@@ -7,38 +7,36 @@ import { Alert, FlatList, TouchableOpacity, View } from 'react-native';
 import { Avatar, Card, Divider, Icon, ProgressBar, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-
 const ClassScreen = () => {
   const [classOfStu, setClassOfStu] = useState<ClassOfStu[]>([])
-  const children = useAuthStore(state => state.user?.children)
+  const stuIdGlobal = useAuthStore(state=>state.selectedStuId)
   const router = useRouter()
 
   useEffect(() => {
 
     const fetchData = async () => {
       try {
-        if (!children?.length) return
-        const res = await mobileApi.getClassByStuId(2)
+        if (!stuIdGlobal) return
+        const res = await mobileApi.getClassByStuId(stuIdGlobal)
         setClassOfStu(res.data)
       } catch (error) {
         Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
         console.log('Có lỗi xảy ra: ', error)
       }
     }
-
     fetchData()
-  }, [])
+  }, [stuIdGlobal])
 
   const dow = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
 
   const renderClassItem = ({ item }: { item: ClassOfStu }) => {
     return (
-      <TouchableOpacity onPress={()=>router.push('/(tabs)/class/class-detail')}>
+      <TouchableOpacity
+        onPress={() => router.push('/(tabs)/class/class-detail')}>
         <Card mode="elevated"
           style={{
             marginBottom: 16, borderRadius: 12, backgroundColor: '#fff'
           }}
-        // ={}
         >
           <Card.Content style={{ gap: 12 }}>
 
@@ -138,11 +136,6 @@ const ClassScreen = () => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#f0f2f5' }}>
       <View style={{ paddingHorizontal: 16, paddingVertical: 20 }}>
-        {/* <Text
-          variant="headlineSmall"
-          style={{ fontWeight: 'bold', color: '#2c3e50' }}>
-          Lớp học của con
-        </Text> */}
       </View>
 
       <FlatList

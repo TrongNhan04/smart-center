@@ -26,8 +26,7 @@ const CourseAction = ({
             onConfirm={() => onRestore(course)}
           >
             <Button
-              type="primary"
-              ghost
+              type="link"
               icon={<UndoOutlined />}
               size="small"
             >
@@ -40,10 +39,10 @@ const CourseAction = ({
   return (
     <Space size="small">
       {/* Nút sửa  */}
-      <Tooltip title="Sửa & xem chi tiết">
+      <Tooltip title="Sửa thông tin">
         <Button
           size="small"
-          type="primary"
+          type="link"
           icon={<EditOutlined />}
           onClick={()=>onEdit(course)}
         >
@@ -60,7 +59,7 @@ const CourseAction = ({
           onConfirm={() => onSoftDelete(course.ID)}
           okButtonProps={{ danger: true }}
         >
-          <Button size="small" icon={<DeleteOutlined />} type="primary" danger></Button>
+          <Button size="small" icon={<DeleteOutlined />} type="link" danger></Button>
         </Popconfirm>
       </Tooltip>
     </Space>

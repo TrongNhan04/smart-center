@@ -11,6 +11,7 @@ interface User {
 	must_change_pw: boolean
 	classes: number[]
 	children: number[]
+
 }
 
 interface AuthState {
@@ -20,6 +21,8 @@ interface AuthState {
 	login: (user: User, token: string) => void,
 	update: (user: User) => void,
 	logout: () => void
+	selectedStuId: number | null
+	setSelectedStuId: (id: number) => void
 }
 
 const useAuthStore = create<AuthState>()(
@@ -27,6 +30,7 @@ const useAuthStore = create<AuthState>()(
 		(set) => ({
 			user: null,
 			access_token: null,
+			selectedStuId: null,
 
 			login: (userData, token) => set({
 				user: userData,
@@ -40,7 +44,11 @@ const useAuthStore = create<AuthState>()(
 			logout: () => set({
 				user: null,
 				access_token: null
-			})
+			}),
+
+			setSelectedStuId: (id) => set({
+				selectedStuId: id
+			}),
 		}),
 		{
 			name: 'auth-storage',

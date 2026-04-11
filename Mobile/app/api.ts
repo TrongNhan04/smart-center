@@ -19,6 +19,9 @@ const mobileApi = {
 
     getClassByStuId: (id:number) => 
         axiosClient.get(`parents/students/${id}/classes`),
+
+    getDetailByStuAndSesId: (stuId: number, sessionId:number) =>
+        axiosClient.get(`parents/students/${stuId}/sessions/${sessionId}`)
 }
 
 export default mobileApi

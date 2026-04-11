@@ -34,97 +34,95 @@ const NavigateDrawer = ({ open, onCancel }: Props) => {
   }, [])
 
   return (
-    <>
-      <Drawer
-        title="Chi tiết buổi học"
-        size={500}
-        placement="right"
-        onClose={() => onCancel()}
-        open={open}
-      >
-        {/* <Card variant='borderless' style={{ borderRadius: 8 }}> */}
-        <Text strong style={{ display: 'block', marginBottom: 12 }}>
-          Chuyển nhanh đến buổi học khác:
-        </Text>
 
-        <div style={{
-          display: 'flex',
-          flexWrap: 'wrap', // giữ khoảng cách và xuống dòng
-          paddingBottom: 8,
-          gap: '8px', // khoảng cách giữa các nút
-          justifyContent: 'center'
-        }}>
-          {sessions.map(item => {
-            // Xác định màu sắc của nút
-            const isCurrent = item.ID === Number(sessionId)
-            const isDone = item.TrangThai === 'COMPLETED'
-            const isCancel = item.TrangThai === 'CANCELLED'
+    <Drawer
+      title="Chi tiết buổi học"
+      size={500}
+      placement="right"
+      onClose={() => onCancel()}
+      open={open}
+    >
+      {/* <Card variant='borderless' style={{ borderRadius: 8 }}> */}
+      <Text strong style={{ display: 'block', marginBottom: 12 }}>
+        Chuyển nhanh đến buổi học khác:
+      </Text>
 
-            let btnType: 'primary' | 'default' | 'dashed' = 'default'
-            let btnColor = ''
+      <div style={{
+        display: 'flex',
+        flexWrap: 'wrap', // giữ khoảng cách và xuống dòng
+        paddingBottom: 8,
+        gap: '8px', // khoảng cách giữa các nút
+        justifyContent: 'center'
+      }}>
+        {sessions.map(item => {
+          // Xác định màu sắc của nút
+          const isCurrent = item.ID === Number(sessionId)
+          const isDone = item.TrangThai === 'COMPLETED'
+          const isCancel = item.TrangThai === 'CANCELLED'
 
-            if (isCurrent) btnType = 'primary' // đang chọn thì màu xanh
-            else if (isDone) btnColor = '#52c41a' // đã chốt viền xanh lá
-            else if (isCancel) btnColor = '#ff4d4f'// đã hủy viền màu đỏ
+          let btnType: 'primary' | 'default' | 'dashed' = 'default'
+          let btnColor = ''
 
-            return (
-              <Button
-                key={item.ID}
-                shape="circle"
-                type={btnType}
-                style={{
-                  borderColor: btnColor, // màu viền
-                  color: btnColor, // màu số
-                  minWidth: 34
-                }}
+          if (isCurrent) btnType = 'primary' // đang chọn thì màu xanh
+          else if (isDone) btnColor = '#52c41a' // đã chốt viền xanh lá
+          else if (isCancel) btnColor = '#ff4d4f'// đã hủy viền màu đỏ
 
-                onClick={() => {
-                  navigate(`/${role}/classes/${classId}/sessions/${item.ID}`);
-                  onCancel()
-                }}
-              >
-                {item.BuoiSo}
-              </Button>
-            )
-          })}
-        </div>
+          return (
+            <Button
+              key={item.ID}
+              shape="circle"
+              type={btnType}
+              style={{
+                borderColor: btnColor, // màu viền
+                color: btnColor, // màu số
+                minWidth: 34
+              }}
 
-        {/* chú thích  */}
-        <div style={{ marginTop: 12, fontSize: 15, color: '#8c8c8c' }}>
-          <Space orientation='vertical' size={0}>
-            <Space>
-              <div style={{
-                width: 10, height: 10,
-                backgroundColor: '#1890ff', borderRadius: '50%'
-              }} /> Đang xem
-            </Space>
+              onClick={() => {
+                navigate(`/${role}/classes/${classId}/sessions/${item.ID}`);
+                onCancel()
+              }}
+            >
+              {item.BuoiSo}
+            </Button>
+          )
+        })}
+      </div>
 
-            <Space>
-              <div style={{
-                width: 10, height: 10,
-                border: '1px solid #52c41a', borderRadius: '50%'
-              }} /> Đã chốt kết quả
-            </Space>
-
-            <Space>
-              <div style={{
-                width: 10, height: 10,
-                border: '1px solid #d9d9d9', borderRadius: '50%'
-              }} /> Chưa chốt / Chưa học
-            </Space>
-
-            <Space>
-              <div style={{
-                width: 10, height: 10,
-                border: '1px solid #ff4d4f', borderRadius: '50%'
-              }} /> Đã hủy
-            </Space>
+      {/* chú thích  */}
+      <div style={{ marginTop: 12, fontSize: 15, color: '#8c8c8c' }}>
+        <Space orientation='vertical' size={0}>
+          <Space>
+            <div style={{
+              width: 10, height: 10,
+              backgroundColor: '#1890ff', borderRadius: '50%'
+            }} /> Đang xem
           </Space>
-        </div>
-        <Divider />
-        {/* </Card> */}
-      </Drawer>
-    </>
+
+          <Space>
+            <div style={{
+              width: 10, height: 10,
+              border: '1px solid #52c41a', borderRadius: '50%'
+            }} /> Đã chốt kết quả
+          </Space>
+
+          <Space>
+            <div style={{
+              width: 10, height: 10,
+              border: '1px solid #d9d9d9', borderRadius: '50%'
+            }} /> Chưa chốt / Chưa học
+          </Space>
+
+          <Space>
+            <div style={{
+              width: 10, height: 10,
+              border: '1px solid #ff4d4f', borderRadius: '50%'
+            }} /> Đã hủy
+          </Space>
+        </Space>
+      </div>
+      <Divider />
+    </Drawer>
   )
 }
 

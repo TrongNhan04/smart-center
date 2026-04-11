@@ -85,7 +85,7 @@ const ClassDetail = () => {
       title: 'Nội dung', dataIndex: 'ChuDe', key: 'ChuDe', ellipsis: true,
       render: (topic: string) => {
         return <Space orientation="vertical" size={0}>
-          <Text ><ReadOutlined style={{ color: '#187cff' }} /> {topic ?? `Chủ đề: chưa cập nhật...`} </Text>
+          <Text ><ReadOutlined style={{ color: 'purple' }} /> {topic ?? `Chủ đề: chưa cập nhật...`} </Text>
         </Space>
       }
     },
@@ -138,7 +138,7 @@ const ClassDetail = () => {
       }
     },
     {// thao tác
-      title: 'Thao tác', key: 'action', align: 'center' as const, //width: 120,
+      title: 'Thao tác', key: 'action', align: 'center' as const, width: 150,
       render: (value: SessionDB) => {
         return isAdmin ? <SessionAction
           session={value}

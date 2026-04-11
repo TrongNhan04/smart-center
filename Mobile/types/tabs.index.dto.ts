@@ -17,10 +17,12 @@ interface BuoiHocKe {
 }
 
 interface KetQuaGanNhat {
+  LopHocID: number,
+  LopHoc: string
+  BuoiHocID: number
   BuoiSo: number
   NgayHoc: string
   ChuDe: string
-  LopHoc: string
   TongSoBuoi: number
   NhanXetCon: string | null
   DiemDanh: boolean

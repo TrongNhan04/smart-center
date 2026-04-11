@@ -1,6 +1,7 @@
 import { Descriptions, Space, Typography, Progress } from 'antd';
 import {
-  UserOutlined, CalendarFilled, EnvironmentFilled, ClockCircleFilled, BookFilled
+  UserOutlined, CalendarFilled, EnvironmentFilled, ClockCircleFilled, BookFilled,
+  ReadFilled
 } from '@ant-design/icons';
 import type { ClassDB } from './ClassDTO';
 
@@ -32,7 +33,9 @@ const TabInfo = ({ lophoc }: Props) => {
         </Descriptions.Item>
 
         <Descriptions.Item label="Lớp">
-          <Text strong style={{ color: '#1890ff' }}>{lophoc.TenLop}</Text>
+          <Space> <Text strong style={{ color: '#1890ff' }}>
+            <ReadFilled /> {lophoc.TenLop}</Text>
+          </Space>
         </Descriptions.Item>
 
         <Descriptions.Item label="Khóa học">
@@ -63,13 +66,13 @@ const TabInfo = ({ lophoc }: Props) => {
         </Descriptions.Item>
 
         <Descriptions.Item label="Thời gian">
-          <Space><CalendarFilled style={{ color: '#1890ff' }} />
+          <Space><CalendarFilled style={{ color: '#ff5d18' }} />
             {tuNgay} - {denNgay}</Space>
         </Descriptions.Item>
 
         <Descriptions.Item label="Lịch học">
           <Space>
-            <Text ><ClockCircleFilled /> {dow} {lophoc.GioHoc}</Text>
+            <Text ><ClockCircleFilled /> {dow}, {lophoc.GioHoc}</Text>
           </Space>
         </Descriptions.Item>
 

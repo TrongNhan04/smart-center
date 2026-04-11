@@ -37,19 +37,19 @@ export class AppParentService {
           },
         }
       }),
-      // kết quả gần nhất
+      // kết quả gần nhất của nhiều lớp
       this.prisma.ghiDanh.findMany({
         where: { HocVienID: studentDB.ID },
         include: {
           lophoc: {
             select: { TenLop: true, khoahoc: { select: { TongSoBuoi: true } } }
           },
-          ketqua_chitiet: {
+          ketqua_chitiet: { // kết quả mới nhất của lớp đó
             include: { ketqua_buoihoc: { include: { buoihoc: true } } },
             orderBy: { UpdatedAt: 'desc' },
             take: 1
           }
-        }
+        },
       }),
       //lấy số hóa đơn chưa thanh toán
       this.prisma.hoaDon.findMany({
@@ -72,7 +72,9 @@ export class AppParentService {
     for (const item of lastestResult) {
       if (item.ketqua_chitiet.length) {
         KetQuaGanNhat.push({
+          LopHocID: item.LopHocID,
           LopHoc: item.lophoc.TenLop,
+          BuoiHocID: item.ketqua_chitiet[0].ketqua_buoihoc.BuoiHocID,
           BuoiSo: item.ketqua_chitiet[0]?.ketqua_buoihoc.buoihoc.BuoiSo,
           TongSoBuoi: item.lophoc.khoahoc.TongSoBuoi,
           NgayHoc: item.ketqua_chitiet[0]?.ketqua_buoihoc.buoihoc.BatDauLuc,
@@ -115,16 +117,16 @@ export class AppParentService {
       }), // kết quả của học viên
       this.prisma.ketQua_ChiTiet.findMany({
         where: { ghidanh: { HocVienID: studentDB.ID } },
-        select: { 
+        select: {
           ID: true, DiemDanh: true,
           ghidanh: { select: { LopHocID: true } }
         }
       })
     ])
-    const mapClass = new Map(classDB.map(item => [item.ID, item]))
+    if (!classDB) throw new NotFoundException('Không tìm thấy lớp học')
     const reduceResult = result.reduce((store: any, item) => {
-      const classId = item.ghidanh.LopHocID // láy id lớp
-
+      const classId = item.ghidanh.LopHocID // lấy id lớp
+      // console.log(classId)
       if (!store[classId]) // nếu chưa có store của id lớp đó thì tạo mới
         store[classId] = {
           LopHocID: classId,
@@ -136,23 +138,31 @@ export class AppParentService {
       else store[classId].Vang++
       return store
     }, {}) // để [] thì có sẽ có nhiều phần tử null
-    
+
     // chuyển từ obj -> arr
     const lastResult = Object.values(reduceResult)
-    return lastResult.map((item: any) => {
-      const classInfo = mapClass.get(item.LopHocID)
-      return {
-        ID: classInfo?.ID,
-        MaLop: classInfo?.MaLopHoc,
-        TenLop: classInfo?.TenLop,
-        GiaoVien: classInfo?.giaovien.User.HoTen,
-        LichHoc: classInfo?.LichHoc,
-        GioHoc: classInfo?.GioBatDau + ' - ' + classInfo?.GioKetThuc,
-        SoBuoiDaHoc: classInfo?._count.buoihoc,
-        TongSoBuoi: classInfo?.khoahoc.TongSoBuoi,
-        CoMat: item.CoMat,
-        Vang: item.Vang
-      }
+    const newMapLastResult = new Map
+      (lastResult.map((item: any) => [item.LopHocID, item]))
+
+    const formatData = (item:any) => ({
+      ID: item.ID, MaLop: item.MaLopHoc,
+      TenLop: item.TenLop, GiaoVien: item.giaovien.User.HoTen,
+      LichHoc: item.LichHoc,
+      GioHoc: item.GioBatDau + ' - ' + item?.GioKetThuc,
+      SoBuoiDaHoc: item._count.buoihoc,
+      TongSoBuoi: item.khoahoc.TongSoBuoi,
+      CoMat: 0,  Vang: 0
+    })
+    return classDB.map(item => {
+      const resultOfClass = newMapLastResult.get(item.ID)
+      const getFormatedData = formatData(item)
+      if (resultOfClass) 
+        return {
+          ...getFormatedData,
+          CoMat: resultOfClass.CoMat,
+          Vang: resultOfClass.Vang
+        }
+      return getFormatedData
     })
   }
 
@@ -248,42 +258,46 @@ export class AppParentService {
 
   // phần dưới: chi tiết các buổi học 
   async GetSessionDetail(userId: number, studentId: number, sessionId: number) {
-    //nhận xét, điểm, điểm danh, ngày học, lớp, giáo viên, chủ đề học, phòng
-    await this.StudentValidator(userId, studentId)
-    const detail = await this.prisma.ketQua_ChiTiet.findFirst({
-      where: {
-        ketqua_buoihoc: { BuoiHocID: sessionId },
-        ghidanh: { HocVienID: studentId }
-      },
-      select: {
-        NhanXetRieng: true, Diem: true, DiemDanh: true,
-        ketqua_buoihoc: {
-          select: {
-            NhanXetChung: true,
-            buoihoc: {
-              select: {
-                BatDauLuc: true, ChuDe: true, PhongHoc: true,
-                lophoc: {
-                  select: {
-                    TenLop: true,
-                    giaovien: { select: { User: { select: { HoTen: true } } } }
-                  }
-                }
-              }
+    const studentDB = await this.StudentValidator(userId, studentId)
+    const [result, sessionDB] = await Promise.all([
+      this.prisma.ketQua_ChiTiet.findFirst({ // kết quả
+        where: {
+          ketqua_buoihoc: { BuoiHocID: sessionId },
+          ghidanh: { HocVienID: studentDB.ID }
+        },
+        include: {
+          ketqua_buoihoc: {
+            include: { tep_dinhkem: { select: { URL: true } }, }
+          }
+        }
+      }),
+      this.prisma.buoiHoc.findUnique({ // buổi học
+        where: { ID: sessionId },
+        include: {
+          lophoc: {
+            select: {
+              TenLop: true,
+              giaovien: { select: { User: { select: { HoTen: true } } } }
             }
           }
         }
-      }
-    })
-    if (!detail) throw new NotFoundException('Student\'s result not found')
+      })
+    ])
+    if (!sessionDB) throw new NotFoundException('Không tìm thấy buổi học')
+
     return {
-      comment: detail.NhanXetRieng ?? detail.ketqua_buoihoc.NhanXetChung,
-      grade: detail.Diem, attend: detail.DiemDanh,
-      date: detail.ketqua_buoihoc.buoihoc.BatDauLuc.toLocaleDateString(),
-      class: detail.ketqua_buoihoc.buoihoc.lophoc.TenLop,
-      teacher: detail.ketqua_buoihoc.buoihoc.lophoc.giaovien.User.HoTen,
-      topic: detail.ketqua_buoihoc.buoihoc.ChuDe,
-      room: detail.ketqua_buoihoc.buoihoc.PhongHoc
+      TenLop: sessionDB.lophoc.TenLop,
+      GiaoVien: sessionDB.lophoc.giaovien.User.HoTen,
+      BuoiHocID: sessionDB.ID,
+      NgayHoc: sessionDB.BatDauLuc,
+      GioHoc: DateHelper.ISOToHHMM(sessionDB.BatDauLuc, sessionDB.KetThucLuc),
+      DiemDanh: result?.DiemDanh,
+      DiemSo: result?.Diem,
+      BaiHoc: sessionDB.ChuDe,
+      NoiDung: result?.ketqua_buoihoc.NoiDungBaiHoc,
+      BaiTap: result?.ketqua_buoihoc.BaiTapVeNha,
+      NhanXet: result?.NhanXetRieng || result?.ketqua_buoihoc.NhanXetChung,
+      TepDinhKem: result?.ketqua_buoihoc.tep_dinhkem
     }
   }
 

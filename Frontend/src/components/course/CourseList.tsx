@@ -4,7 +4,7 @@ import {
   Space, Table, Tag, Typography
 } from 'antd';
 import courseApi from '../../api/courseApi';
-import { ClockCircleFilled, DollarCircleFilled, PlusOutlined, ReadOutlined, SearchOutlined } from '@ant-design/icons';
+import { ClockCircleFilled, ClockCircleOutlined, DollarCircleFilled, DollarCircleOutlined, PlusOutlined, ReadOutlined, SearchOutlined } from '@ant-design/icons';
 import CourseAction from './CourseAction';
 import { type CourseDB } from './CourseDTO';
 import CourseModal from './CourseModal';
@@ -124,7 +124,7 @@ const CourseList = () => {
         if (!fee) return <Text strong>0đ</Text>
         const amount = Number(fee)
         return <Text>
-          <DollarCircleFilled style={{ color: '#52c41a' }} /> {amount.toLocaleString()}đ
+          <DollarCircleOutlined style={{ color: '#52c41a' }} /> {amount.toLocaleString()}đ
         </Text>
       }
     },
@@ -132,7 +132,7 @@ const CourseList = () => {
       title: 'Thời gian', dataIndex: 'ThoiGian', key: 'ThoiGian', width: 170,
       render: (month: number, courses: CourseDB) => (
         <Space>
-          <Text><ClockCircleFilled /> {month} tháng</Text>
+          <Text><ClockCircleOutlined style={{color:'#1677FF'}}/> {month} tháng</Text>
           <Text>({courses.TongSoBuoi} buổi)</Text>
         </Space>
       )

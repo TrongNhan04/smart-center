@@ -78,7 +78,8 @@ export class SessionResultService {
             return enrolls.map(item => mapStudent(item))
 
         // tạo map với key là ghi danh ID, value là kết quả học tập
-        const newMapKQCT = new Map(result.ketqua_chitiet.map(item => [item.GhiDanhID, item]))
+        const newMapKQCT = new Map
+            (result.ketqua_chitiet.map(item => [item.GhiDanhID, item]))
         return enrolls.map(value => { // mỗi value ID (enroll) + thông tin học viên
             const data = newMapKQCT.get(value.ID)
             if (!data) return null // không tồn tại data cho ghi danh id đó
@@ -270,7 +271,7 @@ export class SessionResultService {
             ('Không tìm thấy buổi học hoặc từ chối truy cập')
         if (sessionDB.TrangThai === 'CANCELLED')
             throw new ConflictException(`Buổi học đã hủy`)
-        const {lophoc, ...rest} = sessionDB // tách ra để lấy tên lớp
+        const { lophoc, ...rest } = sessionDB // tách ra để lấy tên lớp
         return {
             sessionDB: {
                 ...rest,

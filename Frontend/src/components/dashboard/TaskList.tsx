@@ -1,9 +1,10 @@
 import { Link, useNavigate } from "react-router-dom"
 import { type ReminderTeacher, type TaskDB } from "./DashboardDTO"
-import { Button, Card, message, notification, Popconfirm, Table, Tag } from "antd"
+import { Button, Card, message, Popconfirm, Table, Tag } from "antd"
 import { useEffect, useState } from "react"
 import { dashboardApi } from "../../api/dashboardApi"
-import { BellOutlined, CheckCircleOutlined, CheckOutlined, PlusCircleOutlined } from "@ant-design/icons"
+import { BellOutlined, CheckCircleOutlined, CheckOutlined, PlusCircleOutlined, ReadOutlined } from "@ant-design/icons"
+import { CatchError } from "../common/catch.error"
 
 const TaskList = () => {
   const navigate = useNavigate()
@@ -16,29 +17,19 @@ const TaskList = () => {
   const fetchTasks = async () => {
     try {
       const res = await dashboardApi.getTasks()
-      const formatRes = res.data.map((item:TaskDB, index:number)=>({
+      const formatRes = res.data.map((item: TaskDB, index: number) => ({
         index, // thêm index để không cảnh báo thiếu unique key
-        ...item 
+        ...item
       }))
       setTasksToday(formatRes)
     } catch (error) {
-      handelError(error)
+      CatchError.HandleError(error)
     }
   }
 
   useEffect(() => {
     fetchTasks()
   }, [])
-
-  const handelError = (error: any) => {
-    notification.error({
-      title: 'Có lỗi xảy ra',
-      description: error?.response?.data?.message,
-      showProgress: true,
-      pauseOnHover: true
-    })
-    console.log('Có lỗi xảy ra: ', error?.response?.data?.message)
-  }
 
   const handleRemindTeacher = async (task: TaskDB) => {
     try {
@@ -53,7 +44,7 @@ const TaskList = () => {
       message.success('Đã tạo thông báo đến giáo viên!')
       localStorage.setItem('remindedTasks', JSON.stringify(newList))
     } catch (error) {
-      handelError(error)
+      CatchError.HandleError(error)
     }
   }
   const handleUnlock = async (sessionId: number) => {
@@ -62,7 +53,7 @@ const TaskList = () => {
       fetchTasks()
       message.success('Thao tác thành công')
     } catch (error) {
-      handelError(error)
+      CatchError.HandleError(error)
     }
   }
 
@@ -71,7 +62,7 @@ const TaskList = () => {
       title: 'Thuộc lớp', dataIndex: 'TenLop', key: 'TenLop', width: 200,
       ellipsis: true,
       render: (name: string, task: TaskDB) =>
-        <Link to={`/admin/classes/${task.LopHocID}`}> {name}</Link>
+        <Link to={`/admin/classes/${task.LopHocID}`}><ReadOutlined /> {name}</Link>
     },
     { // tiêu đề
       title: 'Tiêu đề', dataIndex: 'TieuDe', width: 200,
@@ -87,7 +78,7 @@ const TaskList = () => {
         if (task.Loai === 'REQUEST')
           return <Tag color={'red'}>Yêu cầu mở khóa</Tag>
         if (task.Loai === 'UNSUBMIT')
-          return <Tag color={'blue'}>Chưa nộp kết quả</Tag>
+          return <Tag color={'purple'}>Chưa nộp kết quả</Tag>
         return <Tag color={'orange'}>
           {isEnding ? 'Kiểm tra lớp học' : 'Bổ sung lịch học'}
         </Tag>
@@ -125,14 +116,20 @@ const TaskList = () => {
           const isReminded = remindList.includes(task.BuoiHocID)
           return <Button
             size="small"
-            type={isReminded ? 'default' : 'primary'}
+            style={{
+              color: isReminded ? '#1677ff' : '',
+              background: '#f0f5ff'
+            }}
             disabled={isReminded ? true : false}
             icon={isReminded ? <CheckOutlined /> : <BellOutlined />}
             onClick={() => handleRemindTeacher(task)}
           >{isReminded ? 'Đã nhắc' : 'Nhắc GV'}</Button>
         }
 
-        return <Button size="small" icon={<PlusCircleOutlined/>}
+        return <Button
+          size="small"
+          icon={<PlusCircleOutlined />}
+          // style={{ba}}
           onClick={() => navigate(`/admin/classes/${task.LopHocID}`)}>
           Bổ sung
         </Button>

@@ -22,7 +22,7 @@ const UnlockButton = ({ session, onSave, onReload }: Props) => {
   const handleSendRequest = async () => {
     setLoadingRequest(true)
     try {
-      const reason = `Cập nhật kết quả`
+      const reason = 'cập nhật kết quả'
       await teacherApi.requestUnlock(session.ID, reason)
       onReload(session.ID)
     } catch (error) {

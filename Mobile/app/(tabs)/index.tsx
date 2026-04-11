@@ -7,11 +7,12 @@ import mobileApi from '../api';
 import useAuthStore from '../authStore';
 
 export default function Index() {
-  const user = useAuthStore(state => state.user)
-  const children = user?.children
   const [students, setStudents] = useState<StudentDashboard[]>([])
   const [selectedStuId, setSelectedStuId] = useState(-1)
   const [refresh, setRefresh] = useState(false)
+  const user = useAuthStore(state => state.user)
+  const setStuIdGlobal = useAuthStore(state => state.setSelectedStuId)
+  const children = user?.children
   const fetchData = async () => {
     try {
       if (!children) return
@@ -51,8 +52,9 @@ export default function Index() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView contentContainerStyle={{ paddingBottom: 10 }}
+        showsVerticalScrollIndicator = {false}
         refreshControl={
           <RefreshControl refreshing={refresh}
             onRefresh={handleRefresh} />
@@ -60,15 +62,14 @@ export default function Index() {
 
         {/* Chọn học viên */}
         <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
+          horizontal showsHorizontalScrollIndicator={false}
           style={styles.studentSelector}
         >
           {students?.map(stu => (
             <Chip
               key={stu.ID}
               selected={selectedStuId === stu.ID}
-              onPress={() => setSelectedStuId(stu.ID)}
+              onPress={() => { setSelectedStuId(stu.ID); setStuIdGlobal(stu.ID) }}
               icon={() =>
                 <Icon
                   source='account-school'
