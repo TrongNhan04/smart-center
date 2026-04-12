@@ -6,6 +6,7 @@ export interface ClassOfStu {
     GiaoVien: string,
     LichHoc: number[],
     GioHoc: string,
+    BuoiHocDuocChon: number,
     SoBuoiDaHoc: number,
     TongSoBuoi: number,
     CoMat: number,
@@ -24,5 +25,16 @@ export interface SessionOfStu {
     NoiDung: string,
     BaiTap: string,
     NhanXet: string,
-    TepDinhKem: string[]
+    TepDinhKem: TepDinhKem[]
+}
+
+interface TepDinhKem {
+    ID:number,
+    URL: string,
+    LoaiTep:string
+}
+
+export interface SessionIds{
+    ID: number,
+    BuoiSo: number
 }

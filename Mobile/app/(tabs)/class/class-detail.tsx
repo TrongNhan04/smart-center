@@ -1,19 +1,44 @@
 import mobileApi from '@/app/api';
-import { SessionOfStu } from '@/types/tabs.class.dto';
-import { useRouter } from 'expo-router';
+import useAuthStore from '@/app/authStore';
+import { SessionIds, SessionOfStu } from '@/types/tabs.class.dto';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Alert, Image, ScrollView, StyleSheet, View } from 'react-native';
+import { Alert, Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Card, Icon, IconButton, Surface, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SessionDetailScreen() {
   const router = useRouter();
+  const { classId, sessionId } = useLocalSearchParams() // để lấy id các buổi học, id buổi học có kết quả gần nhất
   const [detailResult, setDetailResult] = useState<SessionOfStu>()
-  useEffect(() => {
+  const [arrSessionId, setArrSessionId] = useState<SessionIds[]>([])
+  const [selectedId, setSelectedId] = useState(0) // id buổi học được chọn
+  const stuIdGlobal = useAuthStore(state => state.selectedStuId)
+  const buoiHocId = Number(sessionId)
 
+  useEffect(() => {//useEffect 1 lấy tất cả id buổi học của lớp
+    const fetchSessionIds = async () => {
+      try {
+        console.log('chạy lại nhé 1')
+        const res = await mobileApi.GetSessionIdsByClassId(classId[0])
+        setArrSessionId(res.data) // mảng id buổi học
+      } catch (error: any) {
+        Alert.alert('Thông báo', error);
+        console.log('Có lỗi xảy ra: ', error)
+      }
+    }
+    fetchSessionIds()
+  }, [])
+
+  //useEffect 2 tải kết quả buổi học từ id buổi học được chọn
+  useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await mobileApi.getDetailByStuAndSesId(2,1)
+        if (!stuIdGlobal) return
+        console.log(sessionId) // có chọn lấy chọn, không có lấy từ param
+        const id = selectedId ? selectedId : buoiHocId
+        const res = await mobileApi
+          .getDetailByStuAndSesId(stuIdGlobal, id)
         setDetailResult(res.data)
       } catch (error) {
         Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
@@ -22,12 +47,7 @@ export default function SessionDetailScreen() {
     }
 
     fetchData()
-  }, [])
-  // // Mặc định chọn buổi học mới nhất (phần tử đầu tiên trong mảng)
-  // const [selectedId, setSelectedId] = useState(SESSIONS_DATA[0].id);
-
-  // // Tìm dữ liệu của buổi học đang được chọn
-  // const detailResult = detailResult?.BuoiHocID
+  }, [selectedId])
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -38,8 +58,10 @@ export default function SessionDetailScreen() {
           <IconButton icon="arrow-left" size={24}
             onPress={() => router.back()} style={{ marginLeft: -10 }} />
           <View style={{ flex: 1 }}>
-            <Text variant="titleLarge" style={styles.textTitle}>{detailResult?.TenLop}</Text>
-            <Text variant="bodyMedium" style={{ color: '#2c3e50' }}>Giáo viên: {detailResult?.GiaoVien}</Text>
+            <Text variant="titleLarge" style={styles.textTitle}>
+              {detailResult?.TenLop}</Text>
+            <Text variant="bodyMedium" style={{ color: '#2c3e50' }}>
+              Giáo viên: {detailResult?.GiaoVien}</Text>
           </View>
         </View>
       </Surface>
@@ -163,9 +185,12 @@ export default function SessionDetailScreen() {
                 <View style={{ gap: 6 }}>
                   {detailResult.TepDinhKem.length > 0 ? (
                     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                      {detailResult.TepDinhKem.map((url, index) => (
-                        <Image key={index} source={{ uri: url }} style={styles.mediaImage} />
-                      ))}
+                      {detailResult.TepDinhKem.map(item => {
+                        if (item.LoaiTep === 'image')
+                          return <Image key={item.ID}
+                            source={{ uri: item.URL }} style={styles.mediaImage} />
+                        // return <Video
+                      })}
                     </ScrollView>
                   ) : (
                     <Text style={{ color: '#95a5a6', fontStyle: 'italic' }}>Không có tài liệu đính kèm cho buổi này.</Text>
@@ -183,25 +208,36 @@ export default function SessionDetailScreen() {
           Chọn buổi học:
         </Text>
         <ScrollView
-          horizontal showsHorizontalScrollIndicator={false}
+          // horizontal showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
           contentContainerStyle={{ padding: 12, paddingBottom: 20, gap: 10 }}
         >
-          {/* {SESSIONS_DATA.map(session => {
-            const isSelected = selectedId === session.id;
+        <View style={{
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          //gap: 12,
+          //paddingHorizontal: 6
+        }}>
+          {arrSessionId?.map(session => {
+            // nếu có chọn thì lấy có chọn, chưa chọn thì lấy cái đầu tiên
+            const isSelected = selectedId ?
+              selectedId === session.ID : buoiHocId === session.ID
             return (
               <TouchableOpacity
-                key={session.id}
-                onPress={() => setSelectedId(session.id)}
+                key={session.ID}
+                onPress={() => setSelectedId(session.ID)}
                 // style này bao bên ngoài
                 style={[styles.navCircle, isSelected && styles.navCircleActive]}
               >
                 <Text // style này là số bên trong
                   style={[styles.navText, isSelected && styles.navTextActive]}>
-                  {session.buoiso}
+                  {session.BuoiSo}
                 </Text>
               </TouchableOpacity>
             )
-          })} */}
+          })}
+        </View>
         </ScrollView>
       </Surface>
 
@@ -209,7 +245,6 @@ export default function SessionDetailScreen() {
   );
 }
 
-// --- CSS GỌN NHẸ ---
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   header: {
@@ -221,7 +256,7 @@ const styles = StyleSheet.create({
   card: { backgroundColor: '#eceffb', borderRadius: 12 },
   view: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   // Content
-  contentArea: { flex: 1 }, // Lệnh flex: 1 này cực kỳ quan trọng để đẩy BottomNav xuống đáy
+  contentArea: { flex: 1 }, // flex 1 để đẩy BottomNav xuống đáy
   label: { fontWeight: 'bold', color: '#7f8c8d', marginBottom: 4 },
   textTitle: { fontWeight: 'bold', color: '#2c3e50' },
 
@@ -232,9 +267,9 @@ const styles = StyleSheet.create({
   },
 
   // Bottom Nav
-  bottomNav: { backgroundColor: '#fff' },
+  bottomNav: { backgroundColor: '#fff', height: 120 },
   navCircle: {
-    width: 46, height: 46, borderRadius: 23,
+    width: 30, height: 30,
     backgroundColor: '#f1f2f6',
     justifyContent: 'center', alignItems: 'center',
     borderWidth: 1, borderColor: '#dcdde1'

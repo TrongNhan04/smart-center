@@ -112,6 +112,7 @@ export class AppParentService {
         include: {
           khoahoc: { select: { TongSoBuoi: true } },
           giaovien: { select: { User: { select: { HoTen: true } } } },
+          buoihoc:{select:{ID:true}, orderBy:{UpdatedAt:'desc'}},
           _count: { select: { buoihoc: { where: { TrangThai: 'COMPLETED' } } } }
         }
       }), // kết quả của học viên
@@ -121,7 +122,7 @@ export class AppParentService {
           ID: true, DiemDanh: true,
           ghidanh: { select: { LopHocID: true } }
         }
-      })
+      }),
     ])
     if (!classDB) throw new NotFoundException('Không tìm thấy lớp học')
     const reduceResult = result.reduce((store: any, item) => {
@@ -144,19 +145,20 @@ export class AppParentService {
     const newMapLastResult = new Map
       (lastResult.map((item: any) => [item.LopHocID, item]))
 
-    const formatData = (item:any) => ({
+    const formatData = (item: any) => ({
       ID: item.ID, MaLop: item.MaLopHoc,
       TenLop: item.TenLop, GiaoVien: item.giaovien.User.HoTen,
       LichHoc: item.LichHoc,
       GioHoc: item.GioBatDau + ' - ' + item?.GioKetThuc,
+      BuoiHocDuocChon: item.buoihoc[0].ID || 0, // 0 là chưa có buổi học nào
       SoBuoiDaHoc: item._count.buoihoc,
       TongSoBuoi: item.khoahoc.TongSoBuoi,
-      CoMat: 0,  Vang: 0
+      CoMat: 0, Vang: 0
     })
     return classDB.map(item => {
       const resultOfClass = newMapLastResult.get(item.ID)
       const getFormatedData = formatData(item)
-      if (resultOfClass) 
+      if (resultOfClass)
         return {
           ...getFormatedData,
           CoMat: resultOfClass.CoMat,
@@ -166,97 +168,7 @@ export class AppParentService {
     })
   }
 
-  // tab buổi học phần trên: đtb, %tham gia, biểu đồ
-  async GetResultSumary(userId: number, studentId: number) {
-    // tính điểm trung bình tháng -> avg._avg.Diem
-    // tính tổng số buổi học đã diễn ra -> result.length
-    // tính tổng số buổi học học viên tham gia -> avg._count.ID
-    // lấy dữ liệu 5 buổi học tham gần nhất vẽ điểm  -> results
-    const { start } = DateHelper.GetStartEndOfMonth(new Date())
-    await this.StudentValidator(userId, studentId)
-
-    const baseWhere: Prisma.KetQua_ChiTietWhereInput = {
-      ketqua_buoihoc: {
-        buoihoc: {
-          TrangThai: { not: 'CANCELLED' },
-          BatDauLuc: { gte: start },
-          KetThucLuc: { lte: new Date() }
-        }
-      },
-      ghidanh: { HocVienID: studentId }
-    }
-    const [avg, results] = await Promise.all([
-      // tính trung bình tháng + tổng buổi đi học
-      this.prisma.ketQua_ChiTiet.aggregate({
-        _count: { ID: true },
-        _avg: { Diem: true },
-        where: {
-          ...baseWhere,
-          DiemDanh: true
-        }
-      })
-      // các buổi đã diễn ra 
-      , this.prisma.ketQua_ChiTiet.findMany({
-        where: { ...baseWhere },
-        orderBy: { ketqua_buoihoc: { buoihoc: { BatDauLuc: 'asc' } } },
-        include: { ketqua_buoihoc: { include: { buoihoc: true } } },
-      })
-    ])
-    return {
-      average_score: Number(avg._avg.Diem),
-      attendance: {
-        total: results.length,
-        attend: avg._count.ID,
-        percent: (avg._count.ID / results.length) * 100
-      },
-      chart_data: results.map(m => ({
-        date: m.ketqua_buoihoc.buoihoc.BatDauLuc.toLocaleDateString(),
-        grade: m.Diem ? Number(m.Diem) : m.Diem
-      }))
-    }
-  }
-
-  // Tab buổi học phần dưới: các buổi đã học (phân trang) 
-  async GetSessionResults(userId: number, studentId: number, p: Pagination) {
-    await this.StudentValidator(userId, studentId)
-    const take = Number(p.limit)
-    const skip = Number(p.page - 1) * Number(p.limit)
-    const results = await this.prisma.ketQua_ChiTiet.findMany({
-      where: {
-        ketqua_buoihoc: {
-          buoihoc: {
-            TrangThai: { not: 'CANCELLED' },
-            KetThucLuc: { lte: new Date() }
-          }
-        },
-        ghidanh: { HocVienID: studentId }
-      },
-      select: {
-        Diem: true,
-        ketqua_buoihoc: {
-          select: {
-            buoihoc: {
-              select: {
-                BatDauLuc: true, ChuDe: true,
-                lophoc: { select: { TenLop: true } }
-              }
-            }
-          }
-        }
-      },
-      take: take, skip: skip
-    })
-    return {  //lịch sử buổi học gồm ngày, lớp, chủ đề, điểm
-      session_results: results.map(m => ({
-        date: m.ketqua_buoihoc.buoihoc.BatDauLuc.toLocaleDateString(),
-        class: m.ketqua_buoihoc.buoihoc.lophoc.TenLop,
-        topic: m.ketqua_buoihoc.buoihoc.ChuDe,
-        grade: m.Diem
-      }))
-    }
-  }
-
-  // phần dưới: chi tiết các buổi học 
+  // lấy 1 chi tiết kết quả buổi học của học viên
   async GetSessionDetail(userId: number, studentId: number, sessionId: number) {
     const studentDB = await this.StudentValidator(userId, studentId)
     const [result, sessionDB] = await Promise.all([
@@ -291,14 +203,26 @@ export class AppParentService {
       BuoiHocID: sessionDB.ID,
       NgayHoc: sessionDB.BatDauLuc,
       GioHoc: DateHelper.ISOToHHMM(sessionDB.BatDauLuc, sessionDB.KetThucLuc),
-      DiemDanh: result?.DiemDanh,
-      DiemSo: result?.Diem,
-      BaiHoc: sessionDB.ChuDe,
-      NoiDung: result?.ketqua_buoihoc.NoiDungBaiHoc,
-      BaiTap: result?.ketqua_buoihoc.BaiTapVeNha,
+      DiemDanh: result?.DiemDanh || null,
+      DiemSo: result?.Diem || null, 
+      BaiHoc: sessionDB.ChuDe || null,
+      NoiDung: result?.ketqua_buoihoc.NoiDungBaiHoc || null,
+      BaiTap: result?.ketqua_buoihoc.BaiTapVeNha || null,
       NhanXet: result?.NhanXetRieng || result?.ketqua_buoihoc.NhanXetChung,
-      TepDinhKem: result?.ketqua_buoihoc.tep_dinhkem
+      TepDinhKem: result?.ketqua_buoihoc.tep_dinhkem || []
     }
+  }
+
+  // lấy danh sách id buổi học của lớp
+  async GetSessionIdsByClassId(classId: number) {
+    const sessionIds = await this.prisma.buoiHoc.findMany({
+      where: { LopHocID: classId},
+      select: { ID: true, BuoiSo: true },
+      orderBy: { ID: 'asc' }
+    })
+    if (!sessionIds.length) throw new BadRequestException
+      ('Lớp học không tồn tại hoặc chưa có lịch học')
+    return sessionIds
   }
 
   // lấy danh sách hóa đơn của học viên

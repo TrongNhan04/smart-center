@@ -9,7 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 const ClassScreen = () => {
   const [classOfStu, setClassOfStu] = useState<ClassOfStu[]>([])
-  const stuIdGlobal = useAuthStore(state=>state.selectedStuId)
+  const stuIdGlobal = useAuthStore(state => state.selectedStuId)
   const router = useRouter()
 
   useEffect(() => {
@@ -29,10 +29,21 @@ const ClassScreen = () => {
 
   const dow = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
 
+  const handlePressToSeeClassDetail = (id: number, idBuoiHoc: number) => {
+    router.push({
+      pathname: '/(tabs)/class/class-detail',
+      params: {
+        classId: id,
+        sessionId: idBuoiHoc
+      }
+    })
+  }
+
   const renderClassItem = ({ item }: { item: ClassOfStu }) => {
     return (
       <TouchableOpacity
-        onPress={() => router.push('/(tabs)/class/class-detail')}>
+        onPress={() =>
+          handlePressToSeeClassDetail(item.ID, item.BuoiHocDuocChon)}>
         <Card mode="elevated"
           style={{
             marginBottom: 16, borderRadius: 12, backgroundColor: '#fff'
@@ -134,7 +145,7 @@ const ClassScreen = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#f0f2f5' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#f0f2f5' }} edges={['top']}>
       <View style={{ paddingHorizontal: 16, paddingVertical: 20 }}>
       </View>
 

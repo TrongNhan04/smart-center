@@ -36,24 +36,6 @@ export class AppParentController {
         return await this.appParent.GetClassesByStuId(+userId, +studentId)
     }
 
-    // Tab học tập: biểu đồ điểm 5-7 buổi gần nhất 
-    // điểm trung bình + chuyên cần 
-    @Get('students/:id/result-sumaries')
-    async GetResultSumary(@Req() req: RequestWithUser,
-        @Param('id') studentId: number) {
-        const userId = req.user.userId
-        return await this.appParent.GetResultSumary(+userId, studentId)
-    }
-
-    // Tab học tập: lịch sử buổi học gồm ngày, lớp, chủ đề, điểm
-    @Get('students/:id/session-results')
-    async GetSessionResults(@Req() req: RequestWithUser,
-        @Param('id') studentId: number,
-        @Query() p: Pagination) {
-        const userId = req.user.userId
-        return await this.appParent.GetSessionResults(+userId, studentId, p)
-    }
-
     // Tab học tập: xem chi tiết 1 buổi học
     @Get('students/:sdId/sessions/:ssId')
     async GetSessionDetail(@Req() req: RequestWithUser,
@@ -61,6 +43,12 @@ export class AppParentController {
         @Param('ssId') sessionId: number) {
         const userId = req.user.userId
         return await this.appParent.GetSessionDetail(+userId, +studentId, +sessionId)
+    }
+
+    // lấy danh sách id buổi học của lớp
+    @Get('classes/:id/sessions')
+    async GetSessionIdsByClassId(@Param('id') classId:number){
+        return this.appParent.GetSessionIdsByClassId(+classId)
     }
 
     // Thông báo - notisService
