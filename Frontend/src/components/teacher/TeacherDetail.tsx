@@ -8,7 +8,8 @@ import {
 } from "antd"
 import classApi from "../../api/classApi"
 import {
-  CalendarFilled, ClockCircleFilled, EditOutlined, InfoCircleOutlined, ReadOutlined,
+  CalendarFilled, CalendarOutlined, ClockCircleFilled, ClockCircleOutlined, EditOutlined, InfoCircleOutlined, LeftOutlined, ReadOutlined,
+  ScheduleOutlined,
   UnorderedListOutlined,
 } from "@ant-design/icons"
 import TeacherModal from "./TeacherModal"
@@ -66,50 +67,59 @@ const TeacherDetail = () => {
     },
     { // tên lớp
       title: 'Lớp', dataIndex: 'TenLop', key: 'TenLop', ellipsis: true,
-      render: (name: string, lophoc: TeacherClass) =>
-        <Link to={`/admin/classes/${lophoc.ID}`} style={{ fontWeight: 'bold' }}>
-          <ReadOutlined /> {name} </Link>
+      render: (name: string, lophoc: TeacherClass) => <>
+        <ReadOutlined style={{ color: '#8c8c8c' }} />
+        <Link to={`/admin/classes/${lophoc.ID}`}
+          style={{ fontWeight: 'bold' }}> {name}
+        </Link>
+      </>
     },
     { // khai giảng = ngày bắt đầu
       title: 'Khai giảng', dataIndex: 'TuNgay', key: 'TuNgay',
-      render: (day: string) =>
-        <Text><CalendarFilled style={{ color: '#ff5d18' }} /> {new Date(day).toLocaleDateString()}</Text>
+      render: (day: string) => <Text>
+        <CalendarOutlined style={{ color: '#8c8c8c' }} /> {new Date(day).toLocaleDateString()}</Text>
     },
     { // lịch học
       title: 'Lịch học', dataIndex: 'LichHoc', key: 'LichHoc',
       render: (timeTable: number[]) => {
         const dow = ['Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7']
         const result = timeTable.map(m => dow[m]).join(', ')
-        return <Text ><UnorderedListOutlined style={{ color: 'black' }} /> {result}</Text>
+        return <Text ><ScheduleOutlined style={{ color: '#8c8c8c' }} /> {result}</Text>
       }
     },
     {// giờ học 
       title: 'Giờ học', dataIndex: 'GioHoc', key: 'GioHoc',
-      render: (time: string) => <Text><ClockCircleFilled /> {time}</Text>
+      render: (time: string) => <Text>
+        <ClockCircleOutlined style={{ color: '#fa8c16' }} /> {time}</Text>
     },
     { // Tiến độ
       title: 'Tiến độ', dataIndex: 'SoBuoiDaHoc', key: 'SoBuoiDaHoc',
-      render: (bdh: number, lophoc: TeacherClass) => (
-        <>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Text>{bdh}/{lophoc.TongSoBuoi}</Text>
-            <Text type="secondary">Buổi học</Text>
-          </div>
-          <Progress
-            percent={(bdh / lophoc.TongSoBuoi) * 100}
-            showInfo={false}
-          />
-        </>
-      )
+      render: (bdh: number, lophoc: TeacherClass) => {
+        const percent = (bdh / lophoc.TongSoBuoi) * 100
+        let percentColor = '#ff4d4f' // đỏ
+        if (percent > 50) percentColor = '#faad14' //vàng
+        if (percent > 80) percentColor = '#52c41a'
+        return <Space>
+          
+            <Text>{bdh}/{lophoc.TongSoBuoi} BH </Text>
+            <Progress
+              steps={5}
+              percent={percent}
+              //percent={}
+              showInfo={false}
+              strokeColor={percentColor}
+            />
+          
+        </Space>
+      }
     },
     { //xem chi tiết
-      title: 'Thao tác', dataIndex: 'ChiTiet', key: 'ChiTiet',
+      title: 'Thao tác', dataIndex: 'ChiTiet', key: 'ChiTiet',  width:130,
       align: 'center' as const,
       render: (_: any, lophoc: TeacherClass) =>
         <Tooltip title='Chi tiết tiến độ'>
-          <Button type="primary" size="small"
+          <Button type="link" size="small"
             icon={<InfoCircleOutlined />}
-            // { path: `classes/:classId/sessions/:sessionId`, element: <SessionDetail /> },
             onClick={() =>
               navigate(`/admin/classes/${lophoc.ID}/sessions/${lophoc.IDBuoiDau}`)} />
         </Tooltip>
@@ -145,8 +155,8 @@ const TeacherDetail = () => {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
               {/* Nút quay lại */}
-              <Button onClick={() => navigate(-1)}> Quay lại
-              </Button>
+              <Button size="large" type="text" icon={<LeftOutlined />}
+              onClick={() => navigate(-1)} />
 
               <Avatar shape="square" size={49} style={{ background: `#0d6efd` }}>
                 {teacher?.MaGiaoVien.substring(0, 4)}
@@ -164,7 +174,7 @@ const TeacherDetail = () => {
               </div>
             </div>
             <Tooltip title='Sửa thông tin'>
-              <Button type="primary" ghost icon={<EditOutlined />}
+              <Button type="link" icon={<EditOutlined />}
                 disabled={teacher?.TrangThai === 'INACTIVE'}
                 onClick={() => { setOpenTeacherModal(true) }}
               />
@@ -201,7 +211,7 @@ const TeacherDetail = () => {
                 {
                   key: '2',
                   label: `Thông tin chung`,
-                  children: (<TabInfo teacher={teacher}/>),
+                  children: (<TabInfo teacher={teacher} />),
                 }
               ]} /> {/* kết thúc tab */}
           </Card>

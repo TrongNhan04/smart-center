@@ -7,7 +7,8 @@ import {
 } from "antd"
 import { Link, useSearchParams } from "react-router-dom"
 import {
-  CalendarFilled, CheckCircleOutlined, CloseCircleOutlined, DeleteOutlined,
+  CalendarFilled, CalendarOutlined, CheckCircleOutlined, CloseCircleOutlined, DeleteOutlined,
+  LockOutlined,
   PlusOutlined, ReadOutlined, SearchOutlined, UserOutlined
 } from "@ant-design/icons"
 import EnrollModal from "./EnrollModal"
@@ -52,7 +53,6 @@ const EnrollList = () => {
   }
 
   const handleSaveModal = (enrollId: number) => {
-    console.log('enrollId: ', enrollId)
     setEnrollId(enrollId)
     fetchEnrolls('')
     setTimeout(() => {
@@ -75,7 +75,9 @@ const EnrollList = () => {
       key: 'TenHocVien', ellipsis: true,
       render: (name: string, enroll: EnrollDB) =>
         <Link to={`/admin/students/${enroll.HocVienID}`}
-          style={{ fontWeight: 'bold' }}><UserOutlined /> {name}</Link>
+          style={{ fontWeight: 'bold' }}>
+          <UserOutlined style={{ color: '#8c8c8c' }} /> {name}
+        </Link>
     },
     { // ngày ghi danh
       title: 'Ngày ghi danh', dataIndex: 'NgayGhiDanh',
@@ -91,7 +93,7 @@ const EnrollList = () => {
       onFilter: (value: any, enroll: EnrollDB) =>
         new Date(enroll.NgayGhiDanh).getMonth() === value,
       render: (day: string) => <Text>
-        <Text><CalendarFilled style={{ color: '#ff7818' }} /> {new Date(day).toLocaleDateString()}</Text>
+        <Text><CalendarOutlined style={{ color: '#8c8c8c' }} /> {new Date(day).toLocaleDateString()}</Text>
       </Text>
     },
     { // tên lớp
@@ -99,11 +101,11 @@ const EnrollList = () => {
       key: 'TenLop', ellipsis: true,
       render: (className: string) =>
         <Space >
-          <ReadOutlined style={{ color: 'brown' }} />{className}
+          <ReadOutlined style={{ color: '#722ed1' }} />{className}
         </Space>
     },
     { // trạng thái
-      title: 'Trạng thái GD', dataIndex: 'TrangThai',
+      title: 'Trạng thái', dataIndex: 'TrangThai',
       key: 'TrangThai', //width: 160,
       render: (value: string) => {
         if (value === 'ACTIVE')
@@ -125,10 +127,17 @@ const EnrollList = () => {
               onConfirm={() => handleInactive(enroll.ID)}
               okButtonProps={{ danger: true }}
             >
-              <Button size="small" icon={<DeleteOutlined />} type="primary" danger></Button>
+              <Button
+                size="small"
+                icon={<DeleteOutlined />}
+                type="link"
+                danger 
+              />
             </Popconfirm>
           </Tooltip>
-        else return <>Không thể thao tác</>
+        else return <Tooltip title='Không thể thao tác'>
+          <Button icon={<LockOutlined/>} type="text"/>
+        </Tooltip>
       }
     },
     // { // ghi chú

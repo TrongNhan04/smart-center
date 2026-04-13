@@ -1,5 +1,5 @@
 import {
-  CalendarFilled, ClockCircleFilled, PlusOutlined, ReadOutlined, SearchOutlined,
+  CalendarFilled, CalendarOutlined, ClockCircleFilled, ClockCircleOutlined, PlusOutlined, ReadOutlined, SearchOutlined,
   UserOutlined
 } from "@ant-design/icons";
 import {
@@ -71,8 +71,7 @@ const ClassList = () => {
       fetchClasses()
       message.success('Thao tác thành công')
     } catch (error) {
-      message.error("Có lỗi xảy ra!")
-      console.log('Có lỗi xảy ra', error)
+      CatchError.HandleError(error)
     }
   }
 
@@ -89,8 +88,11 @@ const ClassList = () => {
       title: 'Lớp học', dataIndex: 'MaLopHoc', key: 'MaLopHoc ', ellipsis: true,
       render: (code: string, lophoc: ClassDB) => (
         <Space orientation="vertical" size={0}>
-          <Link to={`/admin/classes/${lophoc.ID}`}
-            style={{ fontWeight: 'bold' }}><ReadOutlined/> {lophoc.TenLop}</Link>
+          <Link
+            to={`/admin/classes/${lophoc.ID}`}
+            style={{ fontWeight: 'bold' }}>
+            <ReadOutlined style={{ color: '#8c8c8c' }} /> {lophoc.TenLop}
+          </Link>
           <Text code style={{ fontSize: 14 }}>{code}</Text>
         </Space>
       )
@@ -98,13 +100,13 @@ const ClassList = () => {
     { // giáo viên
       title: 'Giáo viên', dataIndex: ['GiaoVien', 'HoTen'],
       key: 'HoTen', ellipsis: true,
-      render: (name: string) =>
-        <Text><UserOutlined /> {name}</Text>
+      render: (name: string) => <Text>
+        <UserOutlined style={{ color: '#857e7e' }} /> {name}</Text>
     },
     { // khai giảng = ngày bắt đầu
       title: 'Khai giảng', dataIndex: 'TuNgay', key: 'TuNgay', width: 130,
       render: (day: string) =>
-        <Text><CalendarFilled style={{ color: '#ff7818' }} /> {new Date(day).toLocaleDateString()}</Text>
+        <Text><CalendarOutlined style={{ color: '#8c8c8c' }} /> {new Date(day).toLocaleDateString()}</Text>
     },
     { // lịch học
       title: 'Lịch học', dataIndex: 'LichHoc', key: 'LichHoc',
@@ -113,7 +115,7 @@ const ClassList = () => {
         const result = schedule.map(m => dow[m]).join('-')
 
         return <Space orientation="vertical" size={0}>
-          <Text><ClockCircleFilled /> {lophoc.GioHoc}</Text>
+          <Text><ClockCircleOutlined style={{ color: '#8c8c8c' }} /> {lophoc.GioHoc}</Text>
           <Text style={{ fontSize: '14px', display: 'block', textAlign: 'center' }}>
             {result}
           </Text>
@@ -122,27 +124,30 @@ const ClassList = () => {
     },
     { // sĩ số
       title: 'Sĩ số', dataIndex: 'SiSo', key: 'SiSo',
-      render: (classSize: number, lophoc: ClassDB) => (
-        <>
+      render: (classSize: number, lophoc: ClassDB) => {
+        const percent = (lophoc.TongGhiDanh / classSize) * 100
+        let percentColor = '#ff4d4f' // đỏ
+        if (percent > 50) percentColor = '#faad14' //vàng
+        if (percent > 80) percentColor = '#52c41a'
+        return <>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>{lophoc.TongGhiDanh}/{classSize}</span>
             <span>Học viên</span>
           </div>
           <Progress
-            percent={(lophoc.TongGhiDanh / classSize) * 100}
+            percent={percent}
             showInfo={false}
-            strokeColor={'green'}
+            strokeColor={percentColor}
           />
         </>
-      )
+      }
     },
     { // trạng thái
-      title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai',
+      title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai', width: 150,
       filters: [
         { text: 'Tuyển sinh', value: 'OPEN' },
         { text: 'Đang hoạt động', value: 'RUNNING' },
         { text: 'Đã đóng', value: 'CLOSED' },
-        { text: 'Đã kết thúc', value: 'FINISHED' }
       ],
       onFilter: (value: any, lophoc: ClassDB) => lophoc.TrangThai === value,
       render: (value: string) => {
@@ -150,7 +155,6 @@ const ClassList = () => {
           OPEN: { color: 'default', text: 'Tuyển sinh' },
           RUNNING: { color: 'processing', text: 'Đang hoạt động' },
           CLOSED: { color: 'error', text: 'Đã đóng' },
-          FINISHED: { color: 'success', text: 'Đã kết thúc' }
         }
         // value là 1 trong 3 key đó
         const status = statusMap[value]
@@ -158,7 +162,7 @@ const ClassList = () => {
       }
     },
     {// thao tác
-      title: 'Thao tác', key: 'action', align: 'center' as const,
+      title: 'Thao tác', key: 'action', align: 'center' as const, width: 150,
       render: (value: ClassDB) => <ClassAction
         lophoc={value}
         onSoftDelete={handleSoftDelete}

@@ -2,7 +2,9 @@ import { Descriptions, Space, Typography, Tag, List, Row, Col } from 'antd';
 import {
   UserOutlined, CalendarFilled, DollarCircleFilled, ReadOutlined,
   BookOutlined,
-  BookFilled
+  BookFilled,
+  DollarCircleOutlined,
+  CalendarOutlined
 } from '@ant-design/icons';
 import type { CourseDB } from './CourseDTO';
 
@@ -31,7 +33,7 @@ console.log(course.decuong)
             size="middle" // tùy kích cỡ màn hình mà hiển thị mấy cột
             column={{ xs: 1, sm: 1, md: 2, lg: 2, xl: 2 }}
             styles={{
-              label: { color: 'black' },
+              label: { color: 'gray' },
               //content: { minWidth: 180 }
             }}
           >
@@ -51,12 +53,12 @@ console.log(course.decuong)
 
             <Descriptions.Item label="Học phí">
               <Text style={{ fontSize: 15 }} >
-                <DollarCircleFilled style={{ color: '#52c41a' }} /> {Number(course.HocPhi).toLocaleString()}đ
+                <DollarCircleOutlined style={{ color: '#52c41a' }} /> {Number(course.HocPhi).toLocaleString()}đ
               </Text>
             </Descriptions.Item>
 
             <Descriptions.Item label="Thời gian đào tạo">
-              <Space><CalendarFilled style={{ color: '#ff8818' }} />
+              <Space><CalendarOutlined style={{ color: '#1677ff' }} />
                 {course.ThoiGian}tháng
               </Space>
             </Descriptions.Item>
@@ -68,11 +70,11 @@ console.log(course.decuong)
             </Descriptions.Item>
 
             <Descriptions.Item label="Số lớp học">
-              <Space><ReadOutlined style={{ color: 'purple' }} />{classes}lớp</Space>
+              <Space><ReadOutlined style={{ color: '#722ed1' }} />{classes}lớp</Space>
             </Descriptions.Item>
 
             <Descriptions.Item label="Tổng học viên">
-              <Space><UserOutlined />{totalStu}</Space>
+              <Space><UserOutlined style={{color:'#8c8c8c'}}/>{totalStu}</Space>
             </Descriptions.Item>
 
             {/* dùng span giống column để trường mô tả ăn hết chiều ngang */}
@@ -87,7 +89,7 @@ console.log(course.decuong)
 
         <Col span={12}>
           <Title level={5} style={{ marginBottom: 16 }}>
-            <BookFilled style={{ marginRight: 8 }} />
+            <BookOutlined style={{ marginRight: 8, color:'#1677ff' }} />
             Đề cương khóa học ({course.decuong.length} buổi)
           </Title>
 

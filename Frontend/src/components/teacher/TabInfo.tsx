@@ -22,7 +22,7 @@ const TabInfo = ({ teacher }: { teacher: TeacherDB }) => {
         borderRadius: 12,
         boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
         border: '1px solid #f0f0f0',
-        maxWidth: 480, // giới hạn chiều rộng để không bị giãn quá mức 
+        maxWidth: 460, // giới hạn chiều rộng để không bị giãn quá mức 
         margin: '20px auto', // căn giữa tabs
         minHeight: 260
       }}

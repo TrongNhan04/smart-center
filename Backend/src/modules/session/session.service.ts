@@ -175,7 +175,7 @@ export class SessionService {
     }
     if (data.length === 0) throw new BadRequestException
       ('Không có buổi học mới nào phù hợp với lịch học')
-    return await this.prisma.buoiHoc.createMany({
+    return await this.prisma.buoiHoc.createManyAndReturn({
       data, skipDuplicates: true
     })
   }

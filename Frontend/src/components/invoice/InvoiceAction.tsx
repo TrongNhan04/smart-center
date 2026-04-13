@@ -18,7 +18,7 @@ const InvoiceAction = ({
   const btnInfo = () =>
     <Tooltip title="Xem chi tiết">
       <Button
-        // size="middle"
+        size="small"
         type="text"
         icon={<InfoCircleOutlined />}
         onClick={() => navigate(`/admin/invoices/${invoice.ID}`)}
@@ -34,10 +34,9 @@ const InvoiceAction = ({
       {daTra > 0 &&
         <Tooltip title="Thêm phiếu chi">
           <Button
-            // size="small"
-            type="primary"
+            size="small"
+            type="link"
             danger
-            ghost
             icon={<RollbackOutlined />}
             onClick={() => onAddPayment(invoice)}
           >
@@ -56,8 +55,8 @@ const InvoiceAction = ({
       {conNo > 0 &&
         <Tooltip title="Thêm phiếu thu">
           <Button
-            // size="small"
-            type="primary"
+            size="small"
+            type="link"
             icon={<DollarCircleOutlined />}
             onClick={() => onAddReceipt(invoice)}
           >

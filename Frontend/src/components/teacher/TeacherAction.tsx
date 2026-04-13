@@ -2,6 +2,7 @@ import { Button, message, notification, Popconfirm, Space, Tooltip } from "antd"
 import type { TeacherDB } from "./TeacherDTO"
 import { DeleteOutlined, EditOutlined, UndoOutlined } from "@ant-design/icons"
 import teacherApi from "../../api/teacherApi"
+import { CatchError } from "../common/catch.error"
 
 interface Props {
   teacher: TeacherDB,
@@ -17,13 +18,7 @@ const TeacherAction = ({ teacher, onReload, onEdit }: Props) => {
       message.success('Thao tác thành công')
       onReload(teacherId)
     } catch (error: any) {
-      notification.error({
-        title: 'Có lỗi xảy ra',
-        description: error.response.data.message,
-        showProgress: true,
-        pauseOnHover: true
-      })
-      console.log('Có lỗi xảy ra: ', error.response.data.message)
+      CatchError.HandleError(error)
     }
   }
 
@@ -33,19 +28,13 @@ const TeacherAction = ({ teacher, onReload, onEdit }: Props) => {
       message.success('Thao tác thành công')
       onReload(teacherId)
     } catch (error: any) {
-      notification.error({
-        title: 'Có lỗi xảy ra',
-        description: error.response.data.message,
-        showProgress: true,
-        pauseOnHover: true
-      })
-      console.log('Có lỗi xảy ra: ', error.response.data.message)
+      CatchError.HandleError(error)
     }
   }
 
   if (teacher.TrangThai === 'INACTIVE')
     return (
-      <Space size="small">
+      <Space >
         <Tooltip title="Khôi phục giáo viên">
           <Popconfirm
             title="Khôi phục giáo viên này?"
@@ -54,8 +43,7 @@ const TeacherAction = ({ teacher, onReload, onEdit }: Props) => {
             onConfirm={() => handleOnRestore(teacher.ID)}
           >
             <Button
-              type="primary"
-              ghost
+              type="link"
               icon={<UndoOutlined />}
               size="small"
             >
@@ -70,8 +58,7 @@ const TeacherAction = ({ teacher, onReload, onEdit }: Props) => {
       {/* Nút sửa  */}
       <Tooltip title="Sửa thông tin">
         <Button
-          size="small"
-          type="primary"
+          type="link"
           icon={<EditOutlined />}
           onClick={() => onEdit(teacher)}
         >
@@ -88,7 +75,12 @@ const TeacherAction = ({ teacher, onReload, onEdit }: Props) => {
           onConfirm={() => handleOnInactive(teacher.ID)}
           okButtonProps={{ danger: true }}
         >
-          <Button size="small" icon={<DeleteOutlined />} type="primary" danger></Button>
+          <Button
+            size="small"
+            icon={<DeleteOutlined />}
+            type="text"
+            danger
+          />
         </Popconfirm>
       </Tooltip>
     </Space>

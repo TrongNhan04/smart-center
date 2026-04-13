@@ -1,7 +1,12 @@
 import { Descriptions, Space, Typography, Progress } from 'antd';
 import {
-  UserOutlined, CalendarFilled, EnvironmentFilled, ClockCircleFilled, BookFilled,
-  ReadFilled
+  UserOutlined,
+  ReadOutlined,
+  BookOutlined,
+  EnvironmentOutlined,
+  CalendarOutlined,
+  ClockCircleOutlined,
+  DollarCircleFilled
 } from '@ant-design/icons';
 import type { ClassDB } from './ClassDTO';
 
@@ -18,28 +23,27 @@ const TabInfo = ({ lophoc }: Props) => {
 
   const tuNgay = new Date(lophoc.TuNgay).toLocaleDateString()
   const denNgay = new Date(lophoc.DenNgay).toLocaleDateString()
+
+
+  const percent = (lophoc.TongGhiDanh / lophoc.SiSo) * 100
+  let percentColor = '#ff4d4f' // đỏ
+  if (percent > 50) percentColor = '#faad14' //vàng
+  if (percent > 80) percentColor = '#52c41a'
+
   return (
     <div style={{ padding: '16px 0' }}>
       <Descriptions
-        // bordered
-        size="middle" // tùy kích cỡ màn hình mà hiển thị mấy cột
+        size="middle"
+        // tùy kích cỡ màn hình mà hiển thị mấy cột
         column={{ xs: 1, sm: 1, md: 2, lg: 2, xl: 2 }}
-        styles={{
-          label: { color: 'black' }
-        }}
       >
-        <Descriptions.Item label="Mã lớp">
-          <Text strong>{lophoc.MaLopHoc}</Text>
+        <Descriptions.Item label="Lớp">
+          <Text>{lophoc.MaLopHoc} - {lophoc.TenLop}</Text>
         </Descriptions.Item>
 
-        <Descriptions.Item label="Lớp">
-          <Space> <Text strong style={{ color: '#1890ff' }}>
-            <ReadFilled /> {lophoc.TenLop}</Text>
-          </Space>
-        </Descriptions.Item>
 
         <Descriptions.Item label="Khóa học">
-          <Space><BookFilled style={{ color: 'purple' }} />
+          <Space><BookOutlined style={{ color: '#722ed1' }} />
             {lophoc.KhoaHoc.TenKhoaHoc}</Space>
         </Descriptions.Item>
 
@@ -48,32 +52,38 @@ const TabInfo = ({ lophoc }: Props) => {
             {lophoc.GiaoVien.HoTen}</Space>
         </Descriptions.Item>
 
-        <Descriptions.Item label="Phòng học">
-          <Space><EnvironmentFilled style={{ color: '#ff4d4f' }} />
-            {lophoc.PhongHoc ?? 'Chưa cập nhật'}</Space>
-        </Descriptions.Item>
-
         <Descriptions.Item label="Sĩ số">
           <Space>
             <Text>{lophoc.TongGhiDanh} / {lophoc.SiSo} HV</Text>
+
             <Progress
-              percent={Math.round((lophoc.TongGhiDanh / lophoc.SiSo) * 100)}
+              percent={percent}
               steps={5} // mỗi ô là 5 đơn vị
               showInfo={false}
-              strokeColor="#52c41a" // màu thanh tiến độ
+              strokeColor={percentColor}
             />
           </Space>
         </Descriptions.Item>
 
         <Descriptions.Item label="Thời gian">
-          <Space><CalendarFilled style={{ color: '#ff5d18' }} />
+          <Space><CalendarOutlined style={{ color: '#1677ff' }} />
             {tuNgay} - {denNgay}</Space>
         </Descriptions.Item>
 
         <Descriptions.Item label="Lịch học">
-          <Space>
-            <Text ><ClockCircleFilled /> {dow}, {lophoc.GioHoc}</Text>
+          <Space><ClockCircleOutlined style={{ color: '#fa8c16' }} />
+            <Text > {dow}, {lophoc.GioHoc}</Text>
           </Space>
+        </Descriptions.Item>
+
+        <Descriptions.Item label="Phòng học">
+          <Space><EnvironmentOutlined style={{ color: '#8c8c8c' }} />
+            {lophoc.PhongHoc ?? 'Chưa cập nhật'}</Space>
+        </Descriptions.Item>
+
+        <Descriptions.Item label='Học phí'>
+          <Text style={{ color: '#52c41a' }}>
+            <DollarCircleFilled /> 123</Text>
         </Descriptions.Item>
 
         {/* dùng span giống column để trường mô tả ăn hết chiều ngang */}

@@ -9,7 +9,7 @@ import type { ClassDB } from "../class/ClassDTO"
 import courseApi from "../../api/courseApi"
 import classApi from "../../api/classApi"
 import {
-  CalendarFilled, ClockCircleFilled, EditOutlined, PlusOutlined, ReadOutlined,
+  CalendarOutlined, ClockCircleOutlined, EditOutlined, LeftOutlined, PlusOutlined, ReadOutlined,
   UserOutlined,
 } from "@ant-design/icons"
 import CourseModal from "./CourseModal"
@@ -86,12 +86,12 @@ const CourseDetail = () => {
     },
     { // giáo viên
       title: 'Giáo viên', dataIndex: ['GiaoVien', 'HoTen'], key: 'HoTen', ellipsis: true,
-      render: (name:string) =><Text><UserOutlined/> {name}</Text>
+      render: (name: string) => <Text><UserOutlined style={{ color: '#8c8c8c' }} /> {name}</Text>
     },
     { // khai giảng = ngày bắt đầu
       title: 'Khai giảng', dataIndex: 'TuNgay', key: 'TuNgay', width: 130,
       render: (day: string) =>
-        <Text><CalendarFilled style={{color:'#ff5d18'}}/> {new Date(day).toLocaleDateString()}</Text>
+        <Text><CalendarOutlined style={{ color: '#8c8c8c' }} /> {new Date(day).toLocaleDateString()}</Text>
     },
     { // lịch học
       title: 'Lịch học', dataIndex: 'LichHoc', key: 'LichHoc',
@@ -100,8 +100,9 @@ const CourseDetail = () => {
         const result = schedule.map(m => dow[m]).join('-')
 
         return <Space orientation="vertical" size={0}>
-          <Text ><ClockCircleFilled /> {lophoc.GioHoc}</Text>
-          <Text type="secondary" style={{ fontSize: '14px', display: 'block', textAlign: 'center' }}>
+          <Text ><ClockCircleOutlined style={{ color: '#8c8c8c' }} /> {lophoc.GioHoc}</Text>
+          <Text
+            style={{ fontSize: '14px', display: 'block', textAlign: 'center' }}>
             {result}
           </Text>
         </Space>
@@ -109,18 +110,23 @@ const CourseDetail = () => {
     },
     { // sĩ số
       title: 'Sĩ số', dataIndex: 'SiSo', key: 'SiSo',
-      render: (classSize: number, lophoc: ClassDB) => (
-        <>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span>{lophoc.TongGhiDanh}/{classSize}</span>
-            <span style={{ color: '#999' }}>Học viên</span>
-          </div>
-          <Progress
-            percent={(lophoc.TongGhiDanh / classSize) * 100}
-            showInfo={false}
-          />
-        </>
-      )
+      render: (classSize: number, lophoc: ClassDB) => {
+        const percent = (lophoc.TongGhiDanh / classSize) * 100
+        let percentColor = '#ff4d4f' // đỏ
+        if (percent > 50) percentColor = '#faad14' //vàng
+        if (percent > 80) percentColor = '#52c41a'
+          return <>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span>{lophoc.TongGhiDanh}/{classSize}</span>
+              <span style={{ color: '#999' }}>Học viên</span>
+            </div>
+            <Progress
+              percent={percent}
+              strokeColor={percentColor}
+              showInfo={false}
+            />
+          </>
+      }
     },
     { // trạng thái
       title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai',
@@ -165,8 +171,8 @@ const CourseDetail = () => {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             {/* Nút quay lại */}
-            <Button onClick={() => navigate(-1)}> Quay lại
-            </Button>
+            <Button size="large" type="text" icon={<LeftOutlined />}
+              onClick={() => navigate(-1)} />
 
             <Avatar shape="square" size={49} style={{ background: `#0d6efd` }}>
               {course.MaKhoaHoc.substring(0, 4)}
@@ -184,7 +190,7 @@ const CourseDetail = () => {
             </div>
           </div>
           <Tooltip title='Sửa khóa học'>
-            <Button type="primary" ghost icon={<EditOutlined />}
+            <Button type="link" icon={<EditOutlined />}
               disabled={course.TrangThai === 'INACTIVE'}
               onClick={() => { setOpenCourseModal(true) }}
             />

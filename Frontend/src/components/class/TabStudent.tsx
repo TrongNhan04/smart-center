@@ -1,7 +1,8 @@
 import {
   CalendarFilled, CalendarOutlined, DollarCircleFilled, EnvironmentFilled,
+  EnvironmentOutlined,
   InfoCircleOutlined,
-  PhoneFilled, SearchOutlined, UserOutlined
+  PhoneFilled, PhoneOutlined, SearchOutlined, UserOutlined
 } from "@ant-design/icons"
 import { Button, Col, Input, Row, Space, Table, Tooltip, Typography } from "antd"
 import { useEffect, useState } from "react"
@@ -56,51 +57,52 @@ const TabStudent = ({ id }: Props) => {
       title: 'Tên học viên', dataIndex: 'TenHocVien', //width: 220,
       key: 'TenHocVien', ellipsis: true,
       render: (name: string, student: StuOfClass) => {
-        return isAmin ? <Link to={`/admin/students/${student.HocVienID}`}
-          style={{ fontWeight: 'bold' }}><UserOutlined /> {name}</Link>
-          : <Text strong style={{ color: '#1890ff' }}><UserOutlined /> {name}</Text>
+        return isAmin ? <><UserOutlined style={{color:'#8c8c8c'}}/>
+          <Link to={`/admin/students/${student.HocVienID}`}
+            style={{ fontWeight: 'bold' }}> {name}</Link></>
+          : <Text strong style={{ color: '#1890ff' }}> {name}</Text>
       }
     },
     { // ngày sinh
       title: 'Ngày sinh', dataIndex: 'NgaySinh', key: 'NgaySinh', //width: 100,
       render: (dob: string) => <Text>
-        <CalendarOutlined /> {new Date(dob).toLocaleDateString()}
+        <CalendarOutlined style={{ color: '#8c8c8c' }} /> {new Date(dob).toLocaleDateString()}
       </Text>
     },
     { // địa chỉ
       title: 'Địa chỉ', dataIndex: 'DiaChi', key: 'DiaChi', ellipsis: true,
       render: (address: string) => <Text>
-        <EnvironmentFilled style={{ color: '#ff1818' }} /> {address ?? '_'}
+        <EnvironmentOutlined style={{ color: '#8c8c8c' }} /> {address ?? '_'}
       </Text>
     },
     { // ngày nhập học
       title: 'Ngày nhập học', dataIndex: 'NgayNhapHoc', key: 'NgayNhapHoc', //width: 100,
       render: (dob: string) => <Text>
-        <CalendarFilled style={{ color: '#b7b7b1' }} /> {new Date(dob).toLocaleDateString()}
+        <CalendarOutlined style={{ color: '#8c8c8c' }} /> {new Date(dob).toLocaleDateString()}
       </Text>
     },
     { // Phụ huynh
       title: 'Phụ huynh', dataIndex: 'PhuHuynh', key: 'PhuHuynh', //width: 100,
       render: (parent: string, stu: StuOfClass) =>
         <Tooltip title={`PH. ${parent}`}>
-          <Space style={{ cursor: 'pointer', color: '#1890ff' }}>
-            <PhoneFilled />{stu.DienThoai}
+          <Space style={{ cursor: 'pointer' }}>
+            <PhoneOutlined style={{color: '#8c8c8c'}}/>{stu.DienThoai}
           </Space>
         </Tooltip>
     },
-    { // học phí
-      title: 'Học phí', dataIndex: 'HocPhi', key: 'HocPhi', //width: 100,
-      align: 'center' as const, render: (fee: string) => {
-        const hocPhi = Number(fee) ?? 0
-        return <Text style={{ color: '#47b410' }}>
-          <DollarCircleFilled /> {hocPhi.toLocaleString()}đ</Text>
-      }
-    },
+    // { // học phí
+    //   title: 'Học phí', dataIndex: 'HocPhi', key: 'HocPhi', //width: 100,
+    //   align: 'center' as const, render: (fee: string) => {
+    //     const hocPhi = Number(fee) ?? 0
+    //     return <Text style={{ color: '#52c41a' }}>
+    //       <DollarCircleFilled /> {hocPhi.toLocaleString()}đ</Text>
+    //   }
+    // },
     { // thao tác của giáo viên
       title: 'Thao tác', key: 'ThaoTac', align: 'center' as const,
       render: (_: any, stu: StuOfClass) => <Button
-        icon={<InfoCircleOutlined/>}
-        style={{ backgroundColor: '#2fb058', color: '#fff'}}
+        icon={<InfoCircleOutlined />}
+        style={{ color: '#52c41a', borderColor: '#52c41a'  }}
         onClick={() => navigate(`students/${stu.HocVienID}`)}>
         Tiến độ
       </Button>
@@ -123,15 +125,6 @@ const TabStudent = ({ id }: Props) => {
             onSearch={fetchStuOfClass}
           />
         </Col>
-
-        {/* <Col style={{ marginLeft: 'auto' }}>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={OpenModalAdd}
-          > Thêm học viên
-          </Button>
-        </Col> */}
       </Row>
       {/* Bảng hiển thị dữ liệu */}
       <Table

@@ -50,6 +50,14 @@ export class StudentController {
         return await this.studentService.GetClassesByStudentID(+studentId)
     }
 
+    // danh sách hóa đơn của học viên
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADMIN')
+    @Get(':id/invoices')
+    async GetManyInvoiceById(@Param('id') studentId: number) {
+        return await this.studentService.GetManyInvoiceById(+studentId)
+    }
+
     // thống kê kết quả học tập 1 lớp mà học viên học
     @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
     @Roles('ADMIN','TEACHER')

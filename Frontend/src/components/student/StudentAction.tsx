@@ -1,13 +1,13 @@
 import { Button, message, notification, Popconfirm, Space, Tooltip } from "antd"
 import { studentApi } from "../../api/studentApi"
 import type { StudentDB } from "./StudentDTO"
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons"
+import { DeleteOutlined, EditOutlined, LockOutlined, LockTwoTone } from "@ant-design/icons"
+import { CatchError } from "../common/catch.error"
 
 interface Props {
   student: StudentDB,
   onEdit: (student: StudentDB) => void,
-  // onReload: (studentId: number) => void
-  onReload: (q:string) => void
+  onReload: (q: string) => void // có q để search
 }
 
 const StudentAction = ({ student, onEdit, onReload }: Props) => {
@@ -17,13 +17,7 @@ const StudentAction = ({ student, onEdit, onReload }: Props) => {
       message.success('Thao tác thành công')
       onReload('')
     } catch (error: any) {
-      notification.error({
-        title: 'Có lỗi xảy ra',
-        description: error.response.data.message,
-        showProgress: true,
-        pauseOnHover: true
-      })
-      console.log('Có lỗi xảy ra: ', error.response.data.message)
+      CatchError.HandleError(error)
     }
   }
 
@@ -34,7 +28,7 @@ const StudentAction = ({ student, onEdit, onReload }: Props) => {
         <Tooltip title="Sửa thông tin">
           <Button
             size="small"
-            type="primary"
+            type="link"
             icon={<EditOutlined />}
             onClick={() => onEdit(student)}
           >
@@ -51,14 +45,20 @@ const StudentAction = ({ student, onEdit, onReload }: Props) => {
             onConfirm={() => handleOnInactive(student.ID)}
             okButtonProps={{ danger: true }}
           >
-            <Button size="small" icon={<DeleteOutlined />} type="primary" danger></Button>
+            <Button
+              size="small"
+              icon={<DeleteOutlined />}
+              type="link"
+              danger />
           </Popconfirm>
         </Tooltip>
       </Space>
     )
 
   return (
-    <>Không thể thao tác</>
+    <Tooltip title='Không thể thao tác'>
+      <Button type="text" icon={<LockOutlined/>}/>
+    </Tooltip>
   )
 }
 

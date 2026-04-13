@@ -43,7 +43,7 @@ export const mapDataStudent = (record: StudentDB):
 
 export interface ClassForStudent {
     ID: number,
-    MaLopHoc:string,
+    MaLopHoc: string,
     TenLop: string,
     GiaoVien: string,
     LichHoc: number[],
@@ -62,7 +62,7 @@ export interface ClassResult {
     GiaoVien: string,
     HocVien: string,
     GioHoc: string,
-    PhongHoc:string,
+    PhongHoc: string,
     KetQua: Result[]
 }
 
@@ -74,4 +74,14 @@ export interface Result {
     NhanXet: string,
     DiemDanh: boolean,
     Diem?: number
+}
+
+export interface InvoiceForStu {
+    ID: number,
+    MaHoaDon: string,
+    TongTien: number,
+    DaTra: number,
+    ThoiHan: string,
+    TrangThai: string,
+    TenLop: string
 }

@@ -1,6 +1,6 @@
 import { Button, Popconfirm, Space, Tooltip } from "antd"
 import type { ClassDB } from "./ClassDTO"
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons"
+import { DeleteOutlined, EditOutlined, LockOutlined } from "@ant-design/icons"
 
 interface Props {
   lophoc: ClassDB,
@@ -16,9 +16,8 @@ const ClassAction = ({ lophoc, onEdit, onSoftDelete }: Props) => {
     return (
       <Space size="small">
         {/* Nút sửa  */}
-        <Tooltip title="Sửa & xem chi tiết">
+        <Tooltip title="Sửa thông tin">
           <Button
-          
             size="small"
             type="link"
             icon={<EditOutlined />}
@@ -40,7 +39,8 @@ const ClassAction = ({ lophoc, onEdit, onSoftDelete }: Props) => {
             <Button
               size="small"
               icon={<DeleteOutlined />}
-              type="primary" danger
+              type="link" 
+              danger
             />
           </Popconfirm>
         </Tooltip>
@@ -53,7 +53,7 @@ const ClassAction = ({ lophoc, onEdit, onSoftDelete }: Props) => {
         <Tooltip title="Sửa & xem chi tiết">
           <Button
             size="small"
-            type="primary"
+            type="link"
             icon={<EditOutlined />}
             onClick={() => onEdit(lophoc)}
           >
@@ -63,7 +63,9 @@ const ClassAction = ({ lophoc, onEdit, onSoftDelete }: Props) => {
     )
 
   return (
-    <>Không thể thao tác</>
+    <Tooltip title='Không thể thao tác'>
+      <Button icon={<LockOutlined/>} type="text"/>
+    </Tooltip>
   )
 }
 

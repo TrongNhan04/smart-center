@@ -1,5 +1,5 @@
 import {
-  CalendarFilled, MailFilled, PhoneFilled, PlusOutlined, SearchOutlined,
+  CalendarFilled, CalendarOutlined, MailFilled, MailOutlined, PhoneFilled, PhoneOutlined, PlusOutlined, SearchOutlined,
   UserOutlined
 } from "@ant-design/icons"
 import {
@@ -11,6 +11,7 @@ import { useEffect, useState } from "react"
 import teacherApi from "../../api/teacherApi"
 import TeacherAction from "./TeacherAction"
 import TeacherModal from "./TeacherModal"
+import { CatchError } from "../common/catch.error"
 
 const { Text } = Typography
 const TeacherList = () => {
@@ -30,13 +31,7 @@ const TeacherList = () => {
       const res = await teacherApi.findMany()
       setTeachers(res.data)
     } catch (error: any) {
-      notification.error({
-        title: 'Có lỗi xảy ra',
-        description: error.response.data.message,
-        showProgress: true,
-        pauseOnHover: true
-      })
-      console.log('Có lỗi xảy ra: ', error)
+      CatchError.HandleError(error)
     }
     finally {
       setLoading(false)
@@ -57,34 +52,35 @@ const TeacherList = () => {
 
   const columns = [
     { // mã giáo viên
-      title: 'Mã giáo viên', dataIndex: 'MaGiaoVien',
+      title: 'Mã GV', dataIndex: 'MaGiaoVien',
       key: 'MaGiaoVien', width: 120, align: 'center' as const,
       render: (code: string) => <Text code>{code}</Text>
     },
     { // tên giáo viên
       title: 'Họ và tên', dataIndex: 'HoTen', //width: 220,
       key: 'HoTen', ellipsis: true,
-      render: (name: string, teacher: TeacherDB) =>
+      render: (name: string, teacher: TeacherDB) => <>
+        <UserOutlined style={{ color: '#8c8c8c' }} />
         <Link to={`/admin/teachers/${teacher.ID}`}
-          style={{ fontWeight: 'bold' }}><UserOutlined /> {name}</Link>
+          style={{ fontWeight: 'bold' }}> {name}</Link>
+      </>
     },
     { // ngày sinh
-      title: 'Ngày sinh', dataIndex: 'NgaySinh', key: 'NgaySinh', //width: 100,
+      title: 'Ngày sinh', dataIndex: 'NgaySinh', key: 'NgaySinh', 
       render: (dob: string) => <Text>
-        <Text><CalendarFilled style={{ color: '#ff7818' }} /> {new Date(dob).toLocaleDateString()}</Text>
+        <Text><CalendarOutlined style={{ color: '#8c8c8c' }} /> {new Date(dob).toLocaleDateString()}</Text>
       </Text>
     },
     { //Điện thoại
       title: 'Điện thoại', dataIndex: 'DienThoai', key: 'DienThoai', //width: 100,
       render: (phone: string) => <Text>
-        <PhoneFilled /> {phone}
+        <PhoneOutlined style={{color: '#8c8c8c'}}/> {phone}
       </Text>
     },
     { // Email
       title: 'Email', dataIndex: 'Email', key: 'Email', //width: 120,
       render: (email: string) => <Text>
-        {/* <MailOutlined style={{color:'#ff1818'}}/> {email} */}
-        <MailFilled style={{ color: '#188fff' }} /> {email}
+        <MailOutlined style={{ color: '#8c8c8c' }} /> {email}
       </Text>
     },
     { // trạng thái

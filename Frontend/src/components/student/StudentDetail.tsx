@@ -7,12 +7,13 @@ import {
   Avatar, Button, Card, Progress, Skeleton, Space, Table, Tabs, Tag, Tooltip, Typography
 } from "antd"
 import {
-  CalendarFilled, ClockCircleFilled, EditOutlined, InfoCircleOutlined, ReadOutlined,
+  CalendarFilled, CalendarOutlined, CaretLeftOutlined, ClockCircleFilled, EditOutlined, InfoCircleOutlined, LeftOutlined, ReadOutlined,
   UserOutlined,
 } from "@ant-design/icons"
 import StudentModal from "./StudentModal"
 import TabInfo from "./TabInfo"
 import { CatchError } from "../common/catch.error"
+import TabInvoice from "./TabInvoice"
 
 const { Text, Title } = Typography
 
@@ -67,32 +68,32 @@ const StudentDetail = () => {
       title: 'Lớp', dataIndex: 'TenLop', key: 'TenLop', ellipsis: true,
       render: (name: string, lophoc: ClassForStudent) =>
         <Link to={`/admin/classes/${lophoc.ID}`} style={{ fontWeight: 'bold' }}>
-          <ReadOutlined /> {name}</Link>
+          <ReadOutlined style={{ color: '#8c8c8c' }} /> {name}</Link>
     },
     { // giáo viên
       title: 'Giáo viên', dataIndex: 'GiaoVien', key: 'GiaoVien', ellipsis: true,
-      render: (name: string) => <Text><UserOutlined /> {name}</Text>
+      render: (name: string) => <Text><UserOutlined style={{ color: '#8c8c8c' }} /> {name}</Text>
     },
     {// ngày nhập học
       title: 'Ngày nhập học', dataIndex: 'NgayGhiDanh', key: 'NgayGhiDanh',
       align: 'center' as const, render: (day: string) =>
-        <Text><CalendarFilled style={{ color: '#ff5d18' }} /> {new Date(day).toLocaleDateString()}</Text>
+        <Text><CalendarOutlined style={{ color: '#8c8c8c' }} /> {new Date(day).toLocaleDateString()}</Text>
     },
-    { // lịch học
-      title: 'Lịch học', dataIndex: 'LichHoc', key: 'LichHoc', align: 'center' as const,
-      render: (timeTable: number[], lophoc: ClassForStudent) => {
-        const dow = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
-        const result = timeTable.map(m => dow[m]).join('-')
+    // { // lịch học
+    //   title: 'Lịch học', dataIndex: 'LichHoc', key: 'LichHoc', align: 'center' as const,
+    //   render: (timeTable: number[], lophoc: ClassForStudent) => {
+    //     const dow = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
+    //     const result = timeTable.map(m => dow[m]).join('-')
 
-        return <Space orientation="vertical" size={0}>
-          <Text ><ClockCircleFilled /> {lophoc.GioHoc}</Text>
-          <Text type="secondary"
-            style={{ fontSize: '14px', display: 'block', textAlign: 'center' }}>
-            {result}
-          </Text>
-        </Space>
-      }
-    },
+    //     return <Space orientation="vertical" size={0}>
+    //       <Text ><ClockCircleFilled /> {lophoc.GioHoc}</Text>
+    //       <Text type="secondary"
+    //         style={{ fontSize: '14px', display: 'block', textAlign: 'center' }}>
+    //         {result}
+    //       </Text>
+    //     </Space>
+    //   }
+    // },
     { // tiến độ
       title: 'Tiến độ', dataIndex: 'BuoiDaHoc', key: 'BuoiDaHoc',
       render: (value: number, lophoc: ClassForStudent) => {
@@ -112,9 +113,12 @@ const StudentDetail = () => {
     },
     {
       title: 'Thao tác', dataIndex: 'action', key: 'action', align: 'center' as const,
-      render: (_: any, lophoc: ClassForStudent) => <Button type="primary"
-        icon={<InfoCircleOutlined />} size="small"
-        onClick={() => navigate(`classes/${lophoc.ID}`)}> Chi tiết</Button>
+      render: (_: any, lophoc: ClassForStudent) =>
+        <Tooltip title='Xem tiến độ'>
+          <Button type="link"
+            icon={<InfoCircleOutlined />} size="small"
+            onClick={() => navigate(`classes/${lophoc.ID}`)} />
+        </Tooltip>
     }
   ]
 
@@ -145,8 +149,8 @@ const StudentDetail = () => {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             {/* nút quay lại */}
-            <Button onClick={() => navigate(-1)} > Quay lại
-            </Button>
+            <Button size="large" type="text" icon={<LeftOutlined />}
+              onClick={() => navigate(-1)} />
 
             <Avatar shape="square" size={49} style={{ background: '#0d6efd' }}>
               {student.MaHocVien.substring(0, 4)}
@@ -164,7 +168,7 @@ const StudentDetail = () => {
             </div>
           </div>
           <Tooltip title='Sửa thông tin'>
-            <Button type="primary" ghost icon={<EditOutlined />}
+            <Button type="link" icon={<EditOutlined />}
               disabled={student.TrangThai === 'INACTIVE'}
               onClick={() => { setopenStudentModal(true) }}
             />
@@ -187,16 +191,23 @@ const StudentDetail = () => {
               {
                 key: "1",
                 label: 'Lớp ghi danh',
-                children: (<Table
-                  dataSource={classes}
-                  columns={columnsOfClass}
-                  pagination={{ defaultPageSize: 5 }}
-                  rowKey="ID"
-                  scroll={{ y: 320 }}
-                />)
+                children: (
+                  <Table
+                    dataSource={classes}
+                    columns={columnsOfClass}
+                    pagination={{ defaultPageSize: 5 }}
+                    rowKey="ID"
+                    scroll={{ y: 320 }}
+                  />
+                )
               },
               {
                 key: '2',
+                label: 'Hóa đơn',
+                children: (<TabInvoice />)
+              },
+              {
+                key: '3',
                 label: 'Thông tin chung',
                 children: (<TabInfo student={student} />)
               }

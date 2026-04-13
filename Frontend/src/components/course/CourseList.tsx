@@ -100,9 +100,11 @@ const CourseList = () => {
     { // tên khóa học
       title: 'Tên khóa học', dataIndex: 'TenKhoaHoc', width: 220,
       key: 'TenKhoaHoc', ellipsis: true,
-      render: (name: string, course: CourseDB) =>
+      render: (name: string, course: CourseDB) => <>
+        <ReadOutlined style={{ color: '#8c8c8c' }} />
         <Link to={`/admin/courses/${course.ID}`}
-          style={{ fontWeight: 'bold' }}><ReadOutlined/> {name}</Link>
+          style={{ fontWeight: 'bold' }}> {name}</Link>
+      </>
     },
     { // trình độ
       title: 'Trình độ', dataIndex: 'TrinhDo', key: 'TrinhDo', width: 100,
@@ -132,7 +134,7 @@ const CourseList = () => {
       title: 'Thời gian', dataIndex: 'ThoiGian', key: 'ThoiGian', width: 170,
       render: (month: number, courses: CourseDB) => (
         <Space>
-          <Text><ClockCircleOutlined style={{color:'#1677FF'}}/> {month} tháng</Text>
+          <Text><ClockCircleOutlined style={{ color: '#1677FF' }} /> {month} tháng</Text>
           <Text>({courses.TongSoBuoi} buổi)</Text>
         </Space>
       )
@@ -147,7 +149,6 @@ const CourseList = () => {
         }
         // value là 1 trong 3 key đó
         const status = statusMap[value]
-        //return <Tag color={status.color}>{status.text}</Tag>
         return <Badge status={status.color as any} text={status.text} />
       }
     },

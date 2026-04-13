@@ -3,9 +3,10 @@ import { useEffect, useState } from "react"
 import type { StudentDB } from "./StudentDTO"
 import { studentApi } from "../../api/studentApi"
 import { Link, useSearchParams } from "react-router-dom"
-import { CalendarFilled, EnvironmentFilled, PlusOutlined, SearchOutlined, UserOutlined } from "@ant-design/icons"
+import { CalendarFilled, CalendarOutlined, EnvironmentFilled, EnvironmentOutlined, PlusOutlined, SearchOutlined, UserOutlined } from "@ant-design/icons"
 import StudentModal from "./StudentModal"
 import StudentAction from "./StudentAction"
+import { CatchError } from "../common/catch.error"
 
 const { Text } = Typography
 const StudentList = () => {
@@ -25,13 +26,7 @@ const StudentList = () => {
       const res = await studentApi.findMany(keyword, filterStatus)
       setStudents(res.data)
     } catch (error: any) {
-      notification.error({
-        title: 'Có lỗi xảy ra',
-        description: error.response.data.message,
-        showProgress: true,
-        pauseOnHover: true
-      })
-      console.log('Có lỗi xảy ra: ', error)
+      CatchError.HandleError(error)
     }
     finally {
       setLoading(false)
@@ -44,7 +39,7 @@ const StudentList = () => {
 
   const columns = [
     { // mã học viên
-      title: 'Mã học viên', dataIndex: 'MaHocVien',
+      title: 'Mã HV', dataIndex: 'MaHocVien',
       key: 'MaHocVien', width: 120, align: 'center' as const,
       render: (code: string) => <Text code>{code}</Text>
     },
@@ -53,18 +48,20 @@ const StudentList = () => {
       key: 'TenHocVien', ellipsis: true,
       render: (name: string, student: StudentDB) =>
         <Link to={`/admin/students/${student.ID}`}
-          style={{ fontWeight: 'bold' }}><UserOutlined/> {name}</Link>
+          style={{ fontWeight: 'bold' }}>
+          <UserOutlined style={{ color: '#8c8c8c' }} /> {name}
+        </Link>
     },
     { // ngày sinh
       title: 'Ngày sinh', dataIndex: 'NgaySinh', key: 'NgaySinh', //width: 100,
       render: (dob: string) => <Text>
-        <CalendarFilled style={{color:'gray'}}/> {new Date(dob).toLocaleDateString()}
+        <CalendarOutlined style={{ color: '#8c8c8c' }} /> {new Date(dob).toLocaleDateString()}
       </Text>
     },
     { // địa chỉ
       title: 'Địa chỉ', dataIndex: 'DiaChi', key: 'DiaChi', ellipsis: true,
       render: (address: string) => <Space>
-        <EnvironmentFilled style={{color:'#ff4d4f'}}/>
+        <EnvironmentOutlined style={{ color: '#8c8c8c' }} />
         {!address || '' ? '_' : address}
       </Space>
     },

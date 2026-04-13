@@ -5,7 +5,7 @@ import {
 } from "antd"
 import { invoiceApi } from "../../api/invoiceApi"
 import {
-  CalendarFilled, CheckCircleOutlined, PhoneOutlined, SearchOutlined,
+  CalendarFilled, CalendarOutlined, CheckCircleOutlined, PhoneOutlined, SearchOutlined,
   UserOutlined
 } from "@ant-design/icons"
 import InvoiceAction from "./InvoiceAction"
@@ -75,7 +75,6 @@ const InvoiceList = () => {
 
   const handleChange = (pagination: any) => {
     setSearchParam({ page: pagination.current })
-    console.log('page: ', pagination.current)
   }
 
   const months = [
@@ -106,9 +105,9 @@ const InvoiceList = () => {
       render: (name: string, invoice: InvoiceDB) =>
         <Space orientation="vertical" size={0}>
           <Link to={`/admin/students/${invoice.HocVienID}`} style={{ fontWeight: 'bold' }}>
-            <UserOutlined /> {name}
+            <UserOutlined style={{ color: '#8c8c8c' }}/> {name}
           </Link>
-          <Text><PhoneOutlined /> {invoice.DienThoai}</Text>
+          <Text><PhoneOutlined style={{ color: '#8c8c8c' }}/> {invoice.DienThoai}</Text>
         </Space>
     },
     { // tổng tiền + còn nợ 
@@ -171,9 +170,9 @@ const InvoiceList = () => {
         let isOverTime_Debt = false
         if (overTime > 0 && isDebt && !isCancelled)
           isOverTime_Debt = true
-        return <Space orientation="vertical">
+        return <Space orientation="vertical" size={0}>
           <Text >
-            <CalendarFilled style={{ color: 'gray' }} /> {new Date(invoiceDate).toLocaleDateString()}
+            <CalendarOutlined style={{ color: '#8c8c8c' }} /> {new Date(invoiceDate).toLocaleDateString()}
           </Text>
           {isOverTime_Debt && <Tag color='red'>Trễ {overDate} ngày</Tag>}
         </Space>
@@ -186,6 +185,7 @@ const InvoiceList = () => {
         { text: 'Thanh toán 1 phần', value: 'Part' },
         { text: 'Chưa thanh toán', value: 'Unpaid' },
         { text: 'Quá hạn', value: 'OverDate' },
+        { text: 'Đã hủy', value: 'CANCELLED'}
       ],
       onFilter: (value: any, invoice: InvoiceDB) => {
         const { DaTra, TongTien, NgayHetHan, TrangThai } = invoice
@@ -197,8 +197,9 @@ const InvoiceList = () => {
           case 'Part': return DaTra > 0 && ConNo && isActive
           case 'Unpaid': return DaTra == 0 && isActive
           case 'OverDate': return now > HetHan && ConNo && isActive
+          case 'CANCELLED': return !isActive
           default:
-            return false
+            return false // return false để table không báo lỗi
         }
       },
       render: (status: string, invoice: InvoiceDB) => {

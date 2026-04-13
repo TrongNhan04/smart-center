@@ -20,7 +20,7 @@ const SessionAction = ({ session, unlock, onCancel }: Props) => {
     <Tooltip title="Xem chi tiết">
       <Button
         size="small"
-        type="primary"
+        type="link"
         icon={<InfoCircleOutlined />}
         onClick={()=>navigate(`sessions/${session.ID}`)}
       >
@@ -62,7 +62,8 @@ const SessionAction = ({ session, unlock, onCancel }: Props) => {
             <Button
               size="small"
               icon={<UnlockOutlined />}
-              type="primary" ghost danger
+              type="link" 
+              style={{color:'orange'}} 
             />
           </Popconfirm>
         </Tooltip>
@@ -83,7 +84,7 @@ const SessionAction = ({ session, unlock, onCancel }: Props) => {
           <Button
             size="small"
             icon={<DeleteOutlined />}
-            type="primary" danger
+            type="link" danger
             onClick={()=>setOpen(true)}
           />
         </Tooltip>

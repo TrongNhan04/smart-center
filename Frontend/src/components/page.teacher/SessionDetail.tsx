@@ -5,8 +5,9 @@ import {
   Skeleton,
 } from 'antd';
 import {
-  CalendarFilled, ClockCircleFilled, EnvironmentFilled,
-  InboxOutlined, PhoneOutlined, ReadFilled, UserOutlined,
+  CalendarFilled, CalendarOutlined, ClockCircleFilled, ClockCircleOutlined, EnvironmentFilled,
+  EnvironmentOutlined,
+  InboxOutlined, LeftOutlined, PhoneOutlined, ReadFilled, ReadOutlined, UserOutlined,
 } from '@ant-design/icons';
 import type { SessionResult, TSessionDetail } from '../session/SessionDTO';
 import { DateHelper } from '../common/date.helper';
@@ -207,12 +208,13 @@ const SessionDetail = () => {
       <Skeleton loading={loading} active paragraph={{ rows: 6 }} />
     </div>
 
-  if (!session) return <div style={{ padding: 24, background: '#f0f2f5', minHeight: '100vh' }}>
-    <Space orientation='vertical' size={3}>
-      <Text>Không tìm thấy buổi học</Text>
-      <Button onClick={() => navigate(-1)}>Quay lại</Button>
-    </Space>
-  </div>
+  if (!session)
+    return <div style={{ padding: 24, background: '#f0f2f5', minHeight: '100vh' }}>
+      <Space orientation='vertical' size={3}>
+        <Text>Không tìm thấy buổi học</Text>
+        <Button onClick={() => navigate(-1)}>Quay lại</Button>
+      </Space>
+    </div>
 
   const ngayHoc = new Date(session.BatDauLuc).toLocaleDateString()
   const gioHoc = DateHelper.ISOToHHMM(session.BatDauLuc, session.KetThucLuc)
@@ -221,8 +223,9 @@ const SessionDetail = () => {
     <div style={{ padding: 24, background: '#f0f2f5', minHeight: '100vh' }}>
 
       <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
-        <Button onClick={() => navigate(-1)} >Quay lại</Button>
-        <Title level={3} style={{ margin: 0 }}>Báo cáo buổi học</Title>
+        <Button size="large" type="text" icon={<LeftOutlined />}
+              onClick={() => navigate(-1)} />
+        <Title level={3} style={{ margin: 0 }}>Buổi học {session.BuoiSo}</Title>
 
         <UnlockButton
           session={session}
@@ -239,8 +242,7 @@ const SessionDetail = () => {
           styles={{ header: { backgroundColor: '#f0f5ff', color: '#1d39c4' } }}
           extra={
             <Button onClick={() => setOpenDrawer(true)}
-
-              style={{ backgroundColor: '#f0f5ff', color: '#1d39c4', fontWeight: 'bold' }}
+              type='link'
             >Xem danh sách</Button>
           }>
 
@@ -249,22 +251,22 @@ const SessionDetail = () => {
             styles={{ label: { color: 'black' } }}
             column={{ xs: 1, sm: 2, md: 3 }}>
             <Descriptions.Item label="Lớp">
-              <Text><ReadFilled style={{ color: '#187cff' }} /> {session.LopHoc}</Text>
+              <Text><ReadOutlined style={{ color: '' }} /> {session.LopHoc}</Text>
             </Descriptions.Item>
             <Descriptions.Item label="Buổi số"><Text>{session.BuoiSo}</Text></Descriptions.Item>
             <Descriptions.Item label="Ngày học">
-              <Text><CalendarFilled style={{ color: '#ff8818' }} /> {ngayHoc}</Text>
+              <Text><CalendarOutlined style={{ color: '#187cff' }} /> {ngayHoc}</Text>
             </Descriptions.Item>
             <Descriptions.Item label="Giáo viên">
-              <Text><UserOutlined /> {session.GiaoVien}</Text>
+              <Text><UserOutlined style={{ color: '#8c8c8c' }}/> {session.GiaoVien}</Text>
             </Descriptions.Item>
             <Descriptions.Item label="Phòng">
               <Text>
-                <EnvironmentFilled style={{ color: '#ff1818' }} /> {session.PhongHoc ?? '_'}
+                <EnvironmentOutlined style={{ color: '#8c8c8c' }} /> {session.PhongHoc ?? '_'}
               </Text>
             </Descriptions.Item>
             <Descriptions.Item label="Thời gian">
-              <Text><ClockCircleFilled /> {gioHoc}</Text>
+              <Text><ClockCircleOutlined style={{color:'#faad14'}}/> {gioHoc}</Text>
             </Descriptions.Item>
           </Descriptions>
 
@@ -275,7 +277,7 @@ const SessionDetail = () => {
                 <Input placeholder="Ví dụ: Unit 5 - Present Simple" size="large" />
               </Form.Item>
               <Form.Item label="Nội dung chi tiết" name="NoiDung">
-                <TextArea rows={4} placeholder="Ghi chú chi tiết các phần đã dạy..." />
+                <TextArea rows={4} placeholder="Nội dung chi tiết các phần đã dạy..." />
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
@@ -284,7 +286,7 @@ const SessionDetail = () => {
               </Form.Item>
               <Form.Item label="Nhận xét chung về lớp" name="NhanXetChung"
                 rules={[{ required: true, message: 'Vui lòng nhập nhận xét!' }]}>
-                <TextArea rows={3} placeholder="Đánh giá tinh thần học tập chung của cả lớp..." />
+                <TextArea rows={3} placeholder="..." />
               </Form.Item>
             </Col>
           </Row>

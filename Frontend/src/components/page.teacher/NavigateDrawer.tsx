@@ -36,16 +36,16 @@ const NavigateDrawer = ({ open, onCancel }: Props) => {
   return (
 
     <Drawer
-      title="Chi tiết buổi học"
+      title="Danh sách buổi học"
       size={500}
       placement="right"
       onClose={() => onCancel()}
       open={open}
     >
-      {/* <Card variant='borderless' style={{ borderRadius: 8 }}> */}
+      {/* <Card variant='borderless' style={{ borderRadius: 8 }}>
       <Text strong style={{ display: 'block', marginBottom: 12 }}>
         Chuyển nhanh đến buổi học khác:
-      </Text>
+      </Text> */}
 
       <div style={{
         display: 'flex',

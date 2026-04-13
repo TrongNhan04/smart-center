@@ -1,5 +1,5 @@
 import {
-  CalendarFilled, EditOutlined, InboxOutlined, InfoCircleOutlined, PlusOutlined, ReadOutlined,
+  CalendarFilled, CalendarOutlined, EditOutlined, InboxOutlined, InfoCircleOutlined, LeftOutlined, PlusOutlined, ReadOutlined,
   UnlockOutlined
 }
   from "@ant-design/icons"
@@ -75,9 +75,7 @@ const ClassDetail = () => {
       key: 'BatDauLuc', //ellipsis: 
       render: (value: string) => {
         return <Space orientation="vertical" size={0}>
-          <Text><CalendarFilled style={{ color: '#ff5d18' }} /> {new Date(value).toLocaleDateString()}</Text>
-          {/* <Text><ClockCircleFilled /> {DateHelper.ISOToHHMM(value, session.KetThucLuc)}
-          </Text> */}
+          <Text><CalendarOutlined style={{ color: '#8c8c8c' }} /> {new Date(value).toLocaleDateString()}</Text>
         </Space>
       }
     },
@@ -85,7 +83,7 @@ const ClassDetail = () => {
       title: 'Nội dung', dataIndex: 'ChuDe', key: 'ChuDe', ellipsis: true,
       render: (topic: string) => {
         return <Space orientation="vertical" size={0}>
-          <Text ><ReadOutlined style={{ color: 'purple' }} /> {topic ?? `Chủ đề: chưa cập nhật...`} </Text>
+          <Text ><ReadOutlined style={{ color: '#722ed1' }} /> {topic ?? `Chủ đề: chưa cập nhật...`} </Text>
         </Space>
       }
     },
@@ -134,7 +132,7 @@ const ClassDetail = () => {
         if (adminMK)
           return <Tag color='green'><UnlockOutlined /> Đang mở</Tag>
         else
-          return <>-</>
+          return <>---</>
       }
     },
     {// thao tác
@@ -218,7 +216,8 @@ const ClassDetail = () => {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             {/* nút quay lại */}
-            <Button onClick={() => navigate(-1)}> Quay lại</Button>
+            <Button size="large" type="text" icon={<LeftOutlined />}
+              onClick={() => navigate(-1)} />
 
             <Avatar shape="square" size={49}
               style={{ background: `#0d6efd` }}
@@ -238,7 +237,7 @@ const ClassDetail = () => {
           </div>
           {/* là admin thì cho sửa */}
           {isAdmin && <><Tooltip title='Sửa lớp học'>
-            <Button type="primary" ghost icon={<EditOutlined />}
+            <Button type="link" icon={<EditOutlined />}
               disabled={lophoc?.TrangThai === 'CLOSED' || lophoc?.TrangThai === 'FINISHED'}
               onClick={() => setOpenClassModal(true)}
             />

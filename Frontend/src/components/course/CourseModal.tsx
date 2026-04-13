@@ -191,10 +191,8 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: Props) => {
 
           <Col span={10}>
             <Alert
-            title="Vui lòng liệt kê các chủ đề theo thứ tự từ 
+              title="Vui lòng liệt kê các chủ đề theo thứ tự từ 
 trên xuống dưới, mỗi chủ đề một dòng."
-              //title="Lưu ý về đề cương"
-              // description=
               type="warning"
               showIcon
               style={{ marginBottom: 10 }}
@@ -204,7 +202,7 @@ trên xuống dưới, mỗi chủ đề một dòng."
               rules={[{ required: true, message: 'Vui lòng nhập đề cương' }]}>
               <Input.TextArea
                 rows={16}
-                placeholder="Simple Present..."
+                placeholder='Simple Present...'
                 showCount
               />
             </Form.Item>
