@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react"
-import { Link, useNavigate, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom"
 import type { ClassForStudent, StudentDB } from "./StudentDTO"
 import { studentApi } from "../../api/studentApi"
 import classApi from "../../api/classApi"
 import {
-  Avatar, Button, Card, Progress, Skeleton, Space, Table, Tabs, Tag, Tooltip, Typography
+  Avatar, Badge, Button, Card, Progress, Skeleton, Space, Table, Tabs, Tag, Tooltip, Typography
 } from "antd"
 import {
   CalendarFilled, CalendarOutlined, CaretLeftOutlined, ClockCircleFilled, EditOutlined, InfoCircleOutlined, LeftOutlined, ReadOutlined,
@@ -24,8 +24,10 @@ const StudentDetail = () => {
   const [classes, setClasses] = useState<ClassForStudent[]>([])
   const [openStudentModal, setopenStudentModal] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [searchParam, setSearchParam] = useSearchParams()
   const navigate = useNavigate()
-
+  const currentTab = searchParam.get('tab') || 'classes'
+  const currentPage = Number(searchParam.get('page')) || 1
 
   const initData = async () => {
     try {
@@ -79,28 +81,13 @@ const StudentDetail = () => {
       align: 'center' as const, render: (day: string) =>
         <Text><CalendarOutlined style={{ color: '#8c8c8c' }} /> {new Date(day).toLocaleDateString()}</Text>
     },
-    // { // lịch học
-    //   title: 'Lịch học', dataIndex: 'LichHoc', key: 'LichHoc', align: 'center' as const,
-    //   render: (timeTable: number[], lophoc: ClassForStudent) => {
-    //     const dow = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
-    //     const result = timeTable.map(m => dow[m]).join('-')
-
-    //     return <Space orientation="vertical" size={0}>
-    //       <Text ><ClockCircleFilled /> {lophoc.GioHoc}</Text>
-    //       <Text type="secondary"
-    //         style={{ fontSize: '14px', display: 'block', textAlign: 'center' }}>
-    //         {result}
-    //       </Text>
-    //     </Space>
-    //   }
-    // },
     { // tiến độ
       title: 'Tiến độ', dataIndex: 'BuoiDaHoc', key: 'BuoiDaHoc',
       render: (value: number, lophoc: ClassForStudent) => {
         if (lophoc.TrangThaiGD === 'INACTIVE')
-          return <Text delete>Đã hủy ghi danh</Text>
+          return <Badge status="error" text='Lớp đã đóng' />
 
-        return <Space orientation="vertical" size={0}>
+        return <Space >
           <Text>{value}/{lophoc.TongSoBuoi} BH &nbsp;
             <Progress steps={4}
               strokeColor={'#52c41a'}
@@ -186,28 +173,36 @@ const StudentDetail = () => {
       <div style={{ padding: '0px 18px 0px 18px' }}>
         <Card >
           <Tabs
-            defaultActiveKey="1"
+            onChange={(value) => setSearchParam({ tab: value })}
+            activeKey={currentTab}
             items={[
               {
-                key: "1",
+                key: "classes",
                 label: 'Lớp ghi danh',
                 children: (
                   <Table
+                    onChange={(page: any) => setSearchParam({
+                      tab: currentTab,
+                      page: page.current
+                    })}
                     dataSource={classes}
                     columns={columnsOfClass}
-                    pagination={{ defaultPageSize: 5 }}
+                    pagination={{
+                      pageSize: 1,
+                      current: currentPage
+                    }}
                     rowKey="ID"
                     scroll={{ y: 320 }}
                   />
                 )
               },
               {
-                key: '2',
+                key: 'invoices',
                 label: 'Hóa đơn',
                 children: (<TabInvoice />)
               },
               {
-                key: '3',
+                key: 'info',
                 label: 'Thông tin chung',
                 children: (<TabInfo student={student} />)
               }

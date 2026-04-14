@@ -1,5 +1,5 @@
 import {
-  CalendarOutlined, ClockCircleFilled, ClockCircleOutlined, MoneyCollectOutlined, PhoneOutlined, 
+  CalendarOutlined, ClockCircleFilled, ClockCircleOutlined, LeftOutlined, MoneyCollectOutlined, PhoneOutlined,
   ReadOutlined, RollbackOutlined, UserOutlined
 } from "@ant-design/icons";
 import {
@@ -134,7 +134,7 @@ const InvoiceDetail = () => {
     },
     {
       title: 'Thu ngân', dataIndex: 'ThuNgan', key: 'ThuNgan', width: 220,
-      render: (name:string) => <Text><UserOutlined/> {name}</Text>
+      render: (name: string) => <Text><UserOutlined /> {name}</Text>
     },
     {
       title: 'Ghi chú', dataIndex: 'GhiChu', key: 'GhiChu',
@@ -146,8 +146,10 @@ const InvoiceDetail = () => {
     <div style={{ padding: 24 }}>
       <Card>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
-          <Button onClick={() => navigate(-1)}> Quay lại</Button>
-          <Text style={{ fontSize: 24, fontWeight: 'bold' }}> HÓA ĐƠN {invoice.MaHoaDon}</Text>
+          <Button type="text"
+            icon = {<LeftOutlined/>}
+            onClick={() => navigate(-1)} />
+          <Text style={{ fontSize: 24, fontWeight: '500' }}> HÓA ĐƠN {invoice.MaHoaDon}</Text>
           <Space>
             {/* <Button icon={<PrinterOutlined />}>In hóa đơn</Button> */}
             <Button type="primary" icon={<MoneyCollectOutlined />}
@@ -172,37 +174,40 @@ const InvoiceDetail = () => {
         <Divider />
         {/* Thông tin hóa đơn */}
         <Descriptions
-          bordered
-          column={2}
+          column={3}
           size="middle"
         >
           <Descriptions.Item label="Học viên">
-            <Text strong style={{ color: '#1677ff' }}>
-              <UserOutlined /> {invoice.TenHocVien}</Text>
-          </Descriptions.Item>
-
-          <Descriptions.Item label="Số điện thoại">
-            <Text ><PhoneOutlined /> {invoice.DienThoai}</Text>
-          </Descriptions.Item>
-
-          <Descriptions.Item label="Lớp học" >
-            <Text ><ReadOutlined /> {invoice.TenLop}</Text>
+            <Text> <UserOutlined style={{ color: '#8c8c8c' }}
+            /> {invoice.TenHocVien}</Text>
           </Descriptions.Item>
 
           <Descriptions.Item label="Ngày phát hành">
             <Text >
-              <CalendarOutlined /> {new Date(invoice.NgayPhatHanh).toLocaleDateString()}
+              <CalendarOutlined style={{ color: '#1677ff' }}
+              /> {new Date(invoice.NgayPhatHanh).toLocaleDateString()}
+            </Text>
+          </Descriptions.Item>
+
+          <Descriptions.Item label="Điện thoại">
+            <Text ><PhoneOutlined style={{ color: '#8c8c8c' }}
+            /> {invoice.DienThoai}</Text>
+          </Descriptions.Item>
+
+          <Descriptions.Item label="Lớp học" >
+            <Text ><ReadOutlined style={{ color: '#722ed1' }}
+            /> {invoice.TenLop}</Text>
+          </Descriptions.Item>
+
+          <Descriptions.Item label="Hạn thanh toán">
+            <Text >
+              <CalendarOutlined style={{ color: 'orange' }}
+              /> {new Date(invoice.NgayHetHan).toLocaleDateString()}
             </Text>
           </Descriptions.Item>
 
           <Descriptions.Item label="Trạng thái" >
             <Text >{status()}</Text>
-          </Descriptions.Item>
-
-          <Descriptions.Item label="Hạn thanh toán">
-            <Text strong>
-              <ClockCircleFilled /> {new Date(invoice.NgayHetHan).toLocaleDateString()}
-            </Text>
           </Descriptions.Item>
         </Descriptions>
         <Divider />
@@ -216,13 +221,13 @@ const InvoiceDetail = () => {
               precision={0}
               formatter={(value) => {
                 return (
-                  <><span
+                  <span
                     style={{
                       textDecoration: isCancelled ? 'line-through' : 'none'
                     }}
                   >
-                    {Number(value).toLocaleString()}
-                  </span> đ</>
+                    {Number(value).toLocaleString()} đ
+                  </span>
                 )
               }}
             />
@@ -232,15 +237,11 @@ const InvoiceDetail = () => {
             <Statistic
               title="Đã thu"
               value={tongThu}
-              // precision={0}
-              styles={{
-                content: { color: '#1677ff' }
-              }}
+              styles={{ content: { color: '#1677ff' } }}
               formatter={(value) => {
                 const total = Number(value)
                 return total.toLocaleString("vi-VN") + " đ"
-              }
-              }
+              }}
             />
           </Col>
 
@@ -248,15 +249,11 @@ const InvoiceDetail = () => {
             <Statistic
               title="Đã hoàn"
               value={tongHoan}
-              // precision={0}
-              styles={{
-                content: { color: '#ff4d4f' }
-              }}
+              styles={{ content: { color: '#ff4d4f' } }}
               formatter={(value) => {
                 const total = Number(value)
                 return total.toLocaleString("vi-VN") + " đ"
-              }
-              }
+              }}
             />
           </Col>
 
@@ -272,13 +269,10 @@ const InvoiceDetail = () => {
                     : (conNo > 0 ? "orange" : "green")
                 }
               }}
-              formatter={(value) =>
-                value.toLocaleString("vi-VN") + " đ"
-              }
+              formatter={(value) => value.toLocaleString("vi-VN") + " đ"}
             />
           </Col>
         </Row>
-
         <Divider />
 
         {/* Lịch sử giao dịch */}

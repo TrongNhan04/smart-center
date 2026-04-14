@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { DateHelper } from "src/common/date.helper";
 import { PrismaService } from "src/prisma/prisma.service";
 import { RemindTeacher } from "./dashboard.dto";
+import { BuoiHocWhereInput } from "src/generated/prisma/models";
 
 type MonthlyData = {
     month: number,
@@ -108,7 +109,7 @@ export class DashboardService {
     async GetHighestRevenue() {
         const classDB = await this.prisma.lopHoc.findMany({
             select: {
-                ID: true, MaLopHoc:true, TenLop:true,
+                ID: true, MaLopHoc: true, TenLop: true,
                 ghidanh: { select: { hoadon: true } }
             }
         })
@@ -120,26 +121,30 @@ export class DashboardService {
                 return sum += Number(item.hoadon?.DaTra)
             }, 0)
         }))
-        .sort((a,b)=>b.DoanhThu-a.DoanhThu).slice(0,12)
-        //tăng là a-b, giảm là b-a, cắt lấy 12 tử
+            .sort((a, b) => b.DoanhThu - a.DoanhThu).slice(0, 12)
+        //tăng là a-b, giảm là b-a, cắt lấy 12 ptu
     }
 
     // lấy danh sách buổi học trong 1 tháng
-    async GetSessionOfMonth(month: number, year: number) {
+    async GetSessionOfMonth(month: number, year: number, userId: number | null) {
         const date = new Date(year, month)
         const { start, end } = DateHelper.GetStartEndOfMonth(date)
+        const where: BuoiHocWhereInput = {
+            BatDauLuc: { gte: start },
+            KetThucLuc: { lt: end },
+            TrangThai: { not: 'CANCELLED' },
+        }
+        if (userId) // giáo viên
+            where.lophoc = { giaovien: { UserID: userId } }
+
         const sessionDB = await this.prisma.buoiHoc.findMany({
-            where: {
-                BatDauLuc: { gte: start },
-                KetThucLuc: { lt: end },
-                TrangThai: { not: 'CANCELLED' }
-            },
+            where: where,
             select: {
                 ID: true, BuoiSo: true,
                 BatDauLuc: true, KetThucLuc: true,
                 lophoc: {
                     select: {
-                        ID:true, TenLop: true, PhongHoc: true,
+                        ID: true, TenLop: true, PhongHoc: true,
                         _count: { select: { ghidanh: { where: { TrangThai: 'ACTIVE' } } } }
                     },
                 },
@@ -148,7 +153,7 @@ export class DashboardService {
         })
         return sessionDB.map(item => ({
             ID: item.ID, // id buổi học
-            LopHocID:item.lophoc.ID,
+            LopHocID: item.lophoc.ID,
             TenLop: item.lophoc.TenLop,
             BuoiSo: item.BuoiSo,
             NgayHoc: item.BatDauLuc.toISOString().slice(0, 10),
@@ -231,18 +236,17 @@ export class DashboardService {
             })
         ])
 
-        const mapData = (data: any, type?: string) =>
-            data.map(item => ({
-                BuoiHocID: item.ID,
-                BuoiSo: item.BuoiSo,
-                LopHocID: item.LopHocID,
-                TenLop: item.lophoc.TenLop,
-                GiaoVienID: item.lophoc.GiaoVienID,
-                GiaoVien: item.lophoc.giaovien.User.HoTen,
-                LoiNhan: item.LyDoMoKhoa || null,
-                Ngay: item.NgayYeuCau || item.BatDauLuc,
-                Loai: type
-            }))
+        const mapData = (data: any, type?: string) => data.map(item => ({
+            BuoiHocID: item.ID,
+            BuoiSo: item.BuoiSo,
+            LopHocID: item.LopHocID,
+            TenLop: item.lophoc.TenLop,
+            GiaoVienID: item.lophoc.GiaoVienID,
+            GiaoVien: item.lophoc.giaovien.User.HoTen,
+            LoiNhan: item.LyDoMoKhoa || null,
+            Ngay: item.NgayYeuCau || item.BatDauLuc,
+            Loai: type
+        }))
 
         return [
             ...mapData(requestUnlock, 'REQUEST'),
@@ -257,11 +261,7 @@ export class DashboardService {
             where: { ID: body.classId, GiaoVienID: teacherId },
             select: {
                 ID: true, TenLop: true,
-                giaovien: {
-                    select: {
-                        UserID: true,
-                    }
-                }
+                giaovien: { select: { UserID: true } }
             }
         })
         if (!classDB) throw new NotFoundException('Không tìm thấy giáo viên hoặc lớp học')

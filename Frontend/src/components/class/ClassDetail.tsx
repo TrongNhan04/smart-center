@@ -143,9 +143,11 @@ const ClassDetail = () => {
           unlock={handleUnlock}
           onCancel={handleCancel}
         />
-          : <Button icon={<InfoCircleOutlined />} size="small" type="primary"
-            onClick={() => navigate(`sessions/${value.ID}`)}>
-            Chi tiết</Button>
+          : <Tooltip title='Xem chi tiết'>
+            <Button icon={<InfoCircleOutlined />} size="small" type="link"
+              onClick={() => navigate(`sessions/${value.ID}`)} />
+          </Tooltip>
+
       }
     }
   ]
@@ -263,7 +265,7 @@ const ClassDetail = () => {
             tabBarExtraContent={ // 2 nút auto, manual
               isAdmin && <Space>
                 <Popconfirm title="Xác nhận tạo buổi học tự động?"
-                  description='Tự động tạo buổi học trong 1 tháng'
+                  description='Tạo tất cả buổi học phù hợp với lớp học'
                   onConfirm={() => AutoGenerate(lophoc.ID)}>
                   <Button type="primary" icon={<PlusOutlined />}
                     disabled={lophoc?.TrangThai === 'CLOSED'}

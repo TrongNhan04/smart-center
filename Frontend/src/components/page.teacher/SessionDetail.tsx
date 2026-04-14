@@ -276,12 +276,12 @@ const SessionDetail = () => {
                 rules={[{ required: true, message: 'Vui lòng nhập chủ đề!' }]}>
                 <Input placeholder="Ví dụ: Unit 5 - Present Simple" size="large" />
               </Form.Item>
-              <Form.Item label="Nội dung chi tiết" name="NoiDung">
+              <Form.Item label="Nội dung chi tiết" name="NoiDungBaiHoc">
                 <TextArea rows={4} placeholder="Nội dung chi tiết các phần đã dạy..." />
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <Form.Item label="Bài tập về nhà " name="BaiTap">
+              <Form.Item label="Bài tập về nhà " name="BaiTapVeNha">
                 <TextArea rows={2} placeholder="Bài tập giao cho học viên..." />
               </Form.Item>
               <Form.Item label="Nhận xét chung về lớp" name="NhanXetChung"

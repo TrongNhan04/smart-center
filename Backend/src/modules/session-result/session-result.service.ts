@@ -113,18 +113,22 @@ export class SessionResultService {
                     YeuCauMoKhoa: false
                 },
                 select: {
-                    ID: true, BatDauLuc: true,
+                    ID: true, BatDauLuc: true, BuoiSo:true,
                     lophoc: {
                         select: {
-                            TenLop: true,
+                            TenLop: true, ID:true,
                             giaovien: { select: { UserID: true } }
                         }
                     }
                 }
             })
-            await this.notisService.UnLockSSNotify(sessionUp.lophoc.giaovien.UserID, sessionUp, tx)
-
-            return `Unlock session id ${sessionDB.ID} successfully`
+            const payload = {
+                ID: sessionUp.ID, BatDauLuc: sessionUp.BatDauLuc, 
+                BuoiSo: sessionUp.BuoiSo,
+                LopHocID: sessionUp.lophoc.ID, TenLop: sessionUp.lophoc.TenLop, 
+                UserID: sessionUp.lophoc.giaovien.UserID
+            }
+            await this.notisService.UnLockSSNotify(payload, tx)
         })
     }
 

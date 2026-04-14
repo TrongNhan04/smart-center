@@ -6,14 +6,6 @@ export interface Summaries {
     TongNoQuaHan: number
 }
 
-// export interface FinanceChart {
-//     Thang: number,
-//     TongThu: number,
-//     TongChi: number,
-//     LoiNhuan: number,
-//     GhiDanhMoi: number
-// }
-
 export interface ReveueChart {
     LopHocID: number,
     MaLopHoc: string,
@@ -21,12 +13,13 @@ export interface ReveueChart {
     DoanhThu: number
 }
 
-export interface EnrollChart{
-    Thang:string,
+export interface EnrollChart {
+    Thang: string,
     GhiDanhMoi: number
 }
 
-export interface TaskDB {
+// thông báo cho admin
+export interface AdminNotis {
     BuoiHocID: number,
     BuoiSo: number,
     LopHocID: number,
@@ -53,4 +46,15 @@ export interface ClassSchedule {
     GioHoc: string,
     PhongHoc: string,
     TongGhiDanh: number
+}
+
+// thông báo cho giáo viên
+export interface TeacherNotis {
+    ID: number,
+    TieuDe: string,
+    NoiDung: string,
+    Loai: string
+    DuLieu: JSON
+    DaDoc: boolean
+    ThoiGian:string
 }

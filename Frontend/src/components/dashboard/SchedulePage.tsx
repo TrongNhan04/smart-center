@@ -8,6 +8,7 @@ import { ClockCircleOutlined, EnvironmentOutlined, UserOutlined } from "@ant-des
 import { CatchError } from "../common/catch.error"
 import { dashboardApi } from "../../api/dashboardApi"
 import { useNavigate } from "react-router-dom"
+import { useAuthStore } from "../../store/useAuthStore"
 
 const { Text, Title } = Typography
 
@@ -32,6 +33,7 @@ const stylesFn: CalendarProps<Dayjs>['styles'] = (info) => {
 
 const SchedulePage = () => {
   const { styles: classNames } = useStyles()
+  const role = useAuthStore(state=>state.user?.role)
   // lưu ngày tháng hiện tại
   const [selectedDate, setSelectedDate] = useState(dayjs())
   const [scheduleData, setScheduleData] = useState<ClassSchedule[]>([])
@@ -128,11 +130,14 @@ const SchedulePage = () => {
                 renderItem={item => (
                   <List.Item
                     onClick={
-                      () => navigate(`/admin/classes/${item.LopHocID}/sessions/${item.ID}`)
+                      () => {
+                        const naviByRole = role==='ADMIN' ? 'admin' : 'teacher'
+                        navigate(`/${naviByRole}/classes/${item.LopHocID}/sessions/${item.ID}`)
+                      }
                     }
                     style={{
-                      padding: '16px',
-                      marginBottom: 12,
+                      padding: '10px',
+                      marginBottom: 15,
                       background: '#f0f5ff',
                       borderRadius: 8,
                       border: '1px solid #f0f0f0',

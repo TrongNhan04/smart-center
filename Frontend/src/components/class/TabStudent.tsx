@@ -1,13 +1,11 @@
 import {
-  CalendarFilled, CalendarOutlined, DollarCircleFilled, EnvironmentFilled,
-  EnvironmentOutlined,
-  InfoCircleOutlined,
-  PhoneFilled, PhoneOutlined, SearchOutlined, UserOutlined
+  CalendarOutlined, EnvironmentOutlined, InfoCircleOutlined, PhoneOutlined,
+  SearchOutlined, UserOutlined
 } from "@ant-design/icons"
 import { Button, Col, Input, Row, Space, Table, Tooltip, Typography } from "antd"
 import { useEffect, useState } from "react"
 import type { StuOfClass } from "./ClassDTO"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useSearchParams } from "react-router-dom"
 import classApi from "../../api/classApi"
 import { CatchError } from "../common/catch.error"
 import { useAuthStore } from "../../store/useAuthStore"
@@ -22,8 +20,11 @@ const TabStudent = ({ id }: Props) => {
   const [loading, setLoading] = useState(false)
   const [searchText, setSearchText] = useState('')
   const navigate = useNavigate()
-  const classId = Number(id)
   const isAmin = useAuthStore(state => state.user?.role) === 'ADMIN'
+  const [searchParam, setSearchParam] = useSearchParams()
+  const currentPage = Number(searchParam.get('page')) || 1
+  const currentTab = searchParam.get('tab') || 'students'
+  const classId = Number(id)
   const fetchStuOfClass = async () => {
     try {
       setLoading(true)
@@ -57,7 +58,7 @@ const TabStudent = ({ id }: Props) => {
       title: 'Tên học viên', dataIndex: 'TenHocVien', //width: 220,
       key: 'TenHocVien', ellipsis: true,
       render: (name: string, student: StuOfClass) => {
-        return isAmin ? <><UserOutlined style={{color:'#8c8c8c'}}/>
+        return isAmin ? <><UserOutlined style={{ color: '#8c8c8c' }} />
           <Link to={`/admin/students/${student.HocVienID}`}
             style={{ fontWeight: 'bold' }}> {name}</Link></>
           : <Text strong style={{ color: '#1890ff' }}> {name}</Text>
@@ -86,26 +87,20 @@ const TabStudent = ({ id }: Props) => {
       render: (parent: string, stu: StuOfClass) =>
         <Tooltip title={`PH. ${parent}`}>
           <Space style={{ cursor: 'pointer' }}>
-            <PhoneOutlined style={{color: '#8c8c8c'}}/>{stu.DienThoai}
+            <PhoneOutlined style={{ color: '#8c8c8c' }} />{stu.DienThoai}
           </Space>
         </Tooltip>
     },
-    // { // học phí
-    //   title: 'Học phí', dataIndex: 'HocPhi', key: 'HocPhi', //width: 100,
-    //   align: 'center' as const, render: (fee: string) => {
-    //     const hocPhi = Number(fee) ?? 0
-    //     return <Text style={{ color: '#52c41a' }}>
-    //       <DollarCircleFilled /> {hocPhi.toLocaleString()}đ</Text>
-    //   }
-    // },
     { // thao tác của giáo viên
       title: 'Thao tác', key: 'ThaoTac', align: 'center' as const,
-      render: (_: any, stu: StuOfClass) => <Button
-        icon={<InfoCircleOutlined />}
-        style={{ color: '#52c41a', borderColor: '#52c41a'  }}
-        onClick={() => navigate(`students/${stu.HocVienID}`)}>
-        Tiến độ
-      </Button>
+      render: (_: any, stu: StuOfClass) => <Tooltip title='Xem tiến độ'>
+        <Button
+          icon={<InfoCircleOutlined />}
+          type="link"
+          size="small"
+          onClick={() => navigate(`students/${stu.HocVienID}`)}>
+        </Button>
+      </Tooltip>
     }
   ]
 
@@ -128,10 +123,17 @@ const TabStudent = ({ id }: Props) => {
       </Row>
       {/* Bảng hiển thị dữ liệu */}
       <Table
+        onChange={(page: any) => setSearchParam({
+          tab: currentTab,
+          page: page.current
+        })}
         dataSource={filteredData}
         columns={filterColumns}
         loading={loading}
-        pagination={{ defaultPageSize: 10 }}
+        pagination={{
+          pageSize: 1,
+          current: currentPage
+        }}
         rowKey="HocVienID"
         scroll={{ x: 1100, y: 408 }}
       />

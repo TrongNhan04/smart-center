@@ -82,7 +82,7 @@ const CourseDetail = () => {
       title: 'Lớp', dataIndex: 'TenLop', key: 'TenLop', ellipsis: true,
       render: (name: string, lophoc: ClassDB) =>
         <Link to={`/admin/classes/${lophoc.ID}`} style={{ fontWeight: 'bold' }}>
-          <ReadOutlined /> {name} </Link>
+          <ReadOutlined style={{color:'#8c8c8c'}}/> {name} </Link>
     },
     { // giáo viên
       title: 'Giáo viên', dataIndex: ['GiaoVien', 'HoTen'], key: 'HoTen', ellipsis: true,

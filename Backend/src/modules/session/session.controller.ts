@@ -31,19 +31,6 @@ export class SessionController {
         return await this.sessionService.ManualGenerateSession(+classId, body)
     }
 
-    //sửa buổi học: chủ đề + phòng học
-    @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
-    @Roles('ADMIN', 'TEACHER')
-    @Patch('teacher/sessions/:id')
-    async UpdateSessionById(
-        @Param('id') sessionId: number,
-        @Body() body: UpdateSessionDTO,
-        @Req() req: RequestWithUser) {
-        const user = req.user
-        const teacherId = user.role === 'ADMIN' ? null : user.userId
-        return await this.sessionService.UpdateSessionById(teacherId, +sessionId, body)
-    }
-
     // hủy buổi học: 
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')

@@ -91,7 +91,7 @@ export class NotifyService {
         })
     }
 
-    // thông báo hủy buổi học có tx?
+    // thông báo hủy buổi học có tx
     async SSCancelledNotify(userId: number[], session: any, reason: string,
         tx?: Prisma.TransactionClient) {
 
@@ -165,18 +165,19 @@ export class NotifyService {
     }
 
     // thông báo mở khóa buổi học có tx
-    async UnLockSSNotify(userId: number, session: any, tx?: Prisma.TransactionClient) {
+    async UnLockSSNotify(session: any, tx?: Prisma.TransactionClient) {
         let client: Prisma.TransactionClient | null = null
         if (tx) client = tx
         else client = this.prisma
         const dateStr = session.BatDauLuc.toLocaleDateString('vi-VN')
         return await client.thongBao.create({
             data: {
-                UserID: userId,
+                UserID: session.UserID,
                 TieuDe: "Thông báo hệ thống",
-                NoiDung: `Đã mở khóa buổi học ngày ${dateStr} của lớp ${session.lophoc.TenLop}. Vui lòng kiểm tra lại buổi học`,
+NoiDung: `Đã mở khóa buổi ${session.BuoiSo} (${dateStr}) của lớp ${session.TenLop}. Vui lòng kiểm tra lại buổi học`,
                 Loai: 'SYSTERM_ARLERT',
                 DuLieu: {
+                    classId: session.LopHocID,
                     sessionId: session.ID
                 },
                 DaDoc: false

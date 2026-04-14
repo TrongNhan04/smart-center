@@ -1,9 +1,11 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from "@nestjs/common";
 import { DashboardService } from "./dashboard.service";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guard/roles.guard";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { RemindTeacher } from "./dashboard.dto";
+
+type RequestWithUser = Request & { user: { userId: number; role?: string } };
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('ADMIN')
@@ -35,8 +37,12 @@ export class DashboardController {
 
     //lấy danh sách buổi học trong 1 tháng
     @Get('sessions')
-    async GetTodaySession(@Query() q: { month: number, year: number }) {
-        return await this.dashboard.GetSessionOfMonth(+q.month, +q.year)
+    @Roles()
+    async GetTodaySession(
+        @Req() req: RequestWithUser,
+        @Query() q: { month: number, year: number }) {
+        const userId = req.user.role === 'ADMIN' ? null : +req.user.userId
+        return await this.dashboard.GetSessionOfMonth(+q.month, +q.year, userId)
     }
 
     // danh sách việc cần làm: các hóa đơn ACTIVE hết hạn, 

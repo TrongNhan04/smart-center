@@ -104,10 +104,12 @@ const InvoiceList = () => {
       key: 'TenHocVien', ellipsis: true,
       render: (name: string, invoice: InvoiceDB) =>
         <Space orientation="vertical" size={0}>
-          <Link to={`/admin/students/${invoice.HocVienID}`} style={{ fontWeight: 'bold' }}>
-            <UserOutlined style={{ color: '#8c8c8c' }}/> {name}
+          <Link to={`/admin/students/${invoice.HocVienID}`}
+            style={{ fontWeight: '500' }}>
+            <UserOutlined style={{ color: '#8c8c8c' }} /> {name}
           </Link>
-          <Text><PhoneOutlined style={{ color: '#8c8c8c' }}/> {invoice.DienThoai}</Text>
+          <Text><PhoneOutlined style={{ color: '#8c8c8c' }}
+          /> {invoice.DienThoai}</Text>
         </Space>
     },
     { // tổng tiền + còn nợ 
@@ -185,7 +187,7 @@ const InvoiceList = () => {
         { text: 'Thanh toán 1 phần', value: 'Part' },
         { text: 'Chưa thanh toán', value: 'Unpaid' },
         { text: 'Quá hạn', value: 'OverDate' },
-        { text: 'Đã hủy', value: 'CANCELLED'}
+        { text: 'Đã hủy', value: 'CANCELLED' }
       ],
       onFilter: (value: any, invoice: InvoiceDB) => {
         const { DaTra, TongTien, NgayHetHan, TrangThai } = invoice
@@ -259,9 +261,6 @@ const InvoiceList = () => {
               ]}
             >
             </Select>
-          </Col>
-          <Col style={{ marginLeft: 'auto' }}>
-            Hiển thị:<Text strong> {invoices.length} hóa đơn</Text>
           </Col>
         </Row>
         {/* Bảng hiển thị dữ liệu */}

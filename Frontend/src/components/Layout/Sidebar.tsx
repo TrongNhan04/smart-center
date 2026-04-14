@@ -8,6 +8,7 @@ import {
   FormOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  NotificationOutlined,
   TeamOutlined,
   UserOutlined,
 } from '@ant-design/icons';
@@ -49,8 +50,8 @@ const SidebarComponent = () => {
 
   const items: MenuItem[] = isAdmin ? [
     getItem('Tổng quan', 'dashboard', <DashboardOutlined />),
-    getItem('Thời khóa biểu', 'schedule', <CalendarOutlined/>),
-    getItem('Việc cần làm', 'tasks', <CheckSquareOutlined />),
+    getItem('Thời khóa biểu', 'schedules', <CalendarOutlined/>),
+    getItem('Thông báo', 'notis', <NotificationOutlined />),
     getItem('Đào tạo', 'train', <BookOutlined />, [
       getItem('Khóa học', 'courses'),
       getItem('Lớp học', 'classes'),
@@ -69,6 +70,7 @@ const SidebarComponent = () => {
   // không phải admin thì menu của giáo viên
   : [
     getItem('Thời khóa biểu', 'schedules', <CalendarOutlined/>),
+    getItem('Thông báo', 'notis', <NotificationOutlined/>),
     getItem('Lớp của tôi', 'classes', <BookOutlined/>),
     getItem('Tài khoản', 'account', <UserOutlined />)
   ]

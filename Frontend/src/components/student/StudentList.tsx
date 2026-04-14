@@ -69,7 +69,7 @@ const StudentList = () => {
       title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai', //width: 160,
       render: (value: string) => {
         const statusMap: Record<string, { color: string, text: string }> = {
-          ACTIVE: { color: 'success', text: 'Đang hoạt động' },
+          ACTIVE: { color: 'success', text: 'Hoạt động' },
           INACTIVE: { color: 'error', text: 'Ngừng hoạt động' }
         }
         // value là 1 trong 3 key đó

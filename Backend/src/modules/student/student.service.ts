@@ -36,8 +36,7 @@ export class StudentService {
                     TenHocVien: body.student.trim(),
                     NgaySinh: body.dob,
                     UserID: userId
-                },
-                omit: { CreatedAt: true, UpdatedAt: true }
+                }
             })
 
             //thêm ghi danh
@@ -50,7 +49,6 @@ export class StudentService {
 
             // thêm thông báo
             await this.notisService.InvoiceNotify(userId, newInvoice, client)
-            return newStudent
         }
         // nếu có user
         if (tx) return await runLogic(tx)

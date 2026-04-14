@@ -39,12 +39,6 @@ const MyClasses = () => {
 
   return (
     <div style={{ padding: 20, background: '#f0f2f5', minHeight: '91vh' }}>
-      <Row justify="space-between" align="middle" style={{ marginBottom: 20 }}>
-        <Col>
-          <Title level={3} style={{ margin: 0 }}>Lớp học của tôi</Title>
-          {/* <Text type="secondary">Bạn đang phụ trách {classes.length} lớp học</Text> */}
-        </Col>
-      </Row>
 
       <List
         grid={{
@@ -58,12 +52,15 @@ const MyClasses = () => {
         }}
         dataSource={classes}
         renderItem={item => {
-          const percent = Math.round((item.SoBuoiDaHoc / item.TongSoBuoi) * 100);
+          const percent = Math.round((item.SoBuoiDaHoc / item.TongSoBuoi) * 100)
+          let percentColor = '#ff4d4f' // đỏ
+          if (percent > 50) percentColor = '#faad14' //vàng
+          if (percent > 80) percentColor = '#52c41a'
 
           return (
             <List.Item>
               <Card
-                styles={{ header: { backgroundColor: '#f0f5ff' } }}
+                styles={{ header: { backgroundColor: '#e6edff' } }}
                 hoverable
                 onClick={() => navigate(`/teacher/classes/${item.ID}`)}
 
@@ -94,7 +91,7 @@ const MyClasses = () => {
                       <TeamOutlined style={{ color: '#8c8c8c' }} />
                       <Text>{item.TongGhiDanh} học viên</Text>
                     </Space>
-                    <Text ><EnvironmentOutlined/> {item.PhongHoc??'_'}</Text>
+                    <Text ><EnvironmentOutlined style={{color:'#8c8c8c'}}/> {item.PhongHoc ?? '_'}</Text>
                   </Space>
 
                   <div>
@@ -107,7 +104,11 @@ const MyClasses = () => {
                         Tiến độ ({item.SoBuoiDaHoc}/{item.TongSoBuoi}) buổi học</Text>
                       <Text strong style={{ fontSize: 12 }}>{percent}%</Text>
                     </div>
-                    <Progress percent={percent} showInfo={false} size="small" />
+                    <Progress
+                      percent={percent} 
+                      showInfo={false} 
+                      strokeColor={percentColor}
+                      size="small" />
                   </div>
 
                 </Space>

@@ -16,14 +16,16 @@ import InvoiceList from "./components/invoice/InvoiceList";
 import InvoiceDetail from "./components/invoice/InvoiceDetail";
 import TongHopThuChi from "./components/invoice/TongHopThuChi";
 import Dashboard from "./components/dashboard/Dashboard";
-import TaskList from "./components/dashboard/TaskList";
 import Profile from "./components/account/Profile";
 import MyClasses from "./components/page.teacher/MyClasses";
 import TeacherRoute from "./components/page.teacher/TeacherRoute";
 import SessionDetail from "./components/page.teacher/SessionDetail";
 import ThongKeDiHoc from "./components/student/ThongKeDiHoc";
 import SchedulePage from "./components/dashboard/SchedulePage";
-import ScheduleTeacher from "./components/page.teacher/ScheduleTeacher";
+import NotisList from "./components/dashboard/NotisList";
+import NotisPage from "./components/page.teacher/NotisPage";
+
+
 
 const router = createBrowserRouter([
   {
@@ -38,7 +40,8 @@ const router = createBrowserRouter([
         element: <SidebarComponent />,
         children: [
           { index: true, element: <Navigate to="schedules" replace /> },
-          { path: 'schedules', element: <ScheduleTeacher /> },
+          { path: 'schedules', element: <SchedulePage /> },
+          { path: 'notis', element:<NotisPage/>},
           { path: 'classes', element: <MyClasses /> },
           {
             path: 'classes/:classId',
@@ -46,7 +49,7 @@ const router = createBrowserRouter([
             children: [
               { index: true, element: <ClassDetail /> },
               { path: 'sessions/:sessionId', element: <SessionDetail /> },
-              { path: 'students/:studentId', element:<ThongKeDiHoc/> }
+              { path: 'students/:studentId', element: <ThongKeDiHoc /> }
             ]
           },
           // { path: '',  },
@@ -65,8 +68,8 @@ const router = createBrowserRouter([
           { index: true, element: <Navigate to="dashboard" replace /> },
 
           { path: 'dashboard', element: <Dashboard /> },
-          { path: 'tasks', element: <TaskList /> },
-          { path: 'schedule', element: <SchedulePage /> },
+          { path: 'notis', element: <NotisList /> },
+          { path: 'schedules', element: <SchedulePage /> },
 
           { path: 'courses', element: <CourseList /> },
           { path: 'courses/:id', element: <CourseDetail /> },

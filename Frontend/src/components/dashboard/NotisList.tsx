@@ -1,14 +1,16 @@
 import { Link, useNavigate } from "react-router-dom"
-import { type ReminderTeacher, type TaskDB } from "./DashboardDTO"
-import { Button, Card, message, Popconfirm, Table, Tag } from "antd"
+import { type AdminNotis, type ReminderTeacher  } from "./DashboardDTO"
+import { Button, Card, message, Popconfirm, Table, Tag, Typography } from "antd"
 import { useEffect, useState } from "react"
 import { dashboardApi } from "../../api/dashboardApi"
-import { BellOutlined, CheckCircleOutlined, CheckOutlined, PlusCircleOutlined, ReadOutlined } from "@ant-design/icons"
+import { BellOutlined, CheckCircleOutlined, CheckOutlined, MessageOutlined, PlusCircleOutlined, ReadOutlined } from "@ant-design/icons"
 import { CatchError } from "../common/catch.error"
 
-const TaskList = () => {
+const {Text} = Typography
+
+const NotisList = () => {
   const navigate = useNavigate()
-  const [tasksToday, setTasksToday] = useState<TaskDB[]>([])
+  const [notisToday, setNotisToday] = useState<AdminNotis[]>([])
   const [remindList, setRemindList] = useState<number[]>(() => {
     const savedData = localStorage.getItem('remindedTasks')
     return savedData ? JSON.parse(savedData) : []
@@ -17,11 +19,11 @@ const TaskList = () => {
   const fetchTasks = async () => {
     try {
       const res = await dashboardApi.getTasks()
-      const formatRes = res.data.map((item: TaskDB, index: number) => ({
+      const formatRes = res.data.map((item: AdminNotis, index: number) => ({
         index, // thêm index để không cảnh báo thiếu unique key
         ...item
       }))
-      setTasksToday(formatRes)
+      setNotisToday(formatRes)
     } catch (error) {
       CatchError.HandleError(error)
     }
@@ -31,7 +33,7 @@ const TaskList = () => {
     fetchTasks()
   }, [])
 
-  const handleRemindTeacher = async (task: TaskDB) => {
+  const handleRemindTeacher = async (task: AdminNotis) => {
     try {
       const payload: ReminderTeacher = {
         classId: task.LopHocID,
@@ -58,47 +60,47 @@ const TaskList = () => {
   }
 
   const columns = [
-    { // Lớp học
-      title: 'Thuộc lớp', dataIndex: 'TenLop', key: 'TenLop', width: 200,
-      ellipsis: true,
-      render: (name: string, task: TaskDB) =>
-        <Link to={`/admin/classes/${task.LopHocID}`}><ReadOutlined /> {name}</Link>
-    },
     { // tiêu đề
       title: 'Tiêu đề', dataIndex: 'TieuDe', width: 200,
       key: 'TieuDe', ellipsis: true,
       filters: [
         { text: 'Yêu cầu mở khóa', value: 'REQUEST' },
-        { text: 'Chưa nộp kết quả', value: 'UNSUBMIT' },
+        { text: 'Chưa chốt kết quả', value: 'UNSUBMIT' },
         { text: 'Bổ sung lịch học', value: 'CREATE_MORE' }
       ],
-      onFilter: (value: any, task: TaskDB) => task.Loai === value,
-      render: (_: any, task: TaskDB) => {
-        const isEnding = task.Loai === 'ENDING_CLASS'
+      onFilter: (value: any, task: AdminNotis) => task.Loai === value,
+      render: (_: any, task: AdminNotis) => {
         if (task.Loai === 'REQUEST')
           return <Tag color={'red'}>Yêu cầu mở khóa</Tag>
         if (task.Loai === 'UNSUBMIT')
-          return <Tag color={'purple'}>Chưa nộp kết quả</Tag>
-        return <Tag color={'orange'}>
-          {isEnding ? 'Kiểm tra lớp học' : 'Bổ sung lịch học'}
-        </Tag>
+          return <Tag color={'purple'}>Chưa chốt kết quả</Tag>
+        return <Tag color={'orange'}>Bổ sung lịch học</Tag>
       }
     },
     { // mô tả
       title: 'Nội dung', dataIndex: 'LoiNhan', key: 'LoiNhan',
-      render: (_: any, task: TaskDB) => {
+      render: (_: any, task: AdminNotis) => {
         const date = new Date(task.Ngay).toLocaleDateString()
+        let message = task.LoiNhan
         if (task.Loai === 'REQUEST')
-          return `GV: ${task.GiaoVien} - Lý do: ${task.LoiNhan} (Buổi ${task.BuoiSo}) - Ngày gửi yêu cầu: ${date}`
+          message = `GV: ${task.GiaoVien} - Lý do: ${task.LoiNhan} (Buổi ${task.BuoiSo}) - Ngày gửi yêu cầu: ${date}`
         if (task.Loai === 'UNSUBMIT')
-          return `GV: ${task.GiaoVien} chưa nộp kết quả buổi ${task.BuoiSo}`
-        return `${task.LoiNhan}`
+          message =  `GV: ${task.GiaoVien} chưa nộp kết quả buổi ${task.BuoiSo}`
+        return <Text><MessageOutlined style={{ color: '#8c8c8c' }}/> {message}</Text>
       }
+    },
+    { // Lớp học
+      title: 'Thuộc lớp', dataIndex: 'TenLop', key: 'TenLop', width: 200,
+      ellipsis: true,
+      render: (name: string, task: AdminNotis) =>
+        <Link to={`/admin/classes/${task.LopHocID}`}>
+          <ReadOutlined style={{ color: '#8c8c8c' }} /> {name}
+        </Link>
     },
     { // thao tác
       title: 'Thao tác', dataIndex: 'ThaoTac', key: 'ThaoTac',
       align: 'center' as const, width: 180,
-      render: (_: any, task: TaskDB) => {
+      render: (_: any, task: AdminNotis) => {
         if (task.Loai === 'REQUEST')
           return <Popconfirm
             title="Xác nhận mở khóa cho buổi học này?"
@@ -106,9 +108,9 @@ const TaskList = () => {
             okText="Duyệt"
             cancelText="Hủy"
           >
-            <Button type="primary" size="small"
+            <Button size="small"
               icon={<CheckCircleOutlined />}
-              style={{ backgroundColor: '#2fb058', color: '#fff' }}
+              style={{ backgroundColor: '#52c41a', color: '#fff' }}
             > Duyệt</Button>
           </Popconfirm>
         if (task.Loai === 'UNSUBMIT') {
@@ -129,7 +131,6 @@ const TaskList = () => {
         return <Button
           size="small"
           icon={<PlusCircleOutlined />}
-          // style={{ba}}
           onClick={() => navigate(`/admin/classes/${task.LopHocID}`)}>
           Bổ sung
         </Button>
@@ -139,7 +140,7 @@ const TaskList = () => {
 
   return (
     <div style={{ padding: 24, background: '#f5f5f5', minHeight: '90vh' }}>
-      <Card title={`Việc cần làm hôm nay`}
+      <Card title={`Thông báo`}
         styles={{
           header: { backgroundColor: '#e6f4ff', color: '#0958d9' }
         }}
@@ -148,7 +149,7 @@ const TaskList = () => {
         {/* Bảng hiển thị dữ liệu */}
         <Table
           style={{ margin: 8 }}
-          dataSource={tasksToday}
+          dataSource={notisToday}
           columns={columns}
           pagination={{ defaultPageSize: 10 }}
           rowKey="index"
@@ -159,4 +160,4 @@ const TaskList = () => {
   )
 }
 
-export default TaskList
+export default NotisList

@@ -22,19 +22,13 @@ const teacherApi = {
     findOne: (teacherId: number) =>
         axiosClient.get(`admin/teachers/${teacherId}`),
 
-    getSchedule: (startDate: string | Date, endDate: string | Date) =>
-        axiosClient.get(`teachers/sessions-week`, {
-            params: {
-                startDate: startDate,
-                endDate: endDate
-            }
-        }),
-
     requestUnlock: (sessionId: number, reason: string) => {
         const body = { reason: reason }
         return axiosClient.post(`sessions/${sessionId}/request-unlock`, body)
-    }
+    },
 
+    getMyNotis: () => axiosClient.get(`notifications`),
 
+    readOneNotis: (id:number) => axiosClient.patch(`notifications/${id}`)
 }
 export default teacherApi

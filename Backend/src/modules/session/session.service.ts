@@ -45,25 +45,6 @@ export class SessionService {
     })
   }
 
-  //sửa buổi học: chủ đề 
-  async UpdateSessionById(userId: number | null, sessionId: number, body: UpdateSessionDTO) {
-    // const data: Prisma.BuoiHocUpdateInput = {}
-    if (!userId) {// admin
-      const sessionDB = await this.SessionIdValidator(sessionId)
-      if (body.room) await this.HasSameRoom(body.room, sessionDB.BatDauLuc, sessionDB.KetThucLuc, sessionId)
-    }
-    else {//giáo viên
-      const { sessionDB } = await this.SessionAcsessValidate(userId, sessionId)
-      if (body.room) await this.HasSameRoom(body.room, sessionDB.BatDauLuc, sessionDB.KetThucLuc, sessionId)
-    }
-
-    await this.prisma.buoiHoc.update({
-      where: { ID: sessionId },
-      data: { ChuDe: body.topic, PhongHoc: body.room },
-      select: { BuoiSo: true, ChuDe: true }
-    })
-  }
-
   // hủy buổi học kèm lý do
   async CancelSessionById(sessionId: number, reason: string) {
     const sessionDB = await this.SessionIdValidator(sessionId)
@@ -92,7 +73,6 @@ export class SessionService {
       const uniqueId = [...new Set(listParentID)]
       await this.notisService.SSCancelledNotify(uniqueId, updateSS, reason, tx)
     })
-    // return { mgs: "Session cancelled and notify parent successfully" }
   }
 
   // tạo buổi học tự động
@@ -215,9 +195,7 @@ export class SessionService {
         select: { BuoiSo: true, lophoc: { select: { TenLop: true } } }
       })
       if (duplicate) throw new ConflictException
-        (`Trùng lịch học với buổi số ${duplicate.BuoiSo} lớp ${duplicate.lophoc.TenLop}`)
-      // // kiểm tra giáo viên lớp mình có trùng buổi học với LỚP KHÁC
-      // await this.CheckTeacherFree(classId, body)
+        (`Trùng lịch học với buổi số ${duplicate.BuoiSo} của lớp`)
       // BuoiSo = max + 1 
       const max = await tx.buoiHoc.findFirst({
         where: { LopHocID: classId },
@@ -291,10 +269,8 @@ export class SessionService {
     const [sessionDB, result] = await Promise.all([
       this.prisma.buoiHoc.findFirst({
         where: { ID: sessionId },
-        select: {
-          ID: true, BuoiSo: true, ChuDe: true, PhongHoc: true,
-          BatDauLuc: true, KetThucLuc: true, TrangThai: true,
-          ketqua_buoihoc: true, AdminMoKhoa: true, YeuCauMoKhoa: true,
+        include: {
+          ketqua_buoihoc: true,
           lophoc: {
             select: {
               TenLop: true,
@@ -306,13 +282,14 @@ export class SessionService {
       this.resultService.GetSSResult(sessionId)
     ])
     if (!sessionDB) throw new NotFoundException('Không tìm thấy buổi học')
+    const { ketqua_buoihoc, lophoc, ...rest } = sessionDB
     return {
-      ID: sessionDB.ID, BuoiSo: sessionDB.BuoiSo, ChuDe: sessionDB.ChuDe,
-      BatDauLuc: sessionDB.BatDauLuc, KetThucLuc: sessionDB.KetThucLuc,
-      PhongHoc: sessionDB.PhongHoc, LopHoc: sessionDB.lophoc.TenLop,
-      NhanXetChung: sessionDB.ketqua_buoihoc?.NhanXetChung,
-      GiaoVien: sessionDB.lophoc.giaovien.User.HoTen, YeuCauMoKhoa: sessionDB.YeuCauMoKhoa,
-      TrangThai: sessionDB.TrangThai, AdminMoKhoa: sessionDB.AdminMoKhoa,
+      ...rest,
+      LopHoc: lophoc.TenLop,
+      NhanXetChung: ketqua_buoihoc?.NhanXetChung,
+      NoiDungBaiHoc: ketqua_buoihoc?.NoiDungBaiHoc,
+      BaiTapVeNha: ketqua_buoihoc?.BaiTapVeNha,
+      GiaoVien: lophoc.giaovien.User.HoTen,
       ChiTietKetQua: result
     }
   }
@@ -327,12 +304,12 @@ export class SessionService {
     return await this.resultService.SubmittedResult(userId, sessionId, body)
   }
 
-  // mở khóa lưu kết quả buổi học
+  // mở khóa lưu kết quả buổi học - resultService
   async UnlockSession(sessionId: number) {
     return await this.resultService.UnlockSession(sessionId)
   }
 
-  // gửi yêu cầu mở khóa buổi học
+  // gửi yêu cầu mở khóa buổi học - resultService
   async RequestUnlock(userId: number, sessionId: number, reason: string) {
     return await this.resultService.RequestUnlock(userId, sessionId, reason)
   }
@@ -356,37 +333,6 @@ export class SessionService {
     if (!sessionDB)
       throw new NotFoundException('Session is not existed')
     return sessionDB
-  }
-
-  // kiểm tra giáo viên có trống buổi đó không
-  private async CheckTeacherFree(classId: number, body: CreateSessionDTO) {
-    const teacherDB = await this.prisma.lopHoc.findUnique({
-      where: { ID: classId },
-      select: { GiaoVienID: true, giaovien: { select: { TrangThai: true } } }
-    })
-    if (!teacherDB) throw new NotFoundException('Teacher not found')
-    if (teacherDB.giaovien.TrangThai === 'INACTIVE')
-      throw new ConflictException('Teacher was retired')
-    const startDay = new Date(body.date)
-    startDay.setHours(0, 0, 0, 0)
-    const endDay = new Date(startDay)
-    endDay.setDate(endDay.getDate() + 1)
-    const teacherSesssions = await this.prisma.buoiHoc.findMany({
-      where: {
-        lophoc: {
-          giaovien: { ID: teacherDB.GiaoVienID },
-          ID: { not: classId }
-        },
-        BatDauLuc: { gt: startDay, lt: endDay },
-        TrangThai: 'SCHEDULED'
-      }
-    })
-    for (var session of teacherSesssions) {
-      const startAt = DateHelper.combineDateAndTime(body.date, body.startAt)
-      const endAt = DateHelper.combineDateAndTime(body.date, body.endAt)
-      if (session.BatDauLuc <= endAt && startAt <= session.KetThucLuc)
-        throw new ConflictException(`Giáo viên trùng lịch dạy buổi học đó`)
-    }
   }
 
   // kiểm tra quyền sở hữu và trạng thái buổi học

@@ -12,7 +12,7 @@ const PrivateRoute = ({ allowedRole }: Props) => {
   // replace: không bấm nút quay lại được
   if (!token || !role) return <Navigate to='/' replace />
 
-  // có token nhưng sai role -> đi lạc thì ai về nhà nấy
+  // có token nhưng sai role -> ai về nhà nấy
   if (role !== allowedRole) {
     if (role === 'ADMIN') return <Navigate to='/admin' replace />
     if (role === 'TEACHER') return <Navigate to='/teacher' replace />

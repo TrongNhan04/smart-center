@@ -41,6 +41,7 @@ export const mapDataStudent = (record: StudentDB):
         address: record.DiaChi
     })
 
+// danh sách lớp học viên ghi danh
 export interface ClassForStudent {
     ID: number,
     MaLopHoc: string,

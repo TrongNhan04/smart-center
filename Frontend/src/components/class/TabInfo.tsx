@@ -6,7 +6,8 @@ import {
   EnvironmentOutlined,
   CalendarOutlined,
   ClockCircleOutlined,
-  DollarCircleFilled
+  DollarCircleFilled,
+  DollarCircleOutlined
 } from '@ant-design/icons';
 import type { ClassDB } from './ClassDTO';
 
@@ -82,8 +83,8 @@ const TabInfo = ({ lophoc }: Props) => {
         </Descriptions.Item>
 
         <Descriptions.Item label='Học phí'>
-          <Text style={{ color: '#52c41a' }}>
-            <DollarCircleFilled /> 123</Text>
+          <Text >
+            <DollarCircleOutlined style={{ color: '#52c41a' }}/> 123</Text>
         </Descriptions.Item>
 
         {/* dùng span giống column để trường mô tả ăn hết chiều ngang */}

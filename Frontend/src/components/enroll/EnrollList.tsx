@@ -140,10 +140,6 @@ const EnrollList = () => {
         </Tooltip>
       }
     },
-    // { // ghi chú
-    //   title: 'Ghi chú', dataIndex: 'GhiChu', key: "GhiChu",
-    //   render: (value: string) => !value || '' ? '-' : value
-    // }
   ]
 
   return (

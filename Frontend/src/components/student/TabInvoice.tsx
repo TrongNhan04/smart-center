@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams, useSearchParams } from "react-router-dom"
 import type { InvoiceForStu } from "./StudentDTO"
 import { CatchError } from "../common/catch.error"
 import { studentApi } from "../../api/studentApi"
@@ -12,6 +12,9 @@ const TabInvoice = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const [invoiceForStu, setInvoiceForStu] = useState<InvoiceForStu[]>([])
+  const [searchParam, setSearchParam] = useSearchParams()
+  const currentTab = searchParam.get('tab') || 'invoices'
+  const currentPage = Number(searchParam.get('page')) || 1
   const studentId = Number(id)
 
   useEffect(() => {
@@ -40,15 +43,15 @@ const TabInvoice = () => {
     {
       title: 'Học phí', dataIndex: 'TongTien', key: 'TongTien',
       align: 'right' as const,
-      render: (value: number) => <Text style={{ color: 'orange' }}>
-        <AccountBookOutlined /> {Number(value).toLocaleString()}đ
+      render: (value: number) => <Text >
+        <AccountBookOutlined style={{ color: 'orange' }} /> {Number(value).toLocaleString()}đ
       </Text>
     },
     {
       title: 'Đã đóng', dataIndex: 'DaTra', key: 'DaTra',
       align: 'right' as const,
-      render: (value: number) => <Text style={{ color: '#52c41a' }}>
-        <CheckCircleOutlined /> {Number(value).toLocaleString()}đ
+      render: (value: number) => <Text >
+        <CheckCircleOutlined style={{ color: '#52c41a' }} /> {Number(value).toLocaleString()}đ
       </Text>
     },
     {
@@ -60,13 +63,13 @@ const TabInvoice = () => {
     },
     {
       title: 'Thao tác', dataIndex: 'ThaoTac', key: 'ThaoTac',
-      align:'center' as const,
-      render: (_: any, invoice: InvoiceForStu) => 
-        <Button 
+      align: 'center' as const,
+      render: (_: any, invoice: InvoiceForStu) =>
+        <Button
           size="small"
-          icon={<InfoCircleOutlined/>}
+          icon={<InfoCircleOutlined />}
           type="text"
-          onClick={()=>navigate(`/admin/invoices/${invoice.ID}`)}
+          onClick={() => navigate(`/admin/invoices/${invoice.ID}`)}
         />
     }
   ]
@@ -74,10 +77,18 @@ const TabInvoice = () => {
 
   return (
     <Table
+      onChange={(page: any) => setSearchParam({
+        tab: currentTab,
+        page: page.current
+      })}
       dataSource={invoiceForStu}
       columns={columns}
       rowKey='ID'
       scroll={{ y: 320 }}
+      pagination={{
+        pageSize: 1,
+        current: currentPage
+      }}
     />
   )
 }
