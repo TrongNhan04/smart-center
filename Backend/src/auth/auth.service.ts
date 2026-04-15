@@ -82,13 +82,13 @@ export class AuthService {
 
         // tìm con của user
         const children = await this.prismaService.hocVien.findMany({
-            where:{Parent:{ID:userDB.ID}},
-            select:{ID:true}
+            where: { Parent: { ID: userDB.ID } },
+            select: { ID: true }
         })
 
         const token = await this.jwtService.signAsync(payload)
         return {
-           access_token: token,
+            access_token: token,
             user: {
                 id: userDB.ID,
                 email: userDB.Email,
@@ -96,8 +96,8 @@ export class AuthService {
                 phone: userDB.DienThoai,
                 role: userDB.VaiTro,
                 must_change_pw: userDB.PhaiDoiMK,
-                classes: classes.map(item=>item.ID),
-                children: children.map(child=>child.ID)
+                classes: classes.map(item => item.ID),
+                children: children.map(child => child.ID)
             }
         }
     }
@@ -167,15 +167,24 @@ export class AuthService {
             data.PhienBanToken = { increment: 1 }// xóa token cũ
         }
 
-        const update = await this.prismaService.user.update({
-            where: { ID: userID }, data
-        })
+        const [update, classes] = await Promise.all([
+            this.prismaService.user.update({
+                where: { ID: userID }, data
+            }),
+            this.prismaService.lopHoc.findMany({
+                where: { giaovien: { UserID: userDB.ID } },
+                select: { ID: true }
+            })
+        ])
+
         return {
             id: update.ID,
             email: update.Email,
             full_name: update.HoTen,
             phone: update.DienThoai,
-            role: update.VaiTro
+            role: update.VaiTro,
+            must_change_pw: userDB.PhaiDoiMK,
+            classes: classes.map(item => item.ID),
         }
     }
 }

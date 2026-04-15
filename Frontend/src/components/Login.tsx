@@ -14,7 +14,8 @@ const Login = () => {
       const response: any = await authApi.login(value)
       const role = response.data.user.role.toLowerCase()
       // lưu vào store
-      login(response.data.user, response.data.access_token)
+      const {children, ...rest} = response.data.user
+      login(rest, response.data.access_token)
 
       message.success('Đăng nhập thành công')
       navigate(`/${role}`)

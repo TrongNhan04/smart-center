@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react"
 import type { TeacherNotis } from "../dashboard/DashboardDTO"
 import { CatchError } from "../common/catch.error"
-import { Card, Table, Tag, Typography } from "antd"
+import { Button, Card, Table, Tag, Tooltip, Typography } from "antd"
 import teacherApi from "../../api/teacherApi"
-import { StarOutlined } from "@ant-design/icons"
+import { InfoCircleOutlined, StarOutlined } from "@ant-design/icons"
+import { useNavigate } from "react-router-dom"
 
 const { Text } = Typography
 
 const NotisPage = () => {
   const [notisToday, setNotisToday] = useState<TeacherNotis[]>([])
-
+  const navigate = useNavigate()
   const fetchNotis = async () => {
     try {
       const res = await teacherApi.getMyNotis()
@@ -41,8 +42,8 @@ const NotisPage = () => {
         return <Text><StarOutlined /> <Tag color={color}>Hệ thống</Tag></Text>
       }
     },
-    { // mô tả
-      dataIndex: 'NoiDung', key: 'NoiDung',
+    { // nội dung
+      dataIndex: 'NoiDung', key: 'NoiDung', ellipsis: true,
       onHeaderCell: () => ({ style: { textAlign: 'center' as const } }),
       render: (value: string, notis: TeacherNotis) =>
         <>
@@ -52,7 +53,7 @@ const NotisPage = () => {
           <Text> - {value}</Text>
         </>
     },
-    {
+    { // thời gian
       dataIndex: 'ThoiGian', key: 'ThoiGian', width: 150,
       align: 'right' as const,
       render: (value: string, notis: TeacherNotis) => {
@@ -72,6 +73,20 @@ const NotisPage = () => {
         return <Text strong={notis.DaDoc ? false : true}>
           {dateStr}
         </Text>
+      }
+    },
+    {// thao tác
+      dataIndex: 'DuLieu', key: 'DuLieu', width: 120,
+      align:'center' as const,
+      render: (value: { classId: number, sessionId: number }) => {
+        const { classId, sessionId } = value
+        return <Tooltip title='Đi đến buổi học'>
+          <Button
+            type="link"
+            icon={<InfoCircleOutlined />}
+            onClick={() => navigate(`/teacher/classes/${classId}/sessions/${sessionId}`)}
+          />
+        </Tooltip>
       }
     }
   ]

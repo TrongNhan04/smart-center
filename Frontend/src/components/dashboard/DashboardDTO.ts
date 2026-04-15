@@ -33,7 +33,7 @@ export interface AdminNotis {
 
 export interface ReminderTeacher {
     classId: number,
-    ssNumber: number
+    sessionId: number
 }
 
 // dto cho trang thời khóa biểu
@@ -54,7 +54,10 @@ export interface TeacherNotis {
     TieuDe: string,
     NoiDung: string,
     Loai: string
-    DuLieu: JSON
+    DuLieu: {
+        classId: number,
+        sessionId: number
+    }
     DaDoc: boolean
-    ThoiGian:string
+    ThoiGian: string
 }

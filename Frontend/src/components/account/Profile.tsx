@@ -8,6 +8,7 @@ import { useState } from "react"
 import { getChangedValue } from "../common/utils"
 import { authApi } from "../../api/authApi"
 import ChangePw from "./ChangePw"
+import { CatchError } from "../common/catch.error"
 
 const { Title, Text } = Typography
 
@@ -24,8 +25,14 @@ const Profile = () => {
     setLoading(true)
     try {
       const values = await form.validateFields()
-
-      const updateData = getChangedValue(user, values)
+      const paload = {
+        ...values,
+        id: user?.id,
+        must_change_pw: user?.must_change_pw,
+        classes: user?.classes
+      }
+      
+      const updateData = getChangedValue(user, paload)
       if (Object.keys(updateData).length === 0) {
         message.info('Không có thông tin nào thay đổi')
         return
@@ -35,18 +42,14 @@ const Profile = () => {
       form.resetFields()
       form.setFieldsValue(res.data)
       update(res.data)
-      message.success('Thao tác thành công')
-      if (Object.keys(updateData).includes('email'))
+      let successMgs = 'Cập nhật thành công'
+      if (Object.keys(updateData).includes('email')){
+        successMgs += ', vui lòng đăng nhập lại!'
         logout()
-
+      }
+      message.success(successMgs)
     } catch (error: any) {
-      notification.error({
-        title: 'Có lỗi xảy ra',
-        description: error?.response?.data?.message,
-        showProgress: true,
-        pauseOnHover: true
-      })
-      console.log('Có lỗi xảy ra: ', error?.response?.data?.message)
+      CatchError.HandleError(error)
     }
     finally {
       setLoading(false)
@@ -70,22 +73,13 @@ const Profile = () => {
             />
             <Title level={4} style={{ margin: 0 }}>{user?.full_name}</Title>
             <Text type="secondary">{role}</Text>
-
-            {/* <Divider />
-
-            <Space orientation="vertical" style={{ width: '100%', textAlign: 'left' }}>
-              <Text type="secondary"><MailFilled /> {user?.email}</Text>
-              <Text type="secondary"><PhoneFilled /> {user?.phone}</Text>
-            </Space>
-
-            <Divider  /> */}
           </Card>
         </Col>
 
         {/* form chỉnh sửa thông tin */}
         <Col xs={24} md={16} lg={18}>
           <Card
-            title="Cập nhật thông tin cá nhân"
+            title="Cập nhật tài khoản"
             variant='borderless'
             styles={{
               header: { backgroundColor: '#e6f4ff', color: '#0958d9' }
@@ -142,13 +136,6 @@ const Profile = () => {
                     <Input placeholder="Nhập số điện thoại" />
                   </Form.Item>
                 </Col>
-
-                {/* <Col span={24}>
-                  <Form.Item // địa chỉ
-                    label="Địa chỉ hiện tại" name="address">
-                    <Input.TextArea rows={3} placeholder="Nhập địa chỉ của bạn" />
-                  </Form.Item>
-                </Col> */}
               </Row>
 
               <Form.Item // nút lưu cập nhật

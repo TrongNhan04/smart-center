@@ -89,7 +89,8 @@ const Notis = () => {
         left={props => (
           <View style={{ justifyContent: 'center', paddingLeft: 8 }}>
             <Avatar.Icon
-              {...props} icon={item.Icon || 'bell-outline'}
+              {...props} 
+              icon={item.Icon || 'bell-outline'}
               size={40} color="#fff"
               style={{ backgroundColor: item.IconColor || '#3498db' }}
             />
@@ -115,7 +116,7 @@ const Notis = () => {
 
         //đổi màu cho tin chưa đọc
         style={{
-          backgroundColor: item.DaDoc ? '#fff' : '#f0f7ff',
+          backgroundColor: item.DaDoc ? '#f0f7ff' : '#fff',
           paddingVertical: 8
         }}
       />
@@ -145,8 +146,7 @@ const Notis = () => {
         data={notifications}
         renderItem={renderItem}
         keyExtractor={item => item.ID.toString()}
-        ItemSeparatorComponent={() =>
-          <Divider style={{ backgroundColor: '#f0f0f0' }} />}
+        ItemSeparatorComponent={() => <Divider/>}
 
         refreshing={refresh}
         onRefresh={handleRefresh}

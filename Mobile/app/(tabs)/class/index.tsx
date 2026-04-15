@@ -29,12 +29,12 @@ const ClassScreen = () => {
 
   const dow = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
 
-  const handlePressToSeeClassDetail = (id: number, idBuoiHoc: number) => {
+  const pressToSeeClassDetail = (id: number, buoiHocId: number) => {
     router.push({
       pathname: '/(tabs)/class/class-detail',
       params: {
         classId: id,
-        sessionId: idBuoiHoc
+        sessionId: buoiHocId
       }
     })
   }
@@ -43,7 +43,7 @@ const ClassScreen = () => {
     return (
       <TouchableOpacity
         onPress={() =>
-          handlePressToSeeClassDetail(item.ID, item.BuoiHocDuocChon)}>
+          pressToSeeClassDetail(item.ID, item.BuoiHocDuocChon)}>
         <Card mode="elevated"
           style={{
             marginBottom: 16, borderRadius: 12, backgroundColor: '#fff'
@@ -154,7 +154,7 @@ const ClassScreen = () => {
         renderItem={renderClassItem}
         keyExtractor={item => item.ID.toString()} // key từ data
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32 }}
-        // nếu trông hiện thị thêm 
+        // nếu trống hiện thị thêm 
         ListEmptyComponent={
           <View style={{ alignItems: 'center', marginTop: 100, gap: 12 }}>
             <Avatar.Icon icon="book-open-variant" size={80} style={{ backgroundColor: '#fff' }} color="#dcdde1" />

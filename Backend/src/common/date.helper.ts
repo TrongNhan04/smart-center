@@ -59,12 +59,12 @@ export class DateHelper {
     }
 
     // lấy đầu tuần đến trước đầu tuần sau
-    static GetStartEndOfWeek(now: Date){
+    static GetStartEndOfWeek(now: Date) {
         const start = startOfWeek(now)
-        const end = startOfWeek(addWeeks(now,1))
-        const sow = new Date(start.setDate(start.getDate()+1))
-        const eow = new Date(end.setDate(end.getDate()+1))
-        return {sow, eow}
+        const end = startOfWeek(addWeeks(now, 1))
+        const sow = new Date(start.setDate(start.getDate() + 1))
+        const eow = new Date(end.setDate(end.getDate() + 1))
+        return { sow, eow }
     }
 
     // lấy đầu ngày hôm nay đến đầu ngày mai
@@ -80,5 +80,17 @@ export class DateHelper {
             { hour: '2-digit', minute: '2-digit' })
             + ' - ' + end.toLocaleTimeString('vi-VN',
                 { hour: '2-digit', minute: '2-digit' })
+    }
+
+    // từ iso thành ngày tháng 10/03
+    static ISOTimeToDate(dateStr: Date) {
+        let end = 4
+        const date = dateStr.getDate()
+        const month = dateStr.getMonth()
+        if (date < 9 && month < 9) // ngày, tháng đều nhỏ hơn 10
+            end = 3
+        else if (date > 8 && month > 8) // ngày tháng đều lớn hơn 9, >=10 là hốt
+            end = 5
+        return dateStr.toLocaleDateString().slice(0, end)
     }
 }

@@ -32,6 +32,18 @@ const TabLayout = () => {
         }}
       />
 
+      <Tabs.Screen name='invoice'
+        options={{
+          title: 'Học phí',
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? 'receipt-sharp' : 'receipt-outline'}
+              color={color} size={24}
+            />
+          )
+        }}
+      />
+
       <Tabs.Screen name='notis'
         options={{
           title: 'Thông báo',

@@ -176,13 +176,13 @@ export class DashboardService {
         for (var lh of classDB) {
             const future = await this.prisma.buoiHoc.count({
                 where: { LopHocID: lh.ID, TrangThai: 'SCHEDULED' }
-            }) // số buổi đã tạo nhưng chưa học
+            }) // tổng số buổi tương lai
 
-            const total = lh.khoahoc.TongSoBuoi
-            const created = lh._count.buoihoc // số buổi học đã tạo gồm chưa học hoặc đã học
+            const total = lh.khoahoc.TongSoBuoi // tổng số buổi của khóa
+            const created = lh._count.buoihoc // số buổi học đã tạo 
             // còn 3 buổi chưa học và số buổi đã tạo nhỏ hơn tổng số buổi
             if (future <= 3 && created < total) {
-                alert.push({ // => auto nhắc tạo thêm buổi
+                alert.push({    
                     LopHocID: lh.ID,
                     TenLop: lh.TenLop,
                     GiaoVienID: lh.GiaoVienID,
@@ -236,17 +236,18 @@ export class DashboardService {
             })
         ])
 
-        const mapData = (data: any, type?: string) => data.map(item => ({
-            BuoiHocID: item.ID,
-            BuoiSo: item.BuoiSo,
-            LopHocID: item.LopHocID,
-            TenLop: item.lophoc.TenLop,
-            GiaoVienID: item.lophoc.GiaoVienID,
-            GiaoVien: item.lophoc.giaovien.User.HoTen,
-            LoiNhan: item.LyDoMoKhoa || null,
-            Ngay: item.NgayYeuCau || item.BatDauLuc,
-            Loai: type
-        }))
+        const mapData = (data: any, type?: string) =>
+            data.map((item: any) => ({
+                BuoiHocID: item.ID,
+                BuoiSo: item.BuoiSo,
+                LopHocID: item.LopHocID,
+                TenLop: item.lophoc.TenLop,
+                GiaoVienID: item.lophoc.GiaoVienID,
+                GiaoVien: item.lophoc.giaovien.User.HoTen,
+                LoiNhan: item.LyDoMoKhoa || null,
+                Ngay: item.NgayYeuCau || item.BatDauLuc,
+                Loai: type
+            }))
 
         return [
             ...mapData(requestUnlock, 'REQUEST'),
@@ -265,14 +266,19 @@ export class DashboardService {
             }
         })
         if (!classDB) throw new NotFoundException('Không tìm thấy giáo viên hoặc lớp học')
+        const sessionDB = await this.prisma.buoiHoc.findFirst({
+            where:{ID:body.sessionId, LopHocID:classDB.ID}
+        })
+        if(!sessionDB) throw new NotFoundException('Không tìm thấy buổi học')
         await this.prisma.thongBao.create({
             data: {
                 UserID: classDB.giaovien.UserID,
                 TieuDe: "Thông báo hệ thống",
-                NoiDung: `Nhắc nhở GV gửi kết quả buổi học, lớp ${classDB.TenLop} - buổi ${body.ssNumber}`,
+NoiDung: `Nhắc nhở GV chốt kết quả buổi học, lớp '${classDB.TenLop}' - buổi ${sessionDB.BuoiSo}`,
                 Loai: 'SYSTERM_ARLERT',
                 DuLieu: {
-                    classId: classDB.ID
+                    classId: classDB.ID,
+                    sessionId: sessionDB.ID
                 },
                 DaDoc: false
             }

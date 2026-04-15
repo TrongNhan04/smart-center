@@ -112,7 +112,8 @@ export class AppParentService {
         include: {
           khoahoc: { select: { TongSoBuoi: true } },
           giaovien: { select: { User: { select: { HoTen: true } } } },
-          buoihoc:{select:{ID:true}, orderBy:{UpdatedAt:'desc'}},
+          // lấy buổi học được cập nhật gần nhất
+          buoihoc: { select: { ID: true }, orderBy: [{ UpdatedAt: 'desc' }, { ID: 'desc' }] },
           _count: { select: { buoihoc: { where: { TrangThai: 'COMPLETED' } } } }
         }
       }), // kết quả của học viên
@@ -125,6 +126,7 @@ export class AppParentService {
       }),
     ])
     if (!classDB) throw new NotFoundException('Không tìm thấy lớp học')
+    // return classDB
     const reduceResult = result.reduce((store: any, item) => {
       const classId = item.ghidanh.LopHocID // lấy id lớp
       // console.log(classId)
@@ -150,7 +152,7 @@ export class AppParentService {
       TenLop: item.TenLop, GiaoVien: item.giaovien.User.HoTen,
       LichHoc: item.LichHoc,
       GioHoc: item.GioBatDau + ' - ' + item?.GioKetThuc,
-      BuoiHocDuocChon: item.buoihoc[0].ID || 0, // 0 là chưa có buổi học nào
+      BuoiHocDuocChon: item.buoihoc.length ? item.buoihoc[0].ID : null, // null là chưa có buổi học nào
       SoBuoiDaHoc: item._count.buoihoc,
       TongSoBuoi: item.khoahoc.TongSoBuoi,
       CoMat: 0, Vang: 0
@@ -168,7 +170,7 @@ export class AppParentService {
     })
   }
 
-  // lấy 1 chi tiết kết quả buổi học của học viên
+  // lấy chi tiết kết quả 1 buổi học của học viên
   async GetSessionDetail(userId: number, studentId: number, sessionId: number) {
     const studentDB = await this.StudentValidator(userId, studentId)
     const [result, sessionDB] = await Promise.all([
@@ -179,7 +181,11 @@ export class AppParentService {
         },
         include: {
           ketqua_buoihoc: {
-            include: { tep_dinhkem: { select: { URL: true } }, }
+            include: {
+              tep_dinhkem: {
+                select: { URL: true, LoaiTep: true, ID: true }
+              },
+            }
           }
         }
       }),
@@ -196,51 +202,61 @@ export class AppParentService {
       })
     ])
     if (!sessionDB) throw new NotFoundException('Không tìm thấy buổi học')
+    let TrangThai = 'Đang diễn ra'
+    const { BatDauLuc: start, KetThucLuc: end } = sessionDB
+    const now = new Date()
+    if (sessionDB.TrangThai === 'CANCELLED') TrangThai = 'Đã hủy'
+    else if (now < start) TrangThai = 'Sắp tới'
+    else if (now > end) TrangThai = 'Đã kết thúc'
 
     return {
       TenLop: sessionDB.lophoc.TenLop,
       GiaoVien: sessionDB.lophoc.giaovien.User.HoTen,
       BuoiHocID: sessionDB.ID,
-      NgayHoc: sessionDB.BatDauLuc,
+      BuoiSo: sessionDB.BuoiSo,
+      NgayHoc: DateHelper.ISOTimeToDate(sessionDB.BatDauLuc),
       GioHoc: DateHelper.ISOToHHMM(sessionDB.BatDauLuc, sessionDB.KetThucLuc),
       DiemDanh: result?.DiemDanh || null,
-      DiemSo: result?.Diem || null, 
+      DiemSo: result?.Diem || null,
       BaiHoc: sessionDB.ChuDe || null,
       NoiDung: result?.ketqua_buoihoc.NoiDungBaiHoc || null,
       BaiTap: result?.ketqua_buoihoc.BaiTapVeNha || null,
       NhanXet: result?.NhanXetRieng || result?.ketqua_buoihoc.NhanXetChung,
-      TepDinhKem: result?.ketqua_buoihoc.tep_dinhkem || []
+      TepDinhKem: result?.ketqua_buoihoc.tep_dinhkem,
+      TrangThai
     }
   }
 
   // lấy danh sách id buổi học của lớp
   async GetSessionIdsByClassId(classId: number) {
     const sessionIds = await this.prisma.buoiHoc.findMany({
-      where: { LopHocID: classId},
+      where: { LopHocID: classId },
       select: { ID: true, BuoiSo: true },
       orderBy: { ID: 'asc' }
     })
-    if (!sessionIds.length) throw new BadRequestException
-      ('Lớp học không tồn tại hoặc chưa có lịch học')
+    if (!sessionIds.length) return []
     return sessionIds
   }
 
   // lấy danh sách hóa đơn của học viên
   async GetInvoiceByStudentID(userId: number, studentId: number) {
-    await this.StudentValidator(userId, studentId)
-    const inv = await this.prisma.hoaDon.findMany({
-      where: { ghidanh: { HocVienID: studentId } }
+    const studentDB = await this.StudentValidator(userId, studentId)
+    const invoiceDB = await this.prisma.hoaDon.findMany({
+      where: { HocVienID: studentDB.ID },
+      include: {
+        hocvien: { select: { TenHocVien: true } },
+        ghidanh: { select: { lophoc: { select: { TenLop: true } } } }
+      },
+      omit: { CreatedAt: true, UpdatedAt: true, GhiDanhID:true }
     })
-    return inv.map(m => ({
-      id: m.ID,
-      code: m.MaHoaDon,
-      total: Number(m.TongTien),
-      paid: Number(m.DaTra),
-      debt: m.TrangThai ? 0 : Number(m.TongTien) - Number(m.DaTra),
-      status: m.TrangThai,
-      term: m.ThoiHan,
-      note: m.GhiChu
-    }))
+    return invoiceDB.map(item => {
+      const { hocvien, ghidanh, ...rest } = item
+      return {
+        ...rest,
+        HocVien: hocvien.TenHocVien,
+        LopHoc: ghidanh?.lophoc.TenLop
+      }
+    })
   }
 
   // check con ai người nấy xem

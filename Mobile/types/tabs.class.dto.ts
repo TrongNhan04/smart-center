@@ -17,6 +17,7 @@ export interface SessionOfStu {
     TenLop: string,
     GiaoVien: string,
     BuoiHocID: number,
+    BuoiSo:number,
     NgayHoc: string,
     GioHoc: string,
     DiemDanh: boolean,
@@ -26,6 +27,7 @@ export interface SessionOfStu {
     BaiTap: string,
     NhanXet: string,
     TepDinhKem: TepDinhKem[]
+    TrangThai: string
 }
 
 interface TepDinhKem {

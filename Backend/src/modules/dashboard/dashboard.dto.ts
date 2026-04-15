@@ -25,23 +25,6 @@ export class RemindTeacher {
     @IsNotEmpty()
     classId!: number
 
-    ssNumber!: string
+    @IsNotEmpty()
+    sessionId!:number
 }
-
-// export interface PendingSSDTO {
-//     rquestUnlock: {
-//         id: number
-//         lesson: number
-//         room: string
-//         teacher: string
-//         reason: string
-//         date: Date
-//     }[],
-
-//     unSubmitted: {
-//         id: number
-//         lesson: number
-//         room: string
-//         teacher: string
-//     }
-// }

@@ -37,7 +37,7 @@ const NotisList = () => {
     try {
       const payload: ReminderTeacher = {
         classId: task.LopHocID,
-        ssNumber: task.BuoiSo
+        sessionId: task.BuoiHocID
       }
       await dashboardApi.reminderTeacher(task.GiaoVienID, payload)
       // lưu id buổi học để biết buổi này có cần nhắc nhở không

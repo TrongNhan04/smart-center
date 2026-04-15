@@ -4,25 +4,25 @@ import { Vaitro } from "src/generated/prisma/enums"
 export class RegisterDTO{
     @IsEmail()
     @IsNotEmpty()
-    email: string
+    email!: string
 
     @IsPhoneNumber('VN')//SĐT VN
     @IsNotEmpty()
-    phone: string
+    phone!: string
 
     @IsEnum(Vaitro,{message:`User có vai trò là ${Object.values(Vaitro).join(",")}`})
     @IsNotEmpty()
-    role: Vaitro
+    role!: Vaitro
 }
 
 export class LoginDTO{
     @IsEmail()
     @IsNotEmpty()
-    email: string
+    email!: string
 
     @IsNotEmpty()
     @IsString()
-    password: string
+    password!: string
 
     @IsOptional()
     mustChangePW?: boolean
@@ -37,20 +37,23 @@ export class ProfileDTO{
     @IsOptional()
     @IsNotEmpty()
     @IsString()
-    oldPassword: string
+    oldPassword!: string
 
     @IsOptional()
     @IsNotEmpty()
     @IsString()
-    newPassword: string
+    newPassword!: string
 
     @IsOptional()
     @IsEmail()
     @IsNotEmpty()
-    email: string
+    email!: string
 
     @IsOptional()
     @IsPhoneNumber('VN')//SĐT VN
     @IsNotEmpty()
-    phone: string
+    phone!: string
+
+    @IsOptional()
+    address?: string
 }

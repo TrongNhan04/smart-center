@@ -174,36 +174,3 @@ const SchedulePage = () => {
 }
 
 export default SchedulePage
-
-
-// useEffect(() => {
-//   let ignore = false; // Biến cờ để chống Race Condition
-
-//   const fetchSession = async () => {
-//     try {
-//       const isSameMonth = currentMonthRef.current?.isSame(selectedDate, 'month');
-      
-//       // Nếu cùng tháng thì thôi, và cập nhật Ref ngay để lần sau ko lọt vào đây
-//       if (isSameMonth) return;
-
-//       const res = await dashboardApi.getSessionsOfMonth(
-//         selectedDate.month(),
-//         selectedDate.year()
-//       );
-
-//       // Chỉ set data nếu đây là yêu cầu mới nhất
-//       if (!ignore) {
-//         setScheduleData(res.data);
-//         currentMonthRef.current = selectedDate; // Chỉ cập nhật Ref khi fetch xong/thay đổi tháng
-//       }
-//     } catch (error) {
-//       if (!ignore) CatchError.HandleError(error);
-//     }
-//   };
-
-//   fetchSession();
-
-//   return () => {
-//     ignore = true; // Khi selectedDate thay đổi lần nữa, yêu cầu cũ sẽ bị bỏ qua
-//   };
-// }, [selectedDate]);

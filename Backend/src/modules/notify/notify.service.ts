@@ -101,7 +101,7 @@ export class NotifyService {
 
         const title = "Thông báo hủy buổi học"
         const dateStr = session.BatDauLuc.toLocaleDateString('vi-VN')
-        const body = `Lớp ${session.lophoc.TenLop} - Buổi ${session.BuoiSo} ngày ${dateStr} đã hủy vì: ${reason}`
+        const body = `Lớp '${session.lophoc.TenLop}' - buổi ${session.BuoiSo} (${dateStr}) đã hủy vì: ${reason}`
 
         const notisData = userId.map(id => ({
             UserID: id,
@@ -149,12 +149,12 @@ export class NotifyService {
         let client: Prisma.TransactionClient | null = null
         if (tx) client = tx
         else client = this.prisma
-        // userId, title, body, tpye, data, isRead
+        const amout = Number(receipt.SoTien).toLocaleString()
         return await client.thongBao.create({
             data: {
                 UserID: userId,
                 TieuDe: 'Thanh toán học phí thành công',
-                NoiDung: `Đã ghi nhận thanh toán học phí, số tiền là ${receipt.SoTien}. Vui lòng kiểm tra lịch sử thanh toán trong ứng dụng.`,
+                NoiDung: `Đã ghi nhận thanh toán học phí, số tiền là ${amout}. Vui lòng kiểm tra lịch sử thanh toán trong ứng dụng.`,
                 Loai: 'RECEIPT',
                 DuLieu: {
                     receiptId: receipt.ID,
@@ -174,7 +174,7 @@ export class NotifyService {
             data: {
                 UserID: session.UserID,
                 TieuDe: "Thông báo hệ thống",
-NoiDung: `Đã mở khóa buổi ${session.BuoiSo} (${dateStr}) của lớp ${session.TenLop}. Vui lòng kiểm tra lại buổi học`,
+NoiDung: `Đã mở khóa buổi ${session.BuoiSo} (${dateStr}) của lớp '${session.TenLop}'. Vui lòng kiểm tra lại buổi học`,
                 Loai: 'SYSTERM_ARLERT',
                 DuLieu: {
                     classId: session.LopHocID,
@@ -190,10 +190,10 @@ NoiDung: `Đã mở khóa buổi ${session.BuoiSo} (${dateStr}) của lớp ${se
         const notis = await this.prisma.thongBao.findUnique({
             where: { ID: notifyId }
         })
-        if (!notis) throw new NotFoundException('Notis not found')
+        if (!notis) throw new NotFoundException('Không tìm thấy thông báo')
 
         if (notis.UserID !== userId)
-            throw new ForbiddenException('Access denied')
+            throw new ForbiddenException('Truy cập từ chối')
         return notis
     }
 }

@@ -51,9 +51,6 @@ export class AppParentController {
         return this.appParent.GetSessionIdsByClassId(+classId)
     }
 
-    // Thông báo - notisService
-    // Đã đọc - notisService
-
     // Danh sách hóa đơn của con
     @Get('students/:id/invoices')
     async GetInvoiceByStudentID(@Req() req: RequestWithUser,

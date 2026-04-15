@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UploadedFiles, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Controller, Get, Param, Post, UploadedFiles, UseGuards, UseInterceptors } from "@nestjs/common";
 import { CloudinaryService } from "./cloudinary.service";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
@@ -18,7 +18,7 @@ export class CloudinaryController {
             fileSize: 5 * 1024 * 1024 // 5mb mỗi file
         }
     })) // bắt cái file, có s
-    async uploadFile(@UploadedFiles() files: Express.Multer.File[]) {
+    async uploadFile(@UploadedFiles() files:Express.Multer.File) {
         // upload nhiều file
         // const arrRes = await this.cloudinaryService.uploadMultiple(files)
         // return arrRes.map(item=>({
