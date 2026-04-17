@@ -225,7 +225,7 @@ export type KetQua_ChiTietGroupByOutputType = {
   _max: KetQua_ChiTietMaxAggregateOutputType | null
 }
 
-type GetKetQua_ChiTietGroupByPayload<T extends KetQua_ChiTietGroupByArgs> = Prisma.PrismaPromise<
+export type GetKetQua_ChiTietGroupByPayload<T extends KetQua_ChiTietGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<KetQua_ChiTietGroupByOutputType, T['by']> &
       {

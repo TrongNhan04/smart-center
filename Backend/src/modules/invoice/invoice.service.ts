@@ -168,7 +168,7 @@ export class InvoiceService {
         if (body.amount > remain) throw new BadRequestException
             (`Số tiền thu không được vượt quá ${remain} đ`)
 
-        let code = '' ; console.log("ID", receiptDB?.ID)
+        let code = '' ;
         if (!receiptDB) code = "PT0" // chưa có giao dịch nào hết
         else code = "PT" + (receiptDB.ID + 1)
 
@@ -271,7 +271,7 @@ export class InvoiceService {
             NgayGD: item.NgayGiaoDich,
             SoTien: item.SoTien,
             PhuongThuc: item.PhuongThuc,
-            ThuNgan: item.user.HoTen,
+            ThuNgan: item.user?.HoTen || null,
             GhiChu: item.GhiChu
         }))
     }
@@ -310,7 +310,7 @@ export class InvoiceService {
             SoTien: item.SoTien, NgayGD: item.NgayGiaoDich,
             PhuongThuc: item.PhuongThuc, GhiChu:item.GhiChu,
             LoaiGD: item.LoaiGiaoDich,
-            ThuNgan: item.user.HoTen,
+            ThuNgan: item.user?.HoTen || null,
             TenHocVien: item.hoadon?.hocvien.TenHocVien || null
         }))
         return {

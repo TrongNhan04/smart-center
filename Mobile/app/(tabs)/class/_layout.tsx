@@ -6,7 +6,6 @@ const ClassLayout = () => {
     <Stack screenOptions={{headerShown:false}}>
         <Stack.Screen name='index'/>
         <Stack.Screen name='class-detail'/>
-        <Stack.Screen name='session-detail'/>
     </Stack>
   )
 }

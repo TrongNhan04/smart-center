@@ -242,7 +242,7 @@ export class AppParentService {
   async GetInvoiceByStudentID(userId: number, studentId: number) {
     const studentDB = await this.StudentValidator(userId, studentId)
     const invoiceDB = await this.prisma.hoaDon.findMany({
-      where: { HocVienID: studentDB.ID },
+      where: { HocVienID: studentDB.ID, TrangThai:'ACTIVE' },
       include: {
         hocvien: { select: { TenHocVien: true } },
         ghidanh: { select: { lophoc: { select: { TenLop: true } } } }

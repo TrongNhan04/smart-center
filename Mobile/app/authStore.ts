@@ -17,11 +17,11 @@ interface User {
 interface AuthState {
 	user: User | null,
 	access_token: string | null,
+	selectedStuId: number | null
 
 	login: (user: User, token: string) => void,
 	update: (user: User) => void,
 	logout: () => void
-	selectedStuId: number | null
 	setSelectedStuId: (id: number) => void
 }
 

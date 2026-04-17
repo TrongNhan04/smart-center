@@ -228,7 +228,7 @@ export type KetQua_BuoiHocGroupByOutputType = {
   _max: KetQua_BuoiHocMaxAggregateOutputType | null
 }
 
-type GetKetQua_BuoiHocGroupByPayload<T extends KetQua_BuoiHocGroupByArgs> = Prisma.PrismaPromise<
+export type GetKetQua_BuoiHocGroupByPayload<T extends KetQua_BuoiHocGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<KetQua_BuoiHocGroupByOutputType, T['by']> &
       {

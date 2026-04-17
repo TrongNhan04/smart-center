@@ -231,7 +231,7 @@ export type UserGroupByOutputType = {
   _max: UserMaxAggregateOutputType | null
 }
 
-type GetUserGroupByPayload<T extends UserGroupByArgs> = Prisma.PrismaPromise<
+export type GetUserGroupByPayload<T extends UserGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<UserGroupByOutputType, T['by']> &
       {
@@ -495,6 +495,11 @@ export type UserScalarRelationFilter = {
   isNot?: Prisma.UserWhereInput
 }
 
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
+}
+
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
 }
@@ -557,10 +562,12 @@ export type UserCreateNestedOneWithoutGiaoDichInput = {
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneRequiredWithoutGiaoDichNestedInput = {
+export type UserUpdateOneWithoutGiaoDichNestedInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutGiaoDichInput, Prisma.UserUncheckedCreateWithoutGiaoDichInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutGiaoDichInput
   upsert?: Prisma.UserUpsertWithoutGiaoDichInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutGiaoDichInput, Prisma.UserUpdateWithoutGiaoDichInput>, Prisma.UserUncheckedUpdateWithoutGiaoDichInput>
 }

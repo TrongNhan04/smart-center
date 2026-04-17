@@ -220,7 +220,7 @@ export type ThongBaoGroupByOutputType = {
   _max: ThongBaoMaxAggregateOutputType | null
 }
 
-type GetThongBaoGroupByPayload<T extends ThongBaoGroupByArgs> = Prisma.PrismaPromise<
+export type GetThongBaoGroupByPayload<T extends ThongBaoGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ThongBaoGroupByOutputType, T['by']> &
       {

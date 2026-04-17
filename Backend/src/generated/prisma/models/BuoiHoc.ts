@@ -263,7 +263,7 @@ export type BuoiHocGroupByOutputType = {
   _max: BuoiHocMaxAggregateOutputType | null
 }
 
-type GetBuoiHocGroupByPayload<T extends BuoiHocGroupByArgs> = Prisma.PrismaPromise<
+export type GetBuoiHocGroupByPayload<T extends BuoiHocGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<BuoiHocGroupByOutputType, T['by']> &
       {

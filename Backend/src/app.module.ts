@@ -14,13 +14,15 @@ import { AppParentModule } from './modules/app-parent/app-parent.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { TransformInterceptor } from './common/transform.interceptor';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { PaymentModule } from './modules/payment/payment.module';
 
 @Module({
   imports: [
     AuthModule, PrismaModule, TeacherModule, 
     ConfigModule.forRoot({isGlobal:true}), CourseModule, 
     ClassModule, SessionModule, StudentModule, EnrollModule, 
-    InvoiceModule, DashboardModule, AppParentModule, CloudinaryModule
+    InvoiceModule, DashboardModule, AppParentModule, CloudinaryModule,
+    PaymentModule
   ],
   providers: [
     {

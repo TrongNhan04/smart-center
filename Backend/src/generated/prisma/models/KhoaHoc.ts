@@ -246,7 +246,7 @@ export type KhoaHocGroupByOutputType = {
   _max: KhoaHocMaxAggregateOutputType | null
 }
 
-type GetKhoaHocGroupByPayload<T extends KhoaHocGroupByArgs> = Prisma.PrismaPromise<
+export type GetKhoaHocGroupByPayload<T extends KhoaHocGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<KhoaHocGroupByOutputType, T['by']> &
       {

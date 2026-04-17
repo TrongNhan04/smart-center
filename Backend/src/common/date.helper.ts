@@ -93,4 +93,9 @@ export class DateHelper {
             end = 5
         return dateStr.toLocaleDateString().slice(0, end)
     }
+
+    static CreateUniqueCode (prefix:any) {
+        // cắt 6 số cuối mili giây ghép vào đầu để được mã không bị trùng
+        return prefix + Date.now().toString().slice(-6)
+    }
 }

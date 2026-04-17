@@ -221,7 +221,7 @@ export type GhiDanhGroupByOutputType = {
   _max: GhiDanhMaxAggregateOutputType | null
 }
 
-type GetGhiDanhGroupByPayload<T extends GhiDanhGroupByArgs> = Prisma.PrismaPromise<
+export type GetGhiDanhGroupByPayload<T extends GhiDanhGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<GhiDanhGroupByOutputType, T['by']> &
       {
@@ -457,11 +457,6 @@ export type GhiDanhSumOrderByAggregateInput = {
   LopHocID?: Prisma.SortOrder
 }
 
-export type GhiDanhNullableScalarRelationFilter = {
-  is?: Prisma.GhiDanhWhereInput | null
-  isNot?: Prisma.GhiDanhWhereInput | null
-}
-
 export type GhiDanhCreateNestedManyWithoutHocvienInput = {
   create?: Prisma.XOR<Prisma.GhiDanhCreateWithoutHocvienInput, Prisma.GhiDanhUncheckedCreateWithoutHocvienInput> | Prisma.GhiDanhCreateWithoutHocvienInput[] | Prisma.GhiDanhUncheckedCreateWithoutHocvienInput[]
   connectOrCreate?: Prisma.GhiDanhCreateOrConnectWithoutHocvienInput | Prisma.GhiDanhCreateOrConnectWithoutHocvienInput[]
@@ -570,12 +565,10 @@ export type GhiDanhCreateNestedOneWithoutHoadonInput = {
   connect?: Prisma.GhiDanhWhereUniqueInput
 }
 
-export type GhiDanhUpdateOneWithoutHoadonNestedInput = {
+export type GhiDanhUpdateOneRequiredWithoutHoadonNestedInput = {
   create?: Prisma.XOR<Prisma.GhiDanhCreateWithoutHoadonInput, Prisma.GhiDanhUncheckedCreateWithoutHoadonInput>
   connectOrCreate?: Prisma.GhiDanhCreateOrConnectWithoutHoadonInput
   upsert?: Prisma.GhiDanhUpsertWithoutHoadonInput
-  disconnect?: Prisma.GhiDanhWhereInput | boolean
-  delete?: Prisma.GhiDanhWhereInput | boolean
   connect?: Prisma.GhiDanhWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.GhiDanhUpdateToOneWithWhereWithoutHoadonInput, Prisma.GhiDanhUpdateWithoutHoadonInput>, Prisma.GhiDanhUncheckedUpdateWithoutHoadonInput>
 }

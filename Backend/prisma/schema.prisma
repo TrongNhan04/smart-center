@@ -290,7 +290,7 @@ enum TrangThai_HD {
 model HoaDon {
   ID        Int    @id @default(autoincrement())
   MaHoaDon  String @unique
-  GhiDanhID Int?   @unique
+  GhiDanhID Int   @unique
   HocVienID Int
 
   TongTien  Decimal      @db.Decimal(10, 2)
@@ -303,7 +303,7 @@ model HoaDon {
   UpdatedAt DateTime @updatedAt @db.Timestamptz(3)
 
   //Quan hệ             
-  ghidanh  GhiDanh?   @relation(fields: [GhiDanhID], references: [ID]) // trả tiền cho ghi danh nào
+  ghidanh  GhiDanh   @relation(fields: [GhiDanhID], references: [ID]) // trả tiền cho ghi danh nào
   hocvien  HocVien    @relation(fields: [HocVienID], references: [ID]) // hóa đơn của ai
   giaodich GiaoDich[] //hóa đơn có nhiều giao dich
 }
@@ -311,14 +311,14 @@ model HoaDon {
 // ============ 13. GIAODICH  ============//
 model GiaoDich {
   ID       Int  @id @default(autoincrement())
-  UserID   Int
+  UserID   Int? // có người thu hoặc giao dịch hệ thống
   HoaDonID Int? // có giao dịch không phải trả tiền cho hóa đơn
 
   MaGiaoDich   String   @unique
   LoaiGiaoDich String
   SoTien       Decimal  @db.Decimal(10, 2)
   NgayGiaoDich DateTime @db.Timestamptz(3)
-  PhuongThuc   String?
+  PhuongThuc   String
   GhiChu       String?
 
   CreatedAt DateTime @default(now()) @db.Timestamptz(3)
@@ -326,7 +326,7 @@ model GiaoDich {
 
   //Quan hệ
   hoadon HoaDon? @relation(fields: [HoaDonID], references: [ID])
-  user   User    @relation(fields: [UserID], references: [ID])
+  user   User?    @relation(fields: [UserID], references: [ID])
 }
 
 // ============ 14. THONGBAO  ============//

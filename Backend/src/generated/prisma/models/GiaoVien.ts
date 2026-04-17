@@ -224,7 +224,7 @@ export type GiaoVienGroupByOutputType = {
   _max: GiaoVienMaxAggregateOutputType | null
 }
 
-type GetGiaoVienGroupByPayload<T extends GiaoVienGroupByArgs> = Prisma.PrismaPromise<
+export type GetGiaoVienGroupByPayload<T extends GiaoVienGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<GiaoVienGroupByOutputType, T['by']> &
       {

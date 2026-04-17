@@ -365,6 +365,23 @@ export type EnumTrangThai_GDWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumTrangThai_GDFilter<$PrismaModel>
 }
 
+export type EnumTrangThai_HDFilter<$PrismaModel = never> = {
+  equals?: $Enums.TrangThai_HD | Prisma.EnumTrangThai_HDFieldRefInput<$PrismaModel>
+  in?: $Enums.TrangThai_HD[] | Prisma.ListEnumTrangThai_HDFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TrangThai_HD[] | Prisma.ListEnumTrangThai_HDFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTrangThai_HDFilter<$PrismaModel> | $Enums.TrangThai_HD
+}
+
+export type EnumTrangThai_HDWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.TrangThai_HD | Prisma.EnumTrangThai_HDFieldRefInput<$PrismaModel>
+  in?: $Enums.TrangThai_HD[] | Prisma.ListEnumTrangThai_HDFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TrangThai_HD[] | Prisma.ListEnumTrangThai_HDFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTrangThai_HDWithAggregatesFilter<$PrismaModel> | $Enums.TrangThai_HD
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumTrangThai_HDFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumTrangThai_HDFilter<$PrismaModel>
+}
+
 export type IntNullableFilter<$PrismaModel = never> = {
   equals?: number | Prisma.IntFieldRefInput<$PrismaModel> | null
   in?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | null
@@ -374,13 +391,6 @@ export type IntNullableFilter<$PrismaModel = never> = {
   gt?: number | Prisma.IntFieldRefInput<$PrismaModel>
   gte?: number | Prisma.IntFieldRefInput<$PrismaModel>
   not?: Prisma.NestedIntNullableFilter<$PrismaModel> | number | null
-}
-
-export type EnumTrangThai_HDFilter<$PrismaModel = never> = {
-  equals?: $Enums.TrangThai_HD | Prisma.EnumTrangThai_HDFieldRefInput<$PrismaModel>
-  in?: $Enums.TrangThai_HD[] | Prisma.ListEnumTrangThai_HDFieldRefInput<$PrismaModel>
-  notIn?: $Enums.TrangThai_HD[] | Prisma.ListEnumTrangThai_HDFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumTrangThai_HDFilter<$PrismaModel> | $Enums.TrangThai_HD
 }
 
 export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -397,16 +407,6 @@ export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
   _sum?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _max?: Prisma.NestedIntNullableFilter<$PrismaModel>
-}
-
-export type EnumTrangThai_HDWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.TrangThai_HD | Prisma.EnumTrangThai_HDFieldRefInput<$PrismaModel>
-  in?: $Enums.TrangThai_HD[] | Prisma.ListEnumTrangThai_HDFieldRefInput<$PrismaModel>
-  notIn?: $Enums.TrangThai_HD[] | Prisma.ListEnumTrangThai_HDFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumTrangThai_HDWithAggregatesFilter<$PrismaModel> | $Enums.TrangThai_HD
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumTrangThai_HDFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumTrangThai_HDFilter<$PrismaModel>
 }
 
 export type JsonFilter<$PrismaModel = never> =
@@ -831,6 +831,16 @@ export type NestedEnumTrangThai_HDFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumTrangThai_HDFilter<$PrismaModel> | $Enums.TrangThai_HD
 }
 
+export type NestedEnumTrangThai_HDWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.TrangThai_HD | Prisma.EnumTrangThai_HDFieldRefInput<$PrismaModel>
+  in?: $Enums.TrangThai_HD[] | Prisma.ListEnumTrangThai_HDFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TrangThai_HD[] | Prisma.ListEnumTrangThai_HDFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTrangThai_HDWithAggregatesFilter<$PrismaModel> | $Enums.TrangThai_HD
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumTrangThai_HDFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumTrangThai_HDFilter<$PrismaModel>
+}
+
 export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
   equals?: number | Prisma.IntFieldRefInput<$PrismaModel> | null
   in?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | null
@@ -856,16 +866,6 @@ export type NestedFloatNullableFilter<$PrismaModel = never> = {
   gt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
   gte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
   not?: Prisma.NestedFloatNullableFilter<$PrismaModel> | number | null
-}
-
-export type NestedEnumTrangThai_HDWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.TrangThai_HD | Prisma.EnumTrangThai_HDFieldRefInput<$PrismaModel>
-  in?: $Enums.TrangThai_HD[] | Prisma.ListEnumTrangThai_HDFieldRefInput<$PrismaModel>
-  notIn?: $Enums.TrangThai_HD[] | Prisma.ListEnumTrangThai_HDFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumTrangThai_HDWithAggregatesFilter<$PrismaModel> | $Enums.TrangThai_HD
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumTrangThai_HDFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumTrangThai_HDFilter<$PrismaModel>
 }
 
 export type NestedJsonFilter<$PrismaModel = never> =

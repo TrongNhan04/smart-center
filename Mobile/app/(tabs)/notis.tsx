@@ -63,12 +63,12 @@ const Notis = () => {
 
   const handleReadNotis = async (id?: number) => {
     try {
-      if(id) await mobileApi.readOneNotis(id)
+      if (id) await mobileApi.readOneNotis(id)
       else await mobileApi.readAllNotis()
       fetchNotis()
-    } catch (error) {
-      Alert.alert('Thông báo', 'Lỗi tải thông báo!');
-      console.log('Có lỗi xảy ra: ', error)
+    } catch (error:any) {
+      Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
+      console.log('Có lỗi xảy ra: ', error?.response?.data)
     }
   }
 
@@ -89,7 +89,7 @@ const Notis = () => {
         left={props => (
           <View style={{ justifyContent: 'center', paddingLeft: 8 }}>
             <Avatar.Icon
-              {...props} 
+              {...props}
               icon={item.Icon || 'bell-outline'}
               size={40} color="#fff"
               style={{ backgroundColor: item.IconColor || '#3498db' }}
@@ -140,13 +140,13 @@ const Notis = () => {
           onPress={() => handleReadNotis()}
         />
       </View>
-      <Divider/>
+      <Divider />
 
       <FlatList
         data={notifications}
         renderItem={renderItem}
         keyExtractor={item => item.ID.toString()}
-        ItemSeparatorComponent={() => <Divider/>}
+        ItemSeparatorComponent={() => <Divider />}
 
         refreshing={refresh}
         onRefresh={handleRefresh}

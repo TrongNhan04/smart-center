@@ -24,9 +24,9 @@ export default function Index() {
       // nếu chưa chọn ai và có dữ liệu thì chọn em đầu tiên
       if (selectedStuId === -1 && res.length > 0)
         setSelectedStuId(data[0].ID)
-    } catch (error) {
+    } catch (error: any) {
       Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
-      console.log('Có lỗi xảy ra: ', error)
+      console.log('Có lỗi xảy ra: ', error?.response?.data)
     }
   }
 
@@ -54,7 +54,7 @@ export default function Index() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView contentContainerStyle={{ paddingBottom: 10 }}
-        showsVerticalScrollIndicator = {false}
+        showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={refresh}
             onRefresh={handleRefresh} />
@@ -176,7 +176,8 @@ export default function Index() {
                       <Text variant="bodyMedium">Tiến độ lớp học</Text>
                       <Text variant="bodyMedium">{item.BuoiSo}/{item.TongSoBuoi}</Text>
                     </View>
-                    <ProgressBar progress={item.BuoiSo / item.TongSoBuoi} color="#3498db" style={{ height: 6, borderRadius: 3 }} />
+                    <ProgressBar progress={item.BuoiSo / item.TongSoBuoi}
+                      color="#3498db" style={{ height: 6, borderRadius: 3 }} />
                   </View>
 
                   <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 6, marginTop: 8 }}>

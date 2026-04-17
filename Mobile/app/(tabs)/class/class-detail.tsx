@@ -4,7 +4,7 @@ import { SessionIds, SessionOfStu } from '@/types/tabs.class.dto';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
-import ImageView from "react-native-image-viewing";
+import ImageView from 'react-native-image-viewing';
 import { Card, Icon, IconButton, Surface, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -25,8 +25,8 @@ export default function SessionDetailScreen() {
         const res = await mobileApi.getSessionIdsByClassId(classId)
         setArrSessionId(res.data) // mảng id buổi học
       } catch (error: any) {
-        Alert.alert('Thông báo', error);
-        console.log('Có lỗi xảy ra: ', error)
+        Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
+        console.log('Có lỗi xảy ra: ', error?.response?.data)
       }
     }
     fetchSessionIds()
@@ -202,7 +202,7 @@ export default function SessionDetailScreen() {
                   </Text>
                 </View>
                 <View style={{ gap: 6 }}>
-                  {detailResult.TepDinhKem.length > 0 ? (
+                  {detailResult?.TepDinhKem?.length > 0 ? (
                     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                       {detailResult.TepDinhKem.map((item, index) => {
                         if (item.LoaiTep === 'image')
@@ -216,6 +216,7 @@ export default function SessionDetailScreen() {
                               source={{ uri: item.URL }}
                             />
                           </TouchableOpacity>
+                        return <></>
                       })}
                       <ImageView
                         visible={visible}
@@ -250,7 +251,7 @@ export default function SessionDetailScreen() {
             justifyContent: 'center',
             gap: 10,
           }}>
-            {arrSessionId.map(session => {
+            {arrSessionId?.map(session => {
               // nếu có chọn thì lấy có chọn, chưa chọn thì lấy cái đầu tiên
               const isSelected = selectedId ?
                 selectedId === session.ID : buoiHocId === session.ID

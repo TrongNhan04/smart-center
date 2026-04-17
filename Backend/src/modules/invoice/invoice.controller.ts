@@ -49,9 +49,9 @@ export class InvoiceController {
         @Param('id') invoiceId: number,
         @Body() body: CreateTransactionDTO,
         @Req() req: RequestWithUser) {
-            const userId = req.user.userId
-            return await this.invoiceService.CreatePayment
-                (+userId, +invoiceId, body)
+        const userId = req.user.userId
+        return await this.invoiceService.CreatePayment
+            (+userId, +invoiceId, body)
     }
 
     //Lấy danh sách giao dịch theo hóa đơn 

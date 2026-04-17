@@ -193,7 +193,7 @@ export type DeCuongGroupByOutputType = {
   _max: DeCuongMaxAggregateOutputType | null
 }
 
-type GetDeCuongGroupByPayload<T extends DeCuongGroupByArgs> = Prisma.PrismaPromise<
+export type GetDeCuongGroupByPayload<T extends DeCuongGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<DeCuongGroupByOutputType, T['by']> &
       {

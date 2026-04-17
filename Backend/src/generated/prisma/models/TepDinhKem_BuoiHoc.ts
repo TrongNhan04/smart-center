@@ -210,7 +210,7 @@ export type TepDinhKem_BuoiHocGroupByOutputType = {
   _max: TepDinhKem_BuoiHocMaxAggregateOutputType | null
 }
 
-type GetTepDinhKem_BuoiHocGroupByPayload<T extends TepDinhKem_BuoiHocGroupByArgs> = Prisma.PrismaPromise<
+export type GetTepDinhKem_BuoiHocGroupByPayload<T extends TepDinhKem_BuoiHocGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<TepDinhKem_BuoiHocGroupByOutputType, T['by']> &
       {

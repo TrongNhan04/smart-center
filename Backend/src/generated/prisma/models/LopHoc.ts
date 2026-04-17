@@ -281,7 +281,7 @@ export type LopHocGroupByOutputType = {
   _max: LopHocMaxAggregateOutputType | null
 }
 
-type GetLopHocGroupByPayload<T extends LopHocGroupByArgs> = Prisma.PrismaPromise<
+export type GetLopHocGroupByPayload<T extends LopHocGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<LopHocGroupByOutputType, T['by']> &
       {

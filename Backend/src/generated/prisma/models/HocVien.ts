@@ -231,7 +231,7 @@ export type HocVienGroupByOutputType = {
   _max: HocVienMaxAggregateOutputType | null
 }
 
-type GetHocVienGroupByPayload<T extends HocVienGroupByArgs> = Prisma.PrismaPromise<
+export type GetHocVienGroupByPayload<T extends HocVienGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<HocVienGroupByOutputType, T['by']> &
       {

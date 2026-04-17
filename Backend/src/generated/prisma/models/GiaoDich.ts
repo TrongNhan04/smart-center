@@ -229,13 +229,13 @@ export type GiaoDichGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 
 export type GiaoDichGroupByOutputType = {
   ID: number
-  UserID: number
+  UserID: number | null
   HoaDonID: number | null
   MaGiaoDich: string
   LoaiGiaoDich: string
   SoTien: runtime.Decimal
   NgayGiaoDich: Date
-  PhuongThuc: string | null
+  PhuongThuc: string
   GhiChu: string | null
   CreatedAt: Date
   UpdatedAt: Date
@@ -246,7 +246,7 @@ export type GiaoDichGroupByOutputType = {
   _max: GiaoDichMaxAggregateOutputType | null
 }
 
-type GetGiaoDichGroupByPayload<T extends GiaoDichGroupByArgs> = Prisma.PrismaPromise<
+export type GetGiaoDichGroupByPayload<T extends GiaoDichGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<GiaoDichGroupByOutputType, T['by']> &
       {
@@ -266,29 +266,29 @@ export type GiaoDichWhereInput = {
   OR?: Prisma.GiaoDichWhereInput[]
   NOT?: Prisma.GiaoDichWhereInput | Prisma.GiaoDichWhereInput[]
   ID?: Prisma.IntFilter<"GiaoDich"> | number
-  UserID?: Prisma.IntFilter<"GiaoDich"> | number
+  UserID?: Prisma.IntNullableFilter<"GiaoDich"> | number | null
   HoaDonID?: Prisma.IntNullableFilter<"GiaoDich"> | number | null
   MaGiaoDich?: Prisma.StringFilter<"GiaoDich"> | string
   LoaiGiaoDich?: Prisma.StringFilter<"GiaoDich"> | string
   SoTien?: Prisma.DecimalFilter<"GiaoDich"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   NgayGiaoDich?: Prisma.DateTimeFilter<"GiaoDich"> | Date | string
-  PhuongThuc?: Prisma.StringNullableFilter<"GiaoDich"> | string | null
+  PhuongThuc?: Prisma.StringFilter<"GiaoDich"> | string
   GhiChu?: Prisma.StringNullableFilter<"GiaoDich"> | string | null
   CreatedAt?: Prisma.DateTimeFilter<"GiaoDich"> | Date | string
   UpdatedAt?: Prisma.DateTimeFilter<"GiaoDich"> | Date | string
   hoadon?: Prisma.XOR<Prisma.HoaDonNullableScalarRelationFilter, Prisma.HoaDonWhereInput> | null
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
 
 export type GiaoDichOrderByWithRelationInput = {
   ID?: Prisma.SortOrder
-  UserID?: Prisma.SortOrder
+  UserID?: Prisma.SortOrderInput | Prisma.SortOrder
   HoaDonID?: Prisma.SortOrderInput | Prisma.SortOrder
   MaGiaoDich?: Prisma.SortOrder
   LoaiGiaoDich?: Prisma.SortOrder
   SoTien?: Prisma.SortOrder
   NgayGiaoDich?: Prisma.SortOrder
-  PhuongThuc?: Prisma.SortOrderInput | Prisma.SortOrder
+  PhuongThuc?: Prisma.SortOrder
   GhiChu?: Prisma.SortOrderInput | Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
   UpdatedAt?: Prisma.SortOrder
@@ -302,28 +302,28 @@ export type GiaoDichWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.GiaoDichWhereInput | Prisma.GiaoDichWhereInput[]
   OR?: Prisma.GiaoDichWhereInput[]
   NOT?: Prisma.GiaoDichWhereInput | Prisma.GiaoDichWhereInput[]
-  UserID?: Prisma.IntFilter<"GiaoDich"> | number
+  UserID?: Prisma.IntNullableFilter<"GiaoDich"> | number | null
   HoaDonID?: Prisma.IntNullableFilter<"GiaoDich"> | number | null
   LoaiGiaoDich?: Prisma.StringFilter<"GiaoDich"> | string
   SoTien?: Prisma.DecimalFilter<"GiaoDich"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   NgayGiaoDich?: Prisma.DateTimeFilter<"GiaoDich"> | Date | string
-  PhuongThuc?: Prisma.StringNullableFilter<"GiaoDich"> | string | null
+  PhuongThuc?: Prisma.StringFilter<"GiaoDich"> | string
   GhiChu?: Prisma.StringNullableFilter<"GiaoDich"> | string | null
   CreatedAt?: Prisma.DateTimeFilter<"GiaoDich"> | Date | string
   UpdatedAt?: Prisma.DateTimeFilter<"GiaoDich"> | Date | string
   hoadon?: Prisma.XOR<Prisma.HoaDonNullableScalarRelationFilter, Prisma.HoaDonWhereInput> | null
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "ID" | "MaGiaoDich">
 
 export type GiaoDichOrderByWithAggregationInput = {
   ID?: Prisma.SortOrder
-  UserID?: Prisma.SortOrder
+  UserID?: Prisma.SortOrderInput | Prisma.SortOrder
   HoaDonID?: Prisma.SortOrderInput | Prisma.SortOrder
   MaGiaoDich?: Prisma.SortOrder
   LoaiGiaoDich?: Prisma.SortOrder
   SoTien?: Prisma.SortOrder
   NgayGiaoDich?: Prisma.SortOrder
-  PhuongThuc?: Prisma.SortOrderInput | Prisma.SortOrder
+  PhuongThuc?: Prisma.SortOrder
   GhiChu?: Prisma.SortOrderInput | Prisma.SortOrder
   CreatedAt?: Prisma.SortOrder
   UpdatedAt?: Prisma.SortOrder
@@ -339,13 +339,13 @@ export type GiaoDichScalarWhereWithAggregatesInput = {
   OR?: Prisma.GiaoDichScalarWhereWithAggregatesInput[]
   NOT?: Prisma.GiaoDichScalarWhereWithAggregatesInput | Prisma.GiaoDichScalarWhereWithAggregatesInput[]
   ID?: Prisma.IntWithAggregatesFilter<"GiaoDich"> | number
-  UserID?: Prisma.IntWithAggregatesFilter<"GiaoDich"> | number
+  UserID?: Prisma.IntNullableWithAggregatesFilter<"GiaoDich"> | number | null
   HoaDonID?: Prisma.IntNullableWithAggregatesFilter<"GiaoDich"> | number | null
   MaGiaoDich?: Prisma.StringWithAggregatesFilter<"GiaoDich"> | string
   LoaiGiaoDich?: Prisma.StringWithAggregatesFilter<"GiaoDich"> | string
   SoTien?: Prisma.DecimalWithAggregatesFilter<"GiaoDich"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   NgayGiaoDich?: Prisma.DateTimeWithAggregatesFilter<"GiaoDich"> | Date | string
-  PhuongThuc?: Prisma.StringNullableWithAggregatesFilter<"GiaoDich"> | string | null
+  PhuongThuc?: Prisma.StringWithAggregatesFilter<"GiaoDich"> | string
   GhiChu?: Prisma.StringNullableWithAggregatesFilter<"GiaoDich"> | string | null
   CreatedAt?: Prisma.DateTimeWithAggregatesFilter<"GiaoDich"> | Date | string
   UpdatedAt?: Prisma.DateTimeWithAggregatesFilter<"GiaoDich"> | Date | string
@@ -356,23 +356,23 @@ export type GiaoDichCreateInput = {
   LoaiGiaoDich: string
   SoTien: runtime.Decimal | runtime.DecimalJsLike | number | string
   NgayGiaoDich: Date | string
-  PhuongThuc?: string | null
+  PhuongThuc: string
   GhiChu?: string | null
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
   hoadon?: Prisma.HoaDonCreateNestedOneWithoutGiaodichInput
-  user: Prisma.UserCreateNestedOneWithoutGiaoDichInput
+  user?: Prisma.UserCreateNestedOneWithoutGiaoDichInput
 }
 
 export type GiaoDichUncheckedCreateInput = {
   ID?: number
-  UserID: number
+  UserID?: number | null
   HoaDonID?: number | null
   MaGiaoDich: string
   LoaiGiaoDich: string
   SoTien: runtime.Decimal | runtime.DecimalJsLike | number | string
   NgayGiaoDich: Date | string
-  PhuongThuc?: string | null
+  PhuongThuc: string
   GhiChu?: string | null
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
@@ -383,23 +383,23 @@ export type GiaoDichUpdateInput = {
   LoaiGiaoDich?: Prisma.StringFieldUpdateOperationsInput | string
   SoTien?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   NgayGiaoDich?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  PhuongThuc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  PhuongThuc?: Prisma.StringFieldUpdateOperationsInput | string
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   hoadon?: Prisma.HoaDonUpdateOneWithoutGiaodichNestedInput
-  user?: Prisma.UserUpdateOneRequiredWithoutGiaoDichNestedInput
+  user?: Prisma.UserUpdateOneWithoutGiaoDichNestedInput
 }
 
 export type GiaoDichUncheckedUpdateInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
-  UserID?: Prisma.IntFieldUpdateOperationsInput | number
+  UserID?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   HoaDonID?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   MaGiaoDich?: Prisma.StringFieldUpdateOperationsInput | string
   LoaiGiaoDich?: Prisma.StringFieldUpdateOperationsInput | string
   SoTien?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   NgayGiaoDich?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  PhuongThuc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  PhuongThuc?: Prisma.StringFieldUpdateOperationsInput | string
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -407,13 +407,13 @@ export type GiaoDichUncheckedUpdateInput = {
 
 export type GiaoDichCreateManyInput = {
   ID?: number
-  UserID: number
+  UserID?: number | null
   HoaDonID?: number | null
   MaGiaoDich: string
   LoaiGiaoDich: string
   SoTien: runtime.Decimal | runtime.DecimalJsLike | number | string
   NgayGiaoDich: Date | string
-  PhuongThuc?: string | null
+  PhuongThuc: string
   GhiChu?: string | null
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
@@ -424,7 +424,7 @@ export type GiaoDichUpdateManyMutationInput = {
   LoaiGiaoDich?: Prisma.StringFieldUpdateOperationsInput | string
   SoTien?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   NgayGiaoDich?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  PhuongThuc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  PhuongThuc?: Prisma.StringFieldUpdateOperationsInput | string
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -432,13 +432,13 @@ export type GiaoDichUpdateManyMutationInput = {
 
 export type GiaoDichUncheckedUpdateManyInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
-  UserID?: Prisma.IntFieldUpdateOperationsInput | number
+  UserID?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   HoaDonID?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   MaGiaoDich?: Prisma.StringFieldUpdateOperationsInput | string
   LoaiGiaoDich?: Prisma.StringFieldUpdateOperationsInput | string
   SoTien?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   NgayGiaoDich?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  PhuongThuc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  PhuongThuc?: Prisma.StringFieldUpdateOperationsInput | string
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -594,12 +594,20 @@ export type GiaoDichUncheckedUpdateManyWithoutHoadonNestedInput = {
   deleteMany?: Prisma.GiaoDichScalarWhereInput | Prisma.GiaoDichScalarWhereInput[]
 }
 
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type GiaoDichCreateWithoutUserInput = {
   MaGiaoDich: string
   LoaiGiaoDich: string
   SoTien: runtime.Decimal | runtime.DecimalJsLike | number | string
   NgayGiaoDich: Date | string
-  PhuongThuc?: string | null
+  PhuongThuc: string
   GhiChu?: string | null
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
@@ -613,7 +621,7 @@ export type GiaoDichUncheckedCreateWithoutUserInput = {
   LoaiGiaoDich: string
   SoTien: runtime.Decimal | runtime.DecimalJsLike | number | string
   NgayGiaoDich: Date | string
-  PhuongThuc?: string | null
+  PhuongThuc: string
   GhiChu?: string | null
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
@@ -650,13 +658,13 @@ export type GiaoDichScalarWhereInput = {
   OR?: Prisma.GiaoDichScalarWhereInput[]
   NOT?: Prisma.GiaoDichScalarWhereInput | Prisma.GiaoDichScalarWhereInput[]
   ID?: Prisma.IntFilter<"GiaoDich"> | number
-  UserID?: Prisma.IntFilter<"GiaoDich"> | number
+  UserID?: Prisma.IntNullableFilter<"GiaoDich"> | number | null
   HoaDonID?: Prisma.IntNullableFilter<"GiaoDich"> | number | null
   MaGiaoDich?: Prisma.StringFilter<"GiaoDich"> | string
   LoaiGiaoDich?: Prisma.StringFilter<"GiaoDich"> | string
   SoTien?: Prisma.DecimalFilter<"GiaoDich"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   NgayGiaoDich?: Prisma.DateTimeFilter<"GiaoDich"> | Date | string
-  PhuongThuc?: Prisma.StringNullableFilter<"GiaoDich"> | string | null
+  PhuongThuc?: Prisma.StringFilter<"GiaoDich"> | string
   GhiChu?: Prisma.StringNullableFilter<"GiaoDich"> | string | null
   CreatedAt?: Prisma.DateTimeFilter<"GiaoDich"> | Date | string
   UpdatedAt?: Prisma.DateTimeFilter<"GiaoDich"> | Date | string
@@ -667,21 +675,21 @@ export type GiaoDichCreateWithoutHoadonInput = {
   LoaiGiaoDich: string
   SoTien: runtime.Decimal | runtime.DecimalJsLike | number | string
   NgayGiaoDich: Date | string
-  PhuongThuc?: string | null
+  PhuongThuc: string
   GhiChu?: string | null
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutGiaoDichInput
+  user?: Prisma.UserCreateNestedOneWithoutGiaoDichInput
 }
 
 export type GiaoDichUncheckedCreateWithoutHoadonInput = {
   ID?: number
-  UserID: number
+  UserID?: number | null
   MaGiaoDich: string
   LoaiGiaoDich: string
   SoTien: runtime.Decimal | runtime.DecimalJsLike | number | string
   NgayGiaoDich: Date | string
-  PhuongThuc?: string | null
+  PhuongThuc: string
   GhiChu?: string | null
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
@@ -720,7 +728,7 @@ export type GiaoDichCreateManyUserInput = {
   LoaiGiaoDich: string
   SoTien: runtime.Decimal | runtime.DecimalJsLike | number | string
   NgayGiaoDich: Date | string
-  PhuongThuc?: string | null
+  PhuongThuc: string
   GhiChu?: string | null
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
@@ -731,7 +739,7 @@ export type GiaoDichUpdateWithoutUserInput = {
   LoaiGiaoDich?: Prisma.StringFieldUpdateOperationsInput | string
   SoTien?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   NgayGiaoDich?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  PhuongThuc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  PhuongThuc?: Prisma.StringFieldUpdateOperationsInput | string
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -745,7 +753,7 @@ export type GiaoDichUncheckedUpdateWithoutUserInput = {
   LoaiGiaoDich?: Prisma.StringFieldUpdateOperationsInput | string
   SoTien?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   NgayGiaoDich?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  PhuongThuc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  PhuongThuc?: Prisma.StringFieldUpdateOperationsInput | string
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -758,7 +766,7 @@ export type GiaoDichUncheckedUpdateManyWithoutUserInput = {
   LoaiGiaoDich?: Prisma.StringFieldUpdateOperationsInput | string
   SoTien?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   NgayGiaoDich?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  PhuongThuc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  PhuongThuc?: Prisma.StringFieldUpdateOperationsInput | string
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -766,12 +774,12 @@ export type GiaoDichUncheckedUpdateManyWithoutUserInput = {
 
 export type GiaoDichCreateManyHoadonInput = {
   ID?: number
-  UserID: number
+  UserID?: number | null
   MaGiaoDich: string
   LoaiGiaoDich: string
   SoTien: runtime.Decimal | runtime.DecimalJsLike | number | string
   NgayGiaoDich: Date | string
-  PhuongThuc?: string | null
+  PhuongThuc: string
   GhiChu?: string | null
   CreatedAt?: Date | string
   UpdatedAt?: Date | string
@@ -782,21 +790,21 @@ export type GiaoDichUpdateWithoutHoadonInput = {
   LoaiGiaoDich?: Prisma.StringFieldUpdateOperationsInput | string
   SoTien?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   NgayGiaoDich?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  PhuongThuc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  PhuongThuc?: Prisma.StringFieldUpdateOperationsInput | string
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutGiaoDichNestedInput
+  user?: Prisma.UserUpdateOneWithoutGiaoDichNestedInput
 }
 
 export type GiaoDichUncheckedUpdateWithoutHoadonInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
-  UserID?: Prisma.IntFieldUpdateOperationsInput | number
+  UserID?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   MaGiaoDich?: Prisma.StringFieldUpdateOperationsInput | string
   LoaiGiaoDich?: Prisma.StringFieldUpdateOperationsInput | string
   SoTien?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   NgayGiaoDich?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  PhuongThuc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  PhuongThuc?: Prisma.StringFieldUpdateOperationsInput | string
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -804,12 +812,12 @@ export type GiaoDichUncheckedUpdateWithoutHoadonInput = {
 
 export type GiaoDichUncheckedUpdateManyWithoutHoadonInput = {
   ID?: Prisma.IntFieldUpdateOperationsInput | number
-  UserID?: Prisma.IntFieldUpdateOperationsInput | number
+  UserID?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   MaGiaoDich?: Prisma.StringFieldUpdateOperationsInput | string
   LoaiGiaoDich?: Prisma.StringFieldUpdateOperationsInput | string
   SoTien?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   NgayGiaoDich?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  PhuongThuc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  PhuongThuc?: Prisma.StringFieldUpdateOperationsInput | string
   GhiChu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   CreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   UpdatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -830,7 +838,7 @@ export type GiaoDichSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   CreatedAt?: boolean
   UpdatedAt?: boolean
   hoadon?: boolean | Prisma.GiaoDich$hoadonArgs<ExtArgs>
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.GiaoDich$userArgs<ExtArgs>
 }, ExtArgs["result"]["giaoDich"]>
 
 export type GiaoDichSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -846,7 +854,7 @@ export type GiaoDichSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   CreatedAt?: boolean
   UpdatedAt?: boolean
   hoadon?: boolean | Prisma.GiaoDich$hoadonArgs<ExtArgs>
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.GiaoDich$userArgs<ExtArgs>
 }, ExtArgs["result"]["giaoDich"]>
 
 export type GiaoDichSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -862,7 +870,7 @@ export type GiaoDichSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   CreatedAt?: boolean
   UpdatedAt?: boolean
   hoadon?: boolean | Prisma.GiaoDich$hoadonArgs<ExtArgs>
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.GiaoDich$userArgs<ExtArgs>
 }, ExtArgs["result"]["giaoDich"]>
 
 export type GiaoDichSelectScalar = {
@@ -882,32 +890,32 @@ export type GiaoDichSelectScalar = {
 export type GiaoDichOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"ID" | "UserID" | "HoaDonID" | "MaGiaoDich" | "LoaiGiaoDich" | "SoTien" | "NgayGiaoDich" | "PhuongThuc" | "GhiChu" | "CreatedAt" | "UpdatedAt", ExtArgs["result"]["giaoDich"]>
 export type GiaoDichInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   hoadon?: boolean | Prisma.GiaoDich$hoadonArgs<ExtArgs>
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.GiaoDich$userArgs<ExtArgs>
 }
 export type GiaoDichIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   hoadon?: boolean | Prisma.GiaoDich$hoadonArgs<ExtArgs>
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.GiaoDich$userArgs<ExtArgs>
 }
 export type GiaoDichIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   hoadon?: boolean | Prisma.GiaoDich$hoadonArgs<ExtArgs>
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.GiaoDich$userArgs<ExtArgs>
 }
 
 export type $GiaoDichPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "GiaoDich"
   objects: {
     hoadon: Prisma.$HoaDonPayload<ExtArgs> | null
-    user: Prisma.$UserPayload<ExtArgs>
+    user: Prisma.$UserPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     ID: number
-    UserID: number
+    UserID: number | null
     HoaDonID: number | null
     MaGiaoDich: string
     LoaiGiaoDich: string
     SoTien: runtime.Decimal
     NgayGiaoDich: Date
-    PhuongThuc: string | null
+    PhuongThuc: string
     GhiChu: string | null
     CreatedAt: Date
     UpdatedAt: Date
@@ -1306,7 +1314,7 @@ readonly fields: GiaoDichFieldRefs;
 export interface Prisma__GiaoDichClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   hoadon<T extends Prisma.GiaoDich$hoadonArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GiaoDich$hoadonArgs<ExtArgs>>): Prisma.Prisma__HoaDonClient<runtime.Types.Result.GetResult<Prisma.$HoaDonPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  user<T extends Prisma.GiaoDich$userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GiaoDich$userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1764,6 +1772,25 @@ export type GiaoDich$hoadonArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   include?: Prisma.HoaDonInclude<ExtArgs> | null
   where?: Prisma.HoaDonWhereInput
+}
+
+/**
+ * GiaoDich.user
+ */
+export type GiaoDich$userArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**

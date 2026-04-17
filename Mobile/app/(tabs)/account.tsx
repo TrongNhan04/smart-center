@@ -28,8 +28,9 @@ const AccountScreen = () => {
           onPress: async () => {
             try {
               await mobileApi.logout() // api đăng xuất
-            } catch (error) {
-              console.log("Lỗi gọi API logout:", error)
+            } catch (error: any) {
+              Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
+              console.log('Có lỗi xảy ra: ', error?.response?.data)
             } finally {
               logout() // xóa trong authStore
               router.replace('/login') // đá về trang login
@@ -66,13 +67,13 @@ const AccountScreen = () => {
             }
           ],
           // không cho user bấm ra ngoài khoảng không để tắt thông báo
-          { cancelable: false } 
+          { cancelable: false }
         );
       }
       hideModal()
     } catch (error: any) {
-      Alert.alert('Thông báo', 'Có lỗi xảy ra')
-      console.log('Có lỗi xảy ra: ', error)
+      Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
+      console.log('Có lỗi xảy ra: ', error?.response?.data)
     }
     finally { setLoading(false) }
   }
@@ -97,7 +98,7 @@ const AccountScreen = () => {
 
         <Avatar.Text size={80} label={avatarLabel}
           style={{ backgroundColor: '#3498db' }}
-          labelStyle = {{color:'#f0f0f0'}} />
+          labelStyle={{ color: '#f0f0f0' }} />
 
         <Text variant="headlineSmall" style={styles.nameText}>
           {user?.full_name || 'Người dùng ẩn danh'}
@@ -147,50 +148,50 @@ const AccountScreen = () => {
         </Button>
       </View>
 
-        <Modal
-          contentContainerStyle={styles.modalContainer}
-          visible={visible} onDismiss={hideModal} style={{ justifyContent: 'center' }}
-        >
-          {/* <KeyboardAvoidingView
+      <Modal
+        contentContainerStyle={styles.modalContainer}
+        visible={visible} onDismiss={hideModal} style={{ justifyContent: 'center' }}
+      >
+        {/* <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}> */}
 
-            <Text variant='titleLarge' style={styles.modalTitle}>
-              Cập nhật tài khoản
-            </Text>
+        <Text variant='titleLarge' style={styles.modalTitle}>
+          Cập nhật tài khoản
+        </Text>
 
-            <TextInput // ô họ tên
-              label={'Họ và tên'} mode='outlined' style={styles.modalInput}
-              value={name} onChangeText={setName}
-            />
+        <TextInput // ô họ tên
+          label={'Họ và tên'} mode='outlined' style={styles.modalInput}
+          value={name} onChangeText={setName}
+        />
 
-            <TextInput // ô họ tên
-              label={'Email'} mode='outlined' style={styles.modalInput}
-              value={email} onChangeText={setEmail}
-            />
+        <TextInput // ô họ tên
+          label={'Email'} mode='outlined' style={styles.modalInput}
+          value={email} onChangeText={setEmail}
+        />
 
-            <TextInput
-              label={'Điện thoại'} mode='outlined'
-              style={styles.modalInput} value={phone}
-              onChangeText={setPhone} keyboardType='phone-pad'
-            />
+        <TextInput
+          label={'Điện thoại'} mode='outlined'
+          style={styles.modalInput} value={phone}
+          onChangeText={setPhone} keyboardType='phone-pad'
+        />
 
-            <View style={styles.modalButtonRow}>
-              <Button mode="text" onPress={hideModal}
-                style={{ flex: 1 }} textColor="gray">
-                Hủy
-              </Button>
-              <Button
-                mode="contained"
-                onPress={updateAccount}
-                loading={loading}
-                style={{ flex: 1, backgroundColor: '#3498db' }}
-              >
-                Lưu
-              </Button>
-            </View>
+        <View style={styles.modalButtonRow}>
+          <Button mode="text" onPress={hideModal}
+            style={{ flex: 1 }} textColor="gray">
+            Hủy
+          </Button>
+          <Button
+            mode="contained"
+            onPress={updateAccount}
+            loading={loading}
+            style={{ flex: 1, backgroundColor: '#3498db' }}
+          >
+            Lưu
+          </Button>
+        </View>
 
-          {/* </KeyboardAvoidingView> */}
-        </Modal>
+        {/* </KeyboardAvoidingView> */}
+      </Modal>
       {/* </Portal> */}
 
     </SafeAreaView>
@@ -207,7 +208,7 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     paddingVertical: 30,
-    backgroundColor: '#f8f9fa', 
+    backgroundColor: '#f8f9fa',
   },
   nameText: {
     fontWeight: 'bold',

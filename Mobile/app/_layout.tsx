@@ -16,7 +16,6 @@ export default function RootLayout() {
 
     // nhét vào đây để chờ render xong mới chuyển hướng
     const timeout = setTimeout(() => {
-
       // ko có token và 
       if (!token) {
         // ở trang index hoặc không ở auth

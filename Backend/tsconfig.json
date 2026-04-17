@@ -23,8 +23,7 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-    "types": ["node", "Multer"],
-    "ignoreDeprecations": "5.0",
+    "types": ["node", "Multer"]
   }
 }
 // "baseUrl": "./",

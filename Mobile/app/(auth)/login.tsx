@@ -26,9 +26,9 @@ export default function LoginScreen() {
 
       // setVisible(true)
       router.replace('/(tabs)');
-    } catch (error:any) {
-      Alert.alert('Thông báo', `Đăng nhập thất bại`);
-      console.log('Có lỗi xảy ra: ', error)
+    } catch (error: any) {
+      Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
+      console.log('Có lỗi xảy ra: ', error?.response?.data)
     }
     finally {
       setLoading(false)

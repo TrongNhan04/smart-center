@@ -27,7 +27,9 @@ const mobileApi = {
         axiosClient.get(`parents/classes/${classId}/sessions`),
 
     getInvoiceByStuId: (stuId:number) =>
-        axiosClient.get(`parents/students/${stuId}/invoices`)
+        axiosClient.get(`parents/students/${stuId}/invoices`),
+
+    payment:(orderId:string|string[]) => axiosClient.post('payments',{orderId})
 }
 
 export default mobileApi
