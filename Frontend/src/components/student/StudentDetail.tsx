@@ -188,7 +188,7 @@ const StudentDetail = () => {
                     dataSource={classes}
                     columns={columnsOfClass}
                     pagination={{
-                      pageSize: 1,
+                      pageSize: 10,
                       current: currentPage
                     }}
                     rowKey="ID"

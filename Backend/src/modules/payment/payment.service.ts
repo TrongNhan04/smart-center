@@ -3,13 +3,15 @@ import { createPaymentDto } from "./payment.dto";
 import { PayOS } from "@payos/node";
 import { PrismaService } from "src/prisma/prisma.service";
 import { DateHelper } from "src/common/date.helper";
+import { EventGateway } from "../event/event.gateway";
 
 @Injectable()
 export class PaymentService {
     private payOS: PayOS
 
     constructor(
-        private readonly primaSv: PrismaService
+        private readonly primaSv: PrismaService,
+        private readonly eventGateway: EventGateway
     ) {
         this.payOS = new PayOS({
             clientId: process.env.PAYOS_CLIENT_ID,
@@ -30,10 +32,11 @@ export class PaymentService {
         const conNo = Number(invoiceDB.TongTien) - Number(invoiceDB.DaTra)
         // hết hạn sau 30 phút
         const expiredAt = Math.floor((Date.now() / 1000) + 30 * 60)
+        // tạo code từ id và 6 số cuối ở thời điểm hiện tại 
         const orderCode = DateHelper.CreateUniqueCode(body.orderId)
         const paymentData = {
             orderCode: Number(orderCode),
-            amount: conNo,
+            amount: 2000,
             description: `THANH TOAN HOC PHI`,
             cancelUrl: 'https://my-smart-center.com/cancel',
             returnUrl: 'https://my-smart-center.com/success',
@@ -57,8 +60,7 @@ export class PaymentService {
                 const inStr = webhookData.orderCode.toString().slice(0, -6)
                 const invoiceId = Number(inStr)
                 const amount = webhookData.amount
-                console.log('invoiceId', invoiceId)
-                // lấy ID giao dịch mới nhất
+
                 await this.primaSv.$transaction(async (tx) => {
                     await tx.giaoDich.create({
                         data: {
@@ -75,8 +77,14 @@ export class PaymentService {
                         data: { DaTra: { increment: amount } }
                     })
                 })
+                // gửi socket cho frontend
+                console.log('gửi cho fe');
+                
+                this.eventGateway.server.emit(`PAYMENT_SUCCESS_${invoiceId}`,{
+                    message:'Thành công',
+                    amount: amount
+                })
             }
-
             return { success: true };
         } catch (error) {
             console.error('Webhook không hợp lệ:', error);

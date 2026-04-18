@@ -1,5 +1,5 @@
 import {
-  CalendarFilled, CalendarOutlined, ClockCircleFilled, ClockCircleOutlined, PlusOutlined, ReadOutlined, SearchOutlined,
+  CalendarOutlined, ClockCircleOutlined, PlusOutlined, ReadOutlined, SearchOutlined,
   UserOutlined
 } from "@ant-design/icons";
 import {
@@ -84,66 +84,61 @@ const ClassList = () => {
     setSearchParam({ page: pagination.current })
   //  render: (text, record, index) => index + 1, // index starts from 0
   const columns = [
-    {// mã lớp+tên lớp chung
-      title: 'Lớp học', dataIndex: 'MaLopHoc', key: 'MaLopHoc ', ellipsis: true,
-      render: (code: string, lophoc: ClassDB) => (
-        <Space orientation="vertical" size={0}>
-          <Link
-            to={`/admin/classes/${lophoc.ID}`}
-            style={{ fontWeight: 'bold' }}>
-            <ReadOutlined style={{ color: '#8c8c8c' }} /> {lophoc.TenLop}
-          </Link>
-          <Text code style={{ fontSize: 14 }}>{code}</Text>
-        </Space>
+    {
+      title: 'Mã lớp', dataIndex: 'MaLopHoc', key: 'MaLopHoc', width:150,
+      render: (code: string) => <Text code>{code}</Text>
+    },
+    {// tên lớp
+      title: 'Lớp học', dataIndex: 'TenLop', key: 'TenLop', width:200,
+      render: (name: string, lophoc: ClassDB) => (
+        <Link
+          to={`/admin/classes/${lophoc.ID}`}
+          style={{ fontWeight: 'bold' }}>
+          <ReadOutlined style={{ color: '#8c8c8c' }} /> {name}
+        </Link>
       )
     },
     { // giáo viên
-      title: 'Giáo viên', dataIndex: ['GiaoVien', 'HoTen'],
-      key: 'HoTen', ellipsis: true,
+      title: 'Giáo viên', dataIndex: ['GiaoVien', 'HoTen'],width:200,
+      key: 'HoTen', 
       render: (name: string) => <Text>
         <UserOutlined style={{ color: '#857e7e' }} /> {name}</Text>
     },
     { // khai giảng = ngày bắt đầu
-      title: 'Khai giảng', dataIndex: 'TuNgay', key: 'TuNgay', width: 130,
+      title: 'Khai giảng', dataIndex: 'TuNgay', key: 'TuNgay', width:150,
       render: (day: string) =>
         <Text><CalendarOutlined style={{ color: '#8c8c8c' }} /> {new Date(day).toLocaleDateString()}</Text>
     },
     { // lịch học
-      title: 'Lịch học', dataIndex: 'LichHoc', key: 'LichHoc',
+      title: 'Lịch học', dataIndex: 'LichHoc', key: 'LichHoc',width:220,
       render: (schedule: number[], lophoc: ClassDB) => {
         const dow = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
         const result = schedule.map(m => dow[m]).join('-')
-
-        return <Space orientation="vertical" size={0}>
-          <Text><ClockCircleOutlined style={{ color: '#8c8c8c' }} /> {lophoc.GioHoc}</Text>
-          <Text style={{ fontSize: '14px', display: 'block', textAlign: 'center' }}>
-            {result}
-          </Text>
-        </Space>
+        return <Text>
+          <ClockCircleOutlined style={{ color: '#8c8c8c' }}
+          /> {result}, {lophoc.GioHoc}</Text>
       }
     },
     { // sĩ số
-      title: 'Sĩ số', dataIndex: 'SiSo', key: 'SiSo',
+      title: 'Sĩ số', dataIndex: 'SiSo', key: 'SiSo',width:200,
       render: (classSize: number, lophoc: ClassDB) => {
         const percent = (lophoc.TongGhiDanh / classSize) * 100
         let percentColor = '#ff4d4f' // đỏ
         if (percent > 50) percentColor = '#faad14' //vàng
         if (percent > 80) percentColor = '#52c41a'
-        return <>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span>{lophoc.TongGhiDanh}/{classSize}</span>
-            <span>Học viên</span>
-          </div>
+        return <Space>
+          <Text>{lophoc.TongGhiDanh}/{classSize}</Text>
           <Progress
+            steps={5}
             percent={percent}
             showInfo={false}
             strokeColor={percentColor}
           />
-        </>
+        </Space>
       }
     },
     { // trạng thái
-      title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai', width: 150,
+      title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai', width:200,
       filters: [
         { text: 'Tuyển sinh', value: 'OPEN' },
         { text: 'Đang hoạt động', value: 'RUNNING' },
@@ -162,7 +157,7 @@ const ClassList = () => {
       }
     },
     {// thao tác
-      title: 'Thao tác', key: 'action', align: 'center' as const, width: 150,
+      title: 'Thao tác', key: 'action', align: 'center' as const,
       render: (value: ClassDB) => <ClassAction
         lophoc={value}
         onSoftDelete={handleSoftDelete}
@@ -229,7 +224,7 @@ const ClassList = () => {
           }}
           onChange={handleBack}
           rowKey="ID"
-          scroll={{ x: 1000, y: 410 }}
+          scroll={{ x:'max-content',y: 410 }}
         />
 
         {/* Hiển thị Modal UI */}

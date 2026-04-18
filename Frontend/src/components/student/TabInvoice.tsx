@@ -88,7 +88,7 @@ const TabInvoice = () => {
       rowKey='ID'
       scroll={{ y: 320 }}
       pagination={{
-        pageSize: 1,
+        pageSize: 10,
         current: currentPage
       }}
     />

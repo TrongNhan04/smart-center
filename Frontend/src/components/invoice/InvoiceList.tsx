@@ -91,71 +91,41 @@ const InvoiceList = () => {
     { // mã hóa đơn + Ngày phát hành
       title: 'Hóa đơn', dataIndex: 'MaHoaDon',
       key: 'MaHoaDon', align: 'center' as const,
-      render: (code: string, invoice: InvoiceDB) =>
-        <Space orientation="vertical" size={0}>
-          <Text code>{code}</Text>
-          <Text type="secondary" style={{ fontSize: '14px', display: 'block', textAlign: 'center' }}>
-            {new Date(invoice.NgayPhatHanh).toLocaleDateString()}
-          </Text>
-        </Space>
+      render: (code: string) => <Text code>{code}</Text>
     },
-    { // tên học viên + SĐT
+    {
+      title: 'Ngày phát hành', dataIndex: 'NgayPhatHanh', key: 'NgayPhatHanh',
+      render: (value: string) => <Text >
+        <CalendarOutlined style={{ color: '#8c8c8c' }}
+        /> {new Date(value).toLocaleDateString()}
+      </Text>
+    },
+    { // tên học viên
       title: 'Học viên', dataIndex: 'TenHocVien', //width: 220,
-      key: 'TenHocVien', ellipsis: true,
+      key: 'TenHocVien',
       render: (name: string, invoice: InvoiceDB) =>
-        <Space orientation="vertical" size={0}>
-          <Link to={`/admin/students/${invoice.HocVienID}`}
-            style={{ fontWeight: '500' }}>
-            <UserOutlined style={{ color: '#8c8c8c' }} /> {name}
-          </Link>
-          <Text><PhoneOutlined style={{ color: '#8c8c8c' }}
-          /> {invoice.DienThoai}</Text>
-        </Space>
+        <Link to={`/admin/students/${invoice.HocVienID}`}
+          style={{ fontWeight: '500' }}>
+          <UserOutlined style={{ color: '#8c8c8c' }} /> {name}
+        </Link>
     },
     { // tổng tiền + còn nợ 
-      title: 'Số tiền (VNĐ)', dataIndex: 'TongTien', key: 'TongTien',
-      render: (total: number, invoice: InvoiceDB) => {
-        if (!total) return <Text >0đ</Text>
-        const tongTien = Number(total || 0)
-        const daTra = Number(invoice.DaTra || 0)
-        const conNo = tongTien - daTra
-        const isCancelled = invoice.TrangThai === 'CANCELLED'
-        let subContent
-        let status = 'DEBT' // mặc định là nợ
-
-        if (isCancelled && daTra == 0) status = 'NO_COST' // chưa phát sinh
-        else if (isCancelled && daTra > 0) status = 'REFUND' // hoàn tiền
-        else if (conNo == 0) status = 'PAID' // hoàn tất
-
-        switch (status) {
-          case 'NO_COST':
-            subContent = <Text  >Chưa phát sinh</Text>
-            break
-
-          case 'REFUND':
-            subContent = <Text strong style={{ color: 'blue' }} >
-              Cần hoàn: {daTra.toLocaleString()}đ</Text>
-            break
-
-          case 'PAID':
-            subContent = <Text strong type="success" >
-              Đã thu đủ <CheckCircleOutlined /></Text>
-            break
-
-          case 'DEBT':
-            subContent = <Text strong type="warning" >
-              Còn nợ: {conNo.toLocaleString()}đ</Text>
-        }
-
-        return (
-          <Space orientation="vertical" size={0}>
-            <Text strong={!isCancelled}>
-              Tổng: {tongTien.toLocaleString()}đ
-            </Text>
-            {subContent}
-          </Space>
-        )
-      }
+      title: 'Học phí', dataIndex: 'TongTien', key: 'TongTien',
+      align: 'right' as const,
+      render: (total: number) =>
+        total ?
+          <Text style={{ fontWeight: '500' }}
+          >{Number(total).toLocaleString()} </Text>
+          : 0
+    },
+    {
+      title: 'Tiền thanh toán', dataIndex: 'DaTra', key: 'DaTra',
+      align: 'right' as const,
+      render: (total: number) =>
+        total ?
+          <Text style={{ fontWeight: '500' }}
+          >{Number(total).toLocaleString()} </Text>
+          : 0
     },
     { // ngày hết hạn
       title: 'Hạn thanh toán', dataIndex: 'NgayHetHan',
@@ -163,60 +133,61 @@ const InvoiceList = () => {
       filters: months, // value là value của months
       onFilter: (value: any, invoice: InvoiceDB) =>
         new Date(invoice.NgayHetHan).getMonth() == value,
-      render: (invoiceDate: string, invoice: InvoiceDB) => {
-        // so sáng hiện tại với thời hạn -> phút
-        const overTime = DateHelper.TimeDiff(invoiceDate)
-        const overDate = Math.floor(overTime / (24 * 60)) // tính xem được mấy ngày 
-        const isCancelled = invoice.TrangThai === 'CANCELLED'
-        const isDebt = invoice.TongTien - invoice.DaTra
-        let isOverTime_Debt = false
-        if (overTime > 0 && isDebt && !isCancelled)
-          isOverTime_Debt = true
-        return <Space orientation="vertical" size={0}>
-          <Text >
-            <CalendarOutlined style={{ color: '#8c8c8c' }} /> {new Date(invoiceDate).toLocaleDateString()}
-          </Text>
-          {isOverTime_Debt && <Tag color='red'>Trễ {overDate} ngày</Tag>}
-        </Space>
+      render: (invoiceDate: string) => {
+        return <Text>
+          <CalendarOutlined style={{ color: '#8c8c8c' }}
+          /> {new Date(invoiceDate).toLocaleDateString()}
+        </Text>
+        // const overTime = DateHelper.TimeDiff(invoiceDate)
+        // const overDate = Math.floor(overTime / (24 * 60)) // tính xem được mấy ngày 
+        // const isCancelled = invoice.TrangThai === 'CANCELLED'
+        // const isDebt = invoice.TongTien - invoice.DaTra
+        // let isOverTime_Debt = false
+        // if (overTime > 0 && isDebt && !isCancelled)
+        //   isOverTime_Debt = true
+        // return <Space orientation="vertical" size={0}>
+        //   <Text >
+        //     <CalendarOutlined style={{ color: '#8c8c8c' }} /> {new Date(invoiceDate).toLocaleDateString()}
+        //   </Text>
+        //   {isOverTime_Debt && <Tag color='red'>Trễ {overDate} ngày</Tag>}
+        // </Space>
       }
     },
     {// trạng thái
       title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai',
       filters: [
-        { text: 'Đã hoàn thành', value: 'Paid' },
-        { text: 'Thanh toán 1 phần', value: 'Part' },
-        { text: 'Chưa thanh toán', value: 'Unpaid' },
-        { text: 'Quá hạn', value: 'OverDate' },
+        { text: 'Đã thanh toán', value: 'PAID' },
+        { text: 'Thanh toán 1 phần', value: 'PART' },
+        { text: 'Chưa thanh toán', value: 'UNPAID' },
+        { text: 'Quá hạn', value: 'OVERDATE' },
         { text: 'Đã hủy', value: 'CANCELLED' }
       ],
       onFilter: (value: any, invoice: InvoiceDB) => {
         const { DaTra, TongTien, NgayHetHan, TrangThai } = invoice
-        const ConNo = TongTien - DaTra > 0
-        const HetHan = new Date(NgayHetHan).getTime()
+        const ConNo = TongTien - DaTra
+        const ThoiHan = new Date(NgayHetHan).getTime()
         const isActive = TrangThai === 'ACTIVE'
+        if (!isActive) return value === TrangThai // đã hủy
         switch (value) {
-          case 'Paid': return TongTien == DaTra && isActive
-          case 'Part': return DaTra > 0 && ConNo && isActive
-          case 'Unpaid': return DaTra == 0 && isActive
-          case 'OverDate': return now > HetHan && ConNo && isActive
-          case 'CANCELLED': return !isActive
-          default:
-            return false // return false để table không báo lỗi
+          case 'PAID': return DaTra == TongTien // đã trả
+          case 'OVERDATE': return ConNo > 0 && now > ThoiHan // quá hạn
+          case 'UNPAID': return DaTra == 0 && now < ThoiHan // chưa trả
+          default: return ConNo > 0 && now < ThoiHan // 1 phần
         }
       },
       render: (status: string, invoice: InvoiceDB) => {
         const { DaTra, TongTien, NgayHetHan } = invoice
-        const ConNo = TongTien - DaTra > 0
+        const ConNo = TongTien - DaTra
         const dueDate = new Date(NgayHetHan).getTime()
         if (status == 'CANCELLED')
           return <Text delete> Đã hủy</Text>
-        if (now > dueDate && ConNo)
+        else if (now > dueDate && ConNo)
           return <Badge status="error" text='Quá hạn' />
-        if (DaTra == TongTien)
-          return <Badge status="success" text='Đã hoàn thành' />
-        if (DaTra == 0)
+        else if (DaTra == TongTien)
+          return <Badge status="success" text='Đã thanh toán' />
+        else if (DaTra == 0)
           return <Badge status="default" text='Chưa thanh toán' />
-        return <Badge status="processing" text="Thanh toán 1 phần" />
+        else return <Badge status="processing" text="Thanh toán 1 phần" />
       }
     },
     {// thao tác

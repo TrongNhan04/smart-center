@@ -1,6 +1,7 @@
 import StudentDashboard from '@/types/tabs.index.dto';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Alert, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { Alert, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Avatar, Card, Chip, Icon, ProgressBar, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import mobileApi from '../api';
@@ -10,6 +11,7 @@ export default function Index() {
   const [students, setStudents] = useState<StudentDashboard[]>([])
   const [selectedStuId, setSelectedStuId] = useState(-1)
   const [refresh, setRefresh] = useState(false)
+  const router = useRouter()
   const user = useAuthStore(state => state.user)
   const setStuIdGlobal = useAuthStore(state => state.setSelectedStuId)
   const children = user?.children
@@ -50,6 +52,16 @@ export default function Index() {
     if (!isoString) return '';
     return new Date(isoString).toLocaleDateString('vi-VN');
   };
+
+  const pressToSeeClassDetail = (classId: number, buoiHocId: number) => {
+    router.push({
+      pathname: '/(tabs)/class/class-detail',
+      params: {
+        classId: classId,
+        sessionId: buoiHocId
+      }
+    })
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -112,8 +124,7 @@ export default function Index() {
                 </View>
 
                 <Text variant="bodyMedium" style={{ marginBottom: 8 }}>
-                  Buổi {nextSession.BuoiSo}:
-                  {nextSession.ChuDe ?? "Chưa có chủ đề"}
+                  Buổi {nextSession.BuoiSo}: {nextSession.ChuDe ?? "Chưa có chủ đề"}
                 </Text>
 
                 {/* Hàng chứa Giờ và Ngày */}
@@ -146,48 +157,54 @@ export default function Index() {
           {/* kết quả gần nhất */}
           {lastestResult?.length ? (
             lastestResult.map((item, index) => (
-              <Card key={index} mode="elevated"
-                style={{ marginTop: 16, backgroundColor: '#e8f5e9' }}>
-                <Card.Title
-                  title="Kết quả học tập"
-                  titleVariant="titleLarge"
-                  left={(props) => <Avatar.Icon {...props} icon="school" />}
-                />
-                <Card.Content>
-                  <View style={{
-                    flexDirection: 'row', justifyContent: 'space-between',
-                    alignItems: 'center', marginBottom: 8
-                  }}>
-                    <Icon source="google-classroom" size={20} />
+              <TouchableOpacity
+                key={index}
+                onPress={() => pressToSeeClassDetail(item.LopHocID, item.BuoiHocID)}
+                activeOpacity={0.7}
+              >
+                <Card key={index} mode="elevated"
+                  style={{ marginTop: 16, backgroundColor: '#e8f5e9' }}>
+                  <Card.Title
+                    title="Kết quả học tập"
+                    titleVariant="titleLarge"
+                    left={(props) => <Avatar.Icon {...props} icon="school" />}
+                  />
+                  <Card.Content>
+                    <View style={{
+                      flexDirection: 'row', justifyContent: 'space-between',
+                      alignItems: 'center', marginBottom: 8
+                    }}>
+                      <Icon source="google-classroom" size={20} />
 
-                    <Text variant="titleMedium"
-                      style={{ flex: 1, marginLeft: 8 }}>{item.LopHoc}</Text>
+                      <Text variant="titleMedium"
+                        style={{ flex: 1, marginLeft: 8 }}>{item.LopHoc}</Text>
 
-                    <Text variant="titleMedium"
-                      style={{ color: item.DiemDanh ? '#2ecc71' : '#e74c3c' }}>
-                      {item.DiemDanh ? 'Có mặt' : 'Vắng'}
-                    </Text>
-                  </View>
-
-                  {/* Thanh Tiến Độ */}
-                  <View style={{ marginVertical: 8 }}>
-                    <View
-                      style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
-                      <Text variant="bodyMedium">Tiến độ lớp học</Text>
-                      <Text variant="bodyMedium">{item.BuoiSo}/{item.TongSoBuoi}</Text>
+                      <Text variant="titleMedium"
+                        style={{ color: item.DiemDanh ? '#2ecc71' : '#e74c3c' }}>
+                        {item.DiemDanh ? 'Có mặt' : 'Vắng'}
+                      </Text>
                     </View>
-                    <ProgressBar progress={item.BuoiSo / item.TongSoBuoi}
-                      color="#3498db" style={{ height: 6, borderRadius: 3 }} />
-                  </View>
 
-                  <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 6, marginTop: 8 }}>
-                    <Icon source="comment-text-outline" size={18} />
-                    <Text variant="bodyMedium" style={{ flex: 1, color: '#34495e' }}>
-                      Nhận xét của giáo viên: {item.NhanXetCon || 'Chưa có nhận xét.'}
-                    </Text>
-                  </View>
-                </Card.Content>
-              </Card>
+                    {/* Thanh Tiến Độ */}
+                    <View style={{ marginVertical: 8 }}>
+                      <View
+                        style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
+                        <Text variant="bodyMedium">Tiến độ lớp học</Text>
+                        <Text variant="bodyMedium">{item.BuoiSo}/{item.TongSoBuoi}</Text>
+                      </View>
+                      <ProgressBar progress={item.BuoiSo / item.TongSoBuoi}
+                        color="#3498db" style={{ height: 6, borderRadius: 3 }} />
+                    </View>
+
+                    <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 6, marginTop: 8 }}>
+                      <Icon source="comment-text-outline" size={18} />
+                      <Text variant="bodyMedium" style={{ flex: 1, color: '#34495e' }}>
+                        Nhận xét của giáo viên: {item.NhanXetCon || 'Chưa có nhận xét.'}
+                      </Text>
+                    </View>
+                  </Card.Content>
+                </Card>
+              </TouchableOpacity>
             ))
           ) : (
             <Card mode="elevated">
@@ -201,36 +218,40 @@ export default function Index() {
           )}
 
           {/* Hóa đơn nợ */}
-          <Card mode="elevated" style={{ marginTop: 16, backgroundColor: '#fff7e6' }} >
-            <Card.Title
-              title="Thông tin học phí"
-              titleVariant="titleLarge"
-              left={(props) => <Avatar.Icon {...props} icon="cash-multiple" />}
-            />
-            <Card.Content>
-              {debtInvoice ? (
-                <View style={{ gap: 8 }}>
+          <TouchableOpacity
+            onPress={() => router.push('/invoice')}
+            activeOpacity={0.7}>
+            <Card mode="elevated" style={{ marginTop: 16, backgroundColor: '#fff7e6' }} >
+              <Card.Title
+                title="Thông tin học phí"
+                titleVariant="titleLarge"
+                left={(props) => <Avatar.Icon {...props} icon="cash-multiple" />}
+              />
+              <Card.Content>
+                {debtInvoice ? (
+                  <View style={{ gap: 8 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                      <Icon source="alert-circle-outline" size={20} color="#FA8C16" />
+                      <Text variant="titleMedium" style={{ color: '#FA8C16' }}>
+                        Còn {debtInvoice.SoHDChuaTra} khoản chưa thanh toán
+                      </Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                      <Icon source="calendar-alert" size={18} />
+                      <Text variant="bodyMedium">Hạn thanh toán: {formatThoiGian(debtInvoice.ThoiHan)}</Text>
+                    </View>
+                  </View>
+                ) : (
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                    <Icon source="alert-circle-outline" size={20} color="#FA8C16" />
-                    <Text variant="titleMedium" style={{ color: '#FA8C16' }}>
-                      Còn {debtInvoice.SoHDChuaTra} khoản chưa thanh toán
+                    <Icon source="check-circle-outline" size={20} color="#27ae60" />
+                    <Text variant="titleMedium" style={{ color: '#27ae60' }}>
+                      Đã hoàn thành toàn bộ học phí
                     </Text>
                   </View>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                    <Icon source="calendar-alert" size={18} />
-                    <Text variant="bodyMedium">Hạn thanh toán: {formatThoiGian(debtInvoice.ThoiHan)}</Text>
-                  </View>
-                </View>
-              ) : (
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                  <Icon source="check-circle-outline" size={20} color="#27ae60" />
-                  <Text variant="titleMedium" style={{ color: '#27ae60' }}>
-                    Đã hoàn thành toàn bộ học phí
-                  </Text>
-                </View>
-              )}
-            </Card.Content>
-          </Card>
+                )}
+              </Card.Content>
+            </Card>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>

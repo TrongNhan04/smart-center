@@ -26,9 +26,7 @@ export class AppParentService {
           }
         },
         orderBy: { BatDauLuc: 'asc' },
-        select: {
-          ID: true, PhongHoc: true, BuoiSo: true, ChuDe: true,
-          BatDauLuc: true, KetThucLuc: true,
+        include: {
           lophoc: {
             select: {
               TenLop: true,
@@ -37,28 +35,28 @@ export class AppParentService {
           },
         }
       }),
-      // kết quả gần nhất của nhiều lớp
-      this.prisma.ghiDanh.findMany({
+      //kết quả gần nhất của nhiều lớp
+      this.prisma.ghiDanh.findMany({ // tìm nhiều ghi danh của học viên
         where: { HocVienID: studentDB.ID },
         include: {
           lophoc: {
             select: { TenLop: true, khoahoc: { select: { TongSoBuoi: true } } }
           },
-          ketqua_chitiet: { // kết quả mới nhất của lớp đó
+          ketqua_chitiet: { // 1 ghi danh có nhiều kết quả chi tiết
+            // lấy 1 kết quả mới nhất của ghi danh 
             include: { ketqua_buoihoc: { include: { buoihoc: true } } },
             orderBy: { UpdatedAt: 'desc' },
             take: 1
           }
         },
       }),
-      //lấy số hóa đơn chưa thanh toán
+      //lấy tất cả hóa đơn ACTIVE của học viên
       this.prisma.hoaDon.findMany({
-        where: { ghidanh: { HocVienID: studentDB.ID } },
+        where: { ghidanh: { HocVienID: studentDB.ID }, TrangThai: 'ACTIVE' },
         orderBy: { ThoiHan: 'asc' } // lấy gần nhất
       })
     ])
     let BuoiHocKe: {} | null = null
-    let KetQuaGanNhat: any[] = []
     if (nextSS)
       BuoiHocKe = {
         ID: nextSS.ID, BuoiSo: nextSS.BuoiSo,
@@ -68,33 +66,36 @@ export class AppParentService {
         Lop: nextSS.lophoc.TenLop,
         GiaoVien: nextSS.lophoc.giaovien.User.HoTen
       }
-
-    for (const item of lastestResult) {
-      if (item.ketqua_chitiet.length) {
-        KetQuaGanNhat.push({
-          LopHocID: item.LopHocID,
-          LopHoc: item.lophoc.TenLop,
-          BuoiHocID: item.ketqua_chitiet[0].ketqua_buoihoc.BuoiHocID,
-          BuoiSo: item.ketqua_chitiet[0]?.ketqua_buoihoc.buoihoc.BuoiSo,
-          TongSoBuoi: item.lophoc.khoahoc.TongSoBuoi,
-          NgayHoc: item.ketqua_chitiet[0]?.ketqua_buoihoc.buoihoc.BatDauLuc,
-          ChuDe: item.ketqua_chitiet[0]?.ketqua_buoihoc.buoihoc.ChuDe,
-          NhanXetCon: item.ketqua_chitiet[0]?.NhanXetRieng ??
-            item.ketqua_chitiet[0].ketqua_buoihoc.NhanXetChung,
-          DiemDanh: item.ketqua_chitiet[0]?.DiemDanh,
-          Diem: item.ketqua_chitiet[0]?.Diem,
-        })
+    const KetQuaGanNhat = lastestResult.map(item => {
+      const { ketqua_chitiet: kq_ct, lophoc, ...restItem } = item
+      if (kq_ct.length) { // có kết quả chi tiết
+        const { ketqua_buoihoc: kq_bh, ...restKq_ct } = kq_ct[0]
+        const { buoihoc } = kq_bh
+        return {
+          LopHocID: restItem.LopHocID,
+          LopHoc: lophoc.TenLop,
+          BuoiHocID: kq_bh.BuoiHocID,
+          BuoiSo: buoihoc.BuoiSo,
+          TongSoBuoi: lophoc.khoahoc.TongSoBuoi,
+          NgayHoc: buoihoc.BatDauLuc,
+          ChuDe: buoihoc.ChuDe,
+          NhanXetCon: restKq_ct.NhanXetRieng ?? kq_bh.NhanXetChung,
+          DiemDanh: restKq_ct.DiemDanh,
+          Diem: restKq_ct.Diem,
+        }
       }
-    }
-    const invoiceFilter = invoice.filter(f => f.DaTra < f.TongTien)
+    }).filter(Boolean)
+    // return KetQuaGanNhat
+    // lọc hóa đơn còn nợ
+    const invoiceDebt = invoice.filter(f => f.DaTra < f.TongTien)
     return {
       ID: studentDB.ID.toString(),
       HocVien: studentDB.TenHocVien,
       BuoiHocKe,
-      KetQuaGanNhat,
+      KetQuaGanNhat, // nhiểu kết quả theo lớp học
       HoaDon: {
-        SoHDChuaTra: invoiceFilter.length,
-        ThoiHan: invoiceFilter.length > 0 ? invoiceFilter[0].ThoiHan : null
+        SoHDChuaTra: invoiceDebt.length,
+        ThoiHan: invoiceDebt.length > 0 ? invoiceDebt[0].ThoiHan : null
       }
     }
   }
@@ -212,15 +213,16 @@ export class AppParentService {
     return {
       TenLop: sessionDB.lophoc.TenLop,
       GiaoVien: sessionDB.lophoc.giaovien.User.HoTen,
+      HocVien: studentDB.TenHocVien,
       BuoiHocID: sessionDB.ID,
       BuoiSo: sessionDB.BuoiSo,
       NgayHoc: DateHelper.ISOTimeToDate(sessionDB.BatDauLuc),
       GioHoc: DateHelper.ISOToHHMM(sessionDB.BatDauLuc, sessionDB.KetThucLuc),
-      DiemDanh: result?.DiemDanh || null,
-      DiemSo: result?.Diem || null,
-      BaiHoc: sessionDB.ChuDe || null,
-      NoiDung: result?.ketqua_buoihoc.NoiDungBaiHoc || null,
-      BaiTap: result?.ketqua_buoihoc.BaiTapVeNha || null,
+      DiemDanh: result?.DiemDanh ?? null,
+      DiemSo: result?.Diem ?? null,
+      BaiHoc: sessionDB.ChuDe ?? null,
+      NoiDung: result?.ketqua_buoihoc.NoiDungBaiHoc ?? null,
+      BaiTap: result?.ketqua_buoihoc.BaiTapVeNha ?? null,
       NhanXet: result?.NhanXetRieng || result?.ketqua_buoihoc.NhanXetChung,
       TepDinhKem: result?.ketqua_buoihoc.tep_dinhkem,
       TrangThai
@@ -242,12 +244,13 @@ export class AppParentService {
   async GetInvoiceByStudentID(userId: number, studentId: number) {
     const studentDB = await this.StudentValidator(userId, studentId)
     const invoiceDB = await this.prisma.hoaDon.findMany({
-      where: { HocVienID: studentDB.ID, TrangThai:'ACTIVE' },
+      where: { HocVienID: studentDB.ID, TrangThai: 'ACTIVE' },
       include: {
         hocvien: { select: { TenHocVien: true } },
         ghidanh: { select: { lophoc: { select: { TenLop: true } } } }
       },
-      omit: { CreatedAt: true, UpdatedAt: true, GhiDanhID:true }
+      omit: { CreatedAt: true, UpdatedAt: true, GhiDanhID: true },
+      orderBy:{ThoiHan:'asc'}
     })
     return invoiceDB.map(item => {
       const { hocvien, ghidanh, ...rest } = item

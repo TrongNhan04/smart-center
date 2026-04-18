@@ -39,11 +39,10 @@ export default function SessionDetailScreen() {
         if (!stuIdGlobal) return
         // có chọn lấy chọn, không có lấy từ param
         const id = selectedId ? selectedId : buoiHocId
-
+                
         const res = await mobileApi
           .getDetailByStuAndSesId(stuIdGlobal, id)
         setDetailResult(res.data)
-
       } catch (error) {
         Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
         console.log('Có lỗi xảy ra: ', error)
@@ -85,6 +84,12 @@ export default function SessionDetailScreen() {
             {/* Card 1 thông tin chung */}
             <Card mode="contained" style={styles.card}>
               <Card.Content style={{ gap: 8 }}>
+                <View style={styles.view}>
+                  <Text variant="titleMedium" style={{ color: '#7f8c8d' }}>Học viên:</Text>
+                  <Text variant="titleMedium" style={{ color: '#2c3e50' }}>
+                    {detailResult.HocVien}
+                  </Text>
+                </View>
 
                 <View style={styles.view}>
                   <Text variant="titleMedium" style={{ color: '#7f8c8d' }}>Buổi số:</Text>
@@ -212,7 +217,7 @@ export default function SessionDetailScreen() {
                               setVisible(true)
                             }}>
                             <Image style={styles.mediaImage}
-                              key={item.ID}
+                              key={index}
                               source={{ uri: item.URL }}
                             />
                           </TouchableOpacity>
@@ -251,13 +256,13 @@ export default function SessionDetailScreen() {
             justifyContent: 'center',
             gap: 10,
           }}>
-            {arrSessionId?.map(session => {
+            {arrSessionId?.map((session, index) => {
               // nếu có chọn thì lấy có chọn, chưa chọn thì lấy cái đầu tiên
               const isSelected = selectedId ?
                 selectedId === session.ID : buoiHocId === session.ID
               return (
                 <TouchableOpacity
-                  key={session.ID}
+                  key={index}
                   onPress={() => setSelectedId(session.ID)}
                   // style này bao bên ngoài
                   style={[styles.navCircle, isSelected && styles.navCircleActive]}

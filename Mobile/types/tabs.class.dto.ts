@@ -16,6 +16,7 @@ export interface ClassOfStu {
 export interface SessionOfStu {
     TenLop: string,
     GiaoVien: string,
+    HocVien: string,
     BuoiHocID: number,
     BuoiSo:number,
     NgayHoc: string,

@@ -40,13 +40,13 @@ const TabStudent = ({ id }: Props) => {
     fetchStuOfClass()
   }, [])
 
-  const filteredData = students.filter(stu => {
-    const keyword = searchText.toLowerCase()
-    const matchesKeyword =
-      stu.MaHocVien.toLowerCase().includes(keyword) ||
-      stu.TenHocVien.toLowerCase().includes(keyword)
-    return matchesKeyword
-  })
+  // const filteredData = students.filter(stu => {
+  //   const keyword = searchText.toLowerCase()
+  //   const matchesKeyword =
+  //     stu.MaHocVien.toLowerCase().includes(keyword) ||
+  //     stu.TenHocVien.toLowerCase().includes(keyword)
+  //   return matchesKeyword
+  // })
 
   const columns = [
     { // mã học viên
@@ -110,7 +110,7 @@ const TabStudent = ({ id }: Props) => {
 
   return (
     <div>{/* ô tìm kiếm và bộ lọc */}
-      <Row gutter={16} style={{ marginBottom: 20 }}>
+      {/* <Row gutter={16} style={{ marginBottom: 20 }}>
         <Col span={6}>
           <Input.Search // ô tìm kiếm
             placeholder='Tìm theo tên hoặc mã...'
@@ -120,14 +120,14 @@ const TabStudent = ({ id }: Props) => {
             onSearch={fetchStuOfClass}
           />
         </Col>
-      </Row>
+      </Row> */}
       {/* Bảng hiển thị dữ liệu */}
       <Table
         onChange={(page: any) => setSearchParam({
           tab: currentTab,
           page: page.current
         })}
-        dataSource={filteredData}
+        dataSource={students}
         columns={filterColumns}
         loading={loading}
         pagination={{

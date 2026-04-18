@@ -5,28 +5,30 @@ import { Alert, FlatList, StyleSheet, View } from 'react-native';
 import { Badge, Button, Card, Divider, Icon, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import mobileApi from '../api';
+import useAuthStore from '../authStore';
 
 const InvoiceListScreen = () => {
   const [invoices, setInvoices] = useState<InvoiceOfStu[]>([])
+  const stuIdGlobal = useAuthStore(state => state.selectedStuId)
   const router = useRouter()
   useEffect(() => {
     const fetchInvoice = async () => {
       try {
-        const res = await mobileApi.getInvoiceByStuId(1)
+        if (!stuIdGlobal) return
+        const res = await mobileApi.getInvoiceByStuId(stuIdGlobal)
         setInvoices(res.data)
-      } catch (error:any) {
+      } catch (error: any) {
         Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
+        console.log(error)
         console.log('Có lỗi xảy ra: ', error?.response?.data)
       }
     }
     fetchInvoice()
-  }, [])
+  }, [stuIdGlobal])
 
-  const formatVND = (amount: any) => {
-    return Number(amount).toLocaleString() + ' đ'
-  };
+  const formatVND = (amount: any) => Number(amount).toLocaleString() + ' đ'
 
-  // Hàm render giao diện trạng thái
+  // render trạng thái hóa đơn
   const renderStatusBadge = (daTra: number, tongTien: number) => {
     if (daTra === tongTien)
       return <Badge size={25} style={{
@@ -53,7 +55,7 @@ const InvoiceListScreen = () => {
     return (
       <Card style={styles.card} mode="elevated">
         <Card.Content>
-          {/* Dòng 1: Tên lớp & Trạng thái */}
+          {/* tên lớp và trạng thái thanh toán */}
           <View style={styles.rowBetween}>
             <Text variant="titleMedium"
               style={styles.className} numberOfLines={1}>
@@ -62,7 +64,7 @@ const InvoiceListScreen = () => {
             {renderStatusBadge(item.DaTra, item.TongTien)}
           </View>
 
-          {/* Dòng 2: Tên học viên */}
+          {/* thông tin học viên */}
           <Text variant="bodyMedium" style={styles.studentName}>
             <Icon
               source='account-school'
@@ -72,30 +74,33 @@ const InvoiceListScreen = () => {
           </Text>
           <Divider style={styles.divider} />
 
-          {/* Dòng 3: Thông tin tiền */}
+          {/* thông tin đã trả, tổng tiền */}
           <View style={styles.moneyContainer}>
             <View>
               <Text variant="titleMedium" style={styles.label}>Đã trả</Text>
-              <Text variant="titleMedium" style={styles.paidAmount}>{formatVND(item.DaTra)}</Text>
+              <Text variant="titleMedium" style={styles.paidAmount}>
+                {formatVND(item.DaTra)}</Text>
             </View>
             <View style={{ alignItems: 'flex-end' }}>
               <Text variant="titleMedium" style={styles.label}>Tổng tiền</Text>
-              <Text variant="titleMedium" style={styles.totalAmount}>{formatVND(item.TongTien)}</Text>
+              <Text variant="titleMedium" style={styles.totalAmount}>
+                {formatVND(item.TongTien)}</Text>
             </View>
           </View>
 
-          {/* Dòng 4: Thời hạn */}
+          {/* thời hạn */}
           <View style={styles.rowBetween}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
               <Icon source="calendar-alert" size={18} />
               <Text variant="bodyMedium" >Hạn thanh toán:</Text>
-              <Text style={styles.dueDate}>{new Date(item.ThoiHan).toLocaleDateString()}</Text>
+              <Text style={isUnpaid ? styles.dueDate : null}>
+                {new Date(item.ThoiHan).toLocaleDateString()}
+              </Text>
             </View>
 
-            {/* Nếu chưa đóng xong thì hiện nút Thanh Toán */}
+            {/* nếu còn nợ thì hiện nút thanh toán */}
             {isUnpaid && (
               <Button
-                //mode="contained"
                 buttonColor="#3498db"
                 textColor='#fff'
                 onPress={() => {
@@ -151,7 +156,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f7fa',
   },
   listContent: {
-    padding: 16,
+    paddingTop: 8,
+    paddingHorizontal: 16,
     paddingBottom: 30,
   },
   card: {

@@ -104,7 +104,7 @@ const ClassScreen = () => {
 
               <ProgressBar
                 progress={item.SoBuoiDaHoc / item.TongSoBuoi}
-                color="#3498db" 
+                color="#3498db"
                 style={{ height: 6, borderRadius: 3, backgroundColor: '#e0e4e8' }}
               />
 
@@ -130,8 +130,12 @@ const ClassScreen = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#f0f2f5' }} edges={['top']}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 8 }}>
-        <Text variant="headlineSmall" style={{ padding: 20, fontWeight: 'bold', color: '#2c3e50' }}>
+      <View style={{
+        flexDirection: 'row', justifyContent: 'space-between',
+        alignItems: 'center', paddingRight: 8
+      }}>
+        <Text variant="headlineSmall"
+          style={{ padding: 20, fontWeight: 'bold', color: '#2c3e50' }}>
           Lớp học
         </Text>
       </View>
@@ -140,11 +144,13 @@ const ClassScreen = () => {
         data={classOfStu}
         renderItem={renderClassItem}
         keyExtractor={item => item.ID.toString()}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32 }}
+        contentContainerStyle={{ paddingTop:8,paddingHorizontal: 16, paddingBottom: 30 }}
         ListEmptyComponent={
           <View style={{ alignItems: 'center', marginTop: 100, gap: 12 }}>
-            <Avatar.Icon icon="book-open-variant" size={80} style={{ backgroundColor: '#e0e4e8' }} color="#bdc3c7" />
-            <Text variant="bodyLarge" style={{ color: '#7f8c8d' }}>Con chưa tham gia lớp học nào</Text>
+            <Avatar.Icon icon="book-open-variant" size={80}
+              style={{ backgroundColor: '#e0e4e8' }} color="#bdc3c7" />
+            <Text variant="bodyLarge" style={{ color: '#7f8c8d' }}>
+              Con chưa tham gia lớp học nào</Text>
           </View>
         }
       />
