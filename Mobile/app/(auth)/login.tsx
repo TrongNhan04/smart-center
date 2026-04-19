@@ -14,20 +14,29 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false)
   const [showMK, setShowMK] = useState(false)
   const login = useAuthStore(state => state.login)
+  const setSelectedStuId = useAuthStore(state => state.setSelectedStuId)
   const router = useRouter();
 
   const handleLogin = async () => {
     try {
       setLoading(true)
+
+      if(!email || !password) {
+        Alert.alert('Thông báo', 'Vui lòng điền đầy đủ thông tin');
+        return
+      }
+
       const payload = { email, password }
       const res = await mobileApi.login(payload)
+      const user = res.data.user
       Alert.alert('Thông báo', 'Đăng nhập thành công!');
-      login(res.data.user, res.data.access_token)
-
-      // setVisible(true)
+      login(user, res.data.access_token)
+      if(user.children.length > 0)
+        setSelectedStuId(user.children[0])
+      
       router.replace('/(tabs)');
     } catch (error: any) {
-      Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
+      Alert.alert('Thông báo', 'Sai email hoặc mật khẩu');
       console.log('Có lỗi xảy ra: ', error?.response?.data)
     }
     finally {

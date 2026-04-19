@@ -1,6 +1,6 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, AppState, View } from 'react-native';
 import { Card, Divider, IconButton, Text } from 'react-native-paper';
 import QRCode from 'react-native-qrcode-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,12 +11,12 @@ const PaymentScreen = () => {
   const router = useRouter()
   const { invoiceId, code, student, debt } = useLocalSearchParams()
   const [qrData, setQrData] = useState(null)
+  const appState = useRef(AppState.currentState) // lấy trạng thái app
 
   // useEffect 1 chạy khi mở qr thanh toán 1 hóa đơn
   useEffect(() => {
     const fetchQR = async () => {
       try {
-        console.log(invoiceId)
         if (!invoiceId) return
         const res = await mobileApi.payment(invoiceId)
         setQrData(res.data.qrCode)
@@ -32,7 +32,7 @@ const PaymentScreen = () => {
   // useEffect 2 chạy khi có socket từ backend 
   useEffect(() => {
     if (!invoiceId) return
-
+    // socket
     const socket = io('http://192.168.1.102:3000')
     const envName = `PAYMENT_SUCCESS_${invoiceId}`
 
@@ -40,11 +40,37 @@ const PaymentScreen = () => {
       console.log('đã nhận được: ', data)
       router.replace('/(tabs)/invoice')
     })
+
+    // kiểm tra state của app 
+    const subcription = AppState.addEventListener('change', nextAppState => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === 'active'
+      ) {
+        // app đã thức dậy
+        checkPaidInvoice(Number(invoiceId))
+      }
+      appState.current = nextAppState
+    })
+
     return () => {
       socket.off(envName)
       socket.disconnect()
+      subcription.remove()
     }
   }, [invoiceId])
+
+  const checkPaidInvoice = async (id: number) => {
+    try {
+      const res = await mobileApi.getInvoiceById(id)
+      if(res.data.DaTra === res.data.TongTien){
+        console.log('api báo đã thanh toán');
+        router.replace('/(tabs)/invoice')
+      }
+    } catch (error:any) {
+      console.log('Có lỗi xảy ra: ', error?.response?.data)
+    }
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#eef2f6' }}>

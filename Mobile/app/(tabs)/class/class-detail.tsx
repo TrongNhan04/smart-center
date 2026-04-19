@@ -10,14 +10,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SessionDetailScreen() {
   const router = useRouter();
-  const { classId, sessionId } = useLocalSearchParams() // để lấy id các buổi học, id buổi học có kết quả gần nhất
+  const { classId, sessionId } = useLocalSearchParams()
+  const buoiHocId = Number(sessionId) // id buổi học có kết quả gần nhất
   const [detailResult, setDetailResult] = useState<SessionOfStu>()
   const [arrSessionId, setArrSessionId] = useState<SessionIds[]>([])
-  const [selectedId, setSelectedId] = useState(0) // id buổi học được chọn
+  const [selectedId, setSelectedId] = useState(buoiHocId) // id buổi học được chọn
   const stuIdGlobal = useAuthStore(state => state.selectedStuId)
   const [visible, setVisible] = useState(false)
   const [currentImgIndex, setCurrentImgIndex] = useState(-1)
-  const buoiHocId = Number(sessionId)
+
 
   useEffect(() => {//useEffect 1 lấy tất cả id buổi học của lớp
     const fetchSessionIds = async () => {
@@ -30,18 +31,16 @@ export default function SessionDetailScreen() {
       }
     }
     fetchSessionIds()
-  }, [])
+  }, [classId])
 
   //useEffect 2 tải kết quả buổi học từ id buổi học được chọn
   useEffect(() => {
     const fetchData = async () => {
       try {
         if (!stuIdGlobal) return
-        // có chọn lấy chọn, không có lấy từ param
-        const id = selectedId ? selectedId : buoiHocId
-                
+        const id = selectedId ? selectedId : sessionId
         const res = await mobileApi
-          .getDetailByStuAndSesId(stuIdGlobal, id)
+          .getDetailByStuAndSesId(stuIdGlobal, Number(id))
         setDetailResult(res.data)
       } catch (error) {
         Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
@@ -50,7 +49,7 @@ export default function SessionDetailScreen() {
     }
 
     fetchData()
-  }, [selectedId])
+  }, [classId, selectedId, stuIdGlobal])
 
   const handleDiemDanh = (attend: boolean | null) => {
     if (attend === null) return '---'
@@ -64,7 +63,11 @@ export default function SessionDetailScreen() {
       <Surface style={styles.header} elevation={1}>
         <View style={styles.headerRow}>
           <IconButton icon="arrow-left" size={24}
-            onPress={() => router.back()} style={{ marginLeft: -10 }} />
+            onPress={() => {
+              router.back();
+              setSelectedId(0) // set = 0 để out ra vào lại vẫn chọn id đúng
+            }}
+            style={{ marginLeft: -10 }} />
           <View style={{ flex: 1 }}>
             <Text variant="titleLarge" style={styles.textTitle}>
               {detailResult?.TenLop}</Text>

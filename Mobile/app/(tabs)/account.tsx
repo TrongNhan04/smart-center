@@ -252,6 +252,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: 20,
     marginBottom: 100,
-    gap: 10, // Tạo khoảng cách giữa 2 nút (Dùng cho React Native mới)
+    gap: 10, 
   }
 })

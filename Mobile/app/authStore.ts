@@ -34,7 +34,7 @@ const useAuthStore = create<AuthState>()(
 
 			login: (userData, token) => set({
 				user: userData,
-				access_token: token
+				access_token: token,
 			}),
 
 			update: (userData) => set({

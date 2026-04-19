@@ -18,7 +18,7 @@ const TabLayout = () => {
             <Ionicons name={focused ? 'home-sharp' : 'home-outline'}
               color={color} size={24}
             />
-          )
+          )  
         }}
       />
       <Tabs.Screen name='class'

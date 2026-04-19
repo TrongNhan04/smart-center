@@ -4,6 +4,7 @@ import useAuthStore from "./authStore";
 
 export default function RootLayout() {
   const token = useAuthStore(state => state.access_token)
+  const role = useAuthStore(state => state.user?.role)
   const router = useRouter()
   const segments = useSegments()
   const rootNavigationState = useRootNavigationState();
@@ -23,7 +24,8 @@ export default function RootLayout() {
           router.replace("/login") // đá về login
       }
       else // có token mà ở trang index hoặc login
-        if (isRootIndex || isAuthGroup)
+        if(role !== 'PARENT') return
+        else if (isRootIndex || isAuthGroup)
           router.replace('/(tabs)') // đá về tabs
     }, 1);
 

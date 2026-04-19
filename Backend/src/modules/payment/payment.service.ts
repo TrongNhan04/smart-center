@@ -36,7 +36,7 @@ export class PaymentService {
         const orderCode = DateHelper.CreateUniqueCode(body.orderId)
         const paymentData = {
             orderCode: Number(orderCode),
-            amount: 2000,
+            amount: conNo,
             description: `THANH TOAN HOC PHI`,
             cancelUrl: 'https://my-smart-center.com/cancel',
             returnUrl: 'https://my-smart-center.com/success',
@@ -77,8 +77,6 @@ export class PaymentService {
                         data: { DaTra: { increment: amount } }
                     })
                 })
-                // gửi socket cho frontend
-                console.log('gửi cho fe');
                 
                 this.eventGateway.server.emit(`PAYMENT_SUCCESS_${invoiceId}`,{
                     message:'Thành công',

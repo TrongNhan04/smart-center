@@ -28,6 +28,9 @@ const mobileApi = {
 
     getInvoiceByStuId: (stuId:number) =>
         axiosClient.get(`parents/students/${stuId}/invoices`),
+    
+    getInvoiceById: (invoiceId:number) => 
+        axiosClient.get(`parents/invoices/${invoiceId}`),
 
     payment:(orderId:string|string[]) => axiosClient.post('payments',{orderId})
 }

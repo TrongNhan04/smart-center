@@ -59,5 +59,9 @@ export class AppParentController {
         return await this.appParent.GetInvoiceByStudentID(+userId, studentId)
     }
 
-    // Thông tin chuyển khoản
+    // lấy 1 hóa đơn 
+    @Get('invoices/:id')
+    async GetInvoiceById(@Param('id') id:number){
+        return this.appParent.GetInvoiceById(+id)
+    }
 }

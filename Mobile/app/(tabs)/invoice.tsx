@@ -2,7 +2,7 @@ import { InvoiceOfStu } from '@/types/tabs.invoice';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, FlatList, StyleSheet, View } from 'react-native';
-import { Badge, Button, Card, Divider, Icon, Text } from 'react-native-paper';
+import { Avatar, Badge, Button, Card, Divider, Icon, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import mobileApi from '../api';
 import useAuthStore from '../authStore';
@@ -29,7 +29,8 @@ const InvoiceListScreen = () => {
   const formatVND = (amount: any) => Number(amount).toLocaleString() + ' đ'
 
   // render trạng thái hóa đơn
-  const renderStatusBadge = (daTra: number, tongTien: number) => {
+  const renderStatusBadge = (daTra: number, tongTien: number, status: string) => {
+    if (status === 'CANCELLED') return <Text>Đã hủy</Text>
     if (daTra === tongTien)
       return <Badge size={25} style={{
         paddingHorizontal: 8,
@@ -50,7 +51,7 @@ const InvoiceListScreen = () => {
   }
 
   const renderInvoiceItem = ({ item }: { item: InvoiceOfStu }) => {
-    const isUnpaid = item.DaTra < item.TongTien
+    const isUnpaid = item.DaTra < item.TongTien && item.TrangThai === 'ACTIVE'
 
     return (
       <Card style={styles.card} mode="elevated">
@@ -61,7 +62,7 @@ const InvoiceListScreen = () => {
               style={styles.className} numberOfLines={1}>
               {item.LopHoc}
             </Text>
-            {renderStatusBadge(item.DaTra, item.TongTien)}
+            {renderStatusBadge(item.DaTra, item.TongTien, item.TrangThai)}
           </View>
 
           {/* thông tin học viên */}
@@ -143,6 +144,14 @@ const InvoiceListScreen = () => {
         renderItem={renderInvoiceItem}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          <View style={{ alignItems: 'center', marginTop: 100, gap: 12 }}>
+            <Avatar.Icon icon="receipt" size={80}
+              style={{ backgroundColor: '#e0e4e8' }} color="#bdc3c7" />
+            <Text variant="bodyLarge" style={{ color: '#7f8c8d' }}>
+              Chưa có hóa đơn học phí nào</Text>
+          </View>
+        }
       />
     </SafeAreaView>
   );

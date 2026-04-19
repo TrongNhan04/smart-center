@@ -1,8 +1,8 @@
 import mobileApi from '@/app/api';
 import useAuthStore from '@/app/authStore';
 import { ClassOfStu } from '@/types/tabs.class.dto';
-import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback, useState } from 'react';
 import { Alert, FlatList, TouchableOpacity, View } from 'react-native';
 import { Avatar, Card, Divider, Icon, ProgressBar, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -12,25 +12,33 @@ const ClassScreen = () => {
   const stuIdGlobal = useAuthStore(state => state.selectedStuId)
   const router = useRouter()
 
-  useEffect(() => {
+  // dùng useFocusEffect để chuyển tab thì call lại api
+  useFocusEffect(
+    useCallback(() => { //useCallback để mỗi lần reder không tạo lại hàm fetchData
+        const fetchData = async () => {
+          try {
+            if (!stuIdGlobal) return
+            const res = await mobileApi.getClassByStuId(stuIdGlobal)
+            setClassOfStu(res.data)
+            console.log('đã chạy useFocusEffect')
+          } catch (error: any) {
+            Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
+            console.log('Có lỗi xảy ra: ', error?.response?.data)
+          }
+        }
+        fetchData()
+    }, [stuIdGlobal]),
+  );
 
-    const fetchData = async () => {
-      try {
-        if (!stuIdGlobal) return
-        const res = await mobileApi.getClassByStuId(stuIdGlobal)
-        setClassOfStu(res.data)
-      } catch (error: any) {
-        Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
-        console.log('Có lỗi xảy ra: ', error?.response?.data)
-      }
-    }
-    fetchData()
-  }, [stuIdGlobal])
+  // useEffect(() => {
+
+
+  // }, [stuIdGlobal])
 
   const dow = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
 
   const pressToSeeClassDetail = (id: number, buoiHocId: number) => {
-    router.push({
+    router.navigate({
       pathname: '/(tabs)/class/class-detail',
       params: {
         classId: id,
@@ -144,7 +152,7 @@ const ClassScreen = () => {
         data={classOfStu}
         renderItem={renderClassItem}
         keyExtractor={item => item.ID.toString()}
-        contentContainerStyle={{ paddingTop:8,paddingHorizontal: 16, paddingBottom: 30 }}
+        contentContainerStyle={{ paddingTop: 8, paddingHorizontal: 16, paddingBottom: 30 }}
         ListEmptyComponent={
           <View style={{ alignItems: 'center', marginTop: 100, gap: 12 }}>
             <Avatar.Icon icon="book-open-variant" size={80}

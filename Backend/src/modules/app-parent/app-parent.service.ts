@@ -36,8 +36,8 @@ export class AppParentService {
         }
       }),
       //kết quả gần nhất của nhiều lớp
-      this.prisma.ghiDanh.findMany({ // tìm nhiều ghi danh của học viên
-        where: { HocVienID: studentDB.ID },
+      this.prisma.ghiDanh.findMany({ // tìm nhiều ghi danh ACTIVE của học viên
+        where: { HocVienID: studentDB.ID, TrangThai: 'ACTIVE' },
         include: {
           lophoc: {
             select: { TenLop: true, khoahoc: { select: { TongSoBuoi: true } } }
@@ -85,18 +85,18 @@ export class AppParentService {
         }
       }
     }).filter(Boolean)
-    // return KetQuaGanNhat
     // lọc hóa đơn còn nợ
     const invoiceDebt = invoice.filter(f => f.DaTra < f.TongTien)
+    const HoaDon = invoiceDebt.length ? {
+      SoHDChuaTra: invoiceDebt.length,
+      ThoiHan: invoiceDebt.length > 0 ? invoiceDebt[0].ThoiHan : null
+    } : null
     return {
       ID: studentDB.ID.toString(),
       HocVien: studentDB.TenHocVien,
       BuoiHocKe,
       KetQuaGanNhat, // nhiểu kết quả theo lớp học
-      HoaDon: {
-        SoHDChuaTra: invoiceDebt.length,
-        ThoiHan: invoiceDebt.length > 0 ? invoiceDebt[0].ThoiHan : null
-      }
+      HoaDon: HoaDon
     }
   }
 
@@ -234,7 +234,7 @@ export class AppParentService {
     const sessionIds = await this.prisma.buoiHoc.findMany({
       where: { LopHocID: classId },
       select: { ID: true, BuoiSo: true },
-      orderBy: { ID: 'asc' }
+      orderBy: { BatDauLuc: 'asc' }
     })
     if (!sessionIds.length) return []
     return sessionIds
@@ -250,7 +250,7 @@ export class AppParentService {
         ghidanh: { select: { lophoc: { select: { TenLop: true } } } }
       },
       omit: { CreatedAt: true, UpdatedAt: true, GhiDanhID: true },
-      orderBy:{ThoiHan:'asc'}
+      orderBy: { ThoiHan: 'asc' }
     })
     return invoiceDB.map(item => {
       const { hocvien, ghidanh, ...rest } = item
@@ -260,6 +260,19 @@ export class AppParentService {
         LopHoc: ghidanh?.lophoc.TenLop
       }
     })
+  }
+
+  // lấy 1 hóa đơn
+  async GetInvoiceById(invoiceId: number) {
+    const invoiceDB = await this.prisma.hoaDon.findUnique({
+      where: { ID: invoiceId },
+      select: {
+        ID: true, MaHoaDon: true,
+        TongTien: true, DaTra: true
+      }
+    })
+    if (!invoiceDB) throw new NotFoundException('Không tìm thấy hóa đơn')
+    return invoiceDB
   }
 
   // check con ai người nấy xem

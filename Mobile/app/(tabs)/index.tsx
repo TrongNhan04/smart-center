@@ -15,6 +15,8 @@ export default function Index() {
   const user = useAuthStore(state => state.user)
   const setStuIdGlobal = useAuthStore(state => state.setSelectedStuId)
   const children = user?.children
+  
+  console.log('trang index')
   const fetchData = async () => {
     try {
       if (!children) return
@@ -23,6 +25,7 @@ export default function Index() {
       )
       const data = res.map(item => item.data)
       setStudents(data)
+      
       // nếu chưa chọn ai và có dữ liệu thì chọn em đầu tiên
       if (selectedStuId === -1 && res.length > 0)
         setSelectedStuId(data[0].ID)
@@ -61,6 +64,7 @@ export default function Index() {
         sessionId: buoiHocId
       }
     })
+    console.log(classId, buoiHocId)
   }
 
   return (
@@ -245,7 +249,7 @@ export default function Index() {
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                     <Icon source="check-circle-outline" size={20} color="#27ae60" />
                     <Text variant="titleMedium" style={{ color: '#27ae60' }}>
-                      Đã hoàn thành toàn bộ học phí
+                      Đã thanh toán toàn bộ học phí
                     </Text>
                   </View>
                 )}
