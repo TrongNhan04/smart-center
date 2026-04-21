@@ -139,9 +139,7 @@ export class DashboardService {
 
         const sessionDB = await this.prisma.buoiHoc.findMany({
             where: where,
-            select: {
-                ID: true, BuoiSo: true,
-                BatDauLuc: true, KetThucLuc: true,
+            include: {
                 lophoc: {
                     select: {
                         ID: true, TenLop: true, PhongHoc: true,

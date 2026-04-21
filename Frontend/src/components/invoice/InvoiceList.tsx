@@ -36,7 +36,7 @@ const InvoiceList = () => {
       const query = {
         q: searchText,
         status: filterStatus,
-        page: currentPage
+        page: searchText ? 1 : currentPage
       }
       const res = await invoiceApi.findMany(query)
       setInvoices(res.data.items)
@@ -89,12 +89,13 @@ const InvoiceList = () => {
   const now = new Date().getTime()
   const columns = [
     { // mã hóa đơn + Ngày phát hành
-      title: 'Hóa đơn', dataIndex: 'MaHoaDon',
+      title: 'Mã HĐ', dataIndex: 'MaHoaDon', width: 120,
       key: 'MaHoaDon', align: 'center' as const,
       render: (code: string) => <Text code>{code}</Text>
     },
     {
-      title: 'Ngày phát hành', dataIndex: 'NgayPhatHanh', key: 'NgayPhatHanh',
+      title: 'Ngày phát hành', dataIndex: 'NgayPhatHanh',
+      key: 'NgayPhatHanh', width: 150,
       render: (value: string) => <Text >
         <CalendarOutlined style={{ color: '#8c8c8c' }}
         /> {new Date(value).toLocaleDateString()}
@@ -109,9 +110,9 @@ const InvoiceList = () => {
           <UserOutlined style={{ color: '#8c8c8c' }} /> {name}
         </Link>
     },
-    { // tổng tiền + còn nợ 
+    { // học phí
       title: 'Học phí', dataIndex: 'TongTien', key: 'TongTien',
-      align: 'right' as const,
+      align: 'right' as const, width: 150,
       render: (total: number) =>
         total ?
           <Text style={{ fontWeight: '500' }}
@@ -120,7 +121,7 @@ const InvoiceList = () => {
     },
     {
       title: 'Tiền thanh toán', dataIndex: 'DaTra', key: 'DaTra',
-      align: 'right' as const,
+      align: 'right' as const, width: 150,
       render: (total: number) =>
         total ?
           <Text style={{ fontWeight: '500' }}
@@ -133,28 +134,16 @@ const InvoiceList = () => {
       filters: months, // value là value của months
       onFilter: (value: any, invoice: InvoiceDB) =>
         new Date(invoice.NgayHetHan).getMonth() == value,
-      render: (invoiceDate: string) => {
-        return <Text>
+      render: (value: string) => {
+        const dueDate = new Date(value)
+        return <Text >
           <CalendarOutlined style={{ color: '#8c8c8c' }}
-          /> {new Date(invoiceDate).toLocaleDateString()}
+          /> {dueDate.toLocaleDateString()}
         </Text>
-        // const overTime = DateHelper.TimeDiff(invoiceDate)
-        // const overDate = Math.floor(overTime / (24 * 60)) // tính xem được mấy ngày 
-        // const isCancelled = invoice.TrangThai === 'CANCELLED'
-        // const isDebt = invoice.TongTien - invoice.DaTra
-        // let isOverTime_Debt = false
-        // if (overTime > 0 && isDebt && !isCancelled)
-        //   isOverTime_Debt = true
-        // return <Space orientation="vertical" size={0}>
-        //   <Text >
-        //     <CalendarOutlined style={{ color: '#8c8c8c' }} /> {new Date(invoiceDate).toLocaleDateString()}
-        //   </Text>
-        //   {isOverTime_Debt && <Tag color='red'>Trễ {overDate} ngày</Tag>}
-        // </Space>
       }
     },
     {// trạng thái
-      title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai',
+      title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai', width: 180,
       filters: [
         { text: 'Đã thanh toán', value: 'PAID' },
         { text: 'Thanh toán 1 phần', value: 'PART' },
@@ -182,16 +171,16 @@ const InvoiceList = () => {
         if (status == 'CANCELLED')
           return <Text delete> Đã hủy</Text>
         else if (now > dueDate && ConNo)
-          return <Badge status="error" text='Quá hạn' />
+          return <Tag color='orange'>Quá hạn</Tag>
         else if (DaTra == TongTien)
-          return <Badge status="success" text='Đã thanh toán' />
+          return <Tag color='green'>Đã thanh toán</Tag>
         else if (DaTra == 0)
-          return <Badge status="default" text='Chưa thanh toán' />
-        else return <Badge status="processing" text="Thanh toán 1 phần" />
+          return <Tag color='default'>Chưa thanh toán</Tag>
+        return <Tag color='processing'>Thanh toán 1 phần</Tag>
       }
     },
     {// thao tác
-      title: 'Thao tác', dataIndex: 'action', key: 'action',
+      title: 'Thao tác', dataIndex: 'action', key: 'action', width: 150,
       align: 'center' as const,
       render: (_: any, invoice: InvoiceDB) =>
         <InvoiceAction
@@ -251,7 +240,7 @@ const InvoiceList = () => {
           }}
           onChange={handleChange}
           rowKey="ID"
-          scroll={{ x: 1100, y: 408 }}
+          scroll={{ x: 'max-content', y: 408 }}
         />
 
         {/* Hiển thị Modal UI */}

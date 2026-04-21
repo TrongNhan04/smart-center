@@ -27,7 +27,7 @@ const ClassAction = ({ lophoc, onEdit, onSoftDelete }: Props) => {
         </Tooltip>
 
         {/* Nút xóa */}
-        <Tooltip title="Đóng lớp lớp học">
+        <Tooltip title="Đóng lớp học">
           <Popconfirm
             title="Xác nhận đóng?"
             description="Hành động này sẽ không thể hoàn tác!"

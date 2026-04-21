@@ -1,13 +1,7 @@
 import { Descriptions, Space, Typography, Progress } from 'antd';
 import {
-  UserOutlined,
-  ReadOutlined,
-  BookOutlined,
-  EnvironmentOutlined,
-  CalendarOutlined,
-  ClockCircleOutlined,
-  DollarCircleFilled,
-  DollarCircleOutlined
+  UserOutlined, BookOutlined, EnvironmentOutlined, CalendarOutlined,
+  ClockCircleOutlined, DollarCircleOutlined
 } from '@ant-design/icons';
 import type { ClassDB } from './ClassDTO';
 
@@ -45,12 +39,14 @@ const TabInfo = ({ lophoc }: Props) => {
 
         <Descriptions.Item label="Khóa học">
           <Space><BookOutlined style={{ color: '#722ed1' }} />
-            {lophoc.KhoaHoc.TenKhoaHoc}</Space>
+            {lophoc.TenKhoaHoc}
+          </Space>
         </Descriptions.Item>
 
         <Descriptions.Item label="Giáo viên">
           <Space><UserOutlined style={{ color: '#8c8c8c' }} />
-            {lophoc.GiaoVien.HoTen}</Space>
+            {lophoc.GiaoVien}
+          </Space>
         </Descriptions.Item>
 
         <Descriptions.Item label="Sĩ số">
@@ -68,7 +64,8 @@ const TabInfo = ({ lophoc }: Props) => {
 
         <Descriptions.Item label="Thời gian">
           <Space><CalendarOutlined style={{ color: '#1677ff' }} />
-            {tuNgay} - {denNgay}</Space>
+            {tuNgay} - {denNgay}
+          </Space>
         </Descriptions.Item>
 
         <Descriptions.Item label="Lịch học">
@@ -79,12 +76,14 @@ const TabInfo = ({ lophoc }: Props) => {
 
         <Descriptions.Item label="Phòng học">
           <Space><EnvironmentOutlined style={{ color: '#8c8c8c' }} />
-            {lophoc.PhongHoc ?? 'Chưa cập nhật'}</Space>
+            {lophoc.PhongHoc ?? 'Chưa cập nhật'}
+          </Space>
         </Descriptions.Item>
 
         <Descriptions.Item label='Học phí'>
           <Text >
-            <DollarCircleOutlined style={{ color: '#52c41a' }}/> 123</Text>
+            <DollarCircleOutlined style={{ color: '#52c41a' }} /> {lophoc.HocPhi}
+          </Text>
         </Descriptions.Item>
 
         {/* dùng span giống column để trường mô tả ăn hết chiều ngang */}

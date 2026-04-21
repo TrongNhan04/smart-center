@@ -47,7 +47,7 @@ const ClassList = () => {
     const matchesKeyword =
       item.TenLop.toLocaleLowerCase().includes(lowerCase) ||
       item.MaLopHoc.toLocaleLowerCase().includes(lowerCase) ||
-      item.GiaoVien.HoTen.toLocaleLowerCase().includes(lowerCase)
+      item.GiaoVien.toLocaleLowerCase().includes(lowerCase)
     const matchesStatus = filterStatus ? item.TrangThai === filterStatus : true
     return matchesKeyword && matchesStatus
   })
@@ -85,11 +85,11 @@ const ClassList = () => {
   //  render: (text, record, index) => index + 1, // index starts from 0
   const columns = [
     {
-      title: 'Mã lớp', dataIndex: 'MaLopHoc', key: 'MaLopHoc', width:150,
+      title: 'Mã lớp', dataIndex: 'MaLopHoc', key: 'MaLopHoc', width: 150,
       render: (code: string) => <Text code>{code}</Text>
     },
     {// tên lớp
-      title: 'Lớp học', dataIndex: 'TenLop', key: 'TenLop', width:200,
+      title: 'Lớp học', dataIndex: 'TenLop', key: 'TenLop', width: 200,
       render: (name: string, lophoc: ClassDB) => (
         <Link
           to={`/admin/classes/${lophoc.ID}`}
@@ -99,18 +99,18 @@ const ClassList = () => {
       )
     },
     { // giáo viên
-      title: 'Giáo viên', dataIndex: ['GiaoVien', 'HoTen'],width:200,
-      key: 'HoTen', 
+      title: 'Giáo viên', dataIndex: 'GiaoVien',
+      key: 'GiaoVien', width: 200,
       render: (name: string) => <Text>
         <UserOutlined style={{ color: '#857e7e' }} /> {name}</Text>
     },
     { // khai giảng = ngày bắt đầu
-      title: 'Khai giảng', dataIndex: 'TuNgay', key: 'TuNgay', width:150,
+      title: 'Khai giảng', dataIndex: 'TuNgay', key: 'TuNgay', width: 150,
       render: (day: string) =>
         <Text><CalendarOutlined style={{ color: '#8c8c8c' }} /> {new Date(day).toLocaleDateString()}</Text>
     },
     { // lịch học
-      title: 'Lịch học', dataIndex: 'LichHoc', key: 'LichHoc',width:220,
+      title: 'Lịch học', dataIndex: 'LichHoc', key: 'LichHoc', width: 220,
       render: (schedule: number[], lophoc: ClassDB) => {
         const dow = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
         const result = schedule.map(m => dow[m]).join('-')
@@ -119,26 +119,35 @@ const ClassList = () => {
           /> {result}, {lophoc.GioHoc}</Text>
       }
     },
-    { // sĩ số
-      title: 'Sĩ số', dataIndex: 'SiSo', key: 'SiSo',width:200,
-      render: (classSize: number, lophoc: ClassDB) => {
-        const percent = (lophoc.TongGhiDanh / classSize) * 100
-        let percentColor = '#ff4d4f' // đỏ
-        if (percent > 50) percentColor = '#faad14' //vàng
-        if (percent > 80) percentColor = '#52c41a'
-        return <Space>
-          <Text>{lophoc.TongGhiDanh}/{classSize}</Text>
+    { // tiến độ
+      title: 'Tiến độ', dataIndex: 'SoBuoiDaHoc', key: 'SoBuoiDaHoc',
+      width: 200,
+      render: (value: number, lh: ClassDB) => {
+        const percent = (value / lh.TongSoBuoi) * 100
+        let percentColor =
+          percent > 50 ? '#faad14' :
+          percent > 80 ? '#52c41a' :
+            '#ff4d4f' // đỏ
+        return <Space style={{ width: '100%' }} wrap={false}>
+          <Text style={{ whiteSpace: 'nowrap' }}>
+            {value}/{lh.TongSoBuoi}
+          </Text>
           <Progress
-            steps={5}
             percent={percent}
             showInfo={false}
             strokeColor={percentColor}
+            style={{ flex: 1, minWidth: 100 }}
           />
         </Space>
       }
     },
+    { // sĩ số
+      title: 'Sĩ số', dataIndex: 'SiSo', key: 'SiSo', width: 100,
+      align: 'center' as const, render: (classSize: number, lophoc: ClassDB) =>
+        <Text>{lophoc.TongGhiDanh}/{classSize}</Text>
+    },
     { // trạng thái
-      title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai', width:200,
+      title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai', width: 200,
       filters: [
         { text: 'Tuyển sinh', value: 'OPEN' },
         { text: 'Đang hoạt động', value: 'RUNNING' },
@@ -214,17 +223,15 @@ const ClassList = () => {
           columns={columns}
           loading={loading}
           rowClassName={
-            (lophoc) =>
-              lophoc.ID === classId ? 'highlight-row' : ''
+            (lophoc) => lophoc.ID === classId ? 'highlight-row' : ''
           }
-          // pagination={{ defaultPageSize: 8 }}
           pagination={{
             current: currentPage,
             pageSize: 10
           }}
           onChange={handleBack}
           rowKey="ID"
-          scroll={{ x:'max-content',y: 410 }}
+          scroll={{ x: 'max-content', y: 410 }}
         />
 
         {/* Hiển thị Modal UI */}

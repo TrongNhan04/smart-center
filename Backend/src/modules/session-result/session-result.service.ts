@@ -80,7 +80,7 @@ export class SessionResultService {
         // tạo map với key là ghi danh ID, value là kết quả học tập
         const newMapKQCT = new Map
             (result.ketqua_chitiet.map(item => [item.GhiDanhID, item]))
-        return enrolls.map(value => { // mỗi value ID (enroll) + thông tin học viên
+        return enrolls.map(value => { // mỗi value là ID (enroll) + thông tin học viên
             const data = newMapKQCT.get(value.ID)
             if (!data) return null // không tồn tại data cho ghi danh id đó
             return {
@@ -108,24 +108,20 @@ export class SessionResultService {
 
             const sessionUp = await tx.buoiHoc.update({
                 where: { ID: sessionId },
-                data: {
-                    AdminMoKhoa: true,
-                    YeuCauMoKhoa: false
-                },
-                select: {
-                    ID: true, BatDauLuc: true, BuoiSo:true,
+                data: { AdminMoKhoa: true, YeuCauMoKhoa: false },
+                include: {
                     lophoc: {
                         select: {
-                            TenLop: true, ID:true,
+                            TenLop: true, ID: true,
                             giaovien: { select: { UserID: true } }
                         }
                     }
                 }
             })
             const payload = {
-                ID: sessionUp.ID, BatDauLuc: sessionUp.BatDauLuc, 
+                ID: sessionUp.ID, BatDauLuc: sessionUp.BatDauLuc,
                 BuoiSo: sessionUp.BuoiSo,
-                LopHocID: sessionUp.lophoc.ID, TenLop: sessionUp.lophoc.TenLop, 
+                LopHocID: sessionUp.lophoc.ID, TenLop: sessionUp.lophoc.TenLop,
                 UserID: sessionUp.lophoc.giaovien.UserID
             }
             await this.notisService.UnLockSSNotify(payload, tx)
@@ -139,14 +135,13 @@ export class SessionResultService {
             throw new BadRequestException('Buổi học chưa bị khóa, không thể gửi yêu cầu')
         if (!reason) throw new BadRequestException('Chưa điền lý do')
         return await this.prisma.buoiHoc.update({
-            where: { ID: sessionId },
+            where: { ID: sessionDB.ID },
             data: {
                 YeuCauMoKhoa: true,
                 LyDoMoKhoa: reason.trim(),
                 NgayYeuCau: new Date()
             }
         })
-        // return { msg: "Send request successfully" }
     }
 
     // xử lý Transaction lưu DB, Dùng chung cho cả Draft và Submit
@@ -162,15 +157,15 @@ export class SessionResultService {
         const inputMap = new Map(body.ChiTietKetQua.map(m => [m.GhiDanhID, m]))
         const listParent = listEnroll.map(e => e.hocvien.UserID)
 
-        return await this.prisma.$transaction(async tx => {
+        return await this.prisma.$transaction(async (tx) => {
             const updateData: KetQua_BuoiHocUpdateInput = {
-                NhanXetChung: body.NhanXetChung ?? null,
+                ...body,
                 TrangThai: status,
             }
             if (body.TepDinhKem) // có tệp đính kèm
                 updateData.tep_dinhkem = {
-                    deleteMany: {}, // xóa những thằng cũ và tạo lại thằngs mới
-                    create: body.TepDinhKem.map(file => ({
+                    deleteMany: {}, // xóa tất cả file cũ và tạo lại những thằng mới
+                    create: body.TepDinhKem.map(file => ({ // không dùng được createMany trong relation
                         TepID: file.public_id,
                         URL: file.url,
                         LoaiTep: file.resource_type
@@ -183,9 +178,7 @@ export class SessionResultService {
                 update: updateData, // update ở trên
                 create: { // không có thì create
                     BuoiHocID: sessionDB.ID, GiaoVienID: teacherId,
-                    NoiDungBaiHoc: body.NoiDungBaiHoc,
-                    BaiTapVeNha: body.BaiTapVeNha,
-                    NhanXetChung: body.NhanXetChung ?? null,
+                    ...body,
                     TrangThai: status,
                     tep_dinhkem: { // tạo mới tệp đính kèm
                         create: body.TepDinhKem.map(file => ({
@@ -198,8 +191,6 @@ export class SessionResultService {
             })
             // Chuẩn bị lệnh Upsert Chi Tiết
             const upsertResultDetail = listEnroll.map(item => {
-                // input map là danh sách ghi danh Id có điểm danh, nhận xét
-                // listEnroll là list ghi danh Id của lớp đó, 
                 const details = inputMap.get(item.ID)
 
                 // Nếu status là SUBMITTED -> Bắt buộc phải có dữ liệu input
@@ -226,23 +217,15 @@ export class SessionResultService {
                     create: {
                         KetQuaID: sessionResult.ID,
                         GhiDanhID: item.ID,
-                        DiemDanh: payLoad.DiemDanh,
-                        NhanXetRieng: payLoad.NhanXetRieng,
-                        Diem: payLoad.Diem
+                        ...payLoad
                     },
-                    update: {
-                        DiemDanh: payLoad.DiemDanh,
-                        NhanXetRieng: payLoad.NhanXetRieng,
-                        Diem: payLoad.Diem
-                    }
+                    update: { ...payLoad }
                 })
             })
             // gửi toàn bộ mảng upsertResultDetail cho  promise.all
             await Promise.all(upsertResultDetail)
 
-            const data: BuoiHocUpdateInput = {
-                ChuDe: body.ChuDe
-            }
+            const data: BuoiHocUpdateInput = { ChuDe: body.ChuDe }
             // Nếu là SUBMITTED -> Cập nhật trạng thái buổi học 
             if (status === 'SUBMITTED') {
                 data.AdminMoKhoa = false // submit thì tắt ưu tiên nếu có

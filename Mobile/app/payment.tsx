@@ -33,12 +33,12 @@ const PaymentScreen = () => {
   useEffect(() => {
     if (!invoiceId) return
     // socket
-    const socket = io('http://192.168.1.102:3000')
+    const socket = io('http://192.168.1.101:3000')
     const envName = `PAYMENT_SUCCESS_${invoiceId}`
 
     socket.on(envName, data => {
       console.log('đã nhận được: ', data)
-      router.replace('/(tabs)/invoice')
+      router.replace('/payment-success')
     })
 
     // kiểm tra state của app 
@@ -65,7 +65,7 @@ const PaymentScreen = () => {
       const res = await mobileApi.getInvoiceById(id)
       if(res.data.DaTra === res.data.TongTien){
         console.log('api báo đã thanh toán');
-        router.replace('/(tabs)/invoice')
+        router.replace('/payment-success')
       }
     } catch (error:any) {
       console.log('Có lỗi xảy ra: ', error?.response?.data)

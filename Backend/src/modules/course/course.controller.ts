@@ -7,71 +7,69 @@ import { CourseQueryDTO, CourseUpdateDTO, CreateCourseDTO } from "./course.dto";
 
 @Controller('admin/courses')
 export class CourseController {
-    constructor(
-        private courseService: CourseService
-    ) { }
+    constructor(private courseService: CourseService) { }
 
     //thêm khóa học
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Post()
-    async CreateCourse(@Body() courseDTO: CreateCourseDTO) {
-        return await this.courseService.CreateCourse(courseDTO)
+    async create(@Body() body: CreateCourseDTO) {
+        return await this.courseService.create(body)
     }
 
     // lấy danh sách khóa học hiện có hoặc theo query
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Get()
-    async GetCourses(@Query() query: CourseQueryDTO) {
-        return await this.courseService.GetCourses(query)
+    async getMany(@Query() query: CourseQueryDTO) {
+        return await this.courseService.getMany(query)
     }
 
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Get('/combobox')
-    async GetDataForCmb() {
-        return await this.courseService.GetDataForCmb()
+    async getManyForCmb() {
+        return await this.courseService.getManyForCmb()
     }
 
     // lấy chi tiết 1 khóa học
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Get(':id')
-    async GetCourseById(@Param('id') id: number) {
-        return await this.courseService.GetCourseById(+id) // ép kiểu id sang number
+    async getOne(@Param('id') id: number) {
+        return await this.courseService.getOne(+id) // ép kiểu id sang number
     }
 
     //sửa khóa học theo trạng thái
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Patch(':id')
-    async UpdateCourseById(@Param('id') id: number,
+    async updateById(@Param('id') id: number,
         @Body() updateCourse: CourseUpdateDTO) {
-        return await this.courseService.UpdateCourseById(+id, updateCourse)
+        return await this.courseService.updateById(+id, updateCourse)
     }
 
     // xóa mềm khóa học
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Patch(':id/inactive')
-    async DeleteCourseByID(@Param('id') id: number) {
-        return await this.courseService.DeleteCouresByID(+id)
+    async deleteById(@Param('id') id: number) {
+        return await this.courseService.deleteById(+id)
     }
 
     // khôi phục khóa học
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Patch(':id/restore')
-    async RestoreCourseById(@Param('id') id: number) {
-        return await this.courseService.RestoreCourseById(+id)
+    async restore(@Param('id') id: number) {
+        return await this.courseService.restore(+id)
     }
 
     // lấy danh sách lớp thuộc khóa học 
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Get(':id/classes')
-    async GetClassesByCourseId(@Param('id') courseId: number) {
-        return this.courseService.GetClassesByCourseId(+courseId)
+    async getClassesById(@Param('id') courseId: number) {
+        return this.courseService.getClassesById(+courseId)
     }
 }

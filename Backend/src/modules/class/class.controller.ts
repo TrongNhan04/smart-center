@@ -3,8 +3,7 @@ import { ClassService } from "./class.service";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guard/roles.guard";
 import { Roles } from "src/auth/decorators/roles.decorator";
-import { QueryClassDTO, UpdateClassDTO, CreateClassDTO, SchechuleDTO } from "./class.dto";
-import { SessionStatusDTO } from "../session/session.dto";
+import { QueryClassDTO, UpdateClassDTO, CreateClassDTO } from "./class.dto";
 import { MustChangePWGuard } from "src/auth/guard/must-change-pw.guard";
 import { SessionService } from "../session/session.service";
 import { Request } from 'express';
@@ -22,32 +21,42 @@ export class ClassController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Post('admin/classes')
-    async CreateClass(@Body() createClassDTO: CreateClassDTO) {
-        return await this.classService.CreateClass(createClassDTO)
+    async create(@Body() body: CreateClassDTO) {
+        return await this.classService.create(body)
     }
 
     // lấy danh sách lớp hiện có hoặc theo điều kiện - query
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Get('admin/classes')
-    async GetClasses(@Query() query: QueryClassDTO) {
-        return await this.classService.GetClasses(query)
+    async getMany(@Query() query: QueryClassDTO) {
+        return await this.classService.getMany(query)
     }
 
     // lấy danh sách lớp cho combobox
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Get('admin/classes-combobox')
-    async GetDataForCmb() {
-        return await this.classService.GetDataForCmb()
+    async getManyForCmb() {
+        return await this.classService.getManyForCmb()
+    }
+
+    // cập nhật lớp theo trạng thái
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADMIN')
+    @Patch('admin/classes/:id')
+    async updateById(
+        @Param('id') classId: number,
+        @Body() body: UpdateClassDTO) {
+        return await this.classService.updateById(+classId, body)
     }
 
     // xóa mềm lớp học
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Patch('admin/classes/:id/closed')
-    async DeleteClassByID(@Param('id') classId: number) {
-        return await this.classService.DeleteClassByID(+classId)
+    async deleteById(@Param('id') classId: number) {
+        return await this.classService.deleteById(+classId)
     }
 
     //  lấy danh sách buổi học của lớp - phần dưới
@@ -65,28 +74,19 @@ export class ClassController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN', 'TEACHER')
     @Get('admin/classes/:id/students')
-    async GetStudentById(@Param('id') classId: number) {
-        return await this.classService.GetStudentById(+classId)
+    async getStusById(@Param('id') classId: number) {
+        return await this.classService.getStusById(+classId)
     }
 
     // lấy chi tiết lớp - phần trên 
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN', 'TEACHER')
     @Get('admin/classes/:id')
-    async GetClassById(
+    async getOne(
         @Req() req: RequestWithUser,
         @Param('id') classId: number) {
         const userId = req.user.role === 'TEACHER' ? req.user.userId : null
-        return await this.classService.GetClassById(+classId, userId)
-    }
-
-    // cập nhật lớp theo trạng thái
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles('ADMIN')
-    @Patch('admin/classes/:id')
-    async UpdateClassById(@Param('id') classId: number,
-        @Body() body: UpdateClassDTO) {
-        return await this.classService.UpdateClassById(+classId, body)
+        return await this.classService.getOne(+classId, userId)
     }
 
     //======================== TEACHER ========================
@@ -94,8 +94,8 @@ export class ClassController {
     @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
     @Roles('ADMIN', 'TEACHER')
     @Get('teachers/classes')
-    async GetClassesByUserId(@Req() req: RequestWithUser) {
-        return this.classService.GetClassesByUserId(req.user.userId)
+    async getManyByUserId(@Req() req: RequestWithUser) {
+        return this.classService.getManyByUserId(req.user.userId)
     }
 
     // danh sách buổi học của 1 lớp giáo viên A dạy - xong
@@ -110,14 +110,5 @@ export class ClassController {
         return await this.sessionService.GetSessionsByUserId(+userId, +classId)
     }
 
-    // lịch dạy của giáo viên
-    @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
-    @Roles('ADMIN', 'TEACHER')
-    @Get('teachers/sessions-week')
-    async GetSessionsOneWeek(@Req() req: RequestWithUser,
-        @Query() q: SchechuleDTO) {
-        const userId = req.user.role === 'ADMIN' ? null : req.user.userId
-        if (!userId) throw new NotFoundException('Teacher not found')
-        return await this.sessionService.GetSessionsOneWeek(+userId, q.startDate, q.endDate)
-    }
+    // lịch dạy của giáo viên - dashboard có
 }

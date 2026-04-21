@@ -2,50 +2,39 @@ import { ConflictException, Injectable, NotFoundException } from "@nestjs/common
 import { PrismaService } from "src/prisma/prisma.service";
 import { CourseQueryDTO, CreateCourseDTO, CourseUpdateDTO } from "./course.dto";
 import { Prisma } from "src/generated/prisma/client";
-import { DeCuongCreateManyInput, DeCuongCreateManyKhoahocInput } from "src/generated/prisma/models";
 
 @Injectable()
 export class CourseService {
     constructor(private prismaSv: PrismaService) { }
     // tạo khóa học
-    async CreateCourse(courseDTO: CreateCourseDTO) {
+    async create(body: CreateCourseDTO) {
         const courseDB = await this.prismaSv.khoaHoc.findUnique({
-            where: { MaKhoaHoc: courseDTO.code }
+            where: { MaKhoaHoc: body.code }
         })
         if (courseDB)
             throw new ConflictException('Mã khóa học đã tồn tại!')
 
-        const name = courseDTO.name.trim()
-        const level = courseDTO.level.trim()
-
-        return await this.prismaSv.$transaction(async (tx) => {
-            const newCourse = await tx.khoaHoc.create({
-                data: {
-                    MaKhoaHoc: courseDTO.code,
-                    TenKhoaHoc: name,
-                    TrinhDo: level,
-                    ThoiGian: courseDTO.duration,
-                    HocPhi: courseDTO.courseFee,
-                    TongSoBuoi: courseDTO.totalSession,
-                    MoTa: courseDTO.description
-                },
-            })
-            const data: DeCuongCreateManyInput[] = courseDTO.syllabus.map(
-                item => ({
-                    KhoaHocID: newCourse.ID,
-                    ThuTu: item.ThuTu,
-                    ChuDe: item.ChuDe
-                })
-            ).splice(0, newCourse.TongSoBuoi)
-            await tx.deCuong.createMany({
-                data: data
-            })
-            return { ID: newCourse.ID }
+        return await this.prismaSv.khoaHoc.create({
+            data: {
+                MaKhoaHoc: body.code,
+                TenKhoaHoc: body.name,
+                TrinhDo: body.level,
+                ThoiGian: body.duration,
+                HocPhi: body.courseFee,
+                TongSoBuoi: body.totalSession,
+                MoTa: body.description,
+                decuong: {
+                    create: body.syllabus.map(item => ({
+                        ThuTu: item.ThuTu,
+                        ChuDe: item.ChuDe
+                    })).slice(0, body.totalSession)
+                }
+            }
         })
     }
 
     // lấy danh sách khóa học
-    async GetCourses(query: CourseQueryDTO) {
+    async getMany(query: CourseQueryDTO) {
         // tạo điều kiện where
         const where: Prisma.KhoaHocWhereInput = {};
         const q = query.q?.trim()
@@ -59,7 +48,7 @@ export class CourseService {
             ]
         }
         // tìm theo bộ lọc ở trên
-        return  await this.prismaSv.khoaHoc.findMany({
+        return await this.prismaSv.khoaHoc.findMany({
             where,
             include: {
                 decuong: {
@@ -71,7 +60,7 @@ export class CourseService {
         })
     }
 
-    async GetDataForCmb() {
+    async getManyForCmb() {
         return await this.prismaSv.khoaHoc.findMany({
             where: { TrangThai: { not: 'INACTIVE' } },
             select: {
@@ -83,8 +72,8 @@ export class CourseService {
     }
 
     // lấy chi tiết 1 khóa học
-    async GetCourseById(id: number) {
-        const courseDB = await this.CourseIdValidator(id)
+    async getOne(id: number) {
+        const courseDB = await this.idValidator(id)
         const syllabusDB = await this.prismaSv.deCuong.findMany({
             where: { KhoaHocID: courseDB.ID },
             omit: { KhoaHocID: true }
@@ -94,26 +83,26 @@ export class CourseService {
     }
 
     // cập nhật khóa học theo trạng thái
-    async UpdateCourseById(courseId: number, courseUpdate: CourseUpdateDTO) {
-        const courseDB = await this.CourseIdValidator(courseId)
+    async updateById(courseId: number, body: CourseUpdateDTO) {
+        const courseDB = await this.idValidator(courseId)
 
         if (courseDB.TrangThai === 'INACTIVE')
             throw new ConflictException('Không thể cập nhật khóa học')
 
         //tạo data cho update
         const updateData: Prisma.KhoaHocUpdateInput = {
-            TenKhoaHoc: courseUpdate.name,
-            TrinhDo: courseUpdate.level,
-            TongSoBuoi: courseUpdate.totalSession,
-            ThoiGian: courseUpdate.duration,
-            HocPhi: courseUpdate.courseFee,
-            MoTa: courseUpdate.description,
+            TenKhoaHoc: body.name ?? courseDB.TenKhoaHoc,
+            TrinhDo: body.level ?? courseDB.TrinhDo,
+            TongSoBuoi: body.totalSession ?? courseDB.TongSoBuoi,
+            ThoiGian: body.duration ?? courseDB.ThoiGian,
+            HocPhi: body.courseFee ?? courseDB.HocPhi,
+            MoTa: body.description ?? courseDB.MoTa,
         }
-        if (courseUpdate.syllabus) {
+        if (body.syllabus) {
             updateData.decuong = {
                 deleteMany: {}, // xóa hết cái cũ
                 // tạo cái mới
-                create: courseUpdate.syllabus.map(item => ({
+                create: body.syllabus.map(item => ({
                     ThuTu: item.ThuTu,
                     ChuDe: item.ChuDe
                 }))
@@ -128,8 +117,8 @@ export class CourseService {
     }
 
     // xóa mềm khóa học
-    async DeleteCouresByID(courseId: number) {
-        const courseDB = await this.CourseIdValidator(courseId)
+    async deleteById(courseId: number) {
+        const courseDB = await this.idValidator(courseId)
         return await this.prismaSv.khoaHoc.update({
             where: { ID: courseDB.ID },
             data: { TrangThai: 'INACTIVE' },
@@ -138,8 +127,8 @@ export class CourseService {
     }
 
     // khôi phục khóa học
-    async RestoreCourseById(courseId: number) {
-        const courseDB = await this.CourseIdValidator(courseId)
+    async restore(courseId: number) {
+        const courseDB = await this.idValidator(courseId)
         return await this.prismaSv.khoaHoc.update({
             where: { ID: courseDB.ID, TrangThai: 'INACTIVE' },
             data: { TrangThai: 'ACTIVE' },
@@ -148,31 +137,29 @@ export class CourseService {
     }
 
     // lấy danh sách lớp học của khóa học
-    async GetClassesByCourseId(courseId: number) {
-        const courseDB = await this.CourseIdValidator(courseId)
+    async getClassesById(courseId: number) {
+        const courseDB = await this.idValidator(courseId)
         const classDB = await this.prismaSv.lopHoc.findMany({
             where: { KhoaHocID: courseDB.ID },
             include: {
-                giaovien: { include: { User: true } },
+                giaovien: { select: { User: { select: { HoTen: true } } } },
                 _count: { select: { ghidanh: { where: { TrangThai: 'ACTIVE' } } } }
             },
             orderBy: { ID: 'desc' }
         })
-        return classDB.map(lh => ({
-            ID: lh.ID, MaLopHoc: lh.MaLopHoc, TenLop: lh.TenLop,
-            GiaoVien: {
-                ID: lh.GiaoVienID,
-                HoTen: lh.giaovien.User.HoTen
-            },
-            PhongHoc: lh.PhongHoc, KhoaHocID: lh.KhoaHocID,
-            TuNgay: lh.TuNgay, DenNgay: lh.DenNgay, LichHoc: lh.LichHoc,
-            GioHoc: lh.GioBatDau + ' - ' + lh.GioKetThuc, SiSo: lh.SiSo,
-            TrangThai: lh.TrangThai, TongGhiDanh: lh._count.ghidanh
-        }))
+        return classDB.map(lh => {
+            const { giaovien, _count, GioBatDau, GioKetThuc, ...rest } = lh
+            return {
+                ...rest,
+                GiaoVien: giaovien.User.HoTen,
+                GioHoc: GioBatDau + ' - ' + GioKetThuc,
+                TongGhiDanh: _count.ghidanh
+            }
+        })
     }
 
     //kiểm tra id khóa học
-    private async CourseIdValidator(courseId: number) {
+    private async idValidator(courseId: number) {
         const courseDB = await this.prismaSv.khoaHoc.findUnique({
             where: { ID: courseId },
             omit: { CreatedAt: true, UpdatedAt: true }

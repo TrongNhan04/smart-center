@@ -1,13 +1,11 @@
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { Prisma } from "src/generated/prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
-import { CreateSessionDTO, SessionStatusDTO, UpdateSessionDTO } from "./session.dto";
+import { CreateSessionDTO } from "./session.dto";
 import { DateHelper } from "src/common/date.helper";
 import { SessionResultService } from "../session-result/session-result.service";
 import { SessionsResultDTO } from "../session-result/session-result.dto";
 import { NotifyService } from "../notify/notify.service";
-import { endOfDay, setDay, startOfDay } from "date-fns";
-import { BuoiHocWhereInput } from "src/generated/prisma/models";
 
 @Injectable()
 export class SessionService {
@@ -35,10 +33,10 @@ export class SessionService {
       orderBy: { BatDauLuc: 'asc' }
     })
     return sessions.map(item => {
-      let status = '' // qua 48h vẫn SCHEDULED = chưa nộp kết quả
+      let status = ''
       const isOverTime = DateHelper.TimeDiff(item.KetThucLuc) > 2880
       if (isOverTime && item.TrangThai === 'SCHEDULED') {
-        status = 'UNSUBMIT'
+        status = 'UNSUBMIT'// qua 48h vẫn SCHEDULED => chưa nộp kết quả
         return { ...item, TrangThai: status }
       }
       return item
@@ -54,13 +52,13 @@ export class SessionService {
 
     return await this.prisma.$transaction(async (tx) => {
       const updateSS = await tx.buoiHoc.update({
-        where: { ID: sessionId, TrangThai: 'SCHEDULED' },
+        where: { ID: sessionDB.ID, TrangThai: 'SCHEDULED' },
         data: { TrangThai: 'CANCELLED' },
         select: {
           BatDauLuc: true, LopHocID: true,
           lophoc: {
             select: {
-              ID: true, MaLopHoc: true,
+              TenLop: true,
               ghidanh: {
                 where: { TrangThai: 'ACTIVE' },
                 select: { hocvien: { select: { UserID: true } } }
@@ -99,7 +97,7 @@ export class SessionService {
     })
 
     if (currentCount >= totalSessions) throw new ConflictException(`Đã đủ số buổi học của khóa (${totalSessions})`)
-    //số buổi cần sinh tổng số buổi trừ số buổi hiện có
+    //số buổi cần sinh 
     const need = totalSessions - currentCount
 
     // xác định ngày của buổi cuối cùng trong danh sách buổi học
@@ -120,36 +118,22 @@ export class SessionService {
 
     const newMapSyllabus = new Map // tạo 1 map đề cương
       (classDB.khoahoc.decuong.map((item, index) => [index + 1, item]))
-    let thuTuDeCuong = currentCount + 1 // lấy thứ tự đề cương từ buổi hiện có + 1
-    // xday <= end endDate để xét trong ngày cuối
+    let thuTuDeCuong = currentCount + 1 // lấy thứ tự đề cương = buổi hiện có + 1
+    // xday <= end endDate để ngày = end vẫn xét tiếp
     // data.length < need để khi length = need thì dừng
     while (xday <= endDate && data.length < need) {
       const dow = xday.getDay() // 0..6
       if (classDB.LichHoc.includes(dow)) {
         const startAt = DateHelper.combineDateAndTime(xday, classDB.GioBatDau)
         const endAt = DateHelper.combineDateAndTime(xday, classDB.GioKetThuc)
-        // tìm những buổi học của lớp khác có trùng thời gian (1)
-        const conflict = await this.prisma.buoiHoc.findFirst({
-          where: {
-            TrangThai: 'SCHEDULED',
-            BatDauLuc: { lt: endAt },
-            KetThucLuc: { gt: startAt },
-            LopHocID: { not: classDB.ID }
-          }
+
+        data.push({
+          LopHocID: classId, PhongHoc: classDB.PhongHoc,
+          BuoiSo: newMapSyllabus.get(thuTuDeCuong)?.ThuTu || thuTuDeCuong,
+          ChuDe: newMapSyllabus.get(thuTuDeCuong)?.ChuDe,
+          BatDauLuc: startAt, KetThucLuc: endAt,
         })
-        // từ (1) -> phòng lớp mình != null và lớp khác có buổi học 
-        // mà phòng học giống phòng lớp mình thì bỏ
-        if (classDB.PhongHoc && conflict?.PhongHoc === classDB.PhongHoc)
-          console.log(`bỏ ngày ${xday.toLocaleString()} vì trùng lịch học với buổi học ID: ${conflict.ID}`)
-        else {
-          data.push({
-            LopHocID: classId, PhongHoc: classDB.PhongHoc,
-            BuoiSo: newMapSyllabus.get(thuTuDeCuong)?.ThuTu || thuTuDeCuong,
-            ChuDe: newMapSyllabus.get(thuTuDeCuong)?.ChuDe,
-            BatDauLuc: startAt, KetThucLuc: endAt,
-          })
-        }
-        thuTuDeCuong++ // tăng bên trong if mới được
+        thuTuDeCuong++ // tăng bên trong if của đúng ngày 
       }
       xday.setDate(xday.getDate() + 1);
     }
@@ -208,37 +192,9 @@ export class SessionService {
         data: {
           BuoiSo: nextSs, LopHocID: classId, ChuDe: body.topic,
           BatDauLuc: startAt, KetThucLuc: endAt, PhongHoc: body.room
-        },
-        omit: { CreatedAt: true, UpdatedAt: true }
+        }
       })
     })
-  }
-
-  // lấy lịch dạy 1 tuần cho giáo viên
-  async GetSessionsOneWeek(userId: number, start: Date, end: Date) {
-    const sod = startOfDay(start)
-    const eod = startOfDay(setDay(end, 1))
-    const teacherDB = await this.GetTeacherByUserId(userId)
-    const sessionDB = await this.prisma.buoiHoc.findMany({
-      where: {
-        lophoc: { GiaoVienID: teacherDB.ID },
-        BatDauLuc: { gte: sod },
-        KetThucLuc: { lt: eod },
-      },
-      select: {
-        ID: true, BatDauLuc: true, KetThucLuc: true, PhongHoc: true,
-        TrangThai: true, LopHocID: true, lophoc: { select: { TenLop: true } }
-      },
-      orderBy: { BatDauLuc: 'asc' }
-    })
-    if (sessionDB.length == 0) return []
-
-    return sessionDB.map(item => ({
-      ID: item.ID, NgayHoc: item.BatDauLuc.toISOString().substring(0, 10),
-      GioHoc: DateHelper.ISOToHHMM(item.BatDauLuc, item.KetThucLuc),
-      LopHocID: item.LopHocID, TenLop: item.lophoc.TenLop,
-      TrangThai: item.TrangThai, PhongHoc: item.PhongHoc
-    }))
   }
 
   // lấy danh sách buổi học 1 lớp giáo viên A dạy 
@@ -251,7 +207,7 @@ export class SessionService {
       ('Lớp không tồn tại hoặc truy cập bị từ chối')
     const sessions = await this.prisma.buoiHoc.findMany({
       where: { LopHocID: classId, lophoc: { GiaoVienID: teacherDB.ID } },
-      omit: { ID: true, LopHocID: true, CreatedAt: true, UpdatedAt: true }
+      omit: { LopHocID: true, CreatedAt: true, UpdatedAt: true }
     })
     return sessions
   }
@@ -294,12 +250,12 @@ export class SessionService {
     }
   }
 
-  // lưu nháp kết quả buổi học - Draft
+  // lưu nháp kết quả buổi học - Draft - resultService
   async SaveDraftResult(userId: number, sessionId: number, body: SessionsResultDTO) {
     return await this.resultService.SaveDraftResult(userId, sessionId, body)
   }
 
-  // lưu thật kết quả buổi học - Submit
+  // lưu thật kết quả buổi học - Submit - resultService
   async SubmittedResult(userId: number, sessionId: number, body: SessionsResultDTO) {
     return await this.resultService.SubmittedResult(userId, sessionId, body)
   }
@@ -319,7 +275,7 @@ export class SessionService {
     const teacherDB = await this.prisma.giaoVien.findUnique({
       where: { UserID: userId }
     })
-    if (!teacherDB) throw new NotFoundException('Teacher not found')
+    if (!teacherDB) throw new NotFoundException('Không tìm thấy giáo viên')
     if (teacherDB.TrangThai === 'INACTIVE')
       throw new ConflictException('Teacher was INACTIVE')
     return teacherDB
@@ -331,20 +287,8 @@ export class SessionService {
       where: { ID: sessionId }
     })
     if (!sessionDB)
-      throw new NotFoundException('Session is not existed')
+      throw new NotFoundException('Không tìm thấy buổi học')
     return sessionDB
-  }
-
-  // kiểm tra quyền sở hữu và trạng thái buổi học
-  private async SessionAcsessValidate(userId: number, sessionId: number) {
-    const teacherDB = await this.GetTeacherByUserId(userId)
-    const sessionDB = await this.prisma.buoiHoc.findUnique({
-      where: { ID: sessionId, lophoc: { GiaoVienID: teacherDB.ID } }
-    })
-    if (!sessionDB) throw new NotFoundException('Session not found or Access denied')
-    if (sessionDB.TrangThai !== 'SCHEDULED')
-      throw new ConflictException(`Session ID ${sessionDB.ID} is ${sessionDB.TrangThai}`)
-    return { sessionDB, teacherId: teacherDB.ID }
   }
 
   // kiểm tra trùng phòng

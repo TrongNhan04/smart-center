@@ -131,7 +131,7 @@ const TabStudent = ({ id }: Props) => {
         columns={filterColumns}
         loading={loading}
         pagination={{
-          pageSize: 1,
+          pageSize: 10,
           current: currentPage
         }}
         rowKey="HocVienID"

@@ -14,72 +14,72 @@ export class TeacherController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @Post()
-  async CreateTeacher(@Body() body: CreateTeacherDTO) {
-    return await this.teacherService.CreateTeacher(body)
+  async create(@Body() body: CreateTeacherDTO) {
+    return await this.teacherService.create(body)
   }
 
   // lấy danh sách giáo viên
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @Get()
-  async GetTeachers(@Query() query: QueryTeacherDTO) {
-    return await this.teacherService.GetTeachers(query)
+  async getMany(@Query() query: QueryTeacherDTO) {
+    return await this.teacherService.getMany(query)
   }
 
   // lấy danh sách giáo viên cho combobox
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @Get('/combobox')
-  async GetDataForCmb() {
-    return await this.teacherService.GetDataForCmb()
+  async getManyForCmb() {
+    return await this.teacherService.getManyForCmb()
   }
 
   // lấy chi tiết giáo viên
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @Get(':id')
-  async GetTeacherByID(@Param('id') teacherId: number) {
-    return await this.teacherService.GetTeacherByID(+teacherId)
+  async getOne(@Param('id') teacherId: number) {
+    return await this.teacherService.getOne(+teacherId)
   }
 
   // cập nhật thông tin giáo viên
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @Patch(':id')
-  async UpdateTeacherByID(@Param('id') teacherId: number,
+  async updateById(@Param('id') teacherId: number,
     @Body() body: UpdateTeacherDTO) {
-    return await this.teacherService.UpdateTeacherByID(+teacherId, body)
+    return await this.teacherService.updateById(+teacherId, body)
   }
 
   // xóa mềm giáo viên
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @Patch(':id/inactive')
-  async DeleteTeacherByID(@Param('id') teacherId: number) {
-    return await this.teacherService.DeleteTeacherByID(+teacherId)
+  async deleteById(@Param('id') teacherId: number) {
+    return await this.teacherService.deleteById(+teacherId)
   }
 
   // khôi phục giáo viên
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Patch(':id/restore')
-    async RestoreCourseById(@Param('id') id: number) {
-        return await this.teacherService.RestoreTeacherById(+id)
+    async restore(@Param('id') id: number) {
+        return await this.teacherService.restore(+id)
     }
 
   // danh sách lớp của 1 giáo viên 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @Get(':id/classes')
-  async GetClassesByTeacherID(@Param('id') teacherId: number) {
-    return await this.teacherService.GetClassesByTeacherID(+teacherId)
+  async getClassesById(@Param('id') teacherId: number) {
+    return await this.teacherService.getClassesById(+teacherId)
   }
 
   //danh sách buổi học đã dạy của giáo viên
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @Get(':id/sessions-completed')
-  async GetCompletedSS(@Param('id') teacherId: number) {
-    return await this.teacherService.GetCompletedSS(+teacherId)
+  async getCompletedSS(@Param('id') teacherId: number) {
+    return await this.teacherService.getCompletedSS(+teacherId)
   }
 }

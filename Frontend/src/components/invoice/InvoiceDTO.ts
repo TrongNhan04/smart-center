@@ -26,11 +26,11 @@ export interface PaymentDto {
 
 export interface GiaoDich {
     ID: number
-    MaGD: string,
+    MaGiaoDich: string,
     HoaDonID: number,
-    LoaiGD: string
+    LoaiGiaoDich: string
     SoTien: number,
-    NgayGD: string,
+    NgayGiaoDich: string,
     PhuongThuc: string,
     ThuNgan: string,
     TenHocVien: string,

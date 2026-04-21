@@ -118,7 +118,7 @@ model KhoaHoc {
 
   //Quan hệ
   lophoc LopHoc[] //khóa học có nhiều lớp học
-  decuong DeCuong[] // lớp học có nhiều đề cương
+  decuong DeCuong[] // khóa học có nhiều đề cương
 }
 
 // ============ 5. DECUONG ============//

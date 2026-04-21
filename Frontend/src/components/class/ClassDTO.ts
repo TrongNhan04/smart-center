@@ -18,14 +18,13 @@ export interface ClassDB {
     ID: number,
     MaLopHoc: string,
     TenLop: string,
-    GiaoVien: {
-        ID: number,
-        HoTen: string
-    },
-    KhoaHoc: {
-        ID: number,
-        TenKhoaHoc: string
-    }
+    TenKhoaHoc:string
+    KhoaHocID: number,
+    HocPhi:number,
+    GiaoVienID: number,
+    GiaoVien: string,
+    SoBuoiDaHoc: number
+    TongSoBuoi: number,
     TuNgay: string,
     DenNgay: string,
     LichHoc: number[],
@@ -36,6 +35,7 @@ export interface ClassDB {
     PhongHoc?: string
     MoTa?: string
 }
+
 
 export interface ClassForCmb {
     ID: number,
@@ -72,9 +72,9 @@ export interface StuOfClass {
 export const mapDataClass = (lophoc: ClassDB): ClassDto => ({
     //id: lophoc.ID,
     code: lophoc.MaLopHoc,
-    courseId: lophoc.KhoaHoc.ID,
-    teacherId: lophoc.GiaoVien.ID,
     name: lophoc.TenLop,
+    courseId: lophoc.KhoaHocID,
+    teacherId: lophoc.GiaoVienID,
     fromDate: lophoc.TuNgay,
     toDate: lophoc.DenNgay,
     timeTable: lophoc.LichHoc,

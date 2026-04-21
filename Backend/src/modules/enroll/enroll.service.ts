@@ -107,11 +107,14 @@ export class EnrollService {
                 throw new ConflictException('Không tìm thấy hóa đơn của ghi danh')
 
             await tx.ghiDanh.update({
-                where: { ID: enrollId },
+                where: { ID: enrollDB.ID },
                 data: { TrangThai: 'INACTIVE' }
             })
 
-            await this.invoiceService.DeleteInvoiceByID(enrollDB.hoadon.ID, tx)
+            await tx.hoaDon.update({
+                where: { GhiDanhID: enrollDB.ID },
+                data: { TrangThai: 'CANCELLED' }
+            })
             return { ID: enrollDB.ID }
         })
     }

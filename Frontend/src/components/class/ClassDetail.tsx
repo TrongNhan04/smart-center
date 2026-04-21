@@ -1,5 +1,5 @@
 import {
-  CalendarFilled, CalendarOutlined, EditOutlined, InboxOutlined, InfoCircleOutlined, LeftOutlined, PlusOutlined, ReadOutlined,
+  CalendarOutlined, EditOutlined, InboxOutlined, InfoCircleOutlined, LeftOutlined, PlusOutlined, ReadOutlined,
   UnlockOutlined
 }
   from "@ant-design/icons"
@@ -248,7 +248,7 @@ const ClassDetail = () => {
               open={openClassModal}
               onCancel={() => setOpenClassModal(false)}
               onSave={(_) => initData()}
-              khoahocId={lophoc.KhoaHoc.ID}
+              khoahocId={lophoc.KhoaHocID}
               editingClass={lophoc}
             />
           </>}

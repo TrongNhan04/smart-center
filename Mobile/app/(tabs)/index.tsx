@@ -16,7 +16,6 @@ export default function Index() {
   const setStuIdGlobal = useAuthStore(state => state.setSelectedStuId)
   const children = user?.children
   
-  console.log('trang index')
   const fetchData = async () => {
     try {
       if (!children) return

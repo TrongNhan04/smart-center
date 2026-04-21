@@ -1,6 +1,5 @@
 import {
-  Modal, Form, Input, Select, DatePicker, TimePicker, InputNumber,
-  Row, Col, message,
+  Modal, Form, Input, Select, DatePicker, TimePicker, InputNumber, Row, Col, message,
 } from 'antd';
 import { useEffect, useState } from 'react';
 import courseApi from '../../api/courseApi';
@@ -111,8 +110,8 @@ const ClassModal = ({ open, onCancel, khoahocId, onSave,
       }
 
       let res = null
-      if (isEdit) {// map data gốc thành tiếng anh
-        const mapOrigin = mapDataClass(editingClass)
+      if (isEdit) {
+        const mapOrigin = mapDataClass(editingClass) // từ việt -> anh
         const updateData = getChangedValue(mapOrigin, payload)
         if (Object.keys(updateData).length === 0) {
           message.info('Không có thông tin nào thay đổi!')
@@ -186,7 +185,6 @@ const ClassModal = ({ open, onCancel, khoahocId, onSave,
                 rules={[{ required: true, message: 'Vui lòng nhập mã lớp!' }]}
               >
                 <Input disabled={isEdit} placeholder="VD: ENG001-01" />
-
               </Form.Item>
 
               <Form.Item // tên lớp
@@ -203,6 +201,7 @@ const ClassModal = ({ open, onCancel, khoahocId, onSave,
                 rules={[{ required: true, message: 'Vui lòng chọn giáo viên!' }]}
               >
                 <Select
+                  disabled={isEdit}
                   placeholder="Chọn giáo viên"
                   showSearch={{
                     filterOption: (label, option) =>

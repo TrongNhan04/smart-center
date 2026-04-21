@@ -15,25 +15,20 @@ const ClassScreen = () => {
   // dùng useFocusEffect để chuyển tab thì call lại api
   useFocusEffect(
     useCallback(() => { //useCallback để mỗi lần reder không tạo lại hàm fetchData
-        const fetchData = async () => {
-          try {
-            if (!stuIdGlobal) return
-            const res = await mobileApi.getClassByStuId(stuIdGlobal)
-            setClassOfStu(res.data)
-            console.log('đã chạy useFocusEffect')
-          } catch (error: any) {
-            Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
-            console.log('Có lỗi xảy ra: ', error?.response?.data)
-          }
+      const fetchData = async () => {
+        try {
+          if (!stuIdGlobal) return
+          const res = await mobileApi.getClassByStuId(stuIdGlobal)
+          setClassOfStu(res.data)
+          console.log('đã chạy useFocusEffect')
+        } catch (error: any) {
+          Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
+          console.log('Có lỗi xảy ra: ', error?.response?.data)
         }
-        fetchData()
+      }
+      fetchData()
     }, [stuIdGlobal]),
   );
-
-  // useEffect(() => {
-
-
-  // }, [stuIdGlobal])
 
   const dow = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
 

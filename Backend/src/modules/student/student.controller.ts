@@ -8,80 +8,80 @@ import { MustChangePWGuard } from "src/auth/guard/must-change-pw.guard";
 
 @Controller('admin/students')
 export class StudentController {
-    constructor(private studentService: StudentService) { }
+    constructor(private readonly stuService: StudentService) { }
 
     // thêm học viên
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Post()
-    async CreateStudent(@Body() body: CreateStudentDTO) {
-        return await this.studentService.CreateStudent(body)
+    async create(@Body() body: CreateStudentDTO) {
+        return await this.stuService.create(body)
     }
 
     // lấy danh sách học viên
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Get()
-    async GetStudents(@Query() query: QueryStudentDTO) {
-        return await this.studentService.GetStudents(query)
+    async getMany(@Query() query: QueryStudentDTO) {
+        return await this.stuService.getMany(query)
     }
 
     // lấy danh sách học viên cho cmb
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Get('combobox')
-    async GetDataForCmb() {
-        return await this.studentService.GetDataForCmb()
+    async getManyForCmb() {
+        return await this.stuService.getManyForCmb()
     }
 
     // xóa mềm học viên
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Patch(':id/inactive')
-    async DelateStudentByID(@Param('id') studentId: number) {
-        return await this.studentService.DeleteStudentByID(+studentId)
+    async deleteById(@Param('id') studentId: number) {
+        return await this.stuService.deleteById(+studentId)
     }
 
     // lấy danh sách lớp học viên đang học
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Get(':id/classes')
-    async GetClassesByStudentId(@Param('id') studentId: number) {
-        return await this.studentService.GetClassesByStudentID(+studentId)
+    async getClassesById(@Param('id') studentId: number) {
+        return await this.stuService.getClassesById(+studentId)
     }
 
     // danh sách hóa đơn của học viên
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Get(':id/invoices')
-    async GetManyInvoiceById(@Param('id') studentId: number) {
-        return await this.studentService.GetManyInvoiceById(+studentId)
+    async getInvoicesById(@Param('id') studentId: number) {
+        return await this.stuService.getInvoicesById(+studentId)
     }
 
     // thống kê kết quả học tập 1 lớp mà học viên học
     @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
     @Roles('ADMIN','TEACHER')
     @Get(':id/classes/:classId')
-    async GetClassResultById(
+    async getClassResultById(
         @Param('id') studentId: number,
         @Param('classId') classId: number) {
-            return await this.studentService.GetClassResultById(+studentId, +classId)
+            return await this.stuService.getClassResultById(+studentId, +classId)
     }
 
     // lấy chi tiết học viên - phần trên
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Get(':id')
-    async GetStudentByID(@Param('id') studentId: number) {
-        return await this.studentService.GetStudentByID(+studentId)
+    async getOne(@Param('id') studentId: number) {
+        return await this.stuService.getOne(+studentId)
     }
 
     // sửa thông tin học viên
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Patch(':id')
-    async UpdateStudentByID(@Param('id') studentId: number,
+    async updateById(@Param('id') studentId: number,
         @Body() body: UpdateStudentDTO) {
-        return await this.studentService.UpdateStudentByID(+studentId, body)
+        return await this.stuService.updateById(+studentId, body)
     }
 }

@@ -1,5 +1,8 @@
 import { Type } from "class-transformer";
-import { ArrayNotEmpty, ArrayUnique, IsArray, IsDate, IsDateString, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, MaxLength, Min } from "class-validator";
+import {
+    ArrayNotEmpty, ArrayUnique, IsArray, IsDate, IsEnum, IsInt,
+    IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, MaxLength, Min
+} from "class-validator";
 import { TrangThaiLH } from "src/generated/prisma/enums";
 
 export class CreateClassDTO {
@@ -56,7 +59,7 @@ export class CreateClassDTO {
     classSize!: number
 
     @IsOptional()
-    room?:string
+    room?: string
 }
 
 export class QueryClassDTO {
@@ -69,9 +72,6 @@ export class QueryClassDTO {
 }
 
 export class UpdateClassDTO {
-    @IsOptional()
-    @IsInt()
-    teacherId?: number
 
     @IsOptional()// không gửi lên thì thôi, gửi thì phải theo @
     @IsString()
@@ -86,6 +86,8 @@ export class UpdateClassDTO {
     @IsString()
     room?: string
 
+    // nếu gửi lên là null hoặc undefined thì bỏ qua validation
+    // không gửi = undefined
     @IsOptional()
     @Type(() => Date)
     @IsDate()
@@ -103,7 +105,7 @@ export class UpdateClassDTO {
     @IsInt({ each: true })// mỗi phần tử là số nguyên
     @Min(0, { each: true })// mỗi phần tử nhỏ nhất là 0 - chủ nhật
     @Max(6, { each: true })// mỗi phần tử lơn nhất là 6 - thứ 7
-    timeTable?: number[]
+    timeTable!: number[]
 
     @IsOptional()
     @IsNotEmpty()
@@ -125,14 +127,11 @@ export class UpdateClassDTO {
     classSize?: number
 }
 
-export class SchechuleDTO{
-    @IsNotEmpty()
-    @Type(() => Date)
-    @IsDate()
-    startDate!: Date
-
-    @IsNotEmpty()
-    @Type(() => Date)
-    @IsDate()
-    endDate!: Date
-}
+export const mapClassData = (classDB: any): UpdateClassDTO => ({
+    fromDate: classDB.TuNgay,
+    toDate: classDB.DenNgay,
+    timeTable: classDB.LichHoc,
+    startTime: classDB.GioBatDau,
+    endTime: classDB.GioKetThuc,
+    room: classDB.PhongHoc!
+})

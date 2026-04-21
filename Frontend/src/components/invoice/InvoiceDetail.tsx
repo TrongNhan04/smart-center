@@ -62,12 +62,12 @@ const InvoiceDetail = () => {
   let tongThu = 0
 
   for (var item of transactions) {
-    if (item.LoaiGD === 'RECEIPT') {
+    if (item.LoaiGiaoDich === 'RECEIPT') {
       receipts.push(item)
       tongThu += Number(item.SoTien)
     }
 
-    if (item.LoaiGD === 'PAYMENT') {
+    if (item.LoaiGiaoDich === 'PAYMENT') {
       payments.push(item)
       tongHoan += Number(item.SoTien)
     }
@@ -81,7 +81,7 @@ const InvoiceDetail = () => {
     if (daTra == 0)
       return <Tag color="default" >Chưa phát sinh</Tag>
     if (conNo == 0)
-      return <Tag color='success'>Đã hoàn thành</Tag>
+      return <Tag color='green'>Đã thanh toán</Tag>
     return <Tag color={'processing'}>Thanh toán 1 phần</Tag>
   }
 
@@ -93,38 +93,26 @@ const InvoiceDetail = () => {
 
   const transactionColumns = [
     { // mã giao dịch
-      title: 'Mã giao dịch', dataIndex: 'MaGD', key: 'MaGD',
+      title: 'Mã giao dịch', dataIndex: 'MaGiaoDich', key: 'MaGiaoDich',
       width: 120, align: 'center' as const
     },
     { // ngày giao dịch
-      title: 'Ngày giao dịch', dataIndex: 'NgayGD', key: 'NgayGD', width: 150,
-      align: 'center' as const,
+      title: 'Ngày giao dịch', dataIndex: 'NgayGiaoDich', key: 'NgayGiaoDich', 
+      width: 150, align: 'center' as const,
       sorter: (a: any, b: any) => new Date(a.NgayGD).getTime() - new Date(b.NgayGD).getTime(),
       render: (value: string) => new Date(value).toLocaleDateString()
     },
     { // loại giao dịch
-      title: 'Loại GD', dataIndex: 'LoaiGD', key: 'LoaiGD',
+      title: 'Loại GD', dataIndex: 'LoaiGiaoDich', key: 'LoaiGiaoDich',
       filters: [
         { text: 'Thu tiền', value: 'RECEIPT' },
         { text: 'Hoàn tiền', value: 'PAYMENT' },
       ],
-      onFilter: (value: any, record: GiaoDich) => record.LoaiGD === value,
+      onFilter: (value: any, record: GiaoDich) => record.LoaiGiaoDich === value,
       render: (type: string) => {
         if (type === 'RECEIPT')
           return <Tag color='green'> THU TIỀN</Tag>
         return <Tag color='red'> HOÀN TIỀN</Tag>
-      }
-    },
-    { // số tiền
-      title: 'Số tiền (VNĐ)', dataIndex: 'SoTien', key: 'SoTien',
-      align: 'right' as const, width: 200,
-      render: (amount: number, record: GiaoDich) => {
-        const value = Number(amount)
-        const isReceipt = record.LoaiGD === 'RECEIPT'
-        let pos = isReceipt ? '+' : "-"
-        return <Text strong type={isReceipt ? 'success' : 'danger'}>
-          {pos} {value.toLocaleString()} đ
-        </Text>
       }
     },
     { // phương thức
@@ -132,13 +120,27 @@ const InvoiceDetail = () => {
       width: 190,
       render: (value: string) => method[value]
     },
+    { // số tiền
+      title: 'Số tiền (VNĐ)', dataIndex: 'SoTien', key: 'SoTien',
+      align: 'right' as const, width: 200,
+      render: (amount: number, record: GiaoDich) => {
+        const value = Number(amount)
+        const isReceipt = record.LoaiGiaoDich === 'RECEIPT'
+        let pos = isReceipt ? '+' : "-"
+        return <Text strong type={isReceipt ? 'success' : 'danger'}>
+          {pos} {value.toLocaleString()} đ
+        </Text>
+      }
+    },
     {
       title: 'Thu ngân', dataIndex: 'ThuNgan', key: 'ThuNgan', width: 220,
-      render: (name: string) => <Text><UserOutlined /> {name}</Text>
+      render: (name: string) => {
+        return name ? <Text><UserOutlined /> {name}</Text> : '---'
+      }
     },
     {
       title: 'Ghi chú', dataIndex: 'GhiChu', key: 'GhiChu',
-      render: (value: string) => !value || '' ? '-' : value
+      render: (value: string) => !value || '' ? '---' : value
     },
   ]
 

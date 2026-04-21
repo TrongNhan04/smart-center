@@ -39,7 +39,6 @@ const classApi = {
     // bỏ code và courseId
     updateOpen: (id: number, body: Partial<ClassDto>) => {
         const { code, courseId, ...rest } = body
-        console.log("payload update class open: ", rest)
         return axiosClient.patch(`admin/classes/${id}`, rest)
     },
 }

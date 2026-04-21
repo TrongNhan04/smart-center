@@ -16,7 +16,7 @@ export class StudentService {
         private notisService: NotifyService
     ) { }
 
-    // thêm học viên + ghi danh + hóa đơn 
+    // thêm học viên + ghi danh + hóa đơn + thông báo
     private async AddRecord_3Table(userId: number, body: CreateStudentDTO,
         tx?: Prisma.TransactionClient) {
         const classDB = await this.prismaSv.lopHoc.findUnique({
@@ -51,7 +51,7 @@ export class StudentService {
             await this.notisService.InvoiceNotify(userId, newInvoice, client)
         }
         // nếu có user
-        if (tx) return await runLogic(tx)
+        if (tx) return await runLogic(tx) // tx từ user
         else { // ko có 
             return await this.prismaSv.$transaction(async (newTX) => {
                 return await runLogic(newTX)
@@ -60,9 +60,11 @@ export class StudentService {
     }
 
     // thêm học viên dựa vào user
-    async CreateStudent(body: CreateStudentDTO) {
-        await this.StudentCodeValidator(body.code)
-        await this.enrollService.TotalSlot(body.classId)
+    async create(body: CreateStudentDTO) {
+        await Promise.all([
+            this.codeValidator(body.code),
+            this.enrollService.TotalSlot(body.classId)
+        ])
         const userDB = await this.prismaSv.user.findMany({
             where: {
                 OR: [{ Email: body.email }, { DienThoai: body.phone }]
@@ -91,11 +93,11 @@ export class StudentService {
         }
         else// tìm được nhiều hơn 1 user => trùng Email hoặc phone
             throw new ConflictException
-                ("Email và số điện thoại được dùng bởi 2 người khác nhau")
+                ("Email và số điện thoại được dùng bởi 2 tài khoản khác nhau")
     }
 
     // lấy danh sách + tìm kiếm + lọc theo điều kiện
-    async GetStudents(query: QueryStudentDTO) {
+    async getMany(query: QueryStudentDTO) {
         const where: Prisma.HocVienWhereInput = {}
         const q = query.q?.trim()
         if (query.status)
@@ -113,51 +115,41 @@ export class StudentService {
             orderBy: { CreatedAt: 'desc' },
             include: { Parent: true }
         })
-        return studentDB.map(item => ({
-            ID: item.ID,
-            MaHocVien: item.MaHocVien,
-            TenHocVien: item.TenHocVien,
-            NgaySinh: item.NgaySinh,
-            DiaChi: item.DiaChi,
-            PhuHuynh: item.Parent.HoTen,
-            DienThoai: item.Parent.DienThoai,
-            Email: item.Parent.Email,
-            TrangThai: item.TrangThai
-        }))
+        return studentDB.map(item => {
+            const { Parent, ...rest } = item
+            return {
+                ...rest,
+                PhuHuynh: Parent.HoTen,
+                DienThoai: Parent.DienThoai,
+                Email: Parent.Email,
+            }
+        })
     }
 
     // lấy dang sách học viên cho combobox
-    async GetDataForCmb() {
+    async getManyForCmb() {
         return await this.prismaSv.hocVien.findMany({
             where: { TrangThai: 'ACTIVE' },
-            select: {
-                ID: true, MaHocVien: true, TenHocVien: true
-            },
+            select: { ID: true, MaHocVien: true, TenHocVien: true },
             orderBy: { MaHocVien: 'asc' }
         })
     }
 
     // lấy chi tiết 1 học viên - phần trên
-    async GetStudentByID(studentId: number) {
-        const studentDB = await this.StudentIdValidator(studentId)
-        if (!studentDB)
-            throw new NotFoundException('Không tìm thấy học viên')
+    async getOne(studentId: number) {
+        const studentDB = await this.idValidator(studentId)
+        const { Parent, ...rest } = studentDB
         return {
-            ID: studentDB.ID,
-            MaHocVien: studentDB.MaHocVien,
-            TenHocVien: studentDB.TenHocVien,
-            NgaySinh: studentDB.NgaySinh,
-            DiaChi: studentDB.DiaChi,
-            PhuHuynh: studentDB.Parent.HoTen,
-            DienThoai: studentDB.Parent.DienThoai,
-            Email: studentDB.Parent.Email,
-            TrangThai: studentDB.TrangThai
+            ...rest,
+            PhuHuynh: Parent.HoTen,
+            DienThoai: Parent.DienThoai,
+            Email: Parent.Email,
         }
     }
 
     // sửa thông tin 1 học viên
-    async UpdateStudentByID(studentId: number, body: UpdateStudentDTO) {
-        const studentDB = await this.StudentIdValidator(studentId)
+    async updateById(studentId: number, body: UpdateStudentDTO) {
+        const studentDB = await this.idValidator(studentId)
 
         const dob = body.dob ?? studentDB.NgaySinh
         const student = body.student ?? studentDB.TenHocVien
@@ -181,79 +173,74 @@ export class StudentService {
     }
 
     //xóa mềm học viên + hủy ghi danh
-    async DeleteStudentByID(studentId: number) {
-        const studentDB = await this.StudentIdValidator(studentId)
-        return await this.prismaSv.$transaction([
-            this.prismaSv.hocVien.update({
-                where: { ID: studentDB.ID, TrangThai: 'ACTIVE' },
-                data: { TrangThai: 'INACTIVE' }
-            }),
-            this.prismaSv.ghiDanh.updateMany({
-                where: { HocVienID: studentDB.ID, TrangThai: 'ACTIVE' },
-                data: { TrangThai: 'INACTIVE' }
-            })
-        ])
+    async deleteById(studentId: number) {
+        const studentDB = await this.idValidator(studentId)
+        return await this.prismaSv.hocVien.update({
+            where: { ID: studentDB.ID },
+            data: {
+                TrangThai: 'INACTIVE',
+                Ghidanh: {
+                    updateMany: {
+                        where: { TrangThai: 'ACTIVE' },
+                        data: { TrangThai: 'INACTIVE' }
+                    }
+                }
+            }
+        })
     }
 
     //lấy danh sách lớp học viên học - phần dưới
-    async GetClassesByStudentID(studentId: number) {
-        const studentDB = await this.StudentIdValidator(studentId)
+    async getClassesById(studentId: number) {
+        const studentDB = await this.idValidator(studentId)
         const enrollDB = await this.prismaSv.ghiDanh.findMany({
             where: { HocVienID: studentDB.ID, TrangThai: 'ACTIVE' },
-            select: {
-                NgayGhiDanh: true, TrangThai: true,
+            include: {
                 lophoc: {
-                    select: {
-                        ID: true, MaLopHoc: true, TenLop: true,
-                        LichHoc: true, TuNgay: true, DenNgay: true,
-                        GioBatDau: true, GioKetThuc: true,
-                        GiaoVienID: true,
+                    include: {
                         giaovien: { select: { User: { select: { HoTen: true } } } },
                         khoahoc: { select: { TongSoBuoi: true } },
                         _count: {
                             select: { buoihoc: { where: { TrangThai: 'COMPLETED' } } }
                         },
-                    }
+                    },
+                    omit: { CreatedAt: true, UpdatedAt: true }
                 },
                 ketqua_chitiet: { select: { DiemDanh: true } }
             }
         })
 
-        return enrollDB.map(lh => ({
-            ID: lh.lophoc.ID, MaLopHoc: lh.lophoc.MaLopHoc,
-            TenLop: lh.lophoc.TenLop,
-            GiaoVien: lh.lophoc.giaovien.User.HoTen,
-            LichHoc: lh.lophoc.LichHoc,
-            TuNgay: lh.lophoc.TuNgay,
-            GioHoc: lh.lophoc.GioBatDau + ' - ' + lh.lophoc.GioKetThuc,
-            TongSoBuoi: lh.lophoc.khoahoc.TongSoBuoi,
-            BuoiDaHoc: lh.lophoc._count.buoihoc,
-            NgayGhiDanh: lh.NgayGhiDanh,
-            TrangThaiGD: lh.TrangThai,
-            DiemDanh: lh.ketqua_chitiet
-        }))
+        return enrollDB.map(enr => {
+            const { lophoc, ketqua_chitiet, NgayGhiDanh, TrangThai } = enr
+            const { giaovien, khoahoc, _count, ...restLopHoc } = lophoc
+            return {
+                ...restLopHoc,
+                GiaoVien: giaovien.User.HoTen,
+                GioHoc: lophoc.GioBatDau + ' - ' + lophoc.GioKetThuc,
+                TongSoBuoi: khoahoc.TongSoBuoi,
+                BuoiDaHoc: _count.buoihoc,
+                NgayGhiDanh: NgayGhiDanh,
+                TrangThai: TrangThai,
+                DiemDanh: ketqua_chitiet
+            }
+        })
     }
 
     // thống kê kết quả học tập 1 lớp mà học viên học
-    async GetClassResultById(studentId: number, classId: number) {
-        const studentDB = await this.StudentIdValidator(studentId)
+    async getClassResultById(studentId: number, classId: number) {
+        const studentDB = await this.idValidator(studentId)
         const classDB = await this.prismaSv.lopHoc.findUnique({
             where: { ID: classId },
-            select: {
-                TenLop: true, GioBatDau: true, GioKetThuc: true, PhongHoc: true,
-                giaovien: {
-                    select: { User: { select: { HoTen: true } } }
-                }
+            include: {
+                giaovien: { select: { User: { select: { HoTen: true } } } }
             }
         })
         if (!classDB) throw new NotFoundException('Không tìm thấy lớp học')
         const result = await this.prismaSv.ketQua_ChiTiet.findMany({
             where: {
-                ghidanh: { HocVienID: studentDB.ID, LopHocID: classId }
+                ghidanh: { HocVienID: studentDB.ID, LopHocID: classDB.ID }
             },
             orderBy: { ketqua_buoihoc: { buoihoc: { BatDauLuc: 'asc' } } },
-            select: {
-                ID: true, NhanXetRieng: true, DiemDanh: true, Diem: true,
+            include: {
                 ketqua_buoihoc: {
                     select: {
                         NhanXetChung: true,
@@ -281,20 +268,15 @@ export class StudentService {
     }
 
     // lấy danh sách hóa đơn của học viên
-    async GetManyInvoiceById(studentId: number) {
-        const studentDB = await this.StudentIdValidator(studentId)
+    async getInvoicesById(studentId: number) {
+        const studentDB = await this.idValidator(studentId)
         const invoiceDB = await this.prismaSv.hoaDon.findMany({
             where: { HocVienID: studentDB.ID },
-            // mã hd, lớp, học phí, đã trả, hạn thanh toán
-            select: {
-                ID: true, MaHoaDon: true,
-                TongTien: true, DaTra: true,
-                ThoiHan: true, TrangThai: true,
-                ghidanh: { select: { lophoc: { select: { TenLop: true } } } }
-            }
+            include: { ghidanh: { select: { lophoc: { select: { TenLop: true } } } } },
+            omit:{CreatedAt:true, UpdatedAt:true}
         })
-        return invoiceDB.map(item=>{
-            const {ghidanh, ...rest} = item
+        return invoiceDB.map(item => {
+            const { ghidanh, ...rest } = item
             return {
                 ...rest, TenLop: ghidanh?.lophoc.TenLop
             }
@@ -302,7 +284,7 @@ export class StudentService {
     }
 
     //kiểm tra trùng mã học viên
-    private async StudentCodeValidator(code: string) {
+    private async codeValidator(code: string) {
         const StudentDB = await this.prismaSv.hocVien.findUnique({
             where: { MaHocVien: code }
         })
@@ -311,7 +293,7 @@ export class StudentService {
     }
 
     // kiểm tra học viên có tồn tại 
-    private async StudentIdValidator(studentId: number) {
+    private async idValidator(studentId: number) {
         const StudentDB = await this.prismaSv.hocVien.findUnique({
             where: { ID: studentId },
             omit: { UpdatedAt: true, CreatedAt: true },
