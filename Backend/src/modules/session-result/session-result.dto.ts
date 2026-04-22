@@ -38,7 +38,7 @@ export class SessionsResultDTO {
     NhanXetChung!: string
 
     @IsOptional()
-    TepDinhKem!: FileAttach[]
+    TepDinhKem?: FileAttach[]
 
     @IsArray()
     @ValidateNested({ each: true }) // kiểm tra các con bên trong

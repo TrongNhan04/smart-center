@@ -127,12 +127,12 @@ const AccountScreen = () => {
         />
         <Divider />
 
-        {/* <List.Item
+        <List.Item
           title="Đổi mật khẩu"
           left={props => <List.Icon {...props} icon="lock-outline" color="#6c757d" />}
           right={props => <List.Icon {...props} icon="chevron-right" />}
-          onPress={() => console.log('Chuyển sang trang đổi mật khẩu')}
-        /> */}
+          onPress={() => router.push('/change.pw')}
+        />
         <Divider />
       </View>
 

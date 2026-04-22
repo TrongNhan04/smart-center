@@ -3,6 +3,7 @@ import { DateHelper } from "src/common/date.helper";
 import { PrismaService } from "src/prisma/prisma.service";
 import { RemindTeacher } from "./dashboard.dto";
 import { BuoiHocWhereInput } from "src/generated/prisma/models";
+import { SessionIncludeClass, SessionSelectCountEnroll } from "../session/session.include";
 
 type MonthlyData = {
     month: number,
@@ -139,14 +140,7 @@ export class DashboardService {
 
         const sessionDB = await this.prisma.buoiHoc.findMany({
             where: where,
-            include: {
-                lophoc: {
-                    select: {
-                        ID: true, TenLop: true, PhongHoc: true,
-                        _count: { select: { ghidanh: { where: { TrangThai: 'ACTIVE' } } } }
-                    },
-                },
-            },
+            include: SessionSelectCountEnroll,
             orderBy: { BatDauLuc: 'asc' }
         })
         return sessionDB.map(item => ({
@@ -180,7 +174,7 @@ export class DashboardService {
             const created = lh._count.buoihoc // số buổi học đã tạo 
             // còn 3 buổi chưa học và số buổi đã tạo nhỏ hơn tổng số buổi
             if (future <= 3 && created < total) {
-                alert.push({    
+                alert.push({
                     LopHocID: lh.ID,
                     TenLop: lh.TenLop,
                     GiaoVienID: lh.GiaoVienID,
@@ -198,16 +192,7 @@ export class DashboardService {
             // buổi học được yêu cầu mở khóa
             this.prisma.buoiHoc.findMany({
                 where: { YeuCauMoKhoa: true, AdminMoKhoa: false },
-                select: {
-                    ID: true, BuoiSo: true, LopHocID: true,
-                    lophoc: {
-                        select: {
-                            TenLop: true, GiaoVienID: true,
-                            giaovien: { select: { User: { select: { HoTen: true } } } }
-                        }
-                    },
-                    LyDoMoKhoa: true, NgayYeuCau: true
-                },
+                include: SessionIncludeClass, // bên file khác
                 take: 10,
                 orderBy: { NgayYeuCau: 'asc' }// ai trước xử lý trước
             }),
@@ -221,16 +206,9 @@ export class DashboardService {
                     TrangThai: 'SCHEDULED',
                     YeuCauMoKhoa: false
                 },
-                select: {
-                    ID: true, BuoiSo: true, LopHocID: true, BatDauLuc: true,
-                    lophoc: {
-                        select: {
-                            TenLop: true, GiaoVienID: true,
-                            giaovien: { select: { User: { select: { HoTen: true } } } }
-                        }
-                    }
-                },
-                orderBy: { BatDauLuc: 'asc' }, take: 10
+                include: SessionIncludeClass,
+                orderBy: { BatDauLuc: 'asc' },
+                take: 10
             })
         ])
 
@@ -265,14 +243,14 @@ export class DashboardService {
         })
         if (!classDB) throw new NotFoundException('Không tìm thấy giáo viên hoặc lớp học')
         const sessionDB = await this.prisma.buoiHoc.findFirst({
-            where:{ID:body.sessionId, LopHocID:classDB.ID}
+            where: { ID: body.sessionId, LopHocID: classDB.ID }
         })
-        if(!sessionDB) throw new NotFoundException('Không tìm thấy buổi học')
+        if (!sessionDB) throw new NotFoundException('Không tìm thấy buổi học')
         await this.prisma.thongBao.create({
             data: {
                 UserID: classDB.giaovien.UserID,
                 TieuDe: "Thông báo hệ thống",
-NoiDung: `Nhắc nhở GV chốt kết quả buổi học, lớp '${classDB.TenLop}' - buổi ${sessionDB.BuoiSo}`,
+                NoiDung: `Nhắc nhở GV chốt kết quả buổi học, lớp '${classDB.TenLop}' - buổi ${sessionDB.BuoiSo}`,
                 Loai: 'SYSTERM_ARLERT',
                 DuLieu: {
                     classId: classDB.ID,

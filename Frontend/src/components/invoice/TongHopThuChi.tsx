@@ -6,7 +6,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import type { GiaoDich } from './InvoiceDTO';
 import { invoiceApi } from '../../api/invoiceApi';
 import dayjs from 'dayjs';
-import { UserOutlined } from '@ant-design/icons';
+import { CalendarOutlined, UserOutlined } from '@ant-design/icons';
 import { CatchError } from '../common/catch.error';
 
 const { Text, Title } = Typography
@@ -40,7 +40,7 @@ const TongHopThuChi = () => {
   let tongThu = 0
   let tongChi = 0
   for (var item of transactions) {
-    if (item.LoaiGD == 'RECEIPT')
+    if (item.LoaiGiaoDich == 'RECEIPT')
       tongThu += Number(item.SoTien)
     else tongChi += Number(item.SoTien)
   }
@@ -48,48 +48,54 @@ const TongHopThuChi = () => {
 
   const columns = [
     { // mã giao dịch
-      title: 'Mã GD', dataIndex: 'MaGD', key: 'maphieu', width: 100,
-    },
-    { // ngày giao dịch
-      title: 'Ngày giao dịch', dataIndex: 'NgayGD', key: 'NgayGD', width: 150,
-      sorter: (a: any, b: any) => new Date(a.NgayGD).getTime() - new Date(b.NgayGD).getTime(),
-      render: (value: string) => new Date(value).toLocaleDateString()
+      title: 'Mã GD', dataIndex: 'MaGiaoDich', key: 'MaGiaoDich', width: 150,
     },
     { // loại giao dịch
-      title: 'Loại GD', dataIndex: 'LoaiGD', key: 'LoaiGD', width: 120,
+      title: 'Loại GD', dataIndex: 'LoaiGiaoDich', 
+      key: 'LoaiGiaoDich', width: 120,
       filters: [
         { text: 'Thu tiền', value: 'RECEIPT' },
         { text: 'Hoàn tiền', value: 'PAYMENT' },
       ],
-      onFilter: (value: any, record: GiaoDich) => record.LoaiGD === value,
+      onFilter: (value: any, record: GiaoDich) => record.LoaiGiaoDich === value,
       render: (type: string) => {
         if (type === 'RECEIPT')
-          return <Tag color='green'> THU TIỀN</Tag>
+          return <Tag color='default'> THU TIỀN</Tag>
         return <Tag color='red'> HOÀN TIỀN</Tag>
       }
+    },
+    { // ngày giao dịch
+      title: 'Ngày giao dịch', dataIndex: 'NgayGiaoDich', 
+      key: 'NgayGiaoDich', width: 150,
+      sorter: (a: any, b: any) => new Date(a.NgayGD).getTime() - new Date(b.NgayGD).getTime(),
+      render: (value: string) => <Text>
+        <CalendarOutlined style={{ color: '#8c8c8c' }}
+        /> {new Date(value).toLocaleDateString()}
+        </Text> 
     },
     { // học viên
       title: 'Học viên', dataIndex: 'TenHocVien', key: 'TenHocVien',
       render: (text: string) =>
-        <Text style={{ color: '#187cff', fontWeight: 'bold' }}>
-          <UserOutlined /> {text}
+        <Text >
+          <UserOutlined style={{ color: '#8c8c8c' }}/> {text}
         </Text>
-    },
-    {
-      title: 'Nội dung', dataIndex: 'GhiChu', key: 'GhiChu',
     },
     {
       title: 'Số tiền', dataIndex: 'SoTien', key: 'SoTien',
       align: 'right' as const, // nếu số âm => a đứng trước b và ngược lại
       sorter: (a: any, b: any) => a.SoTien - b.SoTien,
       render: (val: number, record: GiaoDich) => {
-        const isIncome = record.LoaiGD === 'RECEIPT'
+        const isIncome = record.LoaiGiaoDich === 'RECEIPT'
         return (
-          <strong style={{ color: isIncome ? '#52c41a' : '#ff4d4f', fontSize: 16 }}>
+          <Text style={{ color: isIncome ? '#52c41a' : '#ff4d4f', fontSize: 16 }}>
             {isIncome ? '+' : '-'}{Number(val).toLocaleString()} đ
-          </strong>
+          </Text>
         )
-      },
+      }
+    },
+    {
+      title: 'Ghi chú', dataIndex: 'GhiChu', key: 'GhiChu',
+      render: (value:string) => <Text>{value??'---'}</Text>
     },
     {
       title: 'Thao tác', dataIndex: 'HoaDonID', key: 'HoaDonID',

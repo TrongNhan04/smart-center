@@ -125,8 +125,9 @@ const CourseList = () => {
       render: (fee: number) => {
         if (!fee) return <Text strong>0đ</Text>
         const amount = Number(fee)
-        return <Text>
-          <DollarCircleOutlined style={{ color: '#52c41a' }} /> {amount.toLocaleString()}đ
+        return <Text style={{ fontWeight: 490 }}>
+          <DollarCircleOutlined style={{ color: '#8c8c8c' }}
+          /> {amount.toLocaleString()}đ
         </Text>
       }
     },
@@ -134,7 +135,8 @@ const CourseList = () => {
       title: 'Thời gian', dataIndex: 'ThoiGian', key: 'ThoiGian', width: 170,
       render: (month: number, courses: CourseDB) => (
         <Space>
-          <Text><ClockCircleOutlined style={{ color: '#1677FF' }} /> {month} tháng</Text>
+          <Text><ClockCircleOutlined style={{ color: '#8c8c8c' }}
+          /> {month} tháng</Text>
           <Text>({courses.TongSoBuoi} buổi)</Text>
         </Space>
       )

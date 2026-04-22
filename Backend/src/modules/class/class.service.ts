@@ -1,6 +1,6 @@
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
-import { QueryClassDTO, UpdateClassDTO, CreateClassDTO, mapClassData } from "./class.dto";
+import { QueryClassDTO, UpdateClassDTO, CreateClassDTO } from "./class.dto";
 import { Prisma } from "src/generated/prisma/client";
 import { DateHelper } from "src/common/date.helper";
 import { LopHocWhereUniqueInput } from "src/generated/prisma/models";
@@ -8,7 +8,7 @@ import { classInclude, classIncludeTeacher } from "./class.include";
 
 @Injectable()
 export class ClassService {
-  constructor(private prismaService: PrismaService) { }
+  constructor(private prismaSv: PrismaService) { }
   // find: tìm có thể không có, get: chắc chắn có, ko có báo lỗi
   // thêm lớp mới
   async create(classDTO: CreateClassDTO) {
@@ -24,28 +24,26 @@ export class ClassService {
     const toDate = new Date(classDTO.toDate)
     toDate.setDate(toDate.getDate() + 1)
 
-    return await this.prismaService.$transaction([
-      this.prismaService.lopHoc.create({
-        data: {
-          MaLopHoc: classDTO.code,
-          TenLop: classDTO.name,
-          KhoaHocID: classDTO.courseId,
-          GiaoVienID: classDTO.teacherId,
-          TuNgay: classDTO.fromDate,
-          DenNgay: toDate,
-          LichHoc: classDTO.timeTable,
-          GioBatDau: classDTO.startTime,
-          GioKetThuc: classDTO.endTime,
-          SiSo: classDTO.classSize,
-          PhongHoc: classDTO.room
+    return await this.prismaSv.khoaHoc.update({
+      where: { ID: classDTO.courseId },
+      data: {
+        TrangThai: 'ACTIVE',
+        lophoc: {
+          create: {
+            MaLopHoc: classDTO.code,
+            TenLop: classDTO.name,
+            GiaoVienID: classDTO.teacherId,
+            TuNgay: classDTO.fromDate,
+            DenNgay: toDate,
+            LichHoc: classDTO.timeTable,
+            GioBatDau: classDTO.startTime,
+            GioKetThuc: classDTO.endTime,
+            SiSo: classDTO.classSize,
+            PhongHoc: classDTO.room
+          }
         }
-      }),
-      this.prismaService.khoaHoc.updateMany({
-        where: { ID: classDTO.courseId, TrangThai: 'DRAFT' },
-        data: { TrangThai: 'ACTIVE' }
-      })
-
-    ])
+      }
+    })
   }
 
   // lấy danh sách lớp mặc định hoặc query
@@ -60,16 +58,15 @@ export class ClassService {
         { giaovien: { User: { HoTen: { contains: q, mode: 'insensitive' } } } }
       ]
     }
-    const classDB = await this.prismaService.lopHoc.findMany({
+    const classDB = await this.prismaSv.lopHoc.findMany({
       where,
       include: classIncludeTeacher,
-      orderBy: { ID: 'desc' }
+      orderBy: { ID: 'desc' },
+      omit: { CreatedAt: true, UpdatedAt: true }
     })
 
     return classDB.map(lh => {
-      const {
-        giaovien, khoahoc, GioBatDau, GioKetThuc, _count, ...rest
-      } = lh
+      const { giaovien, khoahoc, GioBatDau, GioKetThuc, _count, ...rest } = lh
       return {
         ...rest,
         ...khoahoc,
@@ -83,7 +80,7 @@ export class ClassService {
 
   // lấy danh sách lớp cho combobox
   async getManyForCmb() {
-    const classDB = await this.prismaService.lopHoc.findMany({
+    const classDB = await this.prismaSv.lopHoc.findMany({
       where: { TrangThai: { not: 'CLOSED' } },
       include: classInclude,
       orderBy: { MaLopHoc: 'asc' }
@@ -102,17 +99,14 @@ export class ClassService {
     if (userId) // là giáo viên thì lấy lớp giáo viên
       where.giaovien = { UserID: userId }
 
-    const classDB = await this.prismaService.lopHoc.findUnique({
+    const classDB = await this.prismaSv.lopHoc.findUnique({
       where: where,
       include: classIncludeTeacher, // include bên file khác
       omit: { CreatedAt: true, UpdatedAt: true }
     })
     if (!classDB) throw new ForbiddenException
       ('Không tìm thấy lớp học hoặc truy cập bị từ chối')
-    const {
-      giaovien, khoahoc, GioBatDau, GioKetThuc,
-      _count, ...rest
-    } = classDB
+    const { giaovien, khoahoc, GioBatDau, GioKetThuc, _count, ...rest } = classDB
     return {
       ...rest,
       ...khoahoc,
@@ -126,7 +120,7 @@ export class ClassService {
   // lấy danh sách học viên của lớp
   async getStusById(classId: number) {
     const classDB = await this.idValidator(classId)
-    const enrolls = await this.prismaService.ghiDanh.findMany({
+    const enrolls = await this.prismaSv.ghiDanh.findMany({
       where: { LopHocID: classDB.ID, TrangThai: 'ACTIVE' },
       include: {
         hocvien: {
@@ -153,7 +147,7 @@ export class ClassService {
   async updateById(classId: number, up: UpdateClassDTO) {
     const classDB = await this.idValidator(classId)
     // đếm buổi học của lớp
-    const countSession = await this.prismaService.buoiHoc.count({
+    const countSession = await this.prismaSv.buoiHoc.count({
       where: { LopHocID: classDB.ID, TrangThai: { not: 'CANCELLED' } }
     })
     const timeFields = ['fromDate', 'toDate', 'timeTable', 'startTime', 'endTime']
@@ -187,7 +181,7 @@ export class ClassService {
     DateHelper.FromDateToDateValidator(merged.fromDate!, merged.toDate!)
     DateHelper.ValidateTimeRange(merged.startTime!, merged.endTime!)
 
-    return await this.prismaService.lopHoc.update({
+    return await this.prismaSv.lopHoc.update({
       where: { ID: classDB.ID },
       data: {
         TenLop: merged.name, MoTa: merged.description, SiSo: merged.classSize,
@@ -209,7 +203,7 @@ export class ClassService {
   // xóa mềm lớp học và hủy các buổi học chưa diễn ra
   async deleteById(classId: number) {
     const classDB = await this.idValidator(classId)
-    return await this.prismaService.lopHoc.update({
+    return await this.prismaSv.lopHoc.update({
       where: { ID: classDB.ID },
       data: {
         TrangThai: 'CLOSED',
@@ -225,22 +219,15 @@ export class ClassService {
 
   // lấy danh sách lớp theo giáo viên - userId
   async getManyByUserId(userId: number) {
-    const teacherDB = await this.prismaService.giaoVien.findUnique({
+    const teacherDB = await this.prismaSv.giaoVien.findUnique({
       where: { UserID: userId }
     })
     if (!teacherDB) throw new NotFoundException('Không tìm thấy giáo viên')
-    const classDB = await this.prismaService.lopHoc.findMany({
+    const classDB = await this.prismaSv.lopHoc.findMany({
       where: { GiaoVienID: teacherDB.ID },
-      include: {
-        khoahoc: { select: { TongSoBuoi: true } },
-        _count: {
-          select:
-          {
-            ghidanh: { where: { TrangThai: 'ACTIVE' } },
-            buoihoc: { where: { TrangThai: 'COMPLETED' } }
-          }
-        }
-      }, orderBy: { CreatedAt: 'desc' }
+      include: classInclude,
+      omit: { CreatedAt: true, UpdatedAt: true },
+      orderBy: { CreatedAt: 'desc' }
     })
     if (classDB.length == 0) return []
     return classDB.map(lh => {
@@ -257,7 +244,7 @@ export class ClassService {
 
   //kiểm tra trùng mã lớp 
   private async codeValidator(code: string) {
-    const classDB = await this.prismaService.lopHoc.findFirst({
+    const classDB = await this.prismaSv.lopHoc.findFirst({
       where: { MaLopHoc: code }
     })
     if (classDB) throw new ConflictException('Mã lớp đã được sử dụng')
@@ -266,7 +253,7 @@ export class ClassService {
 
   // kiểm tra id lớp
   private async idValidator(classId: number) {
-    const classDB = await this.prismaService.lopHoc.findUnique({
+    const classDB = await this.prismaSv.lopHoc.findUnique({
       where: { ID: classId }
     })
     if (!classDB) throw new NotFoundException('Không tìm thấy lớp học')
@@ -275,7 +262,7 @@ export class ClassService {
 
   //kiểm tra id khóa học 
   private async courseIdValidator(courseId: number) {
-    const courseDB = await this.prismaService.khoaHoc.findUnique({
+    const courseDB = await this.prismaSv.khoaHoc.findUnique({
       where: { ID: courseId }
     })
     if (!courseDB)// nếu không tồn tại khóa học
@@ -287,7 +274,7 @@ export class ClassService {
 
   //kiểm tra id giáo viên
   private async teacherIdValidator(teacherId: number) {
-    const teacherDB = await this.prismaService.giaoVien.findUnique({
+    const teacherDB = await this.prismaSv.giaoVien.findUnique({
       where: { ID: teacherId }
     })
     if (!teacherDB)
@@ -312,12 +299,12 @@ export class ClassService {
     if (excludeClassId) where.ID = { not: excludeClassId }
     if (room) where.PhongHoc = room
     // tìm lớp học đầu tiên bị trùng
-    const conflict = await this.prismaService.lopHoc.findFirst({
+    const conflict = await this.prismaSv.lopHoc.findFirst({
       where: {
         ...where,
         TuNgay: { lte: toDate }, // <= ngày so sánh
         DenNgay: { gte: fromDate }, // >= ngày ss
-        LichHoc: { hasSome: timeTable }, // có thứ trong lịch
+        LichHoc: { hasSome: timeTable }, // có thứ trùng lịch
         GioBatDau: { lte: startTime }, // <= giờ ngày ss
         GioKetThuc: { gte: endTime },
       },
@@ -333,7 +320,7 @@ export class ClassService {
     if (!body.room) return
 
     const { fromDate, toDate, timeTable, startTime, endTime } = body
-    const conflict = await this.prismaService.lopHoc.findFirst({
+    const conflict = await this.prismaSv.lopHoc.findFirst({
       where: {
         TrangThai: { not: 'CLOSED' },
         PhongHoc: body.room,// trùng phòng

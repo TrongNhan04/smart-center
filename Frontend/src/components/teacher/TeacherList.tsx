@@ -66,13 +66,13 @@ const TeacherList = () => {
       </>
     },
     { // ngày sinh
-      title: 'Ngày sinh', dataIndex: 'NgaySinh', key: 'NgaySinh', 
+      title: 'Ngày sinh', dataIndex: 'NgaySinh', key: 'NgaySinh', width:130,
       render: (dob: string) => <Text>
         <Text><CalendarOutlined style={{ color: '#8c8c8c' }} /> {new Date(dob).toLocaleDateString()}</Text>
       </Text>
     },
     { //Điện thoại
-      title: 'Điện thoại', dataIndex: 'DienThoai', key: 'DienThoai', //width: 100,
+      title: 'Điện thoại', dataIndex: 'DienThoai', key: 'DienThoai', width: 150,
       render: (phone: string) => <Text>
         <PhoneOutlined style={{color: '#8c8c8c'}}/> {phone}
       </Text>
@@ -84,7 +84,7 @@ const TeacherList = () => {
       </Text>
     },
     { // trạng thái
-      title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai', //width: 160,
+      title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai', width: 160,
       render: (value: string) => {
         const statusMap: Record<string, { color: string, text: string }> = {
           ACTIVE: { color: 'success', text: 'Hoạt động' },
@@ -96,7 +96,7 @@ const TeacherList = () => {
       }
     },
     {// thao tác
-      title: 'Thao tác', key: 'action', align: 'center' as const, //width: 150,
+      title: 'Thao tác', key: 'action', align: 'center' as const, width: 150,
       render: (value: TeacherDB) =>
         <TeacherAction
           teacher={value}

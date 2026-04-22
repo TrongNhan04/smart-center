@@ -62,10 +62,8 @@ const NotisPage = () => {
         const month = dateNotis.getMonth()
         const isLastYear = new Date().getFullYear() - dateNotis.getFullYear()
         let end = 4
-        if (date < 9 && month < 9) // ngày < 10 và tháng < 10
-          end = 3
-        else if (date > 8 && month > 8) // ngày > 9 và tháng > 9, >= 10 là hốt
-          end = 5
+        if (date < 9 && month < 9) end = 3// ngày < 10 và tháng < 10
+        else if (date > 8 && month > 8) end = 5 // ngày > 9 và tháng > 9, >= 10 là hốt
         else if (isLastYear > 0) end = 0
         const dateStr = end === 0 ?
           dateNotis.toLocaleDateString()

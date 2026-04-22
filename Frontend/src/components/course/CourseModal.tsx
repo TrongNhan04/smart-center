@@ -182,7 +182,7 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: Props) => {
               label="Mô tả chi tiết" name="description">
               <Input.TextArea
                 rows={6}
-                placeholder="Chi tiết khóa học, lộ trình, yêu cầu đầu vào..."
+                placeholder="Chi tiết khóa học, yêu cầu đầu vào..."
                 showCount
                 maxLength={500}
               />

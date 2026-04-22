@@ -12,12 +12,12 @@ export class PaymentController{
     @UseGuards(JwtAuthGuard,RolesGuard)
     @Roles('ADMIN', 'TEACHER', 'PARENT')
     @Post()
-    async CreatePayment(@Body() body:createPaymentDto){
-        return this.paymentSv.CreatePayment(body)
+    async createPaymentLink(@Body() body:createPaymentDto){
+        return this.paymentSv.createPaymentLink(body)
     }
 
     @Post('webhook')
-    async HandleWebhook(@Body() body:any){
-        return this.paymentSv.HandleWebhook(body)
+    async handleWebhook(@Body() body:any){
+        return this.paymentSv.handleWebhook(body)
     }
 }

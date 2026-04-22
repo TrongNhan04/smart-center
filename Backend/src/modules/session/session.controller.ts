@@ -17,83 +17,83 @@ export class SessionController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Post('admin/sessions-auto/classes/:id')
-    async AutoGenerateSession(@Param('id') classId: number) {
-        return await this.sessionService.AutoGenerateSession(+classId)
+    async autoGenerate(@Param('id') classId: number) {
+        return await this.sessionService.autoGenerate(+classId)
     }
 
     //tạo buổi học thủ công
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Post('admin/sessions-manual/classes/:id')
-    async ManualGenerateSession(
+    async manualGenerate(
         @Body() body: CreateSessionDTO,
         @Param('id') classId: number) {
-        return await this.sessionService.ManualGenerateSession(+classId, body)
+        return await this.sessionService.manualGenerate(+classId, body)
     }
 
     // hủy buổi học: 
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Patch('admin/sessions/:id/cancel')
-    async CancellSessionById(@Param('id') sessionId: number,
+    async cancelById(@Param('id') sessionId: number,
         @Body('reason') reason: string) {
-        return await this.sessionService.CancelSessionById(+sessionId, reason)
+        return await this.sessionService.cancelById(+sessionId, reason)
     }
 
     // thông tin chi tiết 1 buổi học
     @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
     @Roles('ADMIN', 'TEACHER')
     @Get('sessions/:id')
-    async GetSession_Result(
+    async getOne(
         @Req() req:RequestWithUser,
         @Param('id') sessionId: number) {
         const userId = req.user.role === 'TEACHER'? req.user.userId : null
-        return await this.sessionService.GetSession_Result(+sessionId, userId)
+        return await this.sessionService.getOne(+sessionId, userId)
     }
 
     // lưu nháp kết quả buổi học - DRAFT
     @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
     @Roles('ADMIN', 'TEACHER')
     @Put('teacher/sessions/:id/result-draft')
-    async SaveDraftResult(
+    async saveDraftResult(
         @Param('id') sessionId: number,
         @Body() body: SessionsResultDTO,
         @Req() req: RequestWithUser) {
         const userId = req.user.role === 'ADMIN' ? null : req.user.userId
         if (!userId) throw new NotFoundException('Teacher not found')
-        return await this.sessionService.SaveDraftResult(+userId, +sessionId, body)
+        return await this.sessionService.saveDraftResult(+userId, +sessionId, body)
     }
 
     // lưu thật kết quả buổi học - SUBMITTED
     @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
     @Roles('ADMIN', 'TEACHER')
     @Put('teacher/sessions/:id/result-submit')
-    async SubmittedResult(
+    async submittedResult(
         @Param('id') sessionId: number,
         @Body() body: SessionsResultDTO,
         @Req() req: RequestWithUser) {
         const userId = req.user.role === 'ADMIN' ? null : req.user.userId
         if (!userId) throw new NotFoundException('Teacher not found')
-        return await this.sessionService.SubmittedResult(+userId, +sessionId, body)
+        return await this.sessionService.submittedResult(+userId, +sessionId, body)
     }
 
     // mở khóa lưu kết quả buổi học
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Post('admin/sessions/:id/unlock')
-    async UnlockSession(@Param('id') sessionId: number) {
-        return await this.sessionService.UnlockSession(+sessionId)
+    async unlockSession(@Param('id') sessionId: number) {
+        return await this.sessionService.unlockSession(+sessionId)
     }
 
     // gửi yêu cầu mở khóa buổi học 
     @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
     @Roles('TEACHER')
     @Post('sessions/:id/request-unlock')
-    async RequestUnlock(
+    async requestUnlock(
         @Req() req: RequestWithUser,
         @Param('id') sessionId: number,
         @Body('reason') reason: string) {
         const userId = req.user.userId
-        return await this.sessionService.RequestUnlock(+userId, +sessionId, reason)
+        return await this.sessionService.requestUnlock(+userId, +sessionId, reason)
     }
 }

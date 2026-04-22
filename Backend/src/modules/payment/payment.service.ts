@@ -22,7 +22,7 @@ export class PaymentService {
 
 
     // tạo link thanh toán
-    async CreatePayment(body: createPaymentDto) {
+    async createPaymentLink(body: createPaymentDto) {
         const hoaDonId = Number(body.orderId)
         const invoiceDB = await this.primaSv.hoaDon.findUnique({
             where: { ID: hoaDonId },
@@ -51,7 +51,7 @@ export class PaymentService {
         }
     }
 
-    async HandleWebhook(body: any) {
+    async handleWebhook(body: any) {
         try {
             const webhookData = await this.payOS.webhooks.verify(body)
             if (webhookData.code === '00') {// thành công
@@ -61,25 +61,24 @@ export class PaymentService {
                 const invoiceId = Number(inStr)
                 const amount = webhookData.amount
 
-                await this.primaSv.$transaction(async (tx) => {
-                    await tx.giaoDich.create({
-                        data: {
-                            HoaDonID: invoiceId,
-                            MaGiaoDich: DateHelper.CreateUniqueCode('MGD'),
-                            LoaiGiaoDich: 'RECEIPT',
-                            SoTien: amount,
-                            NgayGiaoDich: new Date(),
-                            PhuongThuc: 'TRANSFER'
+                await this.primaSv.hoaDon.update({
+                    where: { ID: invoiceId },
+                    data: {
+                        DaTra: { increment: amount },
+                        giaodich: {
+                            create: {
+                                MaGiaoDich: DateHelper.CreateUniqueCode('MGD'),
+                                LoaiGiaoDich: 'RECEIPT',
+                                SoTien: amount,
+                                NgayGiaoDich: new Date(),
+                                PhuongThuc: 'TRANSFER'
+                            }
                         }
-                    })
-                    await tx.hoaDon.update({
-                        where: { ID: invoiceId },
-                        data: { DaTra: { increment: amount } }
-                    })
+                    }
                 })
-                
-                this.eventGateway.server.emit(`PAYMENT_SUCCESS_${invoiceId}`,{
-                    message:'Thành công',
+
+                this.eventGateway.server.emit(`PAYMENT_SUCCESS_${invoiceId}`, {
+                    message: 'Thành công',
                     amount: amount
                 })
             }

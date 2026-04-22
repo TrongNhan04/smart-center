@@ -16,7 +16,7 @@ export class SessionService {
   ) { }
 
   // lấy danh sách buổi học theo lớp
-  async GetSessionsByClassId(classId: number, userId: number | null) {
+  async getManyByClassId(classId: number, userId: number | null) {
     const where: Prisma.BuoiHocWhereInput = { LopHocID: classId }
     if (userId) {
       const classDB = await this.prisma.lopHoc.findFirst({
@@ -44,14 +44,14 @@ export class SessionService {
   }
 
   // hủy buổi học kèm lý do
-  async CancelSessionById(sessionId: number, reason: string) {
-    const sessionDB = await this.SessionIdValidator(sessionId)
+  async cancelById(sessionId: number, reason: string) {
+    const sessionDB = await this.sessionIdValidator(sessionId)
     if (sessionDB.TrangThai !== 'SCHEDULED')
       throw new ConflictException('Buổi học đã hoàn thành hoặc đã hủy')
     if (!reason) throw new BadRequestException('Thiếu lý do hủy buổi học')
 
-    return await this.prisma.$transaction(async (tx) => {
-      const updateSS = await tx.buoiHoc.update({
+    const data = await this.prisma.$transaction(async (tx) => {
+      return await tx.buoiHoc.update({
         where: { ID: sessionDB.ID, TrangThai: 'SCHEDULED' },
         data: { TrangThai: 'CANCELLED' },
         select: {
@@ -67,14 +67,14 @@ export class SessionService {
           }
         }
       })
-      const listParentID = updateSS.lophoc.ghidanh.map(e => e.hocvien.UserID)
-      const uniqueId = [...new Set(listParentID)]
-      await this.notisService.SSCancelledNotify(uniqueId, updateSS, reason, tx)
     })
+    const listParentID = data.lophoc.ghidanh.map(e => e.hocvien.UserID)
+    const uniqueId = [...new Set(listParentID)]
+    await this.notisService.createCancelSessionNotify(uniqueId, data, reason)
   }
 
   // tạo buổi học tự động
-  async AutoGenerateSession(classId: number) {
+  async autoGenerate(classId: number) {
     const classDB = await this.prisma.lopHoc.findUnique({
       where: { ID: classId },
       include: {
@@ -145,7 +145,7 @@ export class SessionService {
   }
 
   // tạo buổi học thủ công 
-  async ManualGenerateSession(classId: number, body: CreateSessionDTO) {
+  async manualGenerate(classId: number, body: CreateSessionDTO) {
     const classDB = await this.prisma.lopHoc.findUnique({
       where: { ID: classId }
     })
@@ -166,7 +166,7 @@ export class SessionService {
     const startAt = DateHelper.combineDateAndTime(body.date, body.startAt)
     const endAt = DateHelper.combineDateAndTime(body.date, body.endAt)
 
-    if (body.room) await this.HasSameRoom(body.room, startAt, endAt,)
+    if (body.room) await this.hasSameRoom(body.room, startAt, endAt,)
 
     return await this.prisma.$transaction(async (tx) => {
       // kiểm tra trùng buổi hoặc đè buổi trong CÙNG LỚP
@@ -198,8 +198,8 @@ export class SessionService {
   }
 
   // lấy danh sách buổi học 1 lớp giáo viên A dạy 
-  async GetSessionsByUserId(userId: number, classId: number) {
-    const teacherDB = await this.GetTeacherByUserId(userId)
+  async getManyByUserId(userId: number, classId: number) {
+    const teacherDB = await this.getTeacherByUserId(userId)
     const classDB = await this.prisma.lopHoc.findFirst({
       where: { ID: classId, GiaoVienID: teacherDB.ID }
     })
@@ -213,9 +213,9 @@ export class SessionService {
   }
 
   // lấy thông tin 1 buổi học
-  async GetSession_Result(sessionId: number, userId: number | null) {
+  async getOne(sessionId: number, userId: number | null) {
     if (userId) { // là giáo viên
-      const teacherDB = await this.GetTeacherByUserId(userId)
+      const teacherDB = await this.getTeacherByUserId(userId)
       const canAccess = await this.prisma.buoiHoc.findFirst({
         where: { ID: sessionId, lophoc: { GiaoVienID: teacherDB.ID } }
       })
@@ -226,52 +226,55 @@ export class SessionService {
       this.prisma.buoiHoc.findFirst({
         where: { ID: sessionId },
         include: {
-          ketqua_buoihoc: true,
+          ketqua_buoihoc: {
+            select: {
+              NoiDungBaiHoc: true, BaiTapVeNha: true, NhanXetChung: true
+            }
+          },
           lophoc: {
             select: {
               TenLop: true,
               giaovien: { select: { User: { select: { HoTen: true } } } }
             }
           }
-        }
+        },
+        omit: { CreatedAt: true, UpdatedAt: true }
       }),
-      this.resultService.GetSSResult(sessionId)
+      this.resultService.getSSResult(sessionId)
     ])
     if (!sessionDB) throw new NotFoundException('Không tìm thấy buổi học')
     const { ketqua_buoihoc, lophoc, ...rest } = sessionDB
     return {
       ...rest,
       LopHoc: lophoc.TenLop,
-      NhanXetChung: ketqua_buoihoc?.NhanXetChung,
-      NoiDungBaiHoc: ketqua_buoihoc?.NoiDungBaiHoc,
-      BaiTapVeNha: ketqua_buoihoc?.BaiTapVeNha,
+      ...ketqua_buoihoc,
       GiaoVien: lophoc.giaovien.User.HoTen,
       ChiTietKetQua: result
     }
   }
 
   // lưu nháp kết quả buổi học - Draft - resultService
-  async SaveDraftResult(userId: number, sessionId: number, body: SessionsResultDTO) {
-    return await this.resultService.SaveDraftResult(userId, sessionId, body)
+  async saveDraftResult(userId: number, sessionId: number, body: SessionsResultDTO) {
+    return await this.resultService.saveDraftResult(userId, sessionId, body)
   }
 
   // lưu thật kết quả buổi học - Submit - resultService
-  async SubmittedResult(userId: number, sessionId: number, body: SessionsResultDTO) {
-    return await this.resultService.SubmittedResult(userId, sessionId, body)
+  async submittedResult(userId: number, sessionId: number, body: SessionsResultDTO) {
+    return await this.resultService.submittedResult(userId, sessionId, body)
   }
 
   // mở khóa lưu kết quả buổi học - resultService
-  async UnlockSession(sessionId: number) {
-    return await this.resultService.UnlockSession(sessionId)
+  async unlockSession(sessionId: number) {
+    return await this.resultService.unlockSession(sessionId)
   }
 
   // gửi yêu cầu mở khóa buổi học - resultService
-  async RequestUnlock(userId: number, sessionId: number, reason: string) {
+  async requestUnlock(userId: number, sessionId: number, reason: string) {
     return await this.resultService.RequestUnlock(userId, sessionId, reason)
   }
 
   // lấy giáo viên từ userId
-  private async GetTeacherByUserId(userId: number) {
+  private async getTeacherByUserId(userId: number) {
     const teacherDB = await this.prisma.giaoVien.findUnique({
       where: { UserID: userId }
     })
@@ -282,7 +285,7 @@ export class SessionService {
   }
 
   // kiểm tra id session
-  private async SessionIdValidator(sessionId: number) {
+  private async sessionIdValidator(sessionId: number) {
     const sessionDB = await this.prisma.buoiHoc.findUnique({
       where: { ID: sessionId }
     })
@@ -292,7 +295,7 @@ export class SessionService {
   }
 
   // kiểm tra trùng phòng
-  private async HasSameRoom(room: string, start: Date, end: Date, excludeId?: number) {
+  private async hasSameRoom(room: string, start: Date, end: Date, excludeId?: number) {
     if (!room) return
     const conflict = await this.prisma.buoiHoc.findFirst({
       where: {

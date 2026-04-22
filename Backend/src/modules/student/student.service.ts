@@ -40,15 +40,15 @@ export class StudentService {
             })
 
             //thêm ghi danh
-            const newEnroll = await this.enrollService.CreateEnrollAuto
+            const newEnroll = await this.enrollService.createTx
                 (newStudent.ID, body.classId, client)
 
             // thêm hóa đơn
-            const newInvoice = await this.invoiceService.CreateInvoice
+            const newInvoice = await this.invoiceService.createTx
                 (newStudent.ID, newEnroll.ID, classDB?.DenNgay, fee, client)
 
             // thêm thông báo
-            await this.notisService.InvoiceNotify(userId, newInvoice, client)
+            await this.notisService.createInvoiceNotify(userId, newInvoice)
         }
         // nếu có user
         if (tx) return await runLogic(tx) // tx từ user

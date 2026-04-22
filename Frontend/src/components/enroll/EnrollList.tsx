@@ -101,7 +101,7 @@ const EnrollList = () => {
       key: 'TenLop', ellipsis: true,
       render: (className: string) =>
         <Space >
-          <ReadOutlined style={{ color: '#722ed1' }} />{className}
+          <ReadOutlined style={{ color: '#8c8c8c' }} />{className}
         </Space>
     },
     { // trạng thái

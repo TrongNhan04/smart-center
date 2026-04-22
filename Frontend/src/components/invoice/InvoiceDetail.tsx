@@ -93,14 +93,17 @@ const InvoiceDetail = () => {
 
   const transactionColumns = [
     { // mã giao dịch
-      title: 'Mã giao dịch', dataIndex: 'MaGiaoDich', key: 'MaGiaoDich',
-      width: 120, align: 'center' as const
+      title: 'Mã GD', dataIndex: 'MaGiaoDich', key: 'MaGiaoDich',
+      width: 150, align: 'center' as const
     },
     { // ngày giao dịch
-      title: 'Ngày giao dịch', dataIndex: 'NgayGiaoDich', key: 'NgayGiaoDich', 
+      title: 'Ngày giao dịch', dataIndex: 'NgayGiaoDich', key: 'NgayGiaoDich',
       width: 150, align: 'center' as const,
       sorter: (a: any, b: any) => new Date(a.NgayGD).getTime() - new Date(b.NgayGD).getTime(),
-      render: (value: string) => new Date(value).toLocaleDateString()
+      render: (value: string) => <Text>
+        <CalendarOutlined style={{ color: '#8c8c8c' }}
+        /> {new Date(value).toLocaleDateString()}
+      </Text>
     },
     { // loại giao dịch
       title: 'Loại GD', dataIndex: 'LoaiGiaoDich', key: 'LoaiGiaoDich',
@@ -111,7 +114,7 @@ const InvoiceDetail = () => {
       onFilter: (value: any, record: GiaoDich) => record.LoaiGiaoDich === value,
       render: (type: string) => {
         if (type === 'RECEIPT')
-          return <Tag color='green'> THU TIỀN</Tag>
+          return <Tag color='default'> THU TIỀN</Tag>
         return <Tag color='red'> HOÀN TIỀN</Tag>
       }
     },
@@ -127,7 +130,8 @@ const InvoiceDetail = () => {
         const value = Number(amount)
         const isReceipt = record.LoaiGiaoDich === 'RECEIPT'
         let pos = isReceipt ? '+' : "-"
-        return <Text strong type={isReceipt ? 'success' : 'danger'}>
+        return <Text type={isReceipt ? 'success' : 'danger'}
+          style={{ fontWeight: 500 }}>
           {pos} {value.toLocaleString()} đ
         </Text>
       }
@@ -149,7 +153,7 @@ const InvoiceDetail = () => {
       <Card>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
           <Button type="text"
-            icon = {<LeftOutlined/>}
+            icon={<LeftOutlined />}
             onClick={() => navigate(-1)} />
           <Text style={{ fontSize: 24, fontWeight: '500' }}> HÓA ĐƠN {invoice.MaHoaDon}</Text>
           <Space>

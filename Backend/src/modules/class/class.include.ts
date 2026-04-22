@@ -1,7 +1,6 @@
 import { Prisma } from "src/generated/prisma/client";
 
-export const classInclude = {
-    khoahoc: { select: { TenKhoaHoc: true, TongSoBuoi: true, HocPhi: true } },
+export const classCountSelect = {
     _count: {
         select: {
             ghidanh: { where: { TrangThai: 'ACTIVE' } },
@@ -10,7 +9,12 @@ export const classInclude = {
     }
 } satisfies Prisma.LopHocInclude
 
+export const classInclude = {
+    khoahoc: { select: { TenKhoaHoc: true, TongSoBuoi: true, HocPhi: true } },
+    ...classCountSelect
+} satisfies Prisma.LopHocInclude
+
 export const classIncludeTeacher = {
-    ...classInclude,
     giaovien: { select: { User: { select: { HoTen: true } } } },
+    ...classInclude,
 } satisfies Prisma.LopHocInclude

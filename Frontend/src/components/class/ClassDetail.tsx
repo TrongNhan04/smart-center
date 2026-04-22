@@ -79,8 +79,8 @@ const ClassDetail = () => {
         </Space>
       }
     },
-    { // Nội dung
-      title: 'Nội dung', dataIndex: 'ChuDe', key: 'ChuDe', ellipsis: true,
+    { // Chủ đề
+      title: 'Chủ đề', dataIndex: 'ChuDe', key: 'ChuDe', ellipsis: true,
       render: (topic: string) => {
         return <Space orientation="vertical" size={0}>
           <Text ><ReadOutlined style={{ color: '#722ed1' }} /> {topic ?? `Chủ đề: chưa cập nhật...`} </Text>
@@ -126,10 +126,10 @@ const ClassDetail = () => {
           return session.AdminMoKhoa === false && session.YeuCauMoKhoa === false
         return false
       },
-      render: (adminMK: boolean, session: SessionDB) => {
+      render: (adminMoKhoa: boolean, session: SessionDB) => {
         if (session.YeuCauMoKhoa)
           return <Tag color='orange'><InboxOutlined /> Yêu cầu mở</Tag>
-        if (adminMK)
+        if (adminMoKhoa)
           return <Tag color='green'><UnlockOutlined /> Đang mở</Tag>
         else
           return <>---</>
@@ -152,10 +152,10 @@ const ClassDetail = () => {
     }
   ]
 
-  const filterColumns = () => {
-    if (isAdmin) return columns
-    return columns.filter(item => item.key !== 'AdminMoKhoa')
-  }
+  // const filterColumns = () => {
+  //   if (isAdmin) return columns
+  //   return columns.filter(item => item.key !== 'AdminMoKhoa')
+  // }
 
   const AutoGenerate = async (lopHocId: number) => {
     try {
@@ -292,7 +292,7 @@ const ClassDetail = () => {
                 children: (
                   <Table style={{ marginTop: 8 }}
                     dataSource={sessions}
-                    columns={filterColumns()}
+                    columns={columns}
                     pagination={{
                       current: currentPage,
                       pageSize: 10

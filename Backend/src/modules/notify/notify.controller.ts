@@ -13,16 +13,16 @@ export class NotifyController {
     async GetMyNotis(
         @Req() req: RequestWithUser,
         @Query('page') page: number) {
-        return await this.notifyService.GetMyNotification(+req.user.userId, page)
+        return await this.notifyService.getManyByUserId(+req.user.userId, page)
     }
 
     @Patch('/:id')
     async ReadOne(@Req() req: RequestWithUser, @Param('id') notifyId: number) {
-        return await this.notifyService.MaskAsRead(+req.user.userId, +notifyId)
+        return await this.notifyService.readOne(+req.user.userId, +notifyId)
     }
 
     @Patch()
     async ReadAll(@Req() req: RequestWithUser) {
-        return await this.notifyService.MaskAllRead(+req.user.userId)
+        return await this.notifyService.readAll(+req.user.userId)
     }
 }

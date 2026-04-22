@@ -22,6 +22,6 @@ export class CatchError {
         else
           console.log("Có lỗi xảy ra", error)
       }
-      else notification.error({title: 'Có lỗi xảy ra'})
+      else notification.error({title: 'Có lỗi xảy ra', description:error?.message})
     }
 }

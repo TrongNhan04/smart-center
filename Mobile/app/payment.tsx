@@ -32,7 +32,7 @@ const PaymentScreen = () => {
   // useEffect 2 chạy khi có socket từ backend 
   useEffect(() => {
     if (!invoiceId) return
-    // socket
+    // socket, nhớ đổi ip giống api
     const socket = io('http://192.168.1.101:3000')
     const envName = `PAYMENT_SUCCESS_${invoiceId}`
 

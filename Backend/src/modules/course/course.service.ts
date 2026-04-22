@@ -145,6 +145,7 @@ export class CourseService {
                 giaovien: { select: { User: { select: { HoTen: true } } } },
                 _count: { select: { ghidanh: { where: { TrangThai: 'ACTIVE' } } } }
             },
+            omit:{CreatedAt:true, UpdatedAt:true, KhoaHocID:true},
             orderBy: { ID: 'desc' }
         })
         return classDB.map(lh => {

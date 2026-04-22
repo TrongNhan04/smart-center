@@ -50,7 +50,7 @@ const ClassAction = ({ lophoc, onEdit, onSoftDelete }: Props) => {
     return (
       <Space size="small">
         {/* Nút sửa  */}
-        <Tooltip title="Sửa & xem chi tiết">
+        <Tooltip title="Sửa thông tin">
           <Button
             size="small"
             type="link"

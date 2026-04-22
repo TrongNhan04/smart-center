@@ -26,8 +26,8 @@ export class DashboardController {
     async GetChart(@Query('year') year?: number) {
         const yearNow = year ? year : new Date().getFullYear()
         const [ghiDanh, lopHoc] = await Promise.all([
-            this.dashboard.GetFinaceChart(yearNow), // data cho biểu đồ ghi danh
-            this.dashboard.GetHighestRevenue()// biểu đồ doanh thu
+            this.dashboard.GetFinaceChart(yearNow), // data biểu đồ ghi danh
+            this.dashboard.GetHighestRevenue()// data biểu đồ doanh thu
         ])
         return {
             GhiDanh: ghiDanh,

@@ -170,21 +170,21 @@ const StudentModal = ({ open, onSave, onCancel, editing }: Props) => {
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item // tên học viên
-              label="Tên học viên"
+              label="Học viên"
               name="student"
               rules={[{ required: true, message: 'Vui lòng nhập tên học viên!' }]}
             >
-              <Input placeholder=" tên học viên..." />
+              <Input placeholder="Họ và tên học viên..." />
             </Form.Item>
           </Col>
 
           <Col span={12}>
             <Form.Item // tên phụ huynh
-              label="Tên phụ huynh"
+              label="Phụ huynh"
               name="parent"
               rules={[{ required: true, message: 'Vui lòng nhập tên phụ huynh!' }]}
             >
-              <Input placeholder="tên phụ huynh..." />
+              <Input placeholder="Họ và tên phụ huynh..." />
             </Form.Item>
           </Col>
         </Row>

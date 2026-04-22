@@ -21,9 +21,10 @@ const TabInfo = ({ lophoc }: Props) => {
 
 
   const percent = (lophoc.TongGhiDanh / lophoc.SiSo) * 100
-  let percentColor = '#ff4d4f' // đỏ
-  if (percent > 50) percentColor = '#faad14' //vàng
-  if (percent > 80) percentColor = '#52c41a'
+  let percentColor =
+    percent > 70 ? '#52c41a' :
+    percent > 50 ? '#faad14' :
+      '#ff4d4f' // đỏ
 
   return (
     <div style={{ padding: '16px 0' }}>

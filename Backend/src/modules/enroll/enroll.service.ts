@@ -8,17 +8,17 @@ import { NotifyService } from "../notify/notify.service";
 @Injectable()
 export class EnrollService {
     constructor(
-        private prismaService: PrismaService,
+        private prismaSv: PrismaService,
         private invoiceService: InvoiceService,
         private notisService: NotifyService
     ) { }
 
     // tạo ghi danh tự động
-    async CreateEnrollAuto(studentId: number, classId: number, tx: Prisma.TransactionClient) {
+    async createTx(studentId: number, classId: number, tx: Prisma.TransactionClient) {
         const today = new Date()
         let client: Prisma.TransactionClient | null = null
         if (tx) client = tx
-        else client = this.prismaService
+        else client = this.prismaSv
         return await client.ghiDanh.create({
             data: {
                 LopHocID: classId,
@@ -30,12 +30,12 @@ export class EnrollService {
     }
 
     //tạo ghi danh thủ công + hóa đơn + thông báo
-    async CreateEnroll(body: CreateEnrollDTO) {
-        const classDB = await this.ClassIdValidator(body.classId)
-        const studentDB = await this.StudentIdValidator(body.studentId)
-        await this.EnrollValidator(studentDB.ID, classDB.ID)
+    async create(body: CreateEnrollDTO) {
+        const classDB = await this.classIdValidator(body.classId)
+        const studentDB = await this.studentIdValidator(body.studentId)
+        await this.enrollValidator(studentDB.ID, classDB.ID)
         await this.TotalSlot(classDB.ID)
-        return await this.prismaService.$transaction(async (tx) => {
+        const data = await this.prismaSv.$transaction(async (tx) => {
             const newEnroll = await tx.ghiDanh.create({
                 data: {
                     HocVienID: studentDB.ID,
@@ -44,16 +44,20 @@ export class EnrollService {
                 }
             })
             // thêm hóa đơn
-            const newInvoice = await this.invoiceService.CreateInvoice
+            return await this.invoiceService.createTx
                 (studentDB.ID, newEnroll.ID, classDB.DenNgay, body.fee, tx)
-            // thêm thông báo
-            await this.notisService.InvoiceNotify(studentDB.UserID, newInvoice, classDB, tx)
-            return { ID: newEnroll.ID }
         })
+        // thêm thông báo
+        const payload = {
+            ThoiHan: data.ThoiHan, TenLop: classDB.TenLop,
+            TongTien: data.TongTien, HoaDonId: data.ID,
+            HocVienId: studentDB.ID, LopHocId: classDB.ID
+        }
+        await this.notisService.createInvoiceNotify(studentDB.UserID, payload)
     }
 
     // danh sách ghi danh, bộ lọc trạng thái, tìm kiếm theo từ khóa
-    async GetEnrolls(query: QueryEnrollDTO) {
+    async getMany(query: QueryEnrollDTO) {
         const where: Prisma.GhiDanhWhereInput = {}
         const q = query.q?.trim()
 
@@ -67,61 +71,55 @@ export class EnrollService {
                 { hocvien: { MaHocVien: { contains: q, mode: 'insensitive' } } }
             ]
         }
-        const enrollDB = await this.prismaService.ghiDanh.findMany({
+
+        const enrollDB = await this.prismaSv.ghiDanh.findMany({
             where,
-            select: {
-                ID: true, NgayGhiDanh: true, TrangThai: true, GhiChu: true,
-                lophoc: { select: { ID: true, TenLop: true } },
+            include: {
+                lophoc: { select: { TenLop: true } },
                 hocvien: {
                     select: {
-                        ID: true,
                         TenHocVien: true,
                         MaHocVien: true
                     }
                 }
             },
+            omit: { CreatedAt: true, UpdatedAt: true },
             orderBy: { NgayGhiDanh: 'desc' }
         })
-        return enrollDB.map(e => ({
-            ID: e.ID,
-            LopHocID: e.lophoc.ID,
-            TenLop: e.lophoc.TenLop,
-            HocVienID: e.hocvien.ID,
-            MaHocVien: e.hocvien.MaHocVien,
-            TenHocVien: e.hocvien.TenHocVien,
-            NgayGhiDanh: e.NgayGhiDanh,
-            GhiChu: e.GhiChu,
-            TrangThai: e.TrangThai
-        }))
+        return enrollDB.map(item => {
+            const { lophoc, hocvien, ...rest } = item
+            return {
+                ...rest,
+                ...lophoc,
+                ...hocvien
+            }
+        })
     }
 
     // xóa mềm ghi danh + xóa mềm hóa đơn
-    async DeleteEnrollByID(enrollId: number) {
-        return this.prismaService.$transaction(async tx => {
-            const enrollDB = await tx.ghiDanh.findUnique({
-                where: { ID: enrollId },
-                include: { hoadon: true }
-            })
-            if (!enrollDB) throw new NotFoundException('Không tìm thấy ghi danh')
-            if (!enrollDB.hoadon)
-                throw new ConflictException('Không tìm thấy hóa đơn của ghi danh')
+    async deleteById(enrollId: number) {
+        const enrollDB = await this.prismaSv.ghiDanh.findUnique({
+            where: { ID: enrollId },
+            include: { hoadon: true }
+        })
+        if (!enrollDB) throw new NotFoundException('Không tìm thấy ghi danh')
+        if (!enrollDB.hoadon)
+            throw new ConflictException('Không tìm thấy hóa đơn của ghi danh')
 
-            await tx.ghiDanh.update({
-                where: { ID: enrollDB.ID },
-                data: { TrangThai: 'INACTIVE' }
-            })
-
-            await tx.hoaDon.update({
-                where: { GhiDanhID: enrollDB.ID },
-                data: { TrangThai: 'CANCELLED' }
-            })
-            return { ID: enrollDB.ID }
+        return await this.prismaSv.ghiDanh.update({
+            where: { ID: enrollDB.ID },
+            data: {
+                TrangThai: 'INACTIVE',
+                hoadon: {
+                    update: { TrangThai: 'CANCELLED' }
+                }
+            }
         })
     }
 
     // lấy danh sách ghi danh ACTIVE theo lớp
-    async GetEnrollByClassId(classId: number) {
-        const enrolls = await this.prismaService.ghiDanh.findMany({
+    async getManyByClassId(classId: number) {
+        const enrolls = await this.prismaSv.ghiDanh.findMany({
             where: { LopHocID: classId, TrangThai: 'ACTIVE' },
             select: {
                 hocvien: {
@@ -133,21 +131,23 @@ export class EnrollService {
                 },
             }
         })
-        return enrolls.map(x => ({
-            MaHocVien: x.hocvien.MaHocVien,
-            TenHocVien: x.hocvien.TenHocVien,
-            TenPhuHuynh: x.hocvien.Parent.HoTen,
-            Email: x.hocvien.Parent.Email,
-            DienThoai: x.hocvien.Parent.DienThoai
-        }))
+        return enrolls.map(item => {
+            const { hocvien } = item
+            const { Parent, ...rest } = hocvien
+            return {
+                ...rest,
+                TenPhuHuynh: Parent.HoTen,
+                ...Parent
+            }
+        })
 
     }
 
     // kiểm tra slot lớp
     async TotalSlot(classId: number) {
-        const classDB = await this.ClassIdValidator(classId)
+        const classDB = await this.classIdValidator(classId)
 
-        const totolEnroll = await this.prismaService.ghiDanh.count({
+        const totolEnroll = await this.prismaSv.ghiDanh.count({
             where: { LopHocID: classDB.ID, TrangThai: 'ACTIVE' }
         })
 
@@ -156,8 +156,8 @@ export class EnrollService {
     }
 
     // kiểm tra 1 học viên ghi danh 1 lớp 1 lần
-    private async EnrollValidator(studentId: number, classId: number) {
-        const existed = await this.prismaService.ghiDanh.findFirst({
+    private async enrollValidator(studentId: number, classId: number) {
+        const existed = await this.prismaSv.ghiDanh.findFirst({
             where: {
                 LopHocID: classId,
                 HocVienID: studentId,
@@ -169,8 +169,8 @@ export class EnrollService {
     }
 
     // kiểm tra id lớp
-    private async ClassIdValidator(classId: number) {
-        const classDB = await this.prismaService.lopHoc.findUnique({
+    private async classIdValidator(classId: number) {
+        const classDB = await this.prismaSv.lopHoc.findUnique({
             where: { ID: classId }
         })
         if (!classDB) throw new ConflictException('Không tìm thấy lớp học')
@@ -180,8 +180,8 @@ export class EnrollService {
     }
 
     //kiểm tra id học viên
-    private async StudentIdValidator(studentId: number) {
-        const studentDB = await this.prismaService.hocVien.findUnique({
+    private async studentIdValidator(studentId: number) {
+        const studentDB = await this.prismaSv.hocVien.findUnique({
             where: { ID: studentId }
         })
         if (!studentDB) throw new NotFoundException('Không tìm thấy học viên')

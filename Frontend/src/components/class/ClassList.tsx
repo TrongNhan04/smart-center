@@ -125,9 +125,10 @@ const ClassList = () => {
       render: (value: number, lh: ClassDB) => {
         const percent = (value / lh.TongSoBuoi) * 100
         let percentColor =
-          percent > 50 ? '#faad14' :
-          percent > 80 ? '#52c41a' :
+          percent > 70 ? '#52c41a' : // xanh
+          percent > 50 ? '#faad14' : // vàng cam
             '#ff4d4f' // đỏ
+            
         return <Space style={{ width: '100%' }} wrap={false}>
           <Text style={{ whiteSpace: 'nowrap' }}>
             {value}/{lh.TongSoBuoi}

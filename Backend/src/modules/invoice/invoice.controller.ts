@@ -16,28 +16,27 @@ export class InvoiceController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Get('transactions')
-    async GetTransactions(@Query() query: QueryInvoiceDTO) {
-        return await this.invoiceService.GetTransactions(query)
+    async getTransactions(@Query() query: QueryInvoiceDTO) {
+        return await this.invoiceService.getTransactions(query)
     }
 
     //lấy danh sách hóa đơn + tìm kiếm mã hóa đơn, tên học viên
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Get()
-    async GetInvoices(
-        @Query() query: QueryInvoiceDTO) {
-        return await this.invoiceService.GetInvoices(query)
+    async getMany(@Query() query: QueryInvoiceDTO) {
+        return await this.invoiceService.getMany(query)
     }
 
     //thêm giao dịch thu tiền
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Post(':id/receipts')
-    async CreateInvoices(
+    async createReceipt(
         @Param('id') invoiceId: number,
         @Body() body: CreateTransactionDTO,
         @Req() req: RequestWithUser) {
-        return await this.invoiceService.CreateReceipt(
+        return await this.invoiceService.createReceipt(
             +req.user.userId, +invoiceId, body)
     }
 
@@ -45,28 +44,27 @@ export class InvoiceController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Post(':id/payments')
-    async CreatePayment(
+    async createPayment(
         @Param('id') invoiceId: number,
         @Body() body: CreateTransactionDTO,
         @Req() req: RequestWithUser) {
         const userId = req.user.userId
-        return await this.invoiceService.CreatePayment
-            (+userId, +invoiceId, body)
+        return await this.invoiceService.createPayment(+userId, +invoiceId, body)
     }
 
     //Lấy danh sách giao dịch theo hóa đơn 
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Get(':id/transactions')
-    async GetTransactionsById(@Param('id') invoiceId: number,) {
-        return await this.invoiceService.GetTransactionsById(+invoiceId)
+    async getTransactionsById(@Param('id') invoiceId: number,) {
+        return await this.invoiceService.getTransactionsById(+invoiceId)
     }
 
     // lấy chi tiết hóa đơn
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Get(':id')
-    async GetInvoice(@Param('id') invoiceId: number) {
-        return await this.invoiceService.GetInvoice(+invoiceId)
+    async getOne(@Param('id') invoiceId: number) {
+        return await this.invoiceService.getOne(+invoiceId)
     }
 }

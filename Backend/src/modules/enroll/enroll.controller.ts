@@ -13,23 +13,23 @@ export class EnrollController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Post()
-    async CreateEnroll(@Body() body: CreateEnrollDTO) {
-        return await this.enrollService.CreateEnroll(body)
+    async create(@Body() body: CreateEnrollDTO) {
+        return await this.enrollService.create(body)
     }
 
     // lấy danh sách học viên ghi danh
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Get()
-    async GetEnrolls(@Query() query: QueryEnrollDTO) {
-        return await this.enrollService.GetEnrolls(query)
+    async getMany(@Query() query: QueryEnrollDTO) {
+        return await this.enrollService.getMany(query)
     }
 
     // xóa mềm ghi danh
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
     @Patch(':id/inactive')
-    async DeleteEnrollByID(@Param('id') StudentId: number) {
-       return await this.enrollService.DeleteEnrollByID(+StudentId)
+    async deleteById(@Param('id') StudentId: number) {
+       return await this.enrollService.deleteById(+StudentId)
     }
 }

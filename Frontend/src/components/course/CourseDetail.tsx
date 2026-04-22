@@ -85,7 +85,7 @@ const CourseDetail = () => {
           <ReadOutlined style={{color:'#8c8c8c'}}/> {name} </Link>
     },
     { // giáo viên
-      title: 'Giáo viên', dataIndex: ['GiaoVien', 'HoTen'], key: 'HoTen', ellipsis: true,
+      title: 'Giáo viên', dataIndex: 'GiaoVien', key: 'GiaoVien', ellipsis: true,
       render: (name: string) => <Text><UserOutlined style={{ color: '#8c8c8c' }} /> {name}</Text>
     },
     { // khai giảng = ngày bắt đầu
@@ -94,46 +94,26 @@ const CourseDetail = () => {
         <Text><CalendarOutlined style={{ color: '#8c8c8c' }} /> {new Date(day).toLocaleDateString()}</Text>
     },
     { // lịch học
-      title: 'Lịch học', dataIndex: 'LichHoc', key: 'LichHoc',
+      title: 'Lịch học', dataIndex: 'LichHoc', key: 'LichHoc', width: 220,
       render: (schedule: number[], lophoc: ClassDB) => {
         const dow = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
         const result = schedule.map(m => dow[m]).join('-')
-
-        return <Space orientation="vertical" size={0}>
-          <Text ><ClockCircleOutlined style={{ color: '#8c8c8c' }} /> {lophoc.GioHoc}</Text>
-          <Text
-            style={{ fontSize: '14px', display: 'block', textAlign: 'center' }}>
-            {result}
-          </Text>
-        </Space>
+        return <Text>
+          <ClockCircleOutlined style={{ color: '#8c8c8c' }}
+          /> {result}, {lophoc.GioHoc}</Text>
       }
     },
     { // sĩ số
-      title: 'Sĩ số', dataIndex: 'SiSo', key: 'SiSo',
-      render: (classSize: number, lophoc: ClassDB) => {
-        const percent = (lophoc.TongGhiDanh / classSize) * 100
-        let percentColor = '#ff4d4f' // đỏ
-        if (percent > 50) percentColor = '#faad14' //vàng
-        if (percent > 80) percentColor = '#52c41a'
-          return <>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>{lophoc.TongGhiDanh}/{classSize}</span>
-              <span style={{ color: '#999' }}>Học viên</span>
-            </div>
-            <Progress
-              percent={percent}
-              strokeColor={percentColor}
-              showInfo={false}
-            />
-          </>
-      }
+      title: 'Sĩ số', dataIndex: 'SiSo', key: 'SiSo', width: 100,
+      align: 'center' as const, render: (classSize: number, lophoc: ClassDB) =>
+        <Text>{lophoc.TongGhiDanh}/{classSize}</Text>
     },
     { // trạng thái
       title: 'Trạng thái', dataIndex: 'TrangThai', key: 'TrangThai',
-      render: (value: string) => {
+      align:'center' as const, render: (value: string) => {
         const statusMap: Record<string, { color: string, text: string }> = {
           OPEN: { color: 'default', text: 'Tuyển sinh' },
-          RUNNING: { color: 'success', text: 'Đang hoạt động' },
+          RUNNING: { color: 'success', text: 'Hoạt động' },
           CLOSED: { color: 'error', text: 'Đã đóng' }
         }
         // value là 1 trong 3 key đó

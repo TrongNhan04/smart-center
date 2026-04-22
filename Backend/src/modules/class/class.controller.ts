@@ -63,11 +63,11 @@ export class ClassController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN', 'TEACHER')
     @Get('admin/classes/:id/sessions')
-    async GetSessionsByClassId(
+    async getSessionsByClassId(
         @Req() req: RequestWithUser,
         @Param('id') classId: number) {
         const userId = req.user.role === 'TEACHER' ? req.user.userId : null
-        return await this.sessionService.GetSessionsByClassId(classId, userId)
+        return await this.sessionService.getManyByClassId(classId, userId)
     }
 
     // lấy danh sách học viên ACTIVE của lớp
@@ -102,12 +102,12 @@ export class ClassController {
     @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
     @Roles('ADMIN', 'TEACHER')
     @Get('teachers/classes/:id/sessions')
-    async GetSessionsByUserId(
+    async getSessionsByUserId(
         @Param('id') classId: number,
         @Req() req: RequestWithUser) {
         const userId = req.user.role === 'ADMIN' ? null : req.user.userId
         if (!userId) throw new NotFoundException('Không tìm thấy giáo viên')
-        return await this.sessionService.GetSessionsByUserId(+userId, +classId)
+        return await this.sessionService.getManyByUserId(+userId, +classId)
     }
 
     // lịch dạy của giáo viên - dashboard có

@@ -152,7 +152,7 @@ const SessionDetail = () => {
           Diem: student.Diem ? Number(student.Diem) : null,
         }))
       }
-
+      console.log(payload)
       const isSubmit = type === 'SUBMITTED'
       isSubmit ? await sessionApi.submitted(buoiHocId, payload) :
         await sessionApi.saveDraft(buoiHocId, payload)
