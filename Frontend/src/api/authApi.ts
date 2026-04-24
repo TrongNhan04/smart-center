@@ -11,5 +11,9 @@ export const authApi = {
     logout: () => axiosClient.post('auth/logout'),
 
     update: (body: UpdateProfile) =>
-        axiosClient.patch(`auth/profile`, body)
+        axiosClient.patch(`auth/profile`, body),
+
+    forgotPw: (body:any) => axiosClient.post('auth/forgot-password',body),
+
+    resetPw: (body:any) => axiosClient.post('auth/reset-password',body),
 }

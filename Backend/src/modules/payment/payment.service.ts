@@ -4,6 +4,7 @@ import { PayOS } from "@payos/node";
 import { PrismaService } from "src/prisma/prisma.service";
 import { DateHelper } from "src/common/date.helper";
 import { EventGateway } from "../event/event.gateway";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class PaymentService {
@@ -11,12 +12,13 @@ export class PaymentService {
 
     constructor(
         private readonly primaSv: PrismaService,
-        private readonly eventGateway: EventGateway
+        private readonly eventGateway: EventGateway,
+        private readonly configSv: ConfigService
     ) {
         this.payOS = new PayOS({
-            clientId: process.env.PAYOS_CLIENT_ID,
-            apiKey: process.env.PAYOS_API_KEY,
-            checksumKey: process.env.PAYOS_CHECKSUM_KEY
+            clientId: this.configSv.get<string>('PAYOS_CLIENT_ID'),
+            apiKey: this.configSv.get<string>('PAYOS_API_KEY'),
+            checksumKey: this.configSv.get<string>('PAYOS_CHECKSUM_KEY')
         })
     }
 
@@ -32,7 +34,7 @@ export class PaymentService {
         const conNo = Number(invoiceDB.TongTien) - Number(invoiceDB.DaTra)
         // hết hạn sau 30 phút
         const expiredAt = Math.floor((Date.now() / 1000) + 30 * 60)
-        // tạo code từ id và 6 số cuối ở thời điểm hiện tại 
+        // tạo code từ id hóa đơn và 6 số cuối ở thời điểm hiện tại 
         const orderCode = DateHelper.CreateUniqueCode(body.orderId)
         const paymentData = {
             orderCode: Number(orderCode),

@@ -24,13 +24,16 @@ import ThongKeDiHoc from "./components/student/ThongKeDiHoc";
 import SchedulePage from "./components/dashboard/SchedulePage";
 import NotisList from "./components/dashboard/NotisList";
 import NotisPage from "./components/page.teacher/NotisPage";
-
-
+import ResetPassword from "./components/Reset-password";
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <Login />
+  },
+  {
+    path:'/auth/reset-password',
+    element: <ResetPassword/>
   },
   {
     element: <PrivateRoute allowedRole={'TEACHER'} />,

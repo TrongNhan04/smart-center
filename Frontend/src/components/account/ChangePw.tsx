@@ -3,6 +3,7 @@ import { useState } from "react"
 import { authApi } from "../../api/authApi"
 import { useAuthStore } from "../../store/useAuthStore"
 import { LockOutlined } from "@ant-design/icons"
+import { CatchError } from "../common/catch.error"
 
 interface Props {
   open: boolean
@@ -24,13 +25,7 @@ const ChangePw = ({ open, onCancel }: Props) => {
       handelCancel()
       useAuthStore.getState().logout() // set localStorage = null
     } catch (error: any) {
-      notification.error({
-        title: 'Có lỗi xảy ra',
-        description: error?.response?.data?.message,
-        showProgress: true,
-        pauseOnHover: true
-      })
-      console.log('Có lỗi xảy ra: ', error?.response?.data?.message)
+      CatchError.HandleError(error)
     }
     finally {
       setLoading(false)

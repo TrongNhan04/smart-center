@@ -18,11 +18,10 @@ import { PaymentModule } from './modules/payment/payment.module';
 
 @Module({
   imports: [
-    AuthModule, PrismaModule, TeacherModule, 
-    ConfigModule.forRoot({isGlobal:true}), CourseModule, 
-    ClassModule, SessionModule, StudentModule, EnrollModule, 
-    InvoiceModule, DashboardModule, AppParentModule, CloudinaryModule,
-    PaymentModule
+    ConfigModule.forRoot({ isGlobal: true }),
+    AuthModule, PrismaModule, TeacherModule, CourseModule, ClassModule,
+    SessionModule, StudentModule, EnrollModule, InvoiceModule, DashboardModule,
+    AppParentModule, CloudinaryModule, PaymentModule
   ],
   providers: [
     {
@@ -31,4 +30,4 @@ import { PaymentModule } from './modules/payment/payment.module';
     },
   ]
 })
-export class AppModule {}
+export class AppModule { }

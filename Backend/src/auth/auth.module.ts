@@ -2,21 +2,13 @@ import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { PrismaModule } from '../prisma/prisma.module';
-import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
+import { SharedJWTModule } from 'src/common/share-jwt.module';
+import { EmailModule } from 'src/email/email.module';
 
 @Module({
-    imports: [PrismaModule, ConfigModule,PassportModule,
-        JwtModule.registerAsync({// dùng async vì dùng register thì configService chưa load
-            inject: [ConfigService],// file .env đã đưa cho JwtModule ký jwt
-            useFactory: async (configService: ConfigService) => ({
-                secret: configService.get<string>('JWT_SECRET'),
-                signOptions: {expiresIn: "4h"}
-            })
-        })
-    ],
+    imports: [ PrismaModule, PassportModule, SharedJWTModule, EmailModule],
     controllers: [AuthController],
     providers: [AuthService, JwtStrategy],
     exports: [AuthService]

@@ -1,19 +1,21 @@
-import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { LoginDTO, ProfileDTO, RegisterDTO } from './auth.dto';
+import { ForgotPwDto, LoginDTO, ProfileDTO, RegisterDTO } from './auth.dto';
 import * as bcrypt from 'bcrypt'
 import { JwtService } from '@nestjs/jwt';
 import { Prisma } from 'src/generated/prisma/client';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class AuthService {
     constructor(
-        private prismaService: PrismaService,
-        private jwtService: JwtService,
+        private readonly prismaService: PrismaService,
+        private readonly jwtService: JwtService,
+        private readonly emailService: EmailService
     ) { }
 
     // Đăng ký 
-    async Register(registerDTO: RegisterDTO) {
+    async register(registerDTO: RegisterDTO) {
         // 1 kiểm tra trùng mail và số điện thoại
         const userDB = await this.prismaService.user.findFirst({
             where: {
@@ -49,7 +51,7 @@ export class AuthService {
     }
 
     // Xác thực
-    async ValidateUser(loginDTO: LoginDTO) {
+    async userValidate(loginDTO: LoginDTO) {
         const userDB = await this.prismaService.user.findUnique({
             where: { Email: loginDTO.email }
         })
@@ -63,9 +65,9 @@ export class AuthService {
     }
 
     // Đăng nhập
-    async Login(loginDTO: LoginDTO) {
+    async login(loginDTO: LoginDTO) {
         // check user
-        const userDB = await this.ValidateUser(loginDTO)
+        const userDB = await this.userValidate(loginDTO)
         const payload = {
             sub: userDB.ID,
             role: userDB.VaiTro,
@@ -95,7 +97,6 @@ export class AuthService {
                 full_name: userDB.HoTen,
                 phone: userDB.DienThoai,
                 role: userDB.VaiTro,
-                must_change_pw: userDB.PhaiDoiMK,
                 classes: classes.map(item => item.ID),
                 children: children.map(child => child.ID)
             }
@@ -103,7 +104,7 @@ export class AuthService {
     }
 
     // đăng xuất: tăng token version lên 1
-    async Logout(userId: number) {
+    async logout(userId: number) {
         await this.prismaService.user.update({
             where: { ID: userId },
             data: { PhienBanToken: { increment: 1 } }
@@ -111,7 +112,8 @@ export class AuthService {
         return "Logout succesfully"
     }
 
-    async GetMe(userId: number) {
+    // thông tin tài khoản
+    async getMe(userId: number) {
         const userDB = await this.prismaService.user.findUnique({
             where: { ID: userId },
             select: {
@@ -125,12 +127,11 @@ export class AuthService {
     }
 
     // cập nhật thông tin tài khoản
-    async UpdateProfile(userID: number, profile: ProfileDTO) {
+    async updateProfile(userID: number, profile: ProfileDTO) {
         const userDB = await this.prismaService.user.findUnique({
             where: { ID: userID }
         })
-        if (!userDB)
-            throw new NotFoundException("không tìm thấy User")
+        if (!userDB) throw new NotFoundException("không tìm thấy User")
 
         const data: Prisma.UserUpdateInput = {}
         if (profile.email || profile.phone) {
@@ -186,5 +187,46 @@ export class AuthService {
             must_change_pw: userDB.PhaiDoiMK,
             classes: classes.map(item => item.ID),
         }
+    }
+
+    // WEB: gửi email có link để đặt lại mật khẩu
+    async forgotPassword(body: ForgotPwDto) {
+        const user = await this.prismaService.user.findFirst({
+            where: { Email: body.email }
+        })
+        if (!user) return
+        await this.emailService.sendResetPasswordLink(user.Email, body.mobileUrl)
+    }
+
+    // APP: 
+    async appForgotPassword(email:string){
+        const user = await this.prismaService.user.findFirst({
+            where: { Email: email }
+        })
+        if (!user) return
+        
+    }
+
+    // reset mật khẩu
+    async resetPassword(token: string, password: string) {
+        const { email, tokenVersion } =
+            await this.emailService.decodeConfirmationToken(token)
+
+        const user = await this.prismaService.user.findUnique({
+            where: { Email: email }
+        })
+        if (!user) return
+        if (tokenVersion !== user.PhienBanToken)
+            throw new BadRequestException('Token hết hiệu lực')
+
+        const newPw = await bcrypt.hash(password, 15)
+        await this.prismaService.user.update({
+            where: { Email: email },
+            data: {
+                MatKhauHash: newPw,
+                PhienBanToken: {increment:1}
+            }
+        })
+        return 'Đổi mật khẩu thành công'
     }
 }

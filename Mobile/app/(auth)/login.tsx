@@ -21,7 +21,7 @@ export default function LoginScreen() {
     try {
       setLoading(true)
 
-      if(!email || !password) {
+      if (!email || !password) {
         Alert.alert('Thông báo', 'Vui lòng điền đầy đủ thông tin');
         return
       }
@@ -31,9 +31,9 @@ export default function LoginScreen() {
       const user = res.data.user
       Alert.alert('Thông báo', 'Đăng nhập thành công!');
       login(user, res.data.access_token)
-      if(user.children.length > 0)
+      if (user.children.length > 0)
         setSelectedStuId(user.children[0])
-      
+
       router.replace('/(tabs)');
     } catch (error: any) {
       Alert.alert('Thông báo', 'Sai email hoặc mật khẩu');
@@ -85,6 +85,13 @@ export default function LoginScreen() {
             }
           />
 
+          <Text
+            style={styles.forgotPassword}
+            onPress={()=>router.push('/(auth)/forgot-password')} 
+          >
+            Quên mật khẩu?
+          </Text>
+
           <Button
             mode="contained"
             onPress={handleLogin}
@@ -127,5 +134,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderRadius: 8,
     backgroundColor: '#3498db'
-  }
+  },
+  forgotPassword: {
+  textAlign: 'right',
+  color: '#3498db',
+  marginBottom: 10,
+}
 });

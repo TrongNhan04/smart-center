@@ -7,9 +7,8 @@ import {
 } from "antd"
 import { Link, useSearchParams } from "react-router-dom"
 import {
-  CalendarFilled, CalendarOutlined, CheckCircleOutlined, CloseCircleOutlined, DeleteOutlined,
-  LockOutlined,
-  PlusOutlined, ReadOutlined, SearchOutlined, UserOutlined
+  CalendarOutlined, CheckCircleOutlined, CloseCircleOutlined, DeleteOutlined,
+  LockOutlined, PlusOutlined, ReadOutlined, SearchOutlined, UserOutlined
 } from "@ant-design/icons"
 import EnrollModal from "./EnrollModal"
 import { CatchError } from "../common/catch.error"
@@ -131,12 +130,12 @@ const EnrollList = () => {
                 size="small"
                 icon={<DeleteOutlined />}
                 type="link"
-                danger 
+                danger
               />
             </Popconfirm>
           </Tooltip>
         else return <Tooltip title='Không thể thao tác'>
-          <Button icon={<LockOutlined/>} type="text"/>
+          <Button icon={<LockOutlined />} type="text" />
         </Tooltip>
       }
     },

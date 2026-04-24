@@ -32,7 +32,11 @@ const mobileApi = {
     getInvoiceById: (invoiceId:number) => 
         axiosClient.get(`parents/invoices/${invoiceId}`),
 
-    payment:(orderId:string|string[]) => axiosClient.post('payments',{orderId})
+    payment:(orderId:string|string[]) => axiosClient.post('payments',{orderId}),
+
+    forgorPw: (body:any) => axiosClient.post('auth/forgot-password',body),
+
+    resetPw: (body:any) => axiosClient.post('auth/reset-password', body)
 }
 
 export default mobileApi

@@ -66,17 +66,16 @@ const TeacherModal = ({ open, onCancel, onSave, editing }: Props) => {
   }
 
   useEffect(() => {
-    if (open) {
-      if (editing) {
-        const formData = mapDataTeacher(editing)
-        const formated = {
-          ...formData, dob:dayjs(formData.dob)
-        }
-        form.setFieldsValue(formated)
+    if (!open) return
+    if (editing) {
+      const formData = mapDataTeacher(editing)
+      const formated = {
+        ...formData, dob: dayjs(formData.dob)
       }
-      else
-        form.resetFields()
+      form.setFieldsValue(formated)
     }
+    else
+      form.resetFields()
   }, [open, editing, form])
 
   return (

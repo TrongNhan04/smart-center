@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDTO, ProfileDTO, RegisterDTO } from './auth.dto';
+import { ForgotPwDto, LoginDTO, ProfileDTO, RegisterDTO, ResetPwDto } from './auth.dto';
 import { JwtAuthGuard } from './guard/jwt-auth.guard';
 import { Request } from 'express';
 import { RolesGuard } from './guard/roles.guard';
@@ -22,31 +22,43 @@ export class AuthController {
 
     // đăng nhập
     @Post("login")
-    async Login(@Body() loginDTO: LoginDTO) {
-        return await this.authService.Login(loginDTO);
+    async login(@Body() loginDTO: LoginDTO) {
+        return await this.authService.login(loginDTO);
     }
 
     // đăng xuất
     @UseGuards(JwtAuthGuard)
     @Post("logout")
-    async Loout(@Req() req: RequestWithUser) {
-        return await this.authService.Logout(req.user.userId);
+    async logout(@Req() req: RequestWithUser) {
+        return await this.authService.logout(req.user.userId);
     }
 
     // lấy thông tin tài khoản
 	@UseGuards(JwtAuthGuard, RolesGuard)
 	@Roles('ADMIN', 'TEACHER', 'PARENT')
 	@Get('me')
-	async GetMe(@Req() request: RequestWithUser) {
-		return await this.authService.GetMe(+request.user.userId)
+	async getMe(@Req() request: RequestWithUser) {
+		return await this.authService.getMe(+request.user.userId)
 	}
 
 	// đổi thông tin tài khoản
 	@UseGuards(JwtAuthGuard)
 	@Patch("profile")
-	async UpdateProfile(
+	async updateProfile(
 		@Req() req: RequestWithUser, @Body() profile: ProfileDTO) {
 		const userId = req.user.userId
-        return await this.authService.UpdateProfile(+userId, profile)
+        return await this.authService.updateProfile(+userId, profile)
 	}
+
+    //quên mật khẩu 
+    @Post('forgot-password')
+    async forgotPassword(@Body() body:ForgotPwDto){
+        return await this.authService.forgotPassword(body)
+    }
+
+    // đặt lại mật khẩu
+    @Post('reset-password')
+    async resetPassword(@Body() {token, password}:ResetPwDto){
+        return await this.authService.resetPassword(token, password)
+    }
 }

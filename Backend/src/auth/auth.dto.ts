@@ -1,7 +1,7 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString } from "class-validator"
 import { Vaitro } from "src/generated/prisma/enums"
 
-export class RegisterDTO{
+export class RegisterDTO {
     @IsEmail()
     @IsNotEmpty()
     email!: string
@@ -10,12 +10,12 @@ export class RegisterDTO{
     @IsNotEmpty()
     phone!: string
 
-    @IsEnum(Vaitro,{message:`User có vai trò là ${Object.values(Vaitro).join(",")}`})
+    @IsEnum(Vaitro, { message: `User có vai trò là ${Object.values(Vaitro).join(",")}` })
     @IsNotEmpty()
     role!: Vaitro
 }
 
-export class LoginDTO{
+export class LoginDTO {
     @IsEmail()
     @IsNotEmpty()
     email!: string
@@ -28,7 +28,7 @@ export class LoginDTO{
     mustChangePW?: boolean
 }
 
-export class ProfileDTO{
+export class ProfileDTO {
     @IsOptional()
     @IsNotEmpty()
     @IsString()
@@ -56,4 +56,22 @@ export class ProfileDTO{
 
     @IsOptional()
     address?: string
+}
+
+export class ForgotPwDto {
+    @IsNotEmpty()
+    @IsEmail()
+    email!: string
+
+    mobileUrl?: string
+}
+
+export class ResetPwDto {
+    @IsNotEmpty()
+    @IsString()
+    password!: string
+
+    @IsNotEmpty()
+    @IsString()
+    token!: string
 }
