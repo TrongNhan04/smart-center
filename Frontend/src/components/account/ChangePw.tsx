@@ -1,4 +1,4 @@
-import { Form, Input, message, Modal, notification } from "antd"
+import { Form, Input, message, Modal } from "antd"
 import { useState } from "react"
 import { authApi } from "../../api/authApi"
 import { useAuthStore } from "../../store/useAuthStore"
@@ -84,7 +84,7 @@ const ChangePw = ({ open, onCancel }: Props) => {
               }),
             ]}
           >
-            <Input.Password placeholder="Tạo mật khẩu mới (ít nhất 6 ký tự)" size="large" />
+            <Input.Password placeholder="Tạo mật khẩu mới...." size="large" />
           </Form.Item>
 
           <Form.Item // xác nhận mật khẩu
@@ -104,7 +104,7 @@ const ChangePw = ({ open, onCancel }: Props) => {
               }),
             ]}
           >
-            <Input.Password placeholder="Nhập lại mật khẩu mới một lần nữa" size="large" />
+            <Input.Password placeholder="Xác nhận mật khẩu mới..." size="large" />
           </Form.Item>
         </Form>
       </Modal>

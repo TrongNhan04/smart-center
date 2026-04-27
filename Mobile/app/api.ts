@@ -17,26 +17,27 @@ const mobileApi = {
     getDashboard: (studentId: number) =>
         axiosClient.get(`parents/students/${studentId}/dashboard`),
 
-    getClassByStuId: (id:number) => 
+    getClassByStuId: (id: number) =>
         axiosClient.get(`parents/students/${id}/classes`),
 
-    getDetailByStuAndSesId: (stuId: number, sessionId:number) =>
+    getDetailByStuAndSesId: (stuId: number, sessionId: number) =>
         axiosClient.get(`parents/students/${stuId}/sessions/${sessionId}`),
 
-    getSessionIdsByClassId: (classId:string | string []) => 
+    getSessionIdsByClassId: (classId: string | string[]) =>
         axiosClient.get(`parents/classes/${classId}/sessions`),
 
-    getInvoiceByStuId: (stuId:number) =>
+    getInvoiceByStuId: (stuId: number) =>
         axiosClient.get(`parents/students/${stuId}/invoices`),
-    
-    getInvoiceById: (invoiceId:number) => 
+
+    getInvoiceById: (invoiceId: number) =>
         axiosClient.get(`parents/invoices/${invoiceId}`),
 
-    payment:(orderId:string|string[]) => axiosClient.post('payments',{orderId}),
+    payment: (orderId: string | string[]) => axiosClient.post('payments', { orderId }),
 
-    forgorPw: (body:any) => axiosClient.post('auth/forgot-password',body),
+    forgorPw: (body: any) => axiosClient.post('auth/forgot-password', body),
 
-    resetPw: (body:any) => axiosClient.post('auth/reset-password', body)
+    resetPw: (body: any) =>
+        axiosClient.post('auth/reset-password', body)
 }
 
 export default mobileApi

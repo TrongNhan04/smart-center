@@ -3,7 +3,6 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { NotifyService } from "../notify/notify.service";
 import { SessionsResultDTO } from "./session-result.dto";
 import { DateHelper } from "src/common/date.helper";
-import { BuoiHocUpdateInput, KetQua_BuoiHocUpdateInput } from "src/generated/prisma/models";
 
 @Injectable()
 export class SessionResultService {
@@ -58,7 +57,11 @@ export class SessionResultService {
         include: { ketqua_chitiet: true }
       }),
       this.prismaSv.ghiDanh.findMany({
-        where: { LopHocID: sessionDB.LopHocID, TrangThai: 'ACTIVE' },
+        where: { // tìm ghi danh hợp lệ trước ngày bắt đầu buổi học
+          LopHocID: sessionDB.LopHocID,
+          TrangThai: 'ACTIVE',
+          NgayGhiDanh: {lte:sessionDB.BatDauLuc}
+        },
         include: { hocvien: { include: { Parent: true } } },
         orderBy: { hocvien: { TenHocVien: 'asc' } }
       })
@@ -82,7 +85,7 @@ export class SessionResultService {
       (result.ketqua_chitiet.map(item => [item.GhiDanhID, item]))
     return enrolls.map(value => { // mỗi value là ID (enroll) + thông tin học viên
       const data = newMapKQCT.get(value.ID)
-      if (!data) return null // không tồn tại data cho ghi danh id đó
+      if (!data) return null // không tồn tại kết quả cho ghi danh id đó
       return {
         ...mapStudent(value),
         DiemDanh: data.DiemDanh,
@@ -104,33 +107,39 @@ export class SessionResultService {
     const isOverTime = DateHelper.TimeDiff(sessionDB.KetThucLuc)
     // nhỏ hơn 48h và chưa submit
     if (isOverTime < 2880 && sessionDB.TrangThai === 'SCHEDULED')
-      throw new ConflictException(
-        'Chỉ được mở khóa những buổi học quá hạn nộp kết quả')
+      throw new ConflictException('Chỉ được mở khóa những buổi học quá hạn nộp kết quả')
 
     const sessionUp = await this.prismaSv.buoiHoc.update({
       where: { ID: sessionDB.ID },
       data: { AdminMoKhoa: true, YeuCauMoKhoa: false },
-      include: {
-        lophoc: {
-          select: {
-            TenLop: true, ID: true,
-            giaovien: { select: { UserID: true } }
-          }
-        }
-      }
+      include: { lophoc: { include: { giaovien: { select: { UserID: true } } } } }
     })
     const payload = {
-      ID: sessionUp.ID, BatDauLuc: sessionUp.BatDauLuc,
-      BuoiSo: sessionUp.BuoiSo,
+      ID: sessionUp.ID, BatDauLuc: sessionUp.BatDauLuc, BuoiSo: sessionUp.BuoiSo,
       LopHocID: sessionUp.lophoc.ID, TenLop: sessionUp.lophoc.TenLop,
       UserID: sessionUp.lophoc.giaovien.UserID
     }
     await this.notisService.createUnLockSSNotify(payload)
+  }
 
+  // từ chối mở khóa 
+  async refuseUnlock(sessionId: number) {
+    const sessionUp = await this.prismaSv.buoiHoc.update({
+      where: { ID: sessionId },
+      data: { YeuCauMoKhoa: false },
+      include: { lophoc: { include: { giaovien: { select: { UserID: true } } } } }
+    })
+    if (!sessionUp) throw new NotFoundException('Không tìm thấy buổi học')
+    const payload = {
+      ID: sessionUp.ID, BatDauLuc: sessionUp.BatDauLuc, BuoiSo: sessionUp.BuoiSo,
+      LopHocID: sessionUp.lophoc.ID, TenLop: sessionUp.lophoc.TenLop,
+      UserID: sessionUp.lophoc.giaovien.UserID
+    }
+    await this.notisService.createRefuseUnlockNotify(payload)
   }
 
   // gửi yêu cầu mở khóa
-  async RequestUnlock(userId: number, sessionId: number, reason: string) {
+  async requestUnlock(userId: number, sessionId: number, reason: string) {
     const { sessionDB } = await this.SessionAcsessValidate(userId, sessionId)
     if (sessionDB.BatDauLuc > new Date())
       throw new BadRequestException('Buổi học chưa bị khóa, không thể gửi yêu cầu')
@@ -149,14 +158,18 @@ export class SessionResultService {
   private async ProcessSessionResult(sessionDB: any, teacherId: number,
     body: SessionsResultDTO, status: 'DRAFT' | 'SUBMITTED') {
 
-    // lấy danh sách học viên Active của lớp có buổi học id đó
+    // lấy danh sách học viên Active của lớp trước thời điểm buổi học diễn ra
     const listEnroll = await this.prismaSv.ghiDanh.findMany({
-      where: { LopHocID: sessionDB.LopHocID, TrangThai: 'ACTIVE' },
-      select: { ID: true, hocvien: { select: { UserID: true } } }
+      where: {
+        LopHocID: sessionDB.LopHocID,
+        TrangThai: 'ACTIVE',
+        NgayGhiDanh: { lte: sessionDB.BatDauLuc }
+      },
+      select: { ID: true, HocVienID:true, hocvien: { select: { UserID: true } } }
     })
     // key: enrollmentId, value: dữ liệu của body gửi lên 
     const inputMap = new Map(body.ChiTietKetQua.map(m => [m.GhiDanhID, m]))
-    const listParent = listEnroll.map(e => e.hocvien.UserID)
+    const listParent = listEnroll.map(item => ({stuId:item.HocVienID, userId:item.hocvien.UserID}))
 
     return await this.prismaSv.$transaction(async (tx) => {
       const fileAttach = body.TepDinhKem?.map(file => ({
@@ -230,12 +243,12 @@ export class SessionResultService {
         data: {
           ChuDe: body.ChuDe,
           ...(isSubmitted && {
-            AdminMoKhoa: false,
+            AdminMoKhoa: false, // tắt ưu tiên nếu có
             TrangThai: 'COMPLETED'
           })
         }
       })
-      // Nếu là SUBMITTED -> Cập nhật trạng thái buổi học 
+      // Nếu là SUBMITTED -> Cập nhật trạng thái buổi học + gửi thông báo
       if (isSubmitted) {
         await tx.lopHoc.updateMany({ // update trạng thái lớp
           where: { ID: sessionDB.LopHocID, TrangThai: 'OPEN' },

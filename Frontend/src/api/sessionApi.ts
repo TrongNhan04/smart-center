@@ -26,6 +26,9 @@ export const sessionApi = {
     unlock: (sessionId: number) =>
         axiosClient.post(`admin/sessions/${sessionId}/unlock`),
 
+    refuseUnlock:(sessionId:number) => 
+        axiosClient.post(`admin/sessions/${sessionId}/refuse-unlock`),
+
     cancel: (sessionId: number, reason: string) =>
         axiosClient.patch(`admin/sessions/${sessionId}/cancel`, reason),
 

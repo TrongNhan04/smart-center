@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react';
 import {
   Card, Form, Input, Button, Upload, Table, Typography, Descriptions,
-  Row, Col, Radio, Space, InputNumber, Tooltip, Tag, message,
-  Skeleton,
+  Row, Col, Radio, Space, InputNumber, Tooltip, Tag, message, Skeleton,
 } from 'antd';
 import {
-  CalendarFilled, CalendarOutlined, ClockCircleFilled, ClockCircleOutlined, EnvironmentFilled,
-  EnvironmentOutlined,
-  InboxOutlined, LeftOutlined, PhoneOutlined, ReadFilled, ReadOutlined, UserOutlined,
+  CalendarOutlined, ClockCircleOutlined, EnvironmentOutlined, InboxOutlined,
+  LeftOutlined, ReadOutlined, UserOutlined,
 } from '@ant-design/icons';
 import type { SessionResult, TSessionDetail } from '../session/SessionDTO';
 import { DateHelper } from '../common/date.helper';
@@ -78,15 +76,20 @@ const SessionDetail = () => {
   // Cấu hình cột cho Bảng Học Viên
   const columns = [
     { // số tt
-      title: 'STT', key: 'stt', width: 60, align: 'center' as const,
+      title: 'STT', key: 'stt', width: 80, align: 'center' as const,
       render: (_: any, __: any, index: any) => index + 1
     },
     { // mã học viên
-      title: 'Mã HV', dataIndex: 'MaHocVien', key: 'MaHocVien', width: 100
+      title: 'Mã HV', dataIndex: 'MaHocVien', key: 'MaHocVien', width: 120
     },
     { // tên học viên
-      title: 'Tên Học Viên', dataIndex: 'TenHocVien', key: 'TenHocVien',
-      width: 180, render: (text: string) => <Text strong>{text}</Text>
+      title: 'Họ và tên', dataIndex: 'TenHocVien', key: 'TenHocVien',
+      render: (text: string, record: SessionResult) =>
+        <Tooltip title={<>Ph. {record.PhuHuynh} <br/> ĐT. {record.DienThoai}</>}>
+          <Space style={{ cursor: 'pointer' }}>
+            <UserOutlined style={{ color: '#8c8c8c' }} />{text}
+          </Space>
+        </Tooltip>
     },
     { // điểm danh
       title: 'Điểm danh', dataIndex: 'DiemDanh', key: 'DiemDanh', width: 220,
@@ -120,15 +123,6 @@ const SessionDetail = () => {
           allowClear
         />
     },
-    {//phụ huynh
-      title: 'Phụ huynh', dataIndex: 'PhuHuynh', key: 'PhuHuynh', width: 150,
-      render: (parent: string, record: SessionResult) =>
-        <Tooltip title={`Gọi cho PH ${parent}`}>
-          <Space style={{ cursor: 'pointer', color: '#1890ff' }}>
-            <PhoneOutlined /> {record.DienThoai}
-          </Space>
-        </Tooltip>
-    },
   ]
 
   // Hàm cập nhật state khi giáo viên thao tác trên bảng
@@ -152,7 +146,6 @@ const SessionDetail = () => {
           Diem: student.Diem ? Number(student.Diem) : null,
         }))
       }
-      console.log(payload)
       const isSubmit = type === 'SUBMITTED'
       isSubmit ? await sessionApi.submitted(buoiHocId, payload) :
         await sessionApi.saveDraft(buoiHocId, payload)
@@ -224,7 +217,7 @@ const SessionDetail = () => {
 
       <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
         <Button size="large" type="text" icon={<LeftOutlined />}
-              onClick={() => navigate(-1)} />
+          onClick={() => navigate(-1)} />
         <Title level={3} style={{ margin: 0 }}>Buổi học {session.BuoiSo}</Title>
 
         <UnlockButton
@@ -258,7 +251,7 @@ const SessionDetail = () => {
               <Text><CalendarOutlined style={{ color: '#187cff' }} /> {ngayHoc}</Text>
             </Descriptions.Item>
             <Descriptions.Item label="Giáo viên">
-              <Text><UserOutlined style={{ color: '#8c8c8c' }}/> {session.GiaoVien}</Text>
+              <Text><UserOutlined style={{ color: '#8c8c8c' }} /> {session.GiaoVien}</Text>
             </Descriptions.Item>
             <Descriptions.Item label="Phòng">
               <Text>
@@ -266,7 +259,7 @@ const SessionDetail = () => {
               </Text>
             </Descriptions.Item>
             <Descriptions.Item label="Thời gian">
-              <Text><ClockCircleOutlined style={{color:'#faad14'}}/> {gioHoc}</Text>
+              <Text><ClockCircleOutlined style={{ color: '#faad14' }} /> {gioHoc}</Text>
             </Descriptions.Item>
           </Descriptions>
 

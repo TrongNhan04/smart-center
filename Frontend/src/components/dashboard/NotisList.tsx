@@ -1,12 +1,13 @@
 import { Link, useNavigate } from "react-router-dom"
-import { type AdminNotis, type ReminderTeacher  } from "./DashboardDTO"
-import { Button, Card, message, Popconfirm, Table, Tag, Typography } from "antd"
+import { type AdminNotis, type ReminderTeacher } from "./DashboardDTO"
+import { Button, Card, message, Popconfirm, Table, Tag, Tooltip, Typography } from "antd"
 import { useEffect, useState } from "react"
 import { dashboardApi } from "../../api/dashboardApi"
-import { BellOutlined, CheckCircleOutlined, CheckOutlined, MessageOutlined, PlusCircleOutlined, ReadOutlined } from "@ant-design/icons"
+import { BellOutlined, CheckCircleFilled, CheckOutlined, CloseCircleFilled, MessageOutlined, PlusCircleOutlined, ReadOutlined } from "@ant-design/icons"
 import { CatchError } from "../common/catch.error"
+import { sessionApi } from "../../api/sessionApi"
 
-const {Text} = Typography
+const { Text } = Typography
 
 const NotisList = () => {
   const navigate = useNavigate()
@@ -49,9 +50,10 @@ const NotisList = () => {
       CatchError.HandleError(error)
     }
   }
-  const handleUnlock = async (sessionId: number) => {
+  const handleUnlock = async (sessionId: number, isUnlock:boolean) => {
     try {
-      await dashboardApi.unlock(sessionId)
+      isUnlock ? await sessionApi.unlock(sessionId) 
+      : await sessionApi.refuseUnlock(sessionId)
       fetchTasks()
       message.success('Thao tác thành công')
     } catch (error) {
@@ -78,15 +80,16 @@ const NotisList = () => {
       }
     },
     { // mô tả
-      title: 'Nội dung', dataIndex: 'LoiNhan', key: 'LoiNhan',
+      title: 'Nội dung', dataIndex: 'LoiNhan', key: 'LoiNhan', ellipsis: true,
       render: (_: any, task: AdminNotis) => {
         const date = new Date(task.Ngay).toLocaleDateString()
         let message = task.LoiNhan
         if (task.Loai === 'REQUEST')
-          message = `GV: ${task.GiaoVien} - Lý do: ${task.LoiNhan} (Buổi ${task.BuoiSo}) - Ngày gửi yêu cầu: ${date}`
+          message = `GV: ${task.GiaoVien} - Lý do: ${task.LoiNhan} buổi số ${task.BuoiSo} - Ngày gửi yêu cầu: ${date}`
         if (task.Loai === 'UNSUBMIT')
-          message =  `GV: ${task.GiaoVien} chưa nộp kết quả buổi ${task.BuoiSo}`
-        return <Text><MessageOutlined style={{ color: '#8c8c8c' }}/> {message}</Text>
+          message = `GV: ${task.GiaoVien} chưa nộp kết quả buổi ${task.BuoiSo}`
+        return <Text ellipsis={{ tooltip: message }}>
+          <MessageOutlined style={{ color: '#8c8c8c' }} /> {message}</Text>
       }
     },
     { // Lớp học
@@ -102,17 +105,34 @@ const NotisList = () => {
       align: 'center' as const, width: 180,
       render: (_: any, task: AdminNotis) => {
         if (task.Loai === 'REQUEST')
-          return <Popconfirm
-            title="Xác nhận mở khóa cho buổi học này?"
-            onConfirm={() => handleUnlock(task.BuoiHocID)}
-            okText="Duyệt"
-            cancelText="Hủy"
-          >
-            <Button size="small"
-              icon={<CheckCircleOutlined />}
-              style={{ backgroundColor: '#52c41a', color: '#fff' }}
-            > Duyệt</Button>
-          </Popconfirm>
+          return <>
+            <Tooltip title="Duyệt">
+              <Popconfirm
+                title="Xác nhận mở khóa?"
+                description="Thao tác này có thể thay đổi kết quả buổi học!"
+                okText="Xác nhận mở khóa"
+                cancelText="Hủy"
+                onConfirm={() => handleUnlock(task.BuoiHocID, true)}
+                okButtonProps={{ danger: true }}
+              >
+                <Button
+                  size="middle"
+                  icon={<CheckCircleFilled />}
+                  type="link"
+                  style={{ color: 'green' }}
+                />
+              </Popconfirm>
+            </Tooltip>
+            <Tooltip title="Từ chối">
+              <Button
+                onClick={()=>handleUnlock(task.BuoiHocID, false)}
+                size="small"
+                icon={<CloseCircleFilled />}
+                type="link"
+                style={{ color: 'red' }}
+              />
+            </Tooltip>
+          </>
         if (task.Loai === 'UNSUBMIT') {
           // kiểm tra có phải buổi học đã nhắc rồi hay không
           const isReminded = remindList.includes(task.BuoiHocID)
@@ -127,7 +147,6 @@ const NotisList = () => {
             onClick={() => handleRemindTeacher(task)}
           >{isReminded ? 'Đã nhắc' : 'Nhắc GV'}</Button>
         }
-
         return <Button
           size="small"
           icon={<PlusCircleOutlined />}

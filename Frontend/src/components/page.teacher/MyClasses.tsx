@@ -1,5 +1,5 @@
 import {
-  List, Card, Progress, Typography, Space, Tag, Divider, Row, Col,
+  List, Card, Progress, Typography, Space, Tag, Divider,
 } from 'antd';
 import { TeamOutlined, CalendarOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +8,7 @@ import type { TeacherClass } from '../class/ClassDTO';
 import classApi from '../../api/classApi';
 import { CatchError } from '../common/catch.error';
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 const MyClasses = () => {
   const navigate = useNavigate();

@@ -2,26 +2,32 @@ import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/commo
 import { Prisma } from "src/generated/prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 
+interface StudentAndUserId {
+    stuId: number,
+    userId: number
+}
+
 @Injectable()
 export class NotifyService {
     constructor(private prismaSv: PrismaService) { }
 
-    // tạo NHIỀU thông báo cùng lúc có tx?
-    async createMany(listParentID: number[], session: any,
+    // tạo NHIỀU thông báo cùng lúc có tx
+    async createMany(stuAndUserId: StudentAndUserId[], session: any,
         tx?: Prisma.TransactionClient) {
-
+            
         let client: Prisma.TransactionClient | null = null
         if (tx) client = tx
         else client = this.prismaSv
         const dateStr = session.BatDauLuc.toLocaleDateString()
-        const notionData = listParentID.map(id => ({
-            UserID: id,
+        const notionData = stuAndUserId.map(item => ({
+            UserID: item.userId,
             TieuDe: 'Kết quả học tập mới',
             NoiDung: `Kết quả buổi học số ${session.BuoiSo} ngày ${dateStr} - Lớp học: ${session.LopHoc}`,
             Loai: 'SESSION_RESULT',
             DuLieu: {
                 sessionId: session.ID,
-                classId: session.LopHocID
+                classId: session.LopHocID,
+                studentId: item.stuId
             }
         }))
         return await client.thongBao.createMany({ data: notionData })
@@ -72,20 +78,22 @@ export class NotifyService {
         })
     }
 
-    // thông báo hủy buổi học có tx
-    async createCancelSessionNotify(userId: number[], session: any, reason: string) {
+    // thông báo hủy buổi học
+    async createCancelSessionNotify(stuAndUserId: StudentAndUserId[],
+        session: any, reason: string) {
         const title = "Thông báo hủy buổi học"
         const dateStr = session.BatDauLuc.toLocaleDateString('vi-VN')
         const body = `Lớp '${session.lophoc.TenLop}' - buổi ${session.BuoiSo} (${dateStr}) đã hủy vì: ${reason}`
 
-        const notisData = userId.map(id => ({
-            UserID: id,
+        const notisData = stuAndUserId.map(item => ({
+            UserID: item.userId,
             TieuDe: title,
             NoiDung: body,
             Loai: "SESSION_CANCEL",
             DuLieu: {
                 sessionId: session.ID,
-                classId: session.LopHocID
+                classId: session.LopHocID,
+                studentId: item.stuId
             }
         }))
 
@@ -94,8 +102,8 @@ export class NotifyService {
     }
 
     // thông báo học phí
-    async createInvoiceNotify(userId: number, payload:any) {
-        const {ThoiHan, TenLop, TongTien, HoaDonId, HocVienId, LopHocId} = payload
+    async createInvoiceNotify(userId: number, payload: any) {
+        const { ThoiHan, TenLop, TongTien, HoaDonId, HocVienId, LopHocId } = payload
         const dateStr = ThoiHan.toLocaleDateString('vi-VN')
         return await this.prismaSv.thongBao.create({
             data: {
@@ -137,6 +145,22 @@ export class NotifyService {
                 UserID: session.UserID,
                 TieuDe: "Thông báo hệ thống",
                 NoiDung: `Đã mở khóa buổi ${session.BuoiSo} (${dateStr}) của lớp '${session.TenLop}'. Vui lòng kiểm tra lại buổi học`,
+                Loai: 'SYSTERM_ARLERT',
+                DuLieu: {
+                    classId: session.LopHocID,
+                    sessionId: session.ID
+                }
+            }
+        })
+    }
+
+    async createRefuseUnlockNotify(session: any) {
+        const dateStr = session.BatDauLuc.toLocaleDateString('vi-VN')
+        return await this.prismaSv.thongBao.create({
+            data: {
+                UserID: session.UserID,
+                TieuDe: "Thông báo hệ thống",
+                NoiDung: `Từ chối mở khóa ${session.BuoiSo} (${dateStr}) của lớp '${session.TenLop}'. Vui lòng kiểm tra lại buổi học`,
                 Loai: 'SYSTERM_ARLERT',
                 DuLieu: {
                     classId: session.LopHocID,

@@ -68,14 +68,14 @@ const ClassDetail = () => {
     {// Buổi số
       title: 'Buổi số', dataIndex: 'BuoiSo', width: 90,
       key: 'BuoiSo', align: 'center' as const,
-      render: (value: number) => value
     },
     { // Thời gian
       title: 'Thời gian', dataIndex: 'BatDauLuc', width: 150,
       key: 'BatDauLuc', //ellipsis: 
       render: (value: string) => {
         return <Space orientation="vertical" size={0}>
-          <Text><CalendarOutlined style={{ color: '#8c8c8c' }} /> {new Date(value).toLocaleDateString()}</Text>
+          <Text><CalendarOutlined style={{ color: '#8c8c8c' }}
+          /> {new Date(value).toLocaleDateString()}</Text>
         </Space>
       }
     },
@@ -83,7 +83,8 @@ const ClassDetail = () => {
       title: 'Chủ đề', dataIndex: 'ChuDe', key: 'ChuDe', ellipsis: true,
       render: (topic: string) => {
         return <Space orientation="vertical" size={0}>
-          <Text ><ReadOutlined style={{ color: '#722ed1' }} /> {topic ?? `Chủ đề: chưa cập nhật...`} </Text>
+          <Text ><ReadOutlined style={{ color: '#722ed1' }}
+          /> {topic ?? `Chủ đề: chưa cập nhật...`} </Text>
         </Space>
       }
     },
@@ -141,21 +142,16 @@ const ClassDetail = () => {
         return isAdmin ? <SessionAction
           session={value}
           unlock={handleUnlock}
+          reload={initData}
           onCancel={handleCancel}
         />
           : <Tooltip title='Xem chi tiết'>
             <Button icon={<InfoCircleOutlined />} size="small" type="link"
               onClick={() => navigate(`sessions/${value.ID}`)} />
           </Tooltip>
-
       }
     }
   ]
-
-  // const filterColumns = () => {
-  //   if (isAdmin) return columns
-  //   return columns.filter(item => item.key !== 'AdminMoKhoa')
-  // }
 
   const AutoGenerate = async (lopHocId: number) => {
     try {
@@ -257,7 +253,6 @@ const ClassDetail = () => {
 
       {/* div của body */}
       <div style={{ padding: '0px 18px 0px 18px' }}>
-
         <Card>
           <Tabs
             onChange={(key) => setSearchParam({ tab: key })}
@@ -306,7 +301,7 @@ const ClassDetail = () => {
               {
                 key: 'students',
                 label: `Danh sách học viên`,
-                children: (<TabStudent id={lophoc.ID} />),
+                children: (<TabStudent lophocId={lophoc.ID} />),
               },
               {
                 key: 'info',

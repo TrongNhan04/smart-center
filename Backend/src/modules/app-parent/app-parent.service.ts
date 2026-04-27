@@ -28,8 +28,7 @@ export class AppParentService {
         orderBy: { BatDauLuc: 'asc' },
         include: {
           lophoc: {
-            select: {
-              TenLop: true,
+            include: {
               giaovien: { select: { User: { select: { HoTen: true } } } }
             }
           },

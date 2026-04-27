@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import {
   BookOutlined,
   CalendarOutlined,
-  CheckSquareOutlined,
   CreditCardOutlined,
   DashboardOutlined,
   FormOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   NotificationOutlined,
+  ReadOutlined,
   TeamOutlined,
   UserOutlined,
 } from '@ant-design/icons';
@@ -71,7 +71,7 @@ const SidebarComponent = () => {
   : [
     getItem('Thời khóa biểu', 'schedules', <CalendarOutlined/>),
     getItem('Thông báo', 'notis', <NotificationOutlined/>),
-    getItem('Lớp của tôi', 'classes', <BookOutlined/>),
+    getItem('Lớp của tôi', 'classes', <ReadOutlined/>),
     getItem('Tài khoản', 'account', <UserOutlined />)
   ]
 

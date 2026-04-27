@@ -4,10 +4,11 @@ import type { ClassForStudent, StudentDB } from "./StudentDTO"
 import { studentApi } from "../../api/studentApi"
 import classApi from "../../api/classApi"
 import {
-  Avatar, Badge, Button, Card, Progress, Skeleton, Space, Table, Tabs, Tag, Tooltip, Typography
+  Avatar, Badge, Button, Card, Progress, Skeleton, Space, Table, Tabs, Tag,
+  Tooltip, Typography
 } from "antd"
 import {
-  CalendarFilled, CalendarOutlined, CaretLeftOutlined, ClockCircleFilled, EditOutlined, InfoCircleOutlined, LeftOutlined, ReadOutlined,
+  CalendarOutlined, EditOutlined, InfoCircleOutlined, LeftOutlined, ReadOutlined,
   UserOutlined,
 } from "@ant-design/icons"
 import StudentModal from "./StudentModal"
@@ -198,7 +199,7 @@ const StudentDetail = () => {
               },
               {
                 key: 'invoices',
-                label: 'Hóa đơn',
+                label: 'Học phí',
                 children: (<TabInvoice />)
               },
               {

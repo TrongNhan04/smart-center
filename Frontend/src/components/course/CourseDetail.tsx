@@ -1,5 +1,5 @@
 import {
-  Avatar, Badge, Button, Card, Progress, Skeleton, Space, Table, Tabs, Tag,
+  Avatar, Badge, Button, Card, Skeleton, Space, Table, Tabs, Tag,
   Tooltip, Typography
 } from "antd"
 import { useEffect, useState } from "react"

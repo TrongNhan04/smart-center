@@ -33,7 +33,8 @@ const PaymentScreen = () => {
   useEffect(() => {
     if (!invoiceId) return
     // socket, nhớ đổi ip giống api
-    const socket = io('http://192.168.1.101:3000')
+    //http://192.168.1.101:3000
+    const socket = io('https://peculiar-refreeze-habitable.ngrok-free.dev')
     const envName = `PAYMENT_SUCCESS_${invoiceId}`
 
     socket.on(envName, data => {

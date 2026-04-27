@@ -39,14 +39,23 @@ export class EmailService {
         // EMAIL_RESET_PASSWORD_URL là url của frontend
         // nếu là mobile thì lấy mobile
         const webURL = this.configService.get('EMAIL_RESET_PASSWORD_URL')
-        const url = `${mobileUrl?mobileUrl:webURL}?token=${token}`
+        // ngrokURL biến http://localhost:3000 thành bên dưới
+        const ngrokURL = 'https://peculiar-refreeze-habitable.ngrok-free.dev/auth/redict-to-app'
 
-        const text = `Xin chào, \nĐể thay đổi mật khẩu của bạn, hãy click vào đường dẫn: ${url}`
+        const url = `${mobileUrl ? ngrokURL : webURL}?token=${token}`
+
+        // const text = `Xin chào, \nĐể thay đổi mật khẩu của bạn, hãy click vào đường dẫn`
 
         return this.sendMail({
             to: email,
             subject: 'Reset password',
-            text
+            //text: textWeb,
+            html: `<p>Xin chào, Bạn vừa yêu cầu đổi mật khẩu</p> 
+                <a href="${url}" 
+                    style="padding: 10px; background: #3498db; color: white; 
+                    text-decoration: none; border-radius: 4px; display: inline-block;"> 
+                    BẤM VÀO ĐÂY ĐỂ ĐỔI MẬT KHẨU
+                </a>`   
         })
     }
 

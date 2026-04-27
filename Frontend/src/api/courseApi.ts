@@ -3,16 +3,13 @@ import type { CourseDto } from "../components/course/CourseDTO"
 
 const courseApi = {
     create: (course: Partial<CourseDto>) =>
-        axiosClient.post('admin/courses', course)
-    ,
+        axiosClient.post('admin/courses', course),
 
     update: (id: number, course: Partial<CourseDto>) =>
-        axiosClient.patch(`admin/courses/${id}`, course)
-    ,
+        axiosClient.patch(`admin/courses/${id}`, course),
 
     delete: (id: number) =>
-        axiosClient.patch(`admin/courses/${id}/inactive`)
-    ,
+        axiosClient.patch(`admin/courses/${id}/inactive`),
 
     restore: (id: number) =>
         axiosClient.patch(`admin/courses/${id}/restore`),

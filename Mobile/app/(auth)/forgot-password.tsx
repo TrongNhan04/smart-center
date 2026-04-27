@@ -18,7 +18,7 @@ const ForgotPwScreen = () => {
         setErrorMsg('Không được bỏ trống email')
         return
       }
-      const link = Linking.createURL('/(auth)/forgot-password')
+      const link = Linking.createURL('/(auth)/reset-password')
       const payload = {
         email,
         mobileUrl:link
@@ -75,7 +75,7 @@ const ForgotPwScreen = () => {
               textColor='#000'
               onPress={() => {
                 setEmail('')
-                router.back()
+                router.replace('/login')
               }}
             >
               Hủy

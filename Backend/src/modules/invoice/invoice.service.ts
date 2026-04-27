@@ -84,7 +84,7 @@ export class InvoiceService {
                 where,
                 include: InvoiceIncludeStu_Eroll,
                 take: take, skip: skip,
-                orderBy: { MaHoaDon: 'desc' },
+                orderBy: { CreatedAt: 'desc' },
                 omit: { UpdatedAt: true }
             })
         ])

@@ -133,7 +133,7 @@ const InvoiceListScreen = () => {
         alignItems: 'center', paddingRight: 8
       }}>
         <Text variant="headlineSmall"
-          style={{ padding: 20, fontWeight: 'bold' }}>
+          style={{ padding: 20, fontWeight: 'bold', color: '#2c3e50' }}>
           Học phí
         </Text>
       </View>

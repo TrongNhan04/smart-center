@@ -85,6 +85,14 @@ export class SessionController {
         return await this.sessionService.unlockSession(+sessionId)
     }
 
+    // từ chối mở khóa
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADMIN')
+    @Post('admin/sessions/:id/refuse-unlock')
+    async refuseUnlock(@Param('id') sessionId: number) {
+        return await this.sessionService.refuseUnlock(+sessionId)
+    }
+
     // gửi yêu cầu mở khóa buổi học 
     @UseGuards(JwtAuthGuard, MustChangePWGuard, RolesGuard)
     @Roles('TEACHER')

@@ -1,17 +1,20 @@
-import { Alert, Button, Form, Input, Modal, Popconfirm, Space, Tooltip } from "antd"
+import { Alert, Button, Form, Input, message, Modal, Popconfirm, Space, Tooltip } from "antd"
 import type { SessionDB } from "./SessionDTO"
-import { DeleteOutlined, InfoCircleOutlined, UnlockOutlined } from "@ant-design/icons"
+import { CheckCircleFilled, CloseCircleFilled, DeleteOutlined, InfoCircleOutlined } from "@ant-design/icons"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { CatchError } from "../common/catch.error"
+import { sessionApi } from "../../api/sessionApi"
 
 interface Props {
   session: SessionDB,
   unlock: (sessionId: number) => void,
-  onCancel: (sessionId: number, reason:string) => void
+  reload: () => void,
+  onCancel: (sessionId: number, reason: string) => void
   // onOpenDrawer: (sessionId: number) => void
 }
 
-const SessionAction = ({ session, unlock, onCancel }: Props) => {
+const SessionAction = ({ session, unlock, reload, onCancel }: Props) => {
   const [form] = Form.useForm()
   const [open, setOpen] = useState(false)
   const navigate = useNavigate()
@@ -22,11 +25,21 @@ const SessionAction = ({ session, unlock, onCancel }: Props) => {
         size="small"
         type="link"
         icon={<InfoCircleOutlined />}
-        onClick={()=>navigate(`sessions/${session.ID}`)}
+        onClick={() => navigate(`sessions/${session.ID}`)}
       >
       </Button>
     </Tooltip>
   )
+
+  const handleRefuse = async () => {
+    try {
+      await sessionApi.refuseUnlock(session.ID)
+      message.success('Thao tác thành công')
+      reload()
+    } catch (error) {
+      CatchError.HandleError(error)
+    }
+  }
 
   const handleCancel = () => {
     form.resetFields()
@@ -50,7 +63,7 @@ const SessionAction = ({ session, unlock, onCancel }: Props) => {
         {infoBtn()}
 
         {/* Nút mở khóa */}
-        <Tooltip title="Mở khóa">
+        <Tooltip title="Duyệt">
           <Popconfirm
             title="Xác nhận mở khóa?"
             description="Thao tác này có thể thay đổi kết quả buổi học!"
@@ -61,11 +74,21 @@ const SessionAction = ({ session, unlock, onCancel }: Props) => {
           >
             <Button
               size="small"
-              icon={<UnlockOutlined />}
-              type="link" 
-              style={{color:'orange'}} 
+              icon={<CheckCircleFilled />}
+              type="link"
+              style={{ color: 'green' }}
             />
           </Popconfirm>
+        </Tooltip>
+
+        <Tooltip title="Từ chối">
+          <Button
+            onClick={handleRefuse}
+            size="small"
+            icon={<CloseCircleFilled />}
+            type="link"
+            style={{ color: 'red' }}
+          />
         </Tooltip>
       </Space>
     )
@@ -85,15 +108,15 @@ const SessionAction = ({ session, unlock, onCancel }: Props) => {
             size="small"
             icon={<DeleteOutlined />}
             type="link" danger
-            onClick={()=>setOpen(true)}
+            onClick={() => setOpen(true)}
           />
         </Tooltip>
-        
+
         <Modal
-          title="Xác nhận hủy buổi học" 
+          title="Xác nhận hủy buổi học"
           open={open}
           onCancel={handleCancel}
-          onOk={handleOK} 
+          onOk={handleOK}
           width={500}
           okText="Hủy buổi học"
           okButtonProps={{ danger: true }}
@@ -107,11 +130,11 @@ const SessionAction = ({ session, unlock, onCancel }: Props) => {
             tự động gửi thông báo đến phụ huynh!"
             type="warning"
             showIcon
-            style={{ marginBottom: 20 }} 
+            style={{ marginBottom: 20 }}
           />
 
           <Form form={form} layout="vertical">
-            <Form.Item 
+            <Form.Item
               label={<b>Lý do hủy (Sẽ hiển thị trong thông báo)</b>}
               name="reason"
               rules={[{ required: true, message: 'Vui lòng nhập lý do!' }]}

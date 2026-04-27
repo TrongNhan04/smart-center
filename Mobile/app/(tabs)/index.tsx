@@ -1,7 +1,7 @@
 import StudentDashboard from '@/types/tabs.index.dto';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Alert, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Avatar, Card, Chip, Icon, ProgressBar, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import mobileApi from '../api';
@@ -15,7 +15,7 @@ export default function Index() {
   const user = useAuthStore(state => state.user)
   const setStuIdGlobal = useAuthStore(state => state.setSelectedStuId)
   const children = user?.children
-  
+
   const fetchData = async () => {
     try {
       if (!children) return
@@ -24,7 +24,7 @@ export default function Index() {
       )
       const data = res.map(item => item.data)
       setStudents(data)
-      
+
       // nếu chưa chọn ai và có dữ liệu thì chọn em đầu tiên
       if (selectedStuId === -1 && res.length > 0)
         setSelectedStuId(data[0].ID)
@@ -44,12 +44,6 @@ export default function Index() {
   const lastestResult = stuData?.KetQuaGanNhat
   const debtInvoice = stuData?.HoaDon
 
-  const handleRefresh = async () => {
-    setRefresh(true)
-    await fetchData()
-    setRefresh(false)
-  }
-
   const formatThoiGian = (isoString: string) => {
     if (!isoString) return '';
     return new Date(isoString).toLocaleDateString('vi-VN');
@@ -63,19 +57,13 @@ export default function Index() {
         sessionId: buoiHocId
       }
     })
-    console.log(classId, buoiHocId)
   }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView contentContainerStyle={{ paddingBottom: 10 }}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refresh}
-            onRefresh={handleRefresh} />
-        }>
+        showsVerticalScrollIndicator={false}> 
 
-        {/* Chọn học viên */}
         <ScrollView
           horizontal showsHorizontalScrollIndicator={false}
           style={styles.studentSelector}
@@ -270,6 +258,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold', color: '#2c3e50'
   },
   studentSelector: {
+    paddingTop:30,
     paddingLeft: 16,
     marginVertical: 15,
     flexDirection: 'row'

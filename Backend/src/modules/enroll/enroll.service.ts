@@ -54,6 +54,7 @@ export class EnrollService {
             HocVienId: studentDB.ID, LopHocId: classDB.ID
         }
         await this.notisService.createInvoiceNotify(studentDB.UserID, payload)
+        return {ID: data.GhiDanhID}
     }
 
     // danh sách ghi danh, bộ lọc trạng thái, tìm kiếm theo từ khóa

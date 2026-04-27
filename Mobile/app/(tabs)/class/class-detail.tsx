@@ -227,6 +227,7 @@ export default function SessionDetailScreen() {
                         return <></>
                       })}
                       <ImageView
+                        key={currentImgIndex}
                         visible={visible}
                         onRequestClose={() => setVisible(false)}
                         imageIndex={currentImgIndex}

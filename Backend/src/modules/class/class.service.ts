@@ -132,7 +132,7 @@ export class ClassService {
     })
     return enrolls.map(stu => {
       const { hocvien, ...rest } = stu
-      const { ID, Parent, ...restStu } = hocvien
+      const { ID, Parent, UserID, GhiChu, ...restStu } = hocvien
       return {
         HocVienID: ID,
         ...restStu,

@@ -42,7 +42,6 @@ const CourseModal = ({ open, onCancel, onSave, editingCourse }: Props) => {
           message.info('Không có thông tin nào thay đổi!')
           return
         }
-        console.log({ syllabus: formatedSyllabus() })
         payload = await courseApi.update
           (editingCourse.ID, { ...updateData, syllabus: formatedSyllabus() })
       }

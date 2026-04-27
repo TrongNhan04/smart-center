@@ -1,6 +1,6 @@
 import { SafetyOutlined, UserOutlined } from "@ant-design/icons"
 import {
-  Avatar, Button, Card, Col, Form, Input, message, notification,
+  Avatar, Button, Card, Col, Form, Input, message,
   Row, Select, Typography
 } from "antd"
 import { useAuthStore } from "../../store/useAuthStore"
@@ -152,7 +152,7 @@ const Profile = () => {
 
       <ChangePw
         open={isOpen}
-        onCancel={() => { setIsOpen(false) }}
+        onCancel={() => setIsOpen(false) }
       />
     </div>
   )

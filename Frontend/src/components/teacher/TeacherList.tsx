@@ -1,10 +1,8 @@
 import {
-  CalendarFilled, CalendarOutlined, MailFilled, MailOutlined, PhoneFilled, PhoneOutlined, PlusOutlined, SearchOutlined,
+  CalendarOutlined, MailOutlined, PhoneOutlined, PlusOutlined, SearchOutlined,
   UserOutlined
 } from "@ant-design/icons"
-import {
-  Badge, Button, Card, Col, Input, notification, Row, Select, Table, Typography
-} from "antd"
+import { Badge, Button, Card, Col, Input, Row, Select, Table, Typography } from "antd"
 import type { TeacherDB } from "./TeacherDTO"
 import { Link, useSearchParams } from "react-router-dom"
 import { useEffect, useState } from "react"
@@ -66,7 +64,7 @@ const TeacherList = () => {
       </>
     },
     { // ngày sinh
-      title: 'Ngày sinh', dataIndex: 'NgaySinh', key: 'NgaySinh', width:130,
+      title: 'Ngày sinh', dataIndex: 'NgaySinh', key: 'NgaySinh', width: 130,
       render: (dob: string) => <Text>
         <Text><CalendarOutlined style={{ color: '#8c8c8c' }} /> {new Date(dob).toLocaleDateString()}</Text>
       </Text>
@@ -74,7 +72,7 @@ const TeacherList = () => {
     { //Điện thoại
       title: 'Điện thoại', dataIndex: 'DienThoai', key: 'DienThoai', width: 150,
       render: (phone: string) => <Text>
-        <PhoneOutlined style={{color: '#8c8c8c'}}/> {phone}
+        <PhoneOutlined style={{ color: '#8c8c8c' }} /> {phone}
       </Text>
     },
     { // Email

@@ -99,10 +99,3 @@ const TabInfo = ({ student }: { student: StudentDB }) => {
 };
 
 export default TabInfo;
-
-//background: 'linear-gradient(135deg, #f0f5ff 0%, #e6f7ff 50%, #bae7ff 50%, #e6f7ff 70%, #f0f5ff 100%)',
-//background: 'linear-gradient(135deg, #bae7ff 0%, #91d5ff 30%, #69c0ff 50%, #91d5ff 70%, #bae7ff 100%)',
-//background: 'linear-gradient(135deg, #fafafa 0%, #e6f7ff 30%, #bae7ff 50%, #e6f7ff 70%, #fafafa 100%)',
-//background: 'linear-gradient(135deg, #f0f5ff 0%, #d6e4ff 30%, #adc6ff 50%, #d6e4ff 70%, #f0f5ff 100%)',
-//background: 'linear-gradient(135deg, #fff 0%, #e6f7ff 50%, #fff 100%)',
-//background: 'linear-gradient(135deg, #fff 0%, #bae7ff 50%, #ffffff 100%)',

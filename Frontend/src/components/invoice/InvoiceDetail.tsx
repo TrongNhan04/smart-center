@@ -1,5 +1,5 @@
 import {
-  CalendarOutlined, ClockCircleFilled, ClockCircleOutlined, LeftOutlined, MoneyCollectOutlined, PhoneOutlined,
+  CalendarOutlined, LeftOutlined, MoneyCollectOutlined, PhoneOutlined,
   ReadOutlined, RollbackOutlined, UserOutlined
 } from "@ant-design/icons";
 import {

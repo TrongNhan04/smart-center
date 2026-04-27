@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import type { EnrollDB } from "./EnrollDTO"
 import { enrollApi } from "../../api/enrollApi"
 import {
+  Badge,
   Button, Card, Col, Input, message, Popconfirm, Row, Select, Space, Table,
   Tag, Tooltip, Typography
 } from "antd"
@@ -107,10 +108,9 @@ const EnrollList = () => {
       title: 'Trạng thái', dataIndex: 'TrangThai',
       key: 'TrangThai', //width: 160,
       render: (value: string) => {
-        if (value === 'ACTIVE')
-          return <Tag color='green'><CheckCircleOutlined /> Thành công</Tag>
-        else
-          return <Tag color='error'><CloseCircleOutlined /> Đã hủy</Tag>
+        return value === 'ACTIVE' ? 
+        <Badge color='green' text="Thành công"/> : 
+        <Badge color='red' text="Đã hủy"/>
       }
     },
     {// thao tác

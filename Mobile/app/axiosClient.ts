@@ -4,7 +4,8 @@ import useAuthStore from "./authStore";
 const axiosClient = axios.create({
     // nhớ đổi theo ip máy đang kết nối tới wifi nào
     // cùng 1 wifi nhưng mỗi lần kết nối ip khác nhau
-    baseURL: 'http://192.168.1.104:3000',
+    // baseURL: 'http://192.168.1.101:3000',
+    baseURL: 'https://peculiar-refreeze-habitable.ngrok-free.dev',
     headers: {
         'Content-Type': 'application/json'
     }

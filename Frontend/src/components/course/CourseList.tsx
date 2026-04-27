@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import {
-  Badge, Button, Card, Col, Input, message, notification, Row, Select,
+  Badge, Button, Card, Col, Input, message, Row, Select,
   Space, Table, Tag, Typography
 } from 'antd';
 import courseApi from '../../api/courseApi';
-import { ClockCircleFilled, ClockCircleOutlined, DollarCircleFilled, DollarCircleOutlined, PlusOutlined, ReadOutlined, SearchOutlined } from '@ant-design/icons';
+import { ClockCircleOutlined, DollarCircleOutlined, PlusOutlined, ReadOutlined, SearchOutlined } from '@ant-design/icons';
 import CourseAction from './CourseAction';
 import { type CourseDB } from './CourseDTO';
 import CourseModal from './CourseModal';

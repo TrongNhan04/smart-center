@@ -63,10 +63,14 @@ const Notis = () => {
 
   const handleReadNotis = async (id?: number) => {
     try {
-      if (id) await mobileApi.readOneNotis(id)
-      else await mobileApi.readAllNotis()
-      fetchNotis()
-    } catch (error:any) {
+      if (!id) { // không có id = đọc hết
+        await mobileApi.readAllNotis()
+        fetchNotis()
+        return
+      }
+      await mobileApi.readOneNotis(id)
+      // if(dulieu.sessionId)
+    } catch (error: any) {
       Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
       console.log('Có lỗi xảy ra: ', error?.response?.data)
     }
@@ -101,7 +105,7 @@ const Notis = () => {
         right={() => (
           <View style={{
             justifyContent: 'center', alignItems: 'flex-end',
-            paddingRight: 8
+            paddingRight: 0
           }}>
             <Text variant="labelMedium"
               style={{
@@ -124,14 +128,14 @@ const Notis = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }} edges={['top']}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '##f5f7fa' }} edges={['top']}>
       {/* Header có thêm nút đánh dấu đã đọc hết */}
       <View style={{
         flexDirection: 'row', justifyContent: 'space-between',
         alignItems: 'center', paddingRight: 8
       }}>
         <Text variant="headlineSmall"
-          style={{ padding: 20, fontWeight: 'bold' }}>
+          style={{ padding: 20, fontWeight: 'bold', color: '#2c3e50' }}>
           Thông báo
         </Text>
         <IconButton

@@ -1,17 +1,11 @@
 import { useEffect, useState } from "react"
 import type { InvoiceDB } from "./InvoiceDTO"
-import {
-  Badge, Card, Col, Input, Row, Select, Space, Table, Tag, Typography
-} from "antd"
+import { Card, Col, Input, Row, Select, Table, Tag, Typography } from "antd"
 import { invoiceApi } from "../../api/invoiceApi"
-import {
-  CalendarFilled, CalendarOutlined, CheckCircleOutlined, PhoneOutlined, SearchOutlined,
-  UserOutlined
-} from "@ant-design/icons"
+import { CalendarOutlined, SearchOutlined, UserOutlined } from "@ant-design/icons"
 import InvoiceAction from "./InvoiceAction"
 import InvoiceModal from "./InvoiceModal"
 import { Link, useSearchParams } from "react-router-dom"
-import { DateHelper } from "../common/date.helper"
 import { CatchError } from "../common/catch.error"
 
 const { Text } = Typography
@@ -73,7 +67,7 @@ const InvoiceList = () => {
     setInvoice(invoice)
   }
 
-  const handleChange = (pagination: any) => {
+  const changeTablePage = (pagination: any) => {
     setSearchParam({ page: pagination.current })
   }
 
@@ -238,7 +232,7 @@ const InvoiceList = () => {
             pageSize: 12,
             total: total// tổng từ backend
           }}
-          onChange={handleChange}
+          onChange={changeTablePage}
           rowKey="ID"
           scroll={{ x: 'max-content', y: 408 }}
         />

@@ -1,7 +1,7 @@
-import { Button, message, notification, Popconfirm, Space, Tooltip } from "antd"
+import { Button, message, Popconfirm, Space, Tooltip } from "antd"
 import { studentApi } from "../../api/studentApi"
 import type { StudentDB } from "./StudentDTO"
-import { DeleteOutlined, EditOutlined, LockOutlined, LockTwoTone } from "@ant-design/icons"
+import { DeleteOutlined, EditOutlined, LockOutlined } from "@ant-design/icons"
 import { CatchError } from "../common/catch.error"
 
 interface Props {

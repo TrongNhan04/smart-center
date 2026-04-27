@@ -8,9 +8,8 @@ import {
 } from "antd"
 import classApi from "../../api/classApi"
 import {
-  CalendarFilled, CalendarOutlined, ClockCircleFilled, ClockCircleOutlined, EditOutlined, InfoCircleOutlined, LeftOutlined, ReadOutlined,
-  ScheduleOutlined,
-  UnorderedListOutlined,
+  CalendarOutlined, ClockCircleOutlined, EditOutlined, InfoCircleOutlined,
+  LeftOutlined, ReadOutlined, ScheduleOutlined,
 } from "@ant-design/icons"
 import TeacherModal from "./TeacherModal"
 import { CatchError } from "../common/catch.error"
@@ -100,21 +99,21 @@ const TeacherDetail = () => {
         if (percent > 50) percentColor = '#faad14' //vàng
         if (percent > 80) percentColor = '#52c41a'
         return <Space>
-          
-            <Text>{bdh}/{lophoc.TongSoBuoi} BH </Text>
-            <Progress
-              steps={5}
-              percent={percent}
-              //percent={}
-              showInfo={false}
-              strokeColor={percentColor}
-            />
-          
+
+          <Text>{bdh}/{lophoc.TongSoBuoi} BH </Text>
+          <Progress
+            steps={5}
+            percent={percent}
+            //percent={}
+            showInfo={false}
+            strokeColor={percentColor}
+          />
+
         </Space>
       }
     },
     { //xem chi tiết
-      title: 'Thao tác', dataIndex: 'ChiTiet', key: 'ChiTiet',  width:130,
+      title: 'Thao tác', dataIndex: 'ChiTiet', key: 'ChiTiet', width: 130,
       align: 'center' as const,
       render: (_: any, lophoc: TeacherClass) =>
         <Tooltip title='Chi tiết tiến độ'>
@@ -156,7 +155,7 @@ const TeacherDetail = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
               {/* Nút quay lại */}
               <Button size="large" type="text" icon={<LeftOutlined />}
-              onClick={() => navigate(-1)} />
+                onClick={() => navigate(-1)} />
 
               <Avatar shape="square" size={49} style={{ background: `#0d6efd` }}>
                 {teacher?.MaGiaoVien.substring(0, 4)}
@@ -190,7 +189,6 @@ const TeacherDetail = () => {
 
         {/* div của body */}
         <div style={{ padding: '0px 18px 0px 18px' }}>
-
           <Card>
             <Tabs
               defaultActiveKey="1"

@@ -54,7 +54,7 @@ const NotisPage = () => {
         </>
     },
     { // thời gian
-      dataIndex: 'ThoiGian', key: 'ThoiGian', width: 150,
+      dataIndex: 'ThoiGian', key: 'ThoiGian', width: 100,
       align: 'right' as const,
       render: (value: string, notis: TeacherNotis) => {
         const dateNotis = new Date(value)

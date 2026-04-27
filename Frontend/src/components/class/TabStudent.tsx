@@ -1,8 +1,7 @@
 import {
-  CalendarOutlined, EnvironmentOutlined, InfoCircleOutlined, PhoneOutlined,
-  SearchOutlined, UserOutlined
+  CalendarOutlined, EnvironmentOutlined, InfoCircleOutlined, UserOutlined
 } from "@ant-design/icons"
-import { Button, Col, Input, Row, Space, Table, Tooltip, Typography } from "antd"
+import { Button, Space, Table, Tooltip, Typography } from "antd"
 import { useEffect, useState } from "react"
 import type { StuOfClass } from "./ClassDTO"
 import { Link, useNavigate, useSearchParams } from "react-router-dom"
@@ -12,19 +11,19 @@ import { useAuthStore } from "../../store/useAuthStore"
 
 const { Text } = Typography
 interface Props {
-  id: number
+  lophocId: number
 }
 
-const TabStudent = ({ id }: Props) => {
+const TabStudent = ({ lophocId }: Props) => {
   const [students, setStudents] = useState<StuOfClass[]>([])
   const [loading, setLoading] = useState(false)
-  const [searchText, setSearchText] = useState('')
   const navigate = useNavigate()
   const isAmin = useAuthStore(state => state.user?.role) === 'ADMIN'
   const [searchParam, setSearchParam] = useSearchParams()
   const currentPage = Number(searchParam.get('page')) || 1
   const currentTab = searchParam.get('tab') || 'students'
-  const classId = Number(id)
+  const classId = Number(lophocId)
+  
   const fetchStuOfClass = async () => {
     try {
       setLoading(true)
@@ -50,18 +49,18 @@ const TabStudent = ({ id }: Props) => {
 
   const columns = [
     { // mã học viên
-      title: 'Mã học viên', dataIndex: 'MaHocVien',
+      title: 'Mã HV', dataIndex: 'MaHocVien',
       key: 'MaHocVien', width: 120, align: 'center' as const,
       render: (code: string) => <Text code>{code}</Text>
     },
     { // tên học viên
-      title: 'Tên học viên', dataIndex: 'TenHocVien', //width: 220,
+      title: 'Họ và tên', dataIndex: 'TenHocVien', //width: 220,
       key: 'TenHocVien', ellipsis: true,
       render: (name: string, student: StuOfClass) => {
         return isAmin ? <><UserOutlined style={{ color: '#8c8c8c' }} />
           <Link to={`/admin/students/${student.HocVienID}`}
             style={{ fontWeight: 'bold' }}> {name}</Link></>
-          : <Text strong style={{ color: '#1890ff' }}> {name}</Text>
+          : <Text><UserOutlined style={{ color: '#8c8c8c' }} /> {name}</Text>
       }
     },
     { // ngày sinh
@@ -71,8 +70,8 @@ const TabStudent = ({ id }: Props) => {
       </Text>
     },
     { // địa chỉ
-      title: 'Địa chỉ', dataIndex: 'DiaChi', key: 'DiaChi', ellipsis: true,
-      render: (address: string) => <Text>
+      title: 'Địa chỉ', dataIndex: 'DiaChi', key: 'DiaChi',
+      render: (address: string) => <Text ellipsis={{tooltip:address}}>
         <EnvironmentOutlined style={{ color: '#8c8c8c' }} /> {address ?? '_'}
       </Text>
     },
@@ -85,14 +84,14 @@ const TabStudent = ({ id }: Props) => {
     { // Phụ huynh
       title: 'Phụ huynh', dataIndex: 'PhuHuynh', key: 'PhuHuynh', //width: 100,
       render: (parent: string, stu: StuOfClass) =>
-        <Tooltip title={`PH. ${parent}`}>
+        <Tooltip title={`ĐT. ${stu.DienThoai}`}>
           <Space style={{ cursor: 'pointer' }}>
-            <PhoneOutlined style={{ color: '#8c8c8c' }} />{stu.DienThoai}
+            <UserOutlined style={{ color: '#8c8c8c' }} />{parent}  
           </Space>
         </Tooltip>
     },
     { // thao tác của giáo viên
-      title: 'Thao tác', key: 'ThaoTac', align: 'center' as const,
+      title: 'Thao tác', key: 'ThaoTac', align: 'center' as const, width:100,
       render: (_: any, stu: StuOfClass) => <Tooltip title='Xem tiến độ'>
         <Button
           icon={<InfoCircleOutlined />}
@@ -135,7 +134,7 @@ const TabStudent = ({ id }: Props) => {
           current: currentPage
         }}
         rowKey="HocVienID"
-        scroll={{ x: 1100, y: 408 }}
+        scroll={{ x: 1100, y: 320 }}
       />
     </div>
   )

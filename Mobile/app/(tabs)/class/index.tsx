@@ -20,7 +20,7 @@ const ClassScreen = () => {
           if (!stuIdGlobal) return
           const res = await mobileApi.getClassByStuId(stuIdGlobal)
           setClassOfStu(res.data)
-          console.log('đã chạy useFocusEffect')
+          // console.log('đã chạy useFocusEffect')
         } catch (error: any) {
           Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
           console.log('Có lỗi xảy ra: ', error?.response?.data)

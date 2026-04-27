@@ -2,7 +2,8 @@ import type { UpdateProfile } from "../components/account/ProfileDTO"
 import axiosClient from "../components/AxiosClient"
 
 interface login {
-    email: string, pw: string
+    email: string,
+    pw: string
 }
 
 export const authApi = {
@@ -10,10 +11,9 @@ export const authApi = {
 
     logout: () => axiosClient.post('auth/logout'),
 
-    update: (body: UpdateProfile) =>
-        axiosClient.patch(`auth/profile`, body),
+    update: (body: UpdateProfile) => axiosClient.patch(`auth/profile`, body),
 
-    forgotPw: (body:any) => axiosClient.post('auth/forgot-password',body),
+    forgotPw: (body: any) => axiosClient.post('auth/forgot-password', body),
 
-    resetPw: (body:any) => axiosClient.post('auth/reset-password',body),
+    resetPw: (body: any) => axiosClient.post('auth/reset-password', body),
 }

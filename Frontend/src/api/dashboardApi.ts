@@ -14,13 +14,9 @@ export const dashboardApi = {
         return axiosClient.get('dashboards/sessions', {
             params: params
         })
-    },
-        
+    },    
 
     getTasks: () => axiosClient.get(`dashboards/tasks`),
-
-    unlock: (sessionId: number) =>
-        axiosClient.post(`admin/sessions/${sessionId}/unlock`),
 
     reminderTeacher: (teacherId: number, body: ReminderTeacher) =>
         axiosClient.post(`dashboards/teachers/${teacherId}/reminders`, body)

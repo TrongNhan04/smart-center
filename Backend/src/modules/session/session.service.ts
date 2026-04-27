@@ -50,27 +50,25 @@ export class SessionService {
       throw new ConflictException('Buổi học đã hoàn thành hoặc đã hủy')
     if (!reason) throw new BadRequestException('Thiếu lý do hủy buổi học')
 
-    const data = await this.prisma.$transaction(async (tx) => {
-      return await tx.buoiHoc.update({
-        where: { ID: sessionDB.ID, TrangThai: 'SCHEDULED' },
-        data: { TrangThai: 'CANCELLED' },
-        select: {
-          BatDauLuc: true, LopHocID: true,
-          lophoc: {
-            select: {
-              TenLop: true,
-              ghidanh: {
-                where: { TrangThai: 'ACTIVE' },
-                select: { hocvien: { select: { UserID: true } } }
-              }
+    const data = await this.prisma.buoiHoc.update({
+      where: { ID: sessionDB.ID, TrangThai: 'SCHEDULED' },
+      data: { TrangThai: 'CANCELLED' },
+      include: {
+        lophoc: {
+          include: {
+            ghidanh: {
+              where: { TrangThai: 'ACTIVE' },
+              include: { hocvien: { select: { UserID: true } } }
             }
           }
         }
-      })
+      }
     })
-    const listParentID = data.lophoc.ghidanh.map(e => e.hocvien.UserID)
-    const uniqueId = [...new Set(listParentID)]
-    await this.notisService.createCancelSessionNotify(uniqueId, data, reason)
+    const stuAndUserId = data.lophoc.ghidanh.map(item => ({
+      stuId: item.HocVienID,
+      userId: item.hocvien.UserID
+    }))
+    await this.notisService.createCancelSessionNotify(stuAndUserId, data, reason)
   }
 
   // tạo buổi học tự động
@@ -79,16 +77,14 @@ export class SessionService {
       where: { ID: classId },
       include: {
         khoahoc: {
-          select: {
-            TongSoBuoi: true, ThoiGian: true,
+          include: {
             decuong: { select: { ThuTu: true, ChuDe: true } }
           }
         }
       }
     })
     if (!classDB) throw new NotFoundException('Không tìm thấy lớp học');
-    if (classDB.TrangThai === 'CLOSED')
-      throw new ConflictException('Lớp đã đóng')
+    if (classDB.TrangThai === 'CLOSED') throw new ConflictException('Lớp đã đóng')
 
     const totalSessions = classDB.khoahoc.TongSoBuoi;
     // số buổi đã có trong danh sách buổi học của lớp
@@ -232,10 +228,7 @@ export class SessionService {
             }
           },
           lophoc: {
-            select: {
-              TenLop: true,
-              giaovien: { select: { User: { select: { HoTen: true } } } }
-            }
+            include: { giaovien: { select: { User: { select: { HoTen: true } } } } }
           }
         },
         omit: { CreatedAt: true, UpdatedAt: true }
@@ -268,9 +261,14 @@ export class SessionService {
     return await this.resultService.unlockSession(sessionId)
   }
 
+  // từ chối mở khóa 
+  async refuseUnlock(sessionId: number) {
+    return await this.resultService.refuseUnlock(sessionId)
+  }
+
   // gửi yêu cầu mở khóa buổi học - resultService
   async requestUnlock(userId: number, sessionId: number, reason: string) {
-    return await this.resultService.RequestUnlock(userId, sessionId, reason)
+    return await this.resultService.requestUnlock(userId, sessionId, reason)
   }
 
   // lấy giáo viên từ userId

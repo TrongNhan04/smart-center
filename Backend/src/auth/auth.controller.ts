@@ -1,12 +1,12 @@
-import { Body, Controller, Get, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ForgotPwDto, LoginDTO, ProfileDTO, RegisterDTO, ResetPwDto } from './auth.dto';
 import { JwtAuthGuard } from './guard/jwt-auth.guard';
-import { Request } from 'express';
+import express from 'express';
 import { RolesGuard } from './guard/roles.guard';
 import { Roles } from './decorators/roles.decorator';
 
-type RequestWithUser = Request & { user: { userId: number; role?: string } };
+type RequestWithUser = express.Request & { user: { userId: number; role?: string } };
 
 @Controller('auth')
 export class AuthController {
@@ -60,5 +60,13 @@ export class AuthController {
     @Post('reset-password')
     async resetPassword(@Body() {token, password}:ResetPwDto){
         return await this.authService.resetPassword(token, password)
+    }
+
+    // nhảy về app
+    @Get('redict-to-app')
+    openMobileApp(@Query('token') token:string, @Res() res: express.Response){
+        // nhớ đổi ip 
+        const expoLink = `exp://192.168.1.101:8081/--/(auth)/reset-password?token=${token}`
+        return res.redirect(expoLink)
     }
 }

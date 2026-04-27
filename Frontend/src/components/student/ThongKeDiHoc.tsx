@@ -2,7 +2,10 @@ import {
   Button, Card, Descriptions, Divider, Skeleton, Space, Table, Tag, Typography
 } from "antd"
 import type { ClassResult, Result } from "./StudentDTO"
-import { CalendarFilled, CalendarOutlined, CheckCircleFilled, ClockCircleFilled, ClockCircleOutlined, CloseCircleFilled, CommentOutlined, EnvironmentFilled, EnvironmentOutlined, MessageOutlined, ReadFilled, ReadOutlined, UserOutlined } from "@ant-design/icons"
+import {
+  CalendarOutlined, CheckCircleFilled, ClockCircleOutlined, CloseCircleFilled,
+  CommentOutlined, EnvironmentOutlined, ReadOutlined, UserOutlined
+} from "@ant-design/icons"
 import { useNavigate, useParams } from "react-router-dom"
 import { useEffect, useState } from "react"
 import { studentApi } from "../../api/studentApi"
@@ -56,7 +59,6 @@ const ThongKeDiHoc = () => {
         </Space>
       }
     },
-
     { // điểm danh
       title: 'Điểm danh', dataIndex: 'DiemDanh', key: 'DiemDanh',
       width: 160, align: 'center' as const,
@@ -72,8 +74,8 @@ const ThongKeDiHoc = () => {
       }
     },
     {// nhận xét
-      title: 'Nhận xét', dataIndex: 'NhanXet', key: 'NhanXet', ellipsis: true,
-      render: (value: string) => <Text>
+      title: 'Nhận xét', dataIndex: 'NhanXet', key: 'NhanXet',
+      render: (value: string) => <Text ellipsis={{tooltip:value}}>
         <CommentOutlined style={{ color: '#8c8c8c' }} /> {value}
       </Text>
     },

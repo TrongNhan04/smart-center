@@ -1,4 +1,4 @@
-import { Button, Space, Typography, Drawer, Divider } from 'antd';
+import { Button, Space, Drawer, Divider } from 'antd';
 import { useEffect, useState } from 'react';
 import type { SessionDB } from '../session/SessionDTO';
 import { sessionApi } from '../../api/sessionApi';
@@ -6,7 +6,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { CatchError } from '../common/catch.error';
 import { useAuthStore } from '../../store/useAuthStore';
 
-const { Text } = Typography
 interface Props {
   open: boolean,
   onCancel: () => void
@@ -42,11 +41,6 @@ const NavigateDrawer = ({ open, onCancel }: Props) => {
       onClose={() => onCancel()}
       open={open}
     >
-      {/* <Card variant='borderless' style={{ borderRadius: 8 }}>
-      <Text strong style={{ display: 'block', marginBottom: 12 }}>
-        Chuyển nhanh đến buổi học khác:
-      </Text> */}
-
       <div style={{
         display: 'flex',
         flexWrap: 'wrap', // giữ khoảng cách và xuống dòng
