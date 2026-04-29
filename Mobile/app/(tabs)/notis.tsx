@@ -1,4 +1,5 @@
-import NotisDB from '@/types/tabs.notis.dto';
+import NotisDB, { RefData } from '@/types/tabs.notis.dto';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, FlatList, View } from 'react-native';
 import { Avatar, Divider, IconButton, List, Text } from 'react-native-paper';
@@ -8,6 +9,7 @@ import mobileApi from '../api';
 const Notis = () => {
   const [notifications, setNotifications] = useState<NotisDB[]>([])
   const [refresh, setRefresh] = useState(false)
+  const router = useRouter()
 
   const fetchNotis = async () => {
     try {
@@ -41,9 +43,9 @@ const Notis = () => {
       })
 
       setNotifications(formated)
-    } catch (error) {
+    } catch (error: any) {
       Alert.alert('Thông báo', 'Lỗi tải thông báo!');
-      console.log('Có lỗi xảy ra: ', error)
+      console.log('Có lỗi xảy ra: ', error?.response?.data)
     }
   }
 
@@ -61,26 +63,42 @@ const Notis = () => {
     setRefresh(false)
   }
 
-  const handleReadNotis = async (id?: number) => {
+  const handleReadNotis = async (id?: number, duLieu?: RefData) => {
     try {
-      if (!id) { // không có id = đọc hết
+      if (!id || !duLieu) { // không có id hoặc dữ liệu = đọc hết
         await mobileApi.readAllNotis()
         fetchNotis()
         return
       }
-      await mobileApi.readOneNotis(id)
-      // if(dulieu.sessionId)
+
+      await mobileApi.readOneNotis(id)// đọc 1
+      await fetchNotis()
+      if (duLieu.sessionId)
+        router.push({
+          pathname: '/(tabs)/class/class-detail',
+          params: {
+            classId: duLieu.classId,
+            sessionId: duLieu.sessionId,
+            studentId: duLieu.studentId
+          }
+        })
+      if (duLieu.invoiceId) {
+        router.push({
+          pathname: '/(tabs)/invoice',
+          params: { studentId: duLieu.studentId }
+        })
+      }
     } catch (error: any) {
       Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
       console.log('Có lỗi xảy ra: ', error?.response?.data)
     }
   }
 
-  const renderItem = ({ item }: any) => {
+  const renderItem = ({ item }: { item: NotisDB }) => {
     return (
       <List.Item
         key={item.ID}
-        onPress={() => handleReadNotis(item.ID)}
+        onPress={() => handleReadNotis(item.ID, item.DuLieu)}
         title={item.TieuDe}
         titleStyle={{
           fontWeight: item.DaDoc ? '400' : 'bold',

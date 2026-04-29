@@ -1,8 +1,8 @@
 import mobileApi from '@/app/api';
 import useAuthStore from '@/app/authStore';
 import { ClassOfStu } from '@/types/tabs.class.dto';
-import { useFocusEffect, useRouter } from 'expo-router';
-import React, { useCallback, useState } from 'react';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import { Alert, FlatList, TouchableOpacity, View } from 'react-native';
 import { Avatar, Card, Divider, Icon, ProgressBar, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,24 +11,28 @@ const ClassScreen = () => {
   const [classOfStu, setClassOfStu] = useState<ClassOfStu[]>([])
   const stuIdGlobal = useAuthStore(state => state.selectedStuId)
   const router = useRouter()
+  const [refreshing, setRefreshing] = useState(false)
 
-  // dùng useFocusEffect để chuyển tab thì call lại api
-  useFocusEffect(
-    useCallback(() => { //useCallback để mỗi lần reder không tạo lại hàm fetchData
-      const fetchData = async () => {
-        try {
-          if (!stuIdGlobal) return
-          const res = await mobileApi.getClassByStuId(stuIdGlobal)
-          setClassOfStu(res.data)
-          // console.log('đã chạy useFocusEffect')
-        } catch (error: any) {
-          Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
-          console.log('Có lỗi xảy ra: ', error?.response?.data)
-        }
-      }
-      fetchData()
-    }, [stuIdGlobal]),
-  );
+  const fetchData = async () => {
+    try {
+      if (!stuIdGlobal) return
+      const res = await mobileApi.getClassByStuId(stuIdGlobal)
+      setClassOfStu(res.data)
+    } catch (error: any) {
+      Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
+      console.log('Có lỗi xảy ra: ', error?.response?.data)
+    }
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [stuIdGlobal])
+
+  const handleOnRefresh = async () => {
+    setRefreshing(true)
+    await fetchData()
+    setRefreshing(false)
+  }
 
   const dow = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
 
@@ -45,7 +49,7 @@ const ClassScreen = () => {
   const renderClassItem = ({ item }: { item: ClassOfStu }) => {
     return (
       <TouchableOpacity
-        onPress={() => pressToSeeClassDetail(item.ID, item.BuoiHocDuocChon)}
+        onPress={() => pressToSeeClassDetail(item.ID, item.IdBuoiCapNhatGanNhat)}
         activeOpacity={0.7}
       >
         <Card
@@ -139,7 +143,7 @@ const ClassScreen = () => {
       }}>
         <Text variant="headlineSmall"
           style={{ padding: 20, fontWeight: 'bold', color: '#2c3e50' }}>
-          Lớp học
+          Lớp học - {classOfStu[0]?.HocVien}
         </Text>
       </View>
 
@@ -148,6 +152,9 @@ const ClassScreen = () => {
         renderItem={renderClassItem}
         keyExtractor={item => item.ID.toString()}
         contentContainerStyle={{ paddingTop: 8, paddingHorizontal: 16, paddingBottom: 30 }}
+        refreshing={refreshing}
+        onRefresh={handleOnRefresh}
+
         ListEmptyComponent={
           <View style={{ alignItems: 'center', marginTop: 100, gap: 12 }}>
             <Avatar.Icon icon="book-open-variant" size={80}

@@ -1,5 +1,5 @@
 import { InvoiceOfStu } from '@/types/tabs.invoice';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, FlatList, StyleSheet, View } from 'react-native';
 import { Avatar, Badge, Button, Card, Divider, Icon, Text } from 'react-native-paper';
@@ -9,22 +9,33 @@ import useAuthStore from '../authStore';
 
 const InvoiceListScreen = () => {
   const [invoices, setInvoices] = useState<InvoiceOfStu[]>([])
+  const { studentId } = useLocalSearchParams()
   const stuIdGlobal = useAuthStore(state => state.selectedStuId)
   const router = useRouter()
-  useEffect(() => {
-    const fetchInvoice = async () => {
-      try {
-        if (!stuIdGlobal) return
-        const res = await mobileApi.getInvoiceByStuId(stuIdGlobal)
-        setInvoices(res.data)
-      } catch (error: any) {
-        Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
-        console.log(error)
-        console.log('Có lỗi xảy ra: ', error?.response?.data)
-      }
+  const [refreshing, setRefreshing] = useState(false)
+
+  const fetchInvoice = async () => {
+    try {
+      if (!stuIdGlobal) return
+      const hocVienId = studentId ?? stuIdGlobal
+      const res = await mobileApi.getInvoiceByStuId(Number(hocVienId))
+      setInvoices(res.data)
+    } catch (error: any) {
+      Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
+      console.log(error)
+      console.log('Có lỗi xảy ra: ', error?.response?.data)
     }
+  }
+
+  useEffect(() => {
     fetchInvoice()
   }, [stuIdGlobal])
+
+  const handleOnRefresh = async () => {
+    setRefreshing(true)
+    await fetchInvoice()
+    setRefreshing(false)
+  }
 
   const formatVND = (amount: any) => Number(amount).toLocaleString() + ' đ'
 
@@ -51,8 +62,8 @@ const InvoiceListScreen = () => {
   }
 
   const renderInvoiceItem = ({ item }: { item: InvoiceOfStu }) => {
-    const isUnpaid = item.DaTra < item.TongTien && item.TrangThai === 'ACTIVE'
 
+    const isUnpaid = item.DaTra < item.TongTien && item.TrangThai === 'ACTIVE'
     return (
       <Card style={styles.card} mode="elevated">
         <Card.Content>
@@ -144,6 +155,10 @@ const InvoiceListScreen = () => {
         renderItem={renderInvoiceItem}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
+
+        refreshing={refreshing}
+        onRefresh={handleOnRefresh}
+
         ListEmptyComponent={
           <View style={{ alignItems: 'center', marginTop: 100, gap: 12 }}>
             <Avatar.Icon icon="receipt" size={80}

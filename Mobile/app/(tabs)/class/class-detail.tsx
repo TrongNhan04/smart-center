@@ -1,24 +1,24 @@
 import mobileApi from '@/app/api';
 import useAuthStore from '@/app/authStore';
+import ImageMedia from '@/app/component/image.media';
+import VideoMedia from '@/app/component/video.media';
 import { SessionIds, SessionOfStu } from '@/types/tabs.class.dto';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Alert, Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
-import ImageView from 'react-native-image-viewing';
+import { Alert, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Card, Icon, IconButton, Surface, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SessionDetailScreen() {
   const router = useRouter();
-  const { classId, sessionId } = useLocalSearchParams()
+  const { classId, sessionId, studentId } = useLocalSearchParams()
   const buoiHocId = Number(sessionId) // id buổi học có kết quả gần nhất
   const [detailResult, setDetailResult] = useState<SessionOfStu>()
   const [arrSessionId, setArrSessionId] = useState<SessionIds[]>([])
   const [selectedId, setSelectedId] = useState(buoiHocId) // id buổi học được chọn
   const stuIdGlobal = useAuthStore(state => state.selectedStuId)
-  const [visible, setVisible] = useState(false)
-  const [currentImgIndex, setCurrentImgIndex] = useState(-1)
 
+  //  const [videoSource, setVideoSource] = useState('')
 
   useEffect(() => {//useEffect 1 lấy tất cả id buổi học của lớp
     const fetchSessionIds = async () => {
@@ -27,7 +27,7 @@ export default function SessionDetailScreen() {
         setArrSessionId(res.data) // mảng id buổi học
       } catch (error: any) {
         Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
-        console.log('Có lỗi xảy ra: ', error?.response?.data)
+        console.log('Có lỗi xảy ra: ', error)
       }
     }
     fetchSessionIds()
@@ -37,10 +37,11 @@ export default function SessionDetailScreen() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (!stuIdGlobal) return
-        const id = selectedId ? selectedId : sessionId
+        if (!stuIdGlobal || !sessionId) return
+        //const id = selectedId ? selectedId : buoiHocId
+        const stuIdSearchParam = studentId ?? stuIdGlobal
         const res = await mobileApi
-          .getDetailByStuAndSesId(stuIdGlobal, Number(id))
+          .getDetailByStuAndSesId(Number(stuIdSearchParam), selectedId)
         setDetailResult(res.data)
       } catch (error) {
         Alert.alert('Thông báo', 'Lỗi tải dữ liệu!');
@@ -51,7 +52,7 @@ export default function SessionDetailScreen() {
     fetchData()
   }, [classId, selectedId, stuIdGlobal])
 
-  const handleDiemDanh = (attend: boolean | null) => {
+  const formatDiemDanh = (attend: boolean | null) => {
     if (attend === null) return '---'
     return attend ? 'Có mặt' : 'Vắng mặt'
   }
@@ -63,10 +64,7 @@ export default function SessionDetailScreen() {
       <Surface style={styles.header} elevation={1}>
         <View style={styles.headerRow}>
           <IconButton icon="arrow-left" size={24}
-            onPress={() => {
-              router.back();
-              setSelectedId(0) // set = 0 để out ra vào lại vẫn chọn id đúng
-            }}
+            onPress={() => router.back()}
             style={{ marginLeft: -10 }} />
           <View style={{ flex: 1 }}>
             <Text variant="titleLarge" style={styles.textTitle}>
@@ -83,7 +81,6 @@ export default function SessionDetailScreen() {
 
         {detailResult && (
           <View style={{ gap: 16 }}>
-
             {/* Card 1 thông tin chung */}
             <Card mode="contained" style={styles.card}>
               <Card.Content style={{ gap: 8 }}>
@@ -127,7 +124,7 @@ export default function SessionDetailScreen() {
                       color: detailResult.DiemDanh ? '#27ae60' : '#e74c3c'
                     }}
                   >
-                    {handleDiemDanh(detailResult.DiemDanh)}
+                    {formatDiemDanh(detailResult.DiemDanh)}
                   </Text>
                 </View>
 
@@ -210,32 +207,19 @@ export default function SessionDetailScreen() {
                   </Text>
                 </View>
                 <View style={{ gap: 6 }}>
+
                   {detailResult?.TepDinhKem?.length > 0 ? (
                     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                       {detailResult.TepDinhKem.map((item, index) => {
                         if (item.LoaiTep === 'image')
-                          return <TouchableOpacity key={index}
-                            onPress={() => {
-                              setCurrentImgIndex(index)
-                              setVisible(true)
-                            }}>
-                            <Image style={styles.mediaImage}
-                              key={index}
-                              source={{ uri: item.URL }}
-                            />
-                          </TouchableOpacity>
-                        return <></>
+                          return <ImageMedia key={index} imgURL={item.URL} index={index}/>
+                        //return <Text key={index}>Video</Text>
+                        return <VideoMedia key={index} src={item.URL} />
                       })}
-                      <ImageView
-                        key={currentImgIndex}
-                        visible={visible}
-                        onRequestClose={() => setVisible(false)}
-                        imageIndex={currentImgIndex}
-                        images={detailResult.TepDinhKem.map(item => ({ uri: item.URL }))} />
                     </ScrollView>
                   ) : (
                     <Text style={{ color: '#95a5a6', fontStyle: 'italic' }}
-                    >Không có tài liệu đính kèm cho buổi này.</Text>
+                    >Không có tệp đính kèm cho buổi này.</Text>
                   )}
                 </View>
               </Card.Content>
@@ -255,13 +239,11 @@ export default function SessionDetailScreen() {
           contentContainerStyle={{ padding: 12, paddingBottom: 20, gap: 10 }}
         >
           <View style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            gap: 10,
+            flexDirection: 'row', flexWrap: 'wrap',
+            justifyContent: 'center', gap: 10,
           }}>
-            {arrSessionId?.map((session, index) => {
-              // nếu có chọn thì lấy có chọn, chưa chọn thì lấy cái đầu tiên
+            {arrSessionId.length ? arrSessionId?.map((session, index) => {
+              // nếu có chọn thì xét có chọn, chưa chọn thì xét từ searchParam
               const isSelected = selectedId ?
                 selectedId === session.ID : buoiHocId === session.ID
               return (
@@ -269,7 +251,7 @@ export default function SessionDetailScreen() {
                   key={index}
                   onPress={() => setSelectedId(session.ID)}
                   // style này bao bên ngoài
-                  style={[styles.navCircle, isSelected && styles.navCircleActive]}
+                  style={[styles.navCircle, isSelected && styles.navSquareActive]}
                 >
                   <Text // style này là số bên trong
                     style={[styles.navText, isSelected && styles.navTextActive]}>
@@ -277,7 +259,7 @@ export default function SessionDetailScreen() {
                   </Text>
                 </TouchableOpacity>
               )
-            })}
+            }) : <Text>Lớp học chưa tạo buổi học</Text>}
           </View>
         </ScrollView>
       </Surface>
@@ -315,7 +297,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center',
     borderWidth: 1, borderColor: '#dcdde1'
   },
-  navCircleActive: {
+  navSquareActive: {
     backgroundColor: '#3498db', // Màu xanh khi được chọn
     borderColor: '#3498db',
   },

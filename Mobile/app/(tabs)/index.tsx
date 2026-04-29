@@ -1,7 +1,7 @@
 import StudentDashboard from '@/types/tabs.index.dto';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Alert, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Avatar, Card, Chip, Icon, ProgressBar, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import mobileApi from '../api';
@@ -10,7 +10,7 @@ import useAuthStore from '../authStore';
 export default function Index() {
   const [students, setStudents] = useState<StudentDashboard[]>([])
   const [selectedStuId, setSelectedStuId] = useState(-1)
-  const [refresh, setRefresh] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
   const router = useRouter()
   const user = useAuthStore(state => state.user)
   const setStuIdGlobal = useAuthStore(state => state.setSelectedStuId)
@@ -24,7 +24,6 @@ export default function Index() {
       )
       const data = res.map(item => item.data)
       setStudents(data)
-
       // nếu chưa chọn ai và có dữ liệu thì chọn em đầu tiên
       if (selectedStuId === -1 && res.length > 0)
         setSelectedStuId(data[0].ID)
@@ -37,6 +36,12 @@ export default function Index() {
   useEffect(() => {
     fetchData()
   }, [])
+
+  const handleOnReFresh = async () => {
+    setRefreshing(true)
+    await fetchData()
+    setRefreshing(false)
+  }
 
   // tìm dữ liệu cho student được chọn
   const stuData = students.find(stu => stu.ID === selectedStuId)
@@ -62,7 +67,10 @@ export default function Index() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView contentContainerStyle={{ paddingBottom: 10 }}
-        showsVerticalScrollIndicator={false}> 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleOnReFresh} />
+        }>
 
         <ScrollView
           horizontal showsHorizontalScrollIndicator={false}
@@ -258,7 +266,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold', color: '#2c3e50'
   },
   studentSelector: {
-    paddingTop:30,
+    paddingTop: 30,
     paddingLeft: 16,
     marginVertical: 15,
     flexDirection: 'row'

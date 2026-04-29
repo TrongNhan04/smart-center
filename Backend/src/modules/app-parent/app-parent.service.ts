@@ -1,15 +1,10 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { DateHelper } from "src/common/date.helper";
 import { PrismaService } from "src/prisma/prisma.service";
-import { Pagination } from "../session/session.dto";
-import { startOfMonth } from "date-fns";
-import { Prisma } from "src/generated/prisma/client";
 
 @Injectable()
 export class AppParentService {
-  constructor(
-    private prisma: PrismaService
-  ) { }
+  constructor(private prisma: PrismaService) { }
 
   // Tab trang chủ: buổi học sắp tới, kết quả gần nhất,
   //  nhắc đóng học phí chưa thanh toán của HỌC VIÊN
@@ -51,7 +46,7 @@ export class AppParentService {
       }),
       //lấy tất cả hóa đơn ACTIVE của học viên
       this.prisma.hoaDon.findMany({
-        where: { ghidanh: { HocVienID: studentDB.ID }, TrangThai: 'ACTIVE' },
+        where: { HocVienID: studentDB.ID, TrangThai: 'ACTIVE' },
         orderBy: { ThoiHan: 'asc' } // lấy gần nhất
       })
     ])
@@ -85,7 +80,7 @@ export class AppParentService {
       }
     }).filter(Boolean)
     // lọc hóa đơn còn nợ
-    const invoiceDebt = invoice.filter(f => f.DaTra < f.TongTien)
+    const invoiceDebt = invoice.filter(f => Number(f.DaTra) < Number(f.TongTien))
     const HoaDon = invoiceDebt.length ? {
       SoHDChuaTra: invoiceDebt.length,
       ThoiHan: invoiceDebt.length > 0 ? invoiceDebt[0].ThoiHan : null
@@ -142,7 +137,7 @@ export class AppParentService {
       return store
     }, {}) // để [] thì có sẽ có nhiều phần tử null
 
-    // chuyển từ obj -> arr
+    // chuyển từ obj -> arr, sau đó map để được data kiểu key:Id lớp, value theo id lớp
     const lastResult = Object.values(reduceResult)
     const newMapLastResult = new Map
       (lastResult.map((item: any) => [item.LopHocID, item]))
@@ -150,9 +145,9 @@ export class AppParentService {
     const formatData = (item: any) => ({
       ID: item.ID, MaLop: item.MaLopHoc,
       TenLop: item.TenLop, GiaoVien: item.giaovien.User.HoTen,
-      LichHoc: item.LichHoc,
+      LichHoc: item.LichHoc, HocVien: studentDB.TenHocVien,
       GioHoc: item.GioBatDau + ' - ' + item?.GioKetThuc,
-      BuoiHocDuocChon: item.buoihoc.length ? item.buoihoc[0].ID : null, // null là chưa có buổi học nào
+      IdBuoiCapNhatGanNhat: item.buoihoc.length ? item.buoihoc[0].ID : null, // null là chưa có buổi học nào
       SoBuoiDaHoc: item._count.buoihoc,
       TongSoBuoi: item.khoahoc.TongSoBuoi,
       CoMat: 0, Vang: 0
@@ -160,7 +155,7 @@ export class AppParentService {
     return classDB.map(item => {
       const resultOfClass = newMapLastResult.get(item.ID)
       const getFormatedData = formatData(item)
-      if (resultOfClass)
+      if (resultOfClass)// có kết quả buổi học 
         return {
           ...getFormatedData,
           CoMat: resultOfClass.CoMat,
@@ -193,8 +188,7 @@ export class AppParentService {
         where: { ID: sessionId },
         include: {
           lophoc: {
-            select: {
-              TenLop: true,
+            include: {
               giaovien: { select: { User: { select: { HoTen: true } } } }
             }
           }

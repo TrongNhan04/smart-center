@@ -3,10 +3,18 @@ interface NotisDB {
   TieuDe: string,
   NoiDung: string,
   Loai: string,
-  DuLieu: JSON,
+  DuLieu: RefData,
   DaDoc: boolean,
   Icon?: string,
   IconColor: string,
   ThoiGian: string
 }
 export default NotisDB
+
+export interface RefData {
+  sessionId?: number,
+  classId?: number,
+  studentId?: number,
+  invoiceId?: number,
+  receiptId?: number
+}

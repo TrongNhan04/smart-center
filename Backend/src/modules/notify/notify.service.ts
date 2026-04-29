@@ -131,7 +131,8 @@ export class NotifyService {
                 Loai: 'RECEIPT',
                 DuLieu: {
                     receiptId: receipt.ID,
-                    invoiceId: receipt.HoaDonID
+                    invoiceId: receipt.HoaDonID,
+                    studentId: receipt.HocVienID
                 }
             }
         })
@@ -160,7 +161,7 @@ export class NotifyService {
             data: {
                 UserID: session.UserID,
                 TieuDe: "Thông báo hệ thống",
-                NoiDung: `Từ chối mở khóa ${session.BuoiSo} (${dateStr}) của lớp '${session.TenLop}'. Vui lòng kiểm tra lại buổi học`,
+                NoiDung: `TỪ CHỐI mở khóa ${session.BuoiSo} (${dateStr}) của lớp '${session.TenLop}'. Vui lòng kiểm tra lại buổi học`,
                 Loai: 'SYSTERM_ARLERT',
                 DuLieu: {
                     classId: session.LopHocID,

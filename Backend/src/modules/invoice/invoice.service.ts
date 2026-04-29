@@ -134,7 +134,8 @@ export class InvoiceService {
         const receipt = {
             ID: data.ID,
             HoaDonID: invoiceDB.ID,
-            SoTien: body.amount
+            SoTien: body.amount,
+            HocVienid: invoiceDB.HocVienID
         }
         await this.notisService.createReceiptNotify(userId, receipt)
     }
