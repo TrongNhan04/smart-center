@@ -66,7 +66,7 @@ export class AuthController {
     @Get('redict-to-app')
     openMobileApp(@Query('token') token:string, @Res() res: express.Response){
         // nhớ đổi ip 
-        const expoLink = `exp://192.168.1.101:8081/--/(auth)/reset-password?token=${token}`
+        const expoLink = `exp://172.20.10.2:8081/--/(auth)/reset-password?token=${token}`
         return res.redirect(expoLink)
     }
 }

@@ -290,7 +290,7 @@ const ClassDetail = () => {
                     columns={columns}
                     pagination={{
                       current: currentPage,
-                      pageSize: 10
+                      pageSize: 12
                     }}
                     onChange={changeTablePage}
                     rowKey="ID"

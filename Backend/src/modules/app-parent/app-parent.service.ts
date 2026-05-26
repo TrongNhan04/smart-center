@@ -217,7 +217,7 @@ export class AppParentService {
       NoiDung: result?.ketqua_buoihoc.NoiDungBaiHoc ?? null,
       BaiTap: result?.ketqua_buoihoc.BaiTapVeNha ?? null,
       NhanXet: result?.NhanXetRieng || result?.ketqua_buoihoc.NhanXetChung,
-      TepDinhKem: result?.ketqua_buoihoc.tep_dinhkem,
+      TepDinhKem: result?.ketqua_buoihoc.tep_dinhkem ?? [],
       TrangThai
     }
   }

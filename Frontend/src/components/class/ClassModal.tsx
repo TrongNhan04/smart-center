@@ -179,22 +179,6 @@ const ClassModal = ({ open, onCancel, khoahocId, onSave,
                 />
               </Form.Item>
 
-              <Form.Item // mã lớp học
-                label="Mã lớp học"
-                name="code"
-                rules={[{ required: true, message: 'Vui lòng nhập mã lớp!' }]}
-              >
-                <Input disabled={isEdit} placeholder="VD: ENG001-01" />
-              </Form.Item>
-
-              <Form.Item // tên lớp
-                label="Tên lớp"
-                name="name"
-                rules={[{ required: true, message: 'Vui lòng nhập tên lớp!' }]}
-              >
-                <Input placeholder="VD: Lớp sáng T2-T4-T6" />
-              </Form.Item>
-
               <Form.Item // giáo viên
                 label="Giáo viên"
                 name="teacherId"
@@ -210,6 +194,22 @@ const ClassModal = ({ open, onCancel, khoahocId, onSave,
                   }}
                   options={teacherOption}
                 />
+              </Form.Item>
+
+              <Form.Item // mã lớp học
+                label="Mã lớp học"
+                name="code"
+                rules={[{ required: true, message: 'Vui lòng nhập mã lớp!' }]}
+              >
+                <Input disabled={isEdit} placeholder="VD: ENG001-01" />
+              </Form.Item>
+
+              <Form.Item // tên lớp
+                label="Tên lớp"
+                name="name"
+                rules={[{ required: true, message: 'Vui lòng nhập tên lớp!' }]}
+              >
+                <Input placeholder="VD: Lớp sáng T2-T4-T6" />
               </Form.Item>
             </Col>
 

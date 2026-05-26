@@ -17,6 +17,7 @@ export class CloudinaryService {
     // up 1 file
     uploadFile(file: Express.Multer.File): Promise<CloudinaryResponse> {
         return new Promise<CloudinaryResponse>((resolve, reject) => {
+            // tạo Stream nhận dữ liệu đi vào
             const uploadStream = cloudinary.uploader.upload_stream(
                 { folder: 'smart-center', resource_type:'auto' },
                 (error, result) => {
@@ -25,7 +26,7 @@ export class CloudinaryService {
                     resolve(result) // trả về thông tin trên cloudinary
                 }
             )
-
+            // Client -> NestJS -> Multer -> Buffer -> Stream → Cloudinary
             streamifier.createReadStream(file.buffer).pipe(uploadStream)
         })
     }

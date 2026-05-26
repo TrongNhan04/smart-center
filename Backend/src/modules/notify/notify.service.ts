@@ -14,7 +14,7 @@ export class NotifyService {
     // tạo NHIỀU thông báo cùng lúc có tx
     async createMany(stuAndUserId: StudentAndUserId[], session: any,
         tx?: Prisma.TransactionClient) {
-            
+
         let client: Prisma.TransactionClient | null = null
         if (tx) client = tx
         else client = this.prismaSv
@@ -102,10 +102,14 @@ export class NotifyService {
     }
 
     // thông báo học phí
-    async createInvoiceNotify(userId: number, payload: any) {
+    async createInvoiceNotify(userId: number, payload: any,
+        tx?: Prisma.TransactionClient) {
         const { ThoiHan, TenLop, TongTien, HoaDonId, HocVienId, LopHocId } = payload
         const dateStr = ThoiHan.toLocaleDateString('vi-VN')
-        return await this.prismaSv.thongBao.create({
+        let client: Prisma.TransactionClient | null = null
+        if (tx) client = tx
+        else client = this.prismaSv
+        return await client.thongBao.create({
             data: {
                 UserID: userId,
                 TieuDe: 'Thông báo học phí',

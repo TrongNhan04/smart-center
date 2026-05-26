@@ -75,7 +75,7 @@ const Notis = () => {
       await fetchNotis()
       if (duLieu.sessionId)
         router.push({
-          pathname: '/(tabs)/class/class-detail',
+          pathname: '/class-detail',
           params: {
             classId: duLieu.classId,
             sessionId: duLieu.sessionId,

@@ -48,7 +48,10 @@ export class StudentService {
                 (newStudent.ID, newEnroll.ID, classDB?.DenNgay, fee, client)
 
             // thêm thông báo
-            await this.notisService.createInvoiceNotify(userId, newInvoice)
+            console.log(userId)
+            await this.notisService.createInvoiceNotify(userId, newInvoice, client)
+
+            return {ID:newStudent.ID}
         }
         // nếu có user
         if (tx) return await runLogic(tx) // tx từ user

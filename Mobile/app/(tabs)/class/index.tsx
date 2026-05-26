@@ -38,7 +38,7 @@ const ClassScreen = () => {
 
   const pressToSeeClassDetail = (id: number, buoiHocId: number) => {
     router.navigate({
-      pathname: '/(tabs)/class/class-detail',
+      pathname: '/class-detail',
       params: {
         classId: id,
         sessionId: buoiHocId
@@ -116,15 +116,25 @@ const ClassScreen = () => {
               />
 
               <View style={{ flexDirection: 'row', gap: 16, marginTop: 12 }}>
+
                 {/* Có mặt */}
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                  <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: '#2ecc71' }} />
-                  <Text variant="bodyMedium" style={{ color: '#2c3e50' }}>Có mặt: {item.CoMat}</Text>
+                  <View style={{
+                    width: 10, height: 10, borderRadius: 5,
+                    backgroundColor: '#2ecc71'
+                  }} />
+                  <Text variant="bodyMedium"
+                    style={{ color: '#2c3e50' }}>Có mặt: {item.CoMat}</Text>
                 </View>
+
                 {/* Vắng */}
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                  <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: '#e74c3c' }} />
-                  <Text variant="bodyMedium" style={{ color: '#2c3e50' }}>Vắng mặt: {item.Vang}</Text>
+                  <View style={{
+                    width: 10, height: 10, borderRadius: 5,
+                    backgroundColor: '#e74c3c'
+                  }} />
+                  <Text variant="bodyMedium"
+                    style={{ color: '#2c3e50' }}>Vắng mặt: {item.Vang}</Text>
                 </View>
               </View>
             </View>
@@ -151,9 +161,12 @@ const ClassScreen = () => {
         data={classOfStu}
         renderItem={renderClassItem}
         keyExtractor={item => item.ID.toString()}
-        contentContainerStyle={{ paddingTop: 8, paddingHorizontal: 16, paddingBottom: 30 }}
+        contentContainerStyle={{
+          paddingTop: 8, paddingHorizontal: 16, paddingBottom: 30
+        }}
         refreshing={refreshing}
         onRefresh={handleOnRefresh}
+        showsVerticalScrollIndicator={false}
 
         ListEmptyComponent={
           <View style={{ alignItems: 'center', marginTop: 100, gap: 12 }}>

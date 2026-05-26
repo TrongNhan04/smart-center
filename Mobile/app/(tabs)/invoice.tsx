@@ -125,13 +125,13 @@ const InvoiceListScreen = () => {
                       debt: Number(item.TongTien) - Number(item.DaTra)
                     }
                   })
+                  //router.push('/payment-success');
                 }}
               >
                 Thanh toán
               </Button>
             )}
           </View>
-
         </Card.Content>
       </Card>
     );

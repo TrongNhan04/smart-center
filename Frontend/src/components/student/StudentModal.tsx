@@ -6,6 +6,7 @@ import type { ClassForCmb } from "../class/ClassDTO"
 import classApi from "../../api/classApi"
 import dayjs from "dayjs"
 import { getChangedValue } from "../common/utils"
+import { CatchError } from "../common/catch.error"
 
 interface Props {
   open: boolean,
@@ -101,25 +102,14 @@ const StudentModal = ({ open, onSave, onCancel, editing }: Props) => {
       handleCancel()
     }
     catch (error: any) {
-      // bắt lỗi từ backend
-      console.log("Có lỗi xảy ra: ", error.response.data.message)
-
-      if (error.response) {
-        const serverError = error.response.data
-        // nếu là mảng lỗi thì lấy cái đầu tiên
-        if (Array.isArray(serverError.message))
-          message.error(serverError.message[0])
-        else if (typeof serverError.message === 'string')
-          handleError(error)
-        else
-          message.error("Có lỗi xảy ra")
-      }
+      CatchError.HandleError(error)
     } finally {
       setLoading(false)
     }
   }
 
   const handleCancel = () => {
+    console.log('chạy qua dây')
     form.resetFields()
     onCancel()
   }
@@ -261,7 +251,7 @@ const StudentModal = ({ open, onSave, onCancel, editing }: Props) => {
           </Col>
         </Row>}
 
-        {/* Chuyên môn */}
+        {/* địa chỉ */}
         <Form.Item label="Địa chỉ" name="address">
           <Input.TextArea
             rows={4}

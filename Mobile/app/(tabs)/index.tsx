@@ -37,7 +37,7 @@ export default function Index() {
     fetchData()
   }, [])
 
-  const handleOnReFresh = async () => {
+  const handleOnRefresh = async () => {
     setRefreshing(true)
     await fetchData()
     setRefreshing(false)
@@ -56,7 +56,7 @@ export default function Index() {
 
   const pressToSeeClassDetail = (classId: number, buoiHocId: number) => {
     router.push({
-      pathname: '/(tabs)/class/class-detail',
+      pathname: '/class-detail',
       params: {
         classId: classId,
         sessionId: buoiHocId
@@ -66,10 +66,12 @@ export default function Index() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 10 }}
+
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 10 }}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleOnReFresh} />
+          <RefreshControl refreshing={refreshing} onRefresh={handleOnRefresh} />
         }>
 
         <ScrollView

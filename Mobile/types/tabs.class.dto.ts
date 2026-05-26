@@ -32,7 +32,7 @@ export interface SessionOfStu {
     TrangThai: string
 }
 
-interface TepDinhKem {
+export interface TepDinhKem {
     ID:number,
     URL: string,
     LoaiTep:string
