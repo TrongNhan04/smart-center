@@ -15,10 +15,10 @@ export class AuthController {
     ) { }
 
     // đăng ký
-    // @Post("register")
-    // async Register(@Body() registerDTO: RegisterDTO) {
-    //     return await this.authService.Register(registerDTO);
-    // }
+    @Post("register")
+    async Register(@Body() registerDTO: RegisterDTO) {
+        return await this.authService.register(registerDTO);
+    }
 
     // đăng nhập
     @Post("login")

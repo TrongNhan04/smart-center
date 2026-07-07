@@ -14,7 +14,9 @@
     "sourceMap": true,
     "outDir": "./dist",
     "paths": {
-      "src/*":["./src/*"]
+      "src/*": [
+        "./src/*"
+      ]
     },
     "incremental": true,
     "skipLibCheck": true,
@@ -23,7 +25,10 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-    "types": ["node", "Multer"]
+    // "types": ["node", "Multer"]
+    "types": [
+      "multer"
+    ]
   }
 }
 // "baseUrl": "./",

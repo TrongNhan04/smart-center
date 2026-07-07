@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # 1. Dịch vụ Database (PostgreSQL)
+  db:
+    image: postgres:15-alpine
+    container_name: trungtam-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: smart-center
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data # Lưu trữ dữ liệu DB không bị mất khi tắt container
+
+  # 2. Dịch vụ Backend (NestJS)
+  api:
+    build:
+      context: ./backend # Chỉ đường dẫn vào thư mục backend
+    container_name: trungtam-api
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./backend/.env
+    environment:
+      # Chuỗi kết nối DB lúc này không phải localhost, mà trỏ tới tên container 'db'
+      - DATABASE_URL=postgresql://postgres:123456@db:5432/smart-center?schema=public
+      # Múi giờ
+      - TZ=Asia/Ho_Chi_Minh
+    depends_on:
+      - db # Phải đợi DB chạy lên rồi API mới được chạy
+
+  # 3. Dịch vụ Frontend (React)
+  web:
+    build:
+      context: ./frontend # Chỉ đường dẫn vào thư mục frontend
+    container_name: trungtam-web
+    restart: always
+    ports:
+      - "8080:80" # Frontend sẽ chạy ở cổng 8080 trên máy bạn
+    depends_on:
+      - api
+
+volumes:
+  pgdata: # Định nghĩa volume cho database

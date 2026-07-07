@@ -1,9 +1,6 @@
 import { Descriptions, Space, Typography, Tag, List, Row, Col } from 'antd';
 import {
-  UserOutlined, CalendarFilled, DollarCircleFilled, ReadOutlined,
-  BookOutlined,
-  BookFilled,
-  DollarCircleOutlined,
+  UserOutlined, ReadOutlined, BookOutlined, DollarCircleOutlined,
   CalendarOutlined
 } from '@ant-design/icons';
 import type { CourseDB } from './CourseDTO';

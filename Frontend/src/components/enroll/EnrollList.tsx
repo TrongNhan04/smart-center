@@ -2,14 +2,13 @@ import { useEffect, useState } from "react"
 import type { EnrollDB } from "./EnrollDTO"
 import { enrollApi } from "../../api/enrollApi"
 import {
-  Badge,
-  Button, Card, Col, Input, message, Popconfirm, Row, Select, Space, Table,
-  Tag, Tooltip, Typography
+  Badge, Button, Card, Col, Input, message, Popconfirm, Row, Select,
+  Space, Table, Tooltip, Typography
 } from "antd"
 import { Link, useSearchParams } from "react-router-dom"
 import {
-  CalendarOutlined, CheckCircleOutlined, CloseCircleOutlined, DeleteOutlined,
-  LockOutlined, PlusOutlined, ReadOutlined, SearchOutlined, UserOutlined
+  CalendarOutlined, DeleteOutlined, LockOutlined, PlusOutlined,
+  ReadOutlined, SearchOutlined, UserOutlined
 } from "@ant-design/icons"
 import EnrollModal from "./EnrollModal"
 import { CatchError } from "../common/catch.error"
@@ -108,9 +107,9 @@ const EnrollList = () => {
       title: 'Trạng thái', dataIndex: 'TrangThai',
       key: 'TrangThai', //width: 160,
       render: (value: string) => {
-        return value === 'ACTIVE' ? 
-        <Badge color='green' text="Thành công"/> : 
-        <Badge color='red' text="Đã hủy"/>
+        return value === 'ACTIVE' ?
+          <Badge color='green' text="Thành công" /> :
+          <Badge color='red' text="Đã hủy" />
       }
     },
     {// thao tác
