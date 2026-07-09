@@ -65,8 +65,6 @@ export class EmailService {
             where: { Email: email }
         })
         if (!user) return
-
-
     }
 
     async decodeConfirmationToken(token: string) {

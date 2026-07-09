@@ -25,7 +25,7 @@ const { Header, Sider, Content } = Layout
 
 type MenuItem = Required<MenuProps>['items'][number]
 
-const SidebarComponent = () => {
+const Sidebar = () => {
   const navigate = useNavigate()
   const [darkTheme, setDarkTheme] = useState(true)
   const user = useAuthStore(state => state.user)
@@ -118,4 +118,4 @@ const SidebarComponent = () => {
     </Layout>
   )
 }
-export default SidebarComponent
+export default Sidebar
