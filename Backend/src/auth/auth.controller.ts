@@ -2,6 +2,7 @@ import { Body, Controller, Get, Patch, Post, Query, Req, Res, UseGuards } from '
 import { AuthService } from './auth.service';
 import { ForgotPwDto, LoginDTO, ProfileDTO, RegisterDTO, ResetPwDto } from './auth.dto';
 import { JwtAuthGuard } from './guard/jwt-auth.guard';
+import { JwtRefreshGuard } from './guard/jwt-refresh.guard';
 import express from 'express';
 import { RolesGuard } from './guard/roles.guard';
 import { Roles } from './decorators/roles.decorator';
@@ -31,6 +32,13 @@ export class AuthController {
     @Post("logout")
     async logout(@Req() req: RequestWithUser) {
         return await this.authService.logout(req.user.userId);
+    }
+
+    // làm mới token
+    @UseGuards(JwtRefreshGuard)
+    @Post("refresh")
+    async refreshToken(@Req() req: express.Request & { user: { userId: number, email: string, role: string, tokenVersion: number } }) {
+        return await this.authService.refreshTokens(req.user);
     }
 
     // lấy thông tin tài khoản

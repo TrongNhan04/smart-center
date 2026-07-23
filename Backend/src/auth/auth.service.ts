@@ -5,13 +5,15 @@ import * as bcrypt from 'bcrypt'
 import { JwtService } from '@nestjs/jwt';
 import { Prisma } from 'src/generated/prisma/client';
 import { EmailService } from 'src/email/email.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly prismaService: PrismaService,
         private readonly jwtService: JwtService,
-        private readonly emailService: EmailService
+        private readonly emailService: EmailService,
+        private readonly configService: ConfigService
     ) { }
 
     // Đăng ký 
@@ -58,8 +60,8 @@ export class AuthService {
         if (!userDB)
             throw new UnauthorizedException("Không tìm thấy người dùng!")
 
-        const ok = await bcrypt.compare(loginDTO.password, userDB.MatKhauHash)
-        if (!ok)
+        const correctPassword = await bcrypt.compare(loginDTO.password, userDB.MatKhauHash)
+        if (!correctPassword)
             throw new UnauthorizedException("Sai mật khẩu")
         return userDB
     }
@@ -88,9 +90,20 @@ export class AuthService {
             select: { ID: true }
         })
 
-        const token = await this.jwtService.signAsync(payload)
+        const [access_token, refresh_token] = await Promise.all([
+            this.jwtService.signAsync(payload, {
+                secret: this.configService.get<string>('JWT_ACCESS_SECRET') || this.configService.get<string>('JWT_SECRET'),
+                expiresIn: (this.configService.get<string>('JWT_ACCESS_EXPIRATION') || '15m') as any,
+            }),
+            this.jwtService.signAsync(payload, {
+                secret: this.configService.get<string>('JWT_REFRESH_SECRET') || this.configService.get<string>('JWT_SECRET'),
+                expiresIn: (this.configService.get<string>('JWT_REFRESH_EXPIRATION') || '7d') as any,
+            })
+        ]);
+
         return {
-            access_token: token,
+            access_token,
+            refresh_token,
             user: {
                 id: userDB.ID,
                 email: userDB.Email,
@@ -100,6 +113,32 @@ export class AuthService {
                 classes: classes.map(item => item.ID),
                 children: children.map(child => child.ID)
             }
+        }
+    }
+
+    // Refresh token
+    async refreshTokens(user: { userId: number, email: string, role: string, tokenVersion: number }) {
+        const payload = {
+            sub: user.userId,
+            role: user.role,
+            email: user.email,
+            tokenVersion: user.tokenVersion
+        }
+
+        const [access_token, refresh_token] = await Promise.all([
+            this.jwtService.signAsync(payload, {
+                secret: this.configService.get<string>('JWT_ACCESS_SECRET') || this.configService.get<string>('JWT_SECRET'),
+                expiresIn: (this.configService.get<string>('JWT_ACCESS_EXPIRATION') || '15m') as any,
+            }),
+            this.jwtService.signAsync(payload, {
+                secret: this.configService.get<string>('JWT_REFRESH_SECRET') || this.configService.get<string>('JWT_SECRET'),
+                expiresIn: (this.configService.get<string>('JWT_REFRESH_EXPIRATION') || '7d') as any,
+            })
+        ]);
+
+        return {
+            access_token,
+            refresh_token
         }
     }
 
@@ -199,12 +238,12 @@ export class AuthService {
     }
 
     // APP: 
-    async appForgotPassword(email:string){
+    async appForgotPassword(email: string) {
         const user = await this.prismaService.user.findFirst({
             where: { Email: email }
         })
         if (!user) return
-        
+
     }
 
     // reset mật khẩu
@@ -224,7 +263,7 @@ export class AuthService {
             where: { Email: email },
             data: {
                 MatKhauHash: newPw,
-                PhienBanToken: {increment:1}
+                PhienBanToken: { increment: 1 }
             }
         })
         return 'Đổi mật khẩu thành công'
