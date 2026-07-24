@@ -28,7 +28,7 @@ export default function LoginScreen() {
 
       const payload = { email, password }
       const res = await mobileApi.login(payload)
-      const user = res.data.user
+      const {classes, ...user} = res.data.user // bỏ classes trong user
       Alert.alert('Thông báo', 'Đăng nhập thành công!');
       login(user, res.data.access_token)
       if (user.children.length > 0)

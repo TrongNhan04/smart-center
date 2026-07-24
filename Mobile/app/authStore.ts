@@ -9,9 +9,8 @@ interface User {
 	full_name: string
 	role: 'ADMIN' | 'TEACHER' | 'PARENT'
 	must_change_pw: boolean
-	classes: number[]
+	// classes: number[]
 	children: number[]
-
 }
 
 interface AuthState {
@@ -52,7 +51,7 @@ const useAuthStore = create<AuthState>()(
 		}),
 		{
 			name: 'auth-storage',
-			storage: createJSONStorage(() => AsyncStorage)
+			storage: createJSONStorage(() => localStorage)
 		}
 	)
 )
