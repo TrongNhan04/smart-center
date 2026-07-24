@@ -74,30 +74,28 @@ export class AuthService {
             sub: userDB.ID,
             role: userDB.VaiTro,
             email: userDB.Email,
-            // mustChangePW: userDB.PhaiDoiMK,
             tokenVersion: userDB.PhienBanToken
         }
 
-        // tìm lớp giáo viên dạy
-        const classes = await this.prismaService.lopHoc.findMany({
-            where: { giaovien: { UserID: userDB.ID } },
-            select: { ID: true }
-        })
-
-        // tìm con của user
-        const children = await this.prismaService.hocVien.findMany({
-            where: { Parent: { ID: userDB.ID } },
-            select: { ID: true }
-        })
+        const [classes, children] = await Promise.all([
+            this.prismaService.lopHoc.findMany({
+                where: { giaovien: { UserID: userDB.ID } },
+                select: { ID: true }
+            }),
+            this.prismaService.hocVien.findMany({
+                where: { Parent: { ID: userDB.ID } },
+                select: { ID: true }
+            })
+        ])
 
         const [access_token, refresh_token] = await Promise.all([
             this.jwtService.signAsync(payload, {
-                secret: this.configService.get<string>('JWT_ACCESS_SECRET') || this.configService.get<string>('JWT_SECRET'),
-                expiresIn: (this.configService.get<string>('JWT_ACCESS_EXPIRATION') || '15m') as any,
+                secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+                expiresIn: this.configService.get<string>('JWT_ACCESS_EXPIRATION') as any,
             }),
             this.jwtService.signAsync(payload, {
-                secret: this.configService.get<string>('JWT_REFRESH_SECRET') || this.configService.get<string>('JWT_SECRET'),
-                expiresIn: (this.configService.get<string>('JWT_REFRESH_EXPIRATION') || '7d') as any,
+                secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+                expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRATION') as any,
             })
         ]);
 
@@ -127,12 +125,12 @@ export class AuthService {
 
         const [access_token, refresh_token] = await Promise.all([
             this.jwtService.signAsync(payload, {
-                secret: this.configService.get<string>('JWT_ACCESS_SECRET') || this.configService.get<string>('JWT_SECRET'),
-                expiresIn: (this.configService.get<string>('JWT_ACCESS_EXPIRATION') || '15m') as any,
+                secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+                expiresIn: this.configService.get<string>('JWT_ACCESS_EXPIRATION') as any,
             }),
             this.jwtService.signAsync(payload, {
-                secret: this.configService.get<string>('JWT_REFRESH_SECRET') || this.configService.get<string>('JWT_SECRET'),
-                expiresIn: (this.configService.get<string>('JWT_REFRESH_EXPIRATION') || '7d') as any,
+                secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+                expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRATION') as any,
             })
         ]);
 
@@ -223,7 +221,6 @@ export class AuthService {
             full_name: update.HoTen,
             phone: update.DienThoai,
             role: update.VaiTro,
-            must_change_pw: userDB.PhaiDoiMK,
             classes: classes.map(item => item.ID),
         }
     }

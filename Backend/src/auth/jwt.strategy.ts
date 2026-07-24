@@ -12,7 +12,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
             //lấy token từ header
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false, //hết hạn là bị chặn
-            secretOrKey: configService.get('JWT_ACCESS_SECRET') || configService.get('JWT_SECRET')
+            secretOrKey: configService.get('JWT_ACCESS_SECRET')
         })
     }
 
@@ -30,7 +30,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
  * JwtStrategy validate token: lấy token từ header, verify token = JWT_SECRET,
  * và decode token thành payload và gọi validate(payload)
  * 
- * validate(payload): không lỗi -> cho qua, lỗi -> chặn
+ * validate(payload): cho qua
  * 
  * gắn user vào request: giá trị return của validate sẽ là giá trị của user 
  * trong request

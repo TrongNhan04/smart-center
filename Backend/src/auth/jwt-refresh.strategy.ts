@@ -13,7 +13,7 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
         super({
             jwtFromRequest: ExtractJwt.fromBodyField('refresh_token'), // We can extract from body since it's easier for mobile apps, or from AuthHeader
             ignoreExpiration: false,
-            secretOrKey: configService.get('JWT_REFRESH_SECRET') || configService.get('JWT_SECRET')
+            secretOrKey: configService.get('JWT_REFRESH_SECRET')
         })
     }
 

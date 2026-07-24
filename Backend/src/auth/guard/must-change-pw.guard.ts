@@ -13,7 +13,7 @@ export class MustChangePWGuard implements CanActivate {
 
         const userDB = await this.prismaService.user.findUnique({
             where: { ID: userId },
-            select: { PhaiDoiMK: true, VaiTro:true },
+            select: { PhaiDoiMK: true, VaiTro: true },
         });
 
         if (!userDB?.PhaiDoiMK || userDB?.VaiTro === 'ADMIN') return true
@@ -29,5 +29,4 @@ export class MustChangePWGuard implements CanActivate {
 
         throw new ForbiddenException('Vui lòng đổi mật khẩu một lần vì lý do bảo mật')
     }
-
 }
