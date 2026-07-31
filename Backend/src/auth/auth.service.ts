@@ -12,6 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Prisma } from 'src/generated/prisma/client';
 import { EmailService } from 'src/email/email.service';
 import { ConfigService } from '@nestjs/config';
+import { ActiveUserData } from 'src/common/decorator/user.decorator';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +21,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly emailService: EmailService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   // Đăng ký
   async register(registerDTO: RegisterDTO) {
@@ -35,7 +36,7 @@ export class AuthService {
       throw new BadRequestException('Email hoặc số điện thoại đã được sử dụng');
 
     // 2 băm mật khẩu là số điện thoại
-    const passwordHash = await bcrypt.hash(registerDTO.phone, 15);
+    const passwordHash = await bcrypt.hash(registerDTO.phone, 10);
 
     // 3 lưu user vào DB
     return await this.prismaService.user.create({
@@ -92,20 +93,7 @@ export class AuthService {
       }),
     ]);
 
-    const [access_token, refresh_token] = await Promise.all([
-      this.jwtService.signAsync(payload, {
-        secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
-        expiresIn: this.configService.get<string>(
-          'JWT_ACCESS_EXPIRATION',
-        ) as any,
-      }),
-      this.jwtService.signAsync(payload, {
-        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-        expiresIn: this.configService.get<string>(
-          'JWT_REFRESH_EXPIRATION',
-        ) as any,
-      }),
-    ]);
+    const { access_token, refresh_token } = await this.generateTokens(payload)
 
     return {
       access_token,
@@ -113,7 +101,7 @@ export class AuthService {
       user: {
         id: userDB.ID,
         email: userDB.Email,
-        full_name: userDB.HoTen,
+        fullName: userDB.HoTen,
         phone: userDB.DienThoai,
         role: userDB.VaiTro,
         classes: classes.map((item) => item.ID),
@@ -123,33 +111,14 @@ export class AuthService {
   }
 
   // Refresh token
-  async refreshTokens(user: {
-    userId: number;
-    email: string;
-    role: string;
-    tokenVersion: number;
-  }) {
+  async refreshTokens(user: ActiveUserData) {
     const payload = {
       sub: user.userId,
       role: user.role,
       email: user.email,
       tokenVersion: user.tokenVersion,
     };
-
-    const [access_token, refresh_token] = await Promise.all([
-      this.jwtService.signAsync(payload, {
-        secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
-        expiresIn: this.configService.get<string>(
-          'JWT_ACCESS_EXPIRATION',
-        ) as any,
-      }),
-      this.jwtService.signAsync(payload, {
-        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-        expiresIn: this.configService.get<string>(
-          'JWT_REFRESH_EXPIRATION',
-        ) as any,
-      }),
-    ]);
+    const { access_token, refresh_token } = await this.generateTokens(payload)
 
     return {
       access_token,
@@ -163,7 +132,7 @@ export class AuthService {
       where: { ID: userId },
       data: { PhienBanToken: { increment: 1 } },
     });
-    return 'Logout succesfully';
+    return 'Đăng xuất thành công';
   }
 
   // thông tin tài khoản
@@ -179,7 +148,7 @@ export class AuthService {
         PhaiDoiMK: true,
       },
     });
-    if (!userDB) throw new UnauthorizedException('User is not exist');
+    if (!userDB) throw new UnauthorizedException('Không tìm thấy người dùng!');
     return userDB;
   }
 
@@ -188,7 +157,7 @@ export class AuthService {
     const userDB = await this.prismaService.user.findUnique({
       where: { ID: userID },
     });
-    if (!userDB) throw new NotFoundException('không tìm thấy User');
+    if (!userDB) throw new NotFoundException('không tìm thấy người dùng!');
 
     const data: Prisma.UserUpdateInput = {};
     if (profile.email || profile.phone) {
@@ -205,7 +174,7 @@ export class AuthService {
       if (profile.email) data.PhienBanToken = { increment: 1 }; // xóa token cũ
     }
 
-    data.HoTen = profile.full_name ?? userDB.HoTen;
+    data.HoTen = profile.fullName ?? userDB.HoTen;
 
     if (profile.newPassword && profile.oldPassword) {
       const comparePW = await bcrypt.compare(
@@ -218,7 +187,7 @@ export class AuthService {
       if (profile.oldPassword === profile.newPassword)
         throw new BadRequestException('Mật khẩu không thay đổi!');
 
-      const hashPW = await bcrypt.hash(profile.newPassword, 15);
+      const hashPW = await bcrypt.hash(profile.newPassword, 10);
       data.MatKhauHash = hashPW;
       data.PhaiDoiMK = false;
       data.PhienBanToken = { increment: 1 }; // xóa token cũ
@@ -238,7 +207,7 @@ export class AuthService {
     return {
       id: update.ID,
       email: update.Email,
-      full_name: update.HoTen,
+      fullName: update.HoTen,
       phone: update.DienThoai,
       role: update.VaiTro,
       classes: classes.map((item) => item.ID),
@@ -274,7 +243,7 @@ export class AuthService {
     if (tokenVersion !== user.PhienBanToken)
       throw new BadRequestException('Token hết hiệu lực');
 
-    const newPw = await bcrypt.hash(password, 15);
+    const newPw = await bcrypt.hash(password, 10);
     await this.prismaService.user.update({
       where: { Email: email },
       data: {
@@ -283,5 +252,23 @@ export class AuthService {
       },
     });
     return 'Đổi mật khẩu thành công';
+  }
+
+  private async generateTokens(payload) {
+    const [access_token, refresh_token] = await Promise.all([
+      this.jwtService.signAsync(payload, {
+        secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+        expiresIn: this.configService.get<string>(
+          'JWT_ACCESS_EXPIRATION',
+        ) as any,
+      }),
+      this.jwtService.signAsync(payload, {
+        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+        expiresIn: this.configService.get<string>(
+          'JWT_REFRESH_EXPIRATION',
+        ) as any,
+      }),
+    ]);
+    return { access_token, refresh_token }
   }
 }

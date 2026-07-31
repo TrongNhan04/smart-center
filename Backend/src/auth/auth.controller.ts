@@ -22,10 +22,8 @@ import { JwtRefreshGuard } from './guard/jwt-refresh.guard';
 import express from 'express';
 import { RolesGuard } from './guard/roles.guard';
 import { Roles } from './decorators/roles.decorator';
-
-type RequestWithUser = express.Request & {
-  user: { userId: number; email: string; role?: string };
-};
+import { User } from 'src/common/decorator/user.decorator';
+import type { ActiveUserData } from 'src/common/decorator/user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -46,8 +44,8 @@ export class AuthController {
   // đăng xuất
   @UseGuards(JwtAuthGuard)
   @Post('logout')
-  async logout(@Req() req: RequestWithUser) {
-    return await this.authService.logout(req.user.userId);
+  async logout(@User('userId') userId: number) {
+    return await this.authService.logout(userId);
   }
 
   // làm mới token
@@ -71,18 +69,17 @@ export class AuthController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN', 'TEACHER', 'PARENT')
   @Get('me')
-  async getMe(@Req() request: RequestWithUser) {
-    return await this.authService.getMe(+request.user.userId);
+  async getMe(@User() user: ActiveUserData) {
+    return await this.authService.getMe(user.userId);
   }
 
   // đổi thông tin tài khoản
   @UseGuards(JwtAuthGuard)
   @Patch('profile')
   async updateProfile(
-    @Req() req: RequestWithUser,
+    @User('userId') userId: number,
     @Body() profile: ProfileDTO,
   ) {
-    const userId = req.user.userId;
     return await this.authService.updateProfile(+userId, profile);
   }
 
