@@ -1,24 +1,27 @@
-import { Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { PassportStrategy } from "@nestjs/passport";
-import { Strategy, ExtractJwt } from "passport-jwt";
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { PassportStrategy } from '@nestjs/passport';
+import { Strategy, ExtractJwt } from 'passport-jwt';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-    constructor(
-        configService: ConfigService
-    ) {
-        super({
-            //lấy token từ header
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            ignoreExpiration: false, //hết hạn là bị chặn
-            secretOrKey: configService.get('JWT_ACCESS_SECRET')
-        })
-    }
+  constructor(configService: ConfigService) {
+    super({
+      //lấy token từ header
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false, //hết hạn là bị chặn
+      secretOrKey: configService.get('JWT_ACCESS_SECRET'),
+    });
+  }
 
-    async validate(payload: { sub: number, email: string, role: string, tokenVersion: number }) {
-        return { userId: payload.sub, email: payload.email, role: payload.role };
-    }
+  async validate(payload: {
+    sub: number;
+    email: string;
+    role: string;
+    tokenVersion: number;
+  }) {
+    return { userId: payload.sub, email: payload.email, role: payload.role };
+  }
 }
 
 /**
@@ -44,12 +47,3 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   role: "ADMIN"
 }
  */
-
-
-
-
-
-
-
-
-

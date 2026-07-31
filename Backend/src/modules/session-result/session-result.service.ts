@@ -1,20 +1,32 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
-import { PrismaService } from "src/prisma/prisma.service";
-import { NotifyService } from "../notify/notify.service";
-import { SessionsResultDTO } from "./session-result.dto";
-import { DateHelper } from "src/common/date.helper";
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { NotifyService } from '../notify/notify.service';
+import { SessionsResultDTO } from './session-result.dto';
+import { DateHelper } from 'src/common/date.helper';
 
 @Injectable()
 export class SessionResultService {
   constructor(
     private prismaSv: PrismaService,
-    private notisService: NotifyService
-  ) { }
+    private notisService: NotifyService,
+  ) {}
 
   // lưu NHÁP kết quả buổi học - DRAFT
-  async saveDraftResult(userId: number, sessionId: number, body: SessionsResultDTO) {
-    // kiểm tra quyền và lấy thông tin 
-    const { sessionDB, teacherId } = await this.SessionAcsessValidate(userId, sessionId)
+  async saveDraftResult(
+    userId: number,
+    sessionId: number,
+    body: SessionsResultDTO,
+  ) {
+    // kiểm tra quyền và lấy thông tin
+    const { sessionDB, teacherId } = await this.SessionAcsessValidate(
+      userId,
+      sessionId,
+    );
 
     // kiểm tra quyền cho phép lưu NHÁP
     // const minutesLeftStart = DateHelper.TimeDiff(sessionDB.BatDauLuc)
@@ -26,13 +38,20 @@ export class SessionResultService {
     //         throw new ConflictException('Buổi học đã chốt kết quả, vui lòng liên hệ quản trị viên')
     // }
     // 3. gọi hàm thục thi chung
-    return await this.ProcessSessionResult(sessionDB, teacherId, body, 'DRAFT')
+    return await this.ProcessSessionResult(sessionDB, teacherId, body, 'DRAFT');
   }
 
   // lưu THẬT kết quả buổi học - SUBMITTED
-  async submittedResult(userId: number, sessionId: number, body: SessionsResultDTO) {
+  async submittedResult(
+    userId: number,
+    sessionId: number,
+    body: SessionsResultDTO,
+  ) {
     // validate quyền và lấy thông tin
-    const { sessionDB, teacherId } = await this.SessionAcsessValidate(userId, sessionId)
+    const { sessionDB, teacherId } = await this.SessionAcsessValidate(
+      userId,
+      sessionId,
+    );
     // check thời gian cho lưu THẬT
     // const minutesLeftEnd = DateHelper.TimeDiff(sessionDB.KetThucLuc)
     // if (!sessionDB.AdminMoKhoa) {
@@ -42,30 +61,36 @@ export class SessionResultService {
     //         throw new ConflictException('Buổi học đã chốt kết quả, vui lòng liên hệ quản trị viên')
     // }
     // lưu thật phải có nhận xét chung
-    if (!body.NhanXetChung) throw new ConflictException('Thiếu nhận xét chung')
+    if (!body.NhanXetChung) throw new ConflictException('Thiếu nhận xét chung');
 
     // gọi hàm thực thi chung
-    return await this.ProcessSessionResult(sessionDB, teacherId, body, 'SUBMITTED')
+    return await this.ProcessSessionResult(
+      sessionDB,
+      teacherId,
+      body,
+      'SUBMITTED',
+    );
   }
 
   // lấy kết quả 1 buổi học
   async getSSResult(sessionId: number) {
-    const sessionDB = await this.SessionIdValidator(sessionId)
+    const sessionDB = await this.SessionIdValidator(sessionId);
     const [result, enrolls] = await Promise.all([
       this.prismaSv.ketQua_BuoiHoc.findFirst({
         where: { BuoiHocID: sessionDB.ID },
-        include: { ketqua_chitiet: true }
+        include: { ketqua_chitiet: true },
       }),
       this.prismaSv.ghiDanh.findMany({
-        where: { // tìm ghi danh hợp lệ trước ngày bắt đầu buổi học
+        where: {
+          // tìm ghi danh hợp lệ trước ngày bắt đầu buổi học
           LopHocID: sessionDB.LopHocID,
           TrangThai: 'ACTIVE',
-          NgayGhiDanh: {lte:sessionDB.BatDauLuc}
+          NgayGhiDanh: { lte: sessionDB.BatDauLuc },
         },
         include: { hocvien: { include: { Parent: true } } },
-        orderBy: { hocvien: { TenHocVien: 'asc' } }
-      })
-    ])
+        orderBy: { hocvien: { TenHocVien: 'asc' } },
+      }),
+    ]);
     // console.log(enrolls)
     const mapStudent = (item: any) => ({
       GhiDanhID: item.ID,
@@ -75,167 +100,207 @@ export class SessionResultService {
       DienThoai: item.hocvien.Parent.DienThoai,
       DiemDanh: null,
       NhanXetRieng: null,
-      Diem: null
-    })
-    if (!result)
-      return enrolls.map(item => mapStudent(item))
+      Diem: null,
+    });
+    if (!result) return enrolls.map((item) => mapStudent(item));
 
     // tạo map với key là ghi danh ID, value là kết quả học tập
-    const newMapKQCT = new Map
-      (result.ketqua_chitiet.map(item => [item.GhiDanhID, item]))
-    return enrolls.map(value => { // mỗi value là ID (enroll) + thông tin học viên
-      const data = newMapKQCT.get(value.ID)
-      if (!data) return null // không tồn tại kết quả cho ghi danh id đó
-      return {
-        ...mapStudent(value),
-        DiemDanh: data.DiemDanh,
-        NhanXetRieng: data.NhanXetRieng,
-        Diem: data.Diem
-      }
-    }).filter(Boolean)
+    const newMapKQCT = new Map(
+      result.ketqua_chitiet.map((item) => [item.GhiDanhID, item]),
+    );
+    return enrolls
+      .map((value) => {
+        // mỗi value là ID (enroll) + thông tin học viên
+        const data = newMapKQCT.get(value.ID);
+        if (!data) return null; // không tồn tại kết quả cho ghi danh id đó
+        return {
+          ...mapStudent(value),
+          DiemDanh: data.DiemDanh,
+          NhanXetRieng: data.NhanXetRieng,
+          Diem: data.Diem,
+        };
+      })
+      .filter(Boolean);
   }
 
   // mở khóa lưu kết quả buổi học
   async unlockSession(sessionId: number) {
     const sessionDB = await this.prismaSv.buoiHoc.findUnique({
-      where: { ID: sessionId }
-    })
-    if (!sessionDB) throw new NotFoundException('Không tìm thấy buổi học')
+      where: { ID: sessionId },
+    });
+    if (!sessionDB) throw new NotFoundException('Không tìm thấy buổi học');
     if (sessionDB.TrangThai === 'CANCELLED')
-      throw new ConflictException(`Buổi học ID ${sessionId} đã hủy`)
+      throw new ConflictException(`Buổi học ID ${sessionId} đã hủy`);
 
-    const isOverTime = DateHelper.TimeDiff(sessionDB.KetThucLuc)
+    const isOverTime = DateHelper.TimeDiff(sessionDB.KetThucLuc);
     // nhỏ hơn 48h và chưa submit
     if (isOverTime < 2880 && sessionDB.TrangThai === 'SCHEDULED')
-      throw new ConflictException('Chỉ được mở khóa những buổi học quá hạn nộp kết quả')
+      throw new ConflictException(
+        'Chỉ được mở khóa những buổi học quá hạn nộp kết quả',
+      );
 
     const sessionUp = await this.prismaSv.buoiHoc.update({
       where: { ID: sessionDB.ID },
       data: { AdminMoKhoa: true, YeuCauMoKhoa: false },
-      include: { lophoc: { include: { giaovien: { select: { UserID: true } } } } }
-    })
+      include: {
+        lophoc: { include: { giaovien: { select: { UserID: true } } } },
+      },
+    });
     const payload = {
-      ID: sessionUp.ID, BatDauLuc: sessionUp.BatDauLuc, BuoiSo: sessionUp.BuoiSo,
-      LopHocID: sessionUp.lophoc.ID, TenLop: sessionUp.lophoc.TenLop,
-      UserID: sessionUp.lophoc.giaovien.UserID
-    }
-    await this.notisService.createUnLockSSNotify(payload)
+      ID: sessionUp.ID,
+      BatDauLuc: sessionUp.BatDauLuc,
+      BuoiSo: sessionUp.BuoiSo,
+      LopHocID: sessionUp.lophoc.ID,
+      TenLop: sessionUp.lophoc.TenLop,
+      UserID: sessionUp.lophoc.giaovien.UserID,
+    };
+    await this.notisService.createUnLockSSNotify(payload);
   }
 
-  // từ chối mở khóa 
+  // từ chối mở khóa
   async refuseUnlock(sessionId: number) {
     const sessionUp = await this.prismaSv.buoiHoc.update({
       where: { ID: sessionId },
       data: { YeuCauMoKhoa: false },
-      include: { lophoc: { include: { giaovien: { select: { UserID: true } } } } }
-    })
-    if (!sessionUp) throw new NotFoundException('Không tìm thấy buổi học')
+      include: {
+        lophoc: { include: { giaovien: { select: { UserID: true } } } },
+      },
+    });
+    if (!sessionUp) throw new NotFoundException('Không tìm thấy buổi học');
     const payload = {
-      ID: sessionUp.ID, BatDauLuc: sessionUp.BatDauLuc, BuoiSo: sessionUp.BuoiSo,
-      LopHocID: sessionUp.lophoc.ID, TenLop: sessionUp.lophoc.TenLop,
-      UserID: sessionUp.lophoc.giaovien.UserID
-    }
-    await this.notisService.createRefuseUnlockNotify(payload)
+      ID: sessionUp.ID,
+      BatDauLuc: sessionUp.BatDauLuc,
+      BuoiSo: sessionUp.BuoiSo,
+      LopHocID: sessionUp.lophoc.ID,
+      TenLop: sessionUp.lophoc.TenLop,
+      UserID: sessionUp.lophoc.giaovien.UserID,
+    };
+    await this.notisService.createRefuseUnlockNotify(payload);
   }
 
   // gửi yêu cầu mở khóa
   async requestUnlock(userId: number, sessionId: number, reason: string) {
-    const { sessionDB } = await this.SessionAcsessValidate(userId, sessionId)
+    const { sessionDB } = await this.SessionAcsessValidate(userId, sessionId);
     if (sessionDB.BatDauLuc > new Date())
-      throw new BadRequestException('Buổi học chưa bị khóa, không thể gửi yêu cầu')
-    if (!reason) throw new BadRequestException('Chưa điền lý do')
+      throw new BadRequestException(
+        'Buổi học chưa bị khóa, không thể gửi yêu cầu',
+      );
+    if (!reason) throw new BadRequestException('Chưa điền lý do');
     return await this.prismaSv.buoiHoc.update({
       where: { ID: sessionDB.ID },
       data: {
         YeuCauMoKhoa: true,
         LyDoMoKhoa: reason.trim(),
-        NgayYeuCau: new Date()
-      }
-    })
+        NgayYeuCau: new Date(),
+      },
+    });
   }
 
   // xử lý Transaction lưu DB, Dùng chung cho cả Draft và Submit
-  private async ProcessSessionResult(sessionDB: any, teacherId: number,
-    body: SessionsResultDTO, status: 'DRAFT' | 'SUBMITTED') {
-
+  private async ProcessSessionResult(
+    sessionDB: any,
+    teacherId: number,
+    body: SessionsResultDTO,
+    status: 'DRAFT' | 'SUBMITTED',
+  ) {
     // lấy danh sách học viên Active của lớp trước thời điểm buổi học diễn ra
     const listEnroll = await this.prismaSv.ghiDanh.findMany({
       where: {
         LopHocID: sessionDB.LopHocID,
         TrangThai: 'ACTIVE',
-        NgayGhiDanh: { lte: sessionDB.BatDauLuc }
+        NgayGhiDanh: { lte: sessionDB.BatDauLuc },
       },
-      select: { ID: true, HocVienID:true, hocvien: { select: { UserID: true } } }
-    })
-    // key: enrollmentId, value: dữ liệu của body gửi lên 
-    const inputMap = new Map(body.ChiTietKetQua.map(m => [m.GhiDanhID, m]))
-    const listParent = listEnroll.map(item => ({stuId:item.HocVienID, userId:item.hocvien.UserID}))
+      select: {
+        ID: true,
+        HocVienID: true,
+        hocvien: { select: { UserID: true } },
+      },
+    });
+    // key: enrollmentId, value: dữ liệu của body gửi lên
+    const inputMap = new Map(body.ChiTietKetQua.map((m) => [m.GhiDanhID, m]));
+    const listParent = listEnroll.map((item) => ({
+      stuId: item.HocVienID,
+      userId: item.hocvien.UserID,
+    }));
 
     return await this.prismaSv.$transaction(async (tx) => {
-      const fileAttach = body.TepDinhKem?.map(file => ({
+      const fileAttach = body.TepDinhKem?.map((file) => ({
         TepID: file.public_id,
         URL: file.url,
-        LoaiTep: file.resource_type
-      }))
+        LoaiTep: file.resource_type,
+      }));
 
       // Upsert bảng KetQua_BH và quan hệ 1-n của nó là tệp đính kèm
       const sessionResult = await tx.ketQua_BuoiHoc.upsert({
         where: { BuoiHocID: sessionDB.ID },
         update: {
-          NoiDungBaiHoc: body.NoiDungBaiHoc, BaiTapVeNha: body.BaiTapVeNha,
-          NhanXetChung: body.NhanXetChung, TrangThai: status,
+          NoiDungBaiHoc: body.NoiDungBaiHoc,
+          BaiTapVeNha: body.BaiTapVeNha,
+          NhanXetChung: body.NhanXetChung,
+          TrangThai: status,
           ...(fileAttach && {
             tep_dinhkem: {
               deleteMany: {},
-              create: fileAttach
-            }
-          })
+              create: fileAttach,
+            },
+          }),
         },
-        create: { // không có thì create
-          BuoiHocID: sessionDB.ID, GiaoVienID: teacherId,
-          NoiDungBaiHoc: body.NoiDungBaiHoc, BaiTapVeNha: body.BaiTapVeNha,
-          NhanXetChung: body.NhanXetChung, TrangThai: status,
+        create: {
+          // không có thì create
+          BuoiHocID: sessionDB.ID,
+          GiaoVienID: teacherId,
+          NoiDungBaiHoc: body.NoiDungBaiHoc,
+          BaiTapVeNha: body.BaiTapVeNha,
+          NhanXetChung: body.NhanXetChung,
+          TrangThai: status,
           ...(fileAttach && {
-            tep_dinhkem: { create: fileAttach }
-          })
-        }
-      })
+            tep_dinhkem: { create: fileAttach },
+          }),
+        },
+      });
       // Chuẩn bị lệnh Upsert Chi Tiết
-      const isSubmitted = status === 'SUBMITTED'
+      const isSubmitted = status === 'SUBMITTED';
 
       // dùng promise.all để upsert toàn bộ kết quả chi tiết
-      await Promise.all(listEnroll.map(item => {
-        const details = inputMap.get(item.ID)
+      await Promise.all(
+        listEnroll.map((item) => {
+          const details = inputMap.get(item.ID);
 
-        // Nếu status là SUBMITTED -> Bắt buộc phải có dữ liệu input
-        if (isSubmitted) {
-          if (!details) throw new NotFoundException(`Không tìm thấy học viên có ghi danh ID ${item.ID}`)
-          if (details.DiemDanh === null || details.DiemDanh === undefined)
-            throw new BadRequestException(`Học viên có ghi danh ID ${item.ID} chưa được điểm danh`)
-        }
-        // Chuẩn bị data 
-        const payLoad = {
-          DiemDanh: details?.DiemDanh ?? false,
-          NhanXetRieng: details?.NhanXetRieng ?? null,
-          Diem: details?.Diem ?? null
-        }
+          // Nếu status là SUBMITTED -> Bắt buộc phải có dữ liệu input
+          if (isSubmitted) {
+            if (!details)
+              throw new NotFoundException(
+                `Không tìm thấy học viên có ghi danh ID ${item.ID}`,
+              );
+            if (details.DiemDanh === null || details.DiemDanh === undefined)
+              throw new BadRequestException(
+                `Học viên có ghi danh ID ${item.ID} chưa được điểm danh`,
+              );
+          }
+          // Chuẩn bị data
+          const payLoad = {
+            DiemDanh: details?.DiemDanh ?? false,
+            NhanXetRieng: details?.NhanXetRieng ?? null,
+            Diem: details?.Diem ?? null,
+          };
 
-        // không có await để đưa cho promise.all
-        return tx.ketQua_ChiTiet.upsert({
-          where: {
-            KetQuaID_GhiDanhID: {
+          // không có await để đưa cho promise.all
+          return tx.ketQua_ChiTiet.upsert({
+            where: {
+              KetQuaID_GhiDanhID: {
+                KetQuaID: sessionResult.ID,
+                GhiDanhID: item.ID,
+              },
+            },
+            create: {
               KetQuaID: sessionResult.ID,
-              GhiDanhID: item.ID
-            }
-          },
-          create: {
-            KetQuaID: sessionResult.ID,
-            GhiDanhID: item.ID,
-            ...payLoad
-          },
-          update: payLoad
-        })
-      }))
+              GhiDanhID: item.ID,
+              ...payLoad,
+            },
+            update: payLoad,
+          });
+        }),
+      );
 
       // update buổi học
       await tx.buoiHoc.update({
@@ -244,62 +309,64 @@ export class SessionResultService {
           ChuDe: body.ChuDe,
           ...(isSubmitted && {
             AdminMoKhoa: false, // tắt ưu tiên nếu có
-            TrangThai: 'COMPLETED'
-          })
-        }
-      })
+            TrangThai: 'COMPLETED',
+          }),
+        },
+      });
       // Nếu là SUBMITTED -> Cập nhật trạng thái buổi học + gửi thông báo
       if (isSubmitted) {
-        await tx.lopHoc.updateMany({ // update trạng thái lớp
+        await tx.lopHoc.updateMany({
+          // update trạng thái lớp
           where: { ID: sessionDB.LopHocID, TrangThai: 'OPEN' },
           data: { TrangThai: 'RUNNING' },
-        })
+        });
         // gửi thông báo cho phụ huynh
-        await this.notisService.createMany(listParent, sessionDB, tx)
+        await this.notisService.createMany(listParent, sessionDB, tx);
       }
-    })
+    });
   }
 
   // kiểm tra quyền sở hữu và trạng thái buổi học
   private async SessionAcsessValidate(userId: number, sessionId: number) {
-    const teacherDB = await this.GetTeacherByUserId(userId)
+    const teacherDB = await this.GetTeacherByUserId(userId);
     const sessionDB = await this.prismaSv.buoiHoc.findUnique({
       where: { ID: sessionId, lophoc: { GiaoVienID: teacherDB.ID } },
       include: { lophoc: true },
-      omit: { CreatedAt: true, UpdatedAt: true }
-    })
-    if (!sessionDB) throw new NotFoundException
-      ('Không tìm thấy buổi học hoặc từ chối truy cập')
+      omit: { CreatedAt: true, UpdatedAt: true },
+    });
+    if (!sessionDB)
+      throw new NotFoundException(
+        'Không tìm thấy buổi học hoặc từ chối truy cập',
+      );
     if (sessionDB.TrangThai === 'CANCELLED')
-      throw new ConflictException(`Buổi học đã hủy`)
-    const { lophoc, ...rest } = sessionDB // tách ra để lấy tên lớp
+      throw new ConflictException(`Buổi học đã hủy`);
+    const { lophoc, ...rest } = sessionDB; // tách ra để lấy tên lớp
     return {
       sessionDB: {
         ...rest,
-        LopHoc: lophoc.TenLop
+        LopHoc: lophoc.TenLop,
       },
-      teacherId: teacherDB.ID
-    }
+      teacherId: teacherDB.ID,
+    };
   }
 
   // kiểm tra id buổi học
   private async SessionIdValidator(sessionId: number) {
     const sessionDB = await this.prismaSv.buoiHoc.findUnique({
-      where: { ID: sessionId }
-    })
-    if (!sessionDB)
-      throw new NotFoundException('Không tìm thấy buổi học')
-    return sessionDB
+      where: { ID: sessionId },
+    });
+    if (!sessionDB) throw new NotFoundException('Không tìm thấy buổi học');
+    return sessionDB;
   }
 
   // lấy giáo viên từ userId
   private async GetTeacherByUserId(userId: number) {
     const teacherDB = await this.prismaSv.giaoVien.findUnique({
-      where: { UserID: userId }
-    })
-    if (!teacherDB) throw new NotFoundException('Không tìm thấy giáo viên')
+      where: { UserID: userId },
+    });
+    if (!teacherDB) throw new NotFoundException('Không tìm thấy giáo viên');
     if (teacherDB.TrangThai === 'INACTIVE')
-      throw new ConflictException('Giáo viên đã ngừng hoạt động')
-    return teacherDB
+      throw new ConflictException('Giáo viên đã ngừng hoạt động');
+    return teacherDB;
   }
 }

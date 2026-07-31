@@ -9,9 +9,9 @@ import { EmailModule } from 'src/email/email.module';
 import { JwtRefreshStrategy } from './jwt-refresh.strategy';
 
 @Module({
-    imports: [ PrismaModule, PassportModule, SharedJWTModule, EmailModule],
-    controllers: [AuthController],
-    providers: [AuthService, JwtStrategy, JwtRefreshStrategy],
-    exports: [AuthService]
+  imports: [PrismaModule, PassportModule, SharedJWTModule, EmailModule],
+  controllers: [AuthController],
+  providers: [AuthService, JwtStrategy, JwtRefreshStrategy],
+  exports: [AuthService],
 })
-export class AuthModule { }
+export class AuthModule {}

@@ -3,28 +3,28 @@
 //     unSubmitted: UnsubmittedDTO[]
 // }
 
-import { IsNotEmpty } from "class-validator"
+import { IsNotEmpty } from 'class-validator';
 
 export class RequestUnlockDTO {
-    id!: number
-    lesson!: number
-    room!: string
-    teacher!: string
-    reason!: string
-    date!: Date
+  id!: number;
+  lesson!: number;
+  room!: string;
+  teacher!: string;
+  reason!: string;
+  date!: Date;
 }
 
 export class UnsubmittedDTO {
-    id!: number
-    lesson!: number
-    room!: string
-    teacher!: string
+  id!: number;
+  lesson!: number;
+  room!: string;
+  teacher!: string;
 }
 
 export class RemindTeacher {
-    @IsNotEmpty()
-    classId!: number
+  @IsNotEmpty()
+  classId!: number;
 
-    @IsNotEmpty()
-    sessionId!:number
+  @IsNotEmpty()
+  sessionId!: number;
 }

@@ -1,41 +1,47 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsPositive, IsString } from "class-validator";
-import { TrangThai_HD } from "src/generated/prisma/enums";
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsPositive,
+  IsString,
+} from 'class-validator';
+import { TrangThai_HD } from 'src/generated/prisma/enums';
 
 export class QueryInvoiceDTO {
-    @IsNotEmpty()
-    page!: number
+  @IsNotEmpty()
+  page!: number;
 
-    @IsOptional()
-    @IsEnum(TrangThai_HD)
-    status?: TrangThai_HD
+  @IsOptional()
+  @IsEnum(TrangThai_HD)
+  status?: TrangThai_HD;
 
-    @IsOptional()
-    q?: string
+  @IsOptional()
+  q?: string;
 
-    // @IsOptional()
-    // overdue:string
+  // @IsOptional()
+  // overdue:string
 }
 
 export class QueryTransaction {
-    page!: number
+  page!: number;
 
-    @IsOptional()
-    month?: number
+  @IsOptional()
+  month?: number;
 
-    @IsOptional()
-    year?: number
+  @IsOptional()
+  year?: number;
 }
 
 export class CreateTransactionDTO {
-    @IsNotEmpty()
-    @IsPositive()
-    amount!: number
+  @IsNotEmpty()
+  @IsPositive()
+  amount!: number;
 
-    @IsNotEmpty()
-    @IsString()
-    method!: string
+  @IsNotEmpty()
+  @IsString()
+  method!: string;
 
-    @IsOptional()
-    @IsString()
-    note?: string
+  @IsOptional()
+  @IsString()
+  note?: string;
 }

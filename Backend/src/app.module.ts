@@ -19,15 +19,25 @@ import { PaymentModule } from './modules/payment/payment.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    AuthModule, PrismaModule, TeacherModule, CourseModule, ClassModule,
-    SessionModule, StudentModule, EnrollModule, InvoiceModule, DashboardModule,
-    AppParentModule, CloudinaryModule, PaymentModule
+    AuthModule,
+    PrismaModule,
+    TeacherModule,
+    CourseModule,
+    ClassModule,
+    SessionModule,
+    StudentModule,
+    EnrollModule,
+    InvoiceModule,
+    DashboardModule,
+    AppParentModule,
+    CloudinaryModule,
+    PaymentModule,
   ],
   providers: [
     {
       provide: APP_INTERCEPTOR,
       useClass: TransformInterceptor,
     },
-  ]
+  ],
 })
-export class AppModule { }
+export class AppModule {}

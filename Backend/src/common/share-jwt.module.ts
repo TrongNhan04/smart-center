@@ -1,16 +1,17 @@
-import { Module } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { JwtModule } from "@nestjs/jwt";
+import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-    imports: [
-        JwtModule.registerAsync({// dùng async vì dùng register thì configService chưa load
-            inject: [ConfigService],// file .env đã đưa cho JwtModule ký jwt
-            useFactory: async (configService: ConfigService) => ({
-                secret: configService.get<string>('JWT_SECRET')
-            })
-        })
-    ],
-    exports: [JwtModule]
+  imports: [
+    JwtModule.registerAsync({
+      // dùng async vì dùng register thì configService chưa load
+      inject: [ConfigService], // file .env đã đưa cho JwtModule ký jwt
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+      }),
+    }),
+  ],
+  exports: [JwtModule],
 })
-export class SharedJWTModule { }
+export class SharedJWTModule {}

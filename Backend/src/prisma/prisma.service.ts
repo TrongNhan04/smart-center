@@ -4,11 +4,16 @@ import { Pool } from 'pg';
 import { PrismaClient } from 'src/generated/prisma/client';
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+export class PrismaService
+  extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
   constructor() {
     const connectionString = process.env.DATABASE_URL;
     if (!connectionString) {
-      throw new Error('DATABASE_URL is missing. Check your .env and ConfigModule.');
+      throw new Error(
+        'DATABASE_URL is missing. Check your .env and ConfigModule.',
+      );
     }
 
     const pool = new Pool({ connectionString });

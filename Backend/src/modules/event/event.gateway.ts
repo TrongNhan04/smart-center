@@ -1,11 +1,11 @@
-import { WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { Server } from 'socket.io'
+import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { Server } from 'socket.io';
 @WebSocketGateway({
-    cors: {
-        origin: '*',
-    }
+  cors: {
+    origin: '*',
+  },
 })
 export class EventGateway {
-    @WebSocketServer()
-    server!: Server;
+  @WebSocketServer()
+  server!: Server;
 }
