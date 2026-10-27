@@ -64,8 +64,8 @@ smart-center/
 
 ### 3. Phụ huynh (Parent Mobile App)
 <p align="center"> 
-  <img width="280" alt="Kết quả buổi học" src="https://github.com/user-attachments/assets/befa9048-7372-491d-bca7-0fee8f99ccae" />&nbsp;&nbsp;&nbsp;
-  <img width="280" alt="Danh sách hóa đơn" src="https://github.com/user-attachments/assets/6f5d7a5c-5cd5-475d-9e8d-4866100fc2b1" />&nbsp;&nbsp;&nbsp;
+  <img width="280" alt="Kết quả buổi học" src="https://github.com/user-attachments/assets/befa9048-7372-491d-bca7-0fee8f99ccae" />&nbsp;&nbsp;
+  <img width="280" alt="Danh sách hóa đơn" src="https://github.com/user-attachments/assets/6f5d7a5c-5cd5-475d-9e8d-4866100fc2b1" />&nbsp;&nbsp;
   <img width="280" alt="Thanh toán QR" src="https://github.com/user-attachments/assets/b7ae9ece-995e-4544-be9f-3bf7682a3e1f" />
 </p>
 
