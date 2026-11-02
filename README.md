@@ -167,4 +167,4 @@ EMAIL_PASS="your_app_password"
 
 * **Đoàn Trọng Nhân**
 * **GitHub:** [@TrongNhan04](https://github.com/TrongNhan04)
-* **Email:** [doantrongnhan04]@gmail.com
+* **Email:** doantrongnhan04@gmail.com
